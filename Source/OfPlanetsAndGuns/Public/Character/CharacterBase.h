@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"			//GAS_Plugin
 #include "AbilitySystemInterface.h"			//GAS_Plugin
 #include "Abilities/GameplayAbility.h"		//GAS_Plugin
+#include <EnhancedInput/Public/EnhancedInputLibrary.h>
 #include "CharacterBase.generated.h"
 
 class UBaseAttributeSet;
@@ -59,5 +60,8 @@ public:
 		void OnManaChanged(float OldValue, float NewValue);												//GAS_Plugin
 	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")								//GAS_Plugin
 		void OnStaminaChanged(float OldValue, float NewValue);											//GAS_Plugin
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterBase")
+		UInputMappingContext* MappingContext;
 
 };
