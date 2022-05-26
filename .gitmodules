@@ -1,3 +1,6 @@
 [submodule "Plugins/UEGitPlugin"]
 	path = Plugins/UEGitPlugin
 	url = https://github.com/ProjectBorealis/UEGitPlugin.git
+[submodule "Plugins/DonAINavigation"]
+	path = Plugins/DonAINavigation
+	url = https://github.com/FAUSheppy/DonAINavigation.git
