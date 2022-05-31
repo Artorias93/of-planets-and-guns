@@ -14,9 +14,13 @@ struct FLevelOffset : public FTableRowBase
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FName LevelName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Exits;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FTransform Offset;
+
 };
