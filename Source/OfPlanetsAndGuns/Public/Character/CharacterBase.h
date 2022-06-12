@@ -49,10 +49,13 @@ public:
 		void GetManaValues(float& Mana, float& MaxMana);												//GAS_Plugin
 	UFUNCTION(BlueprintPure, Category = "CharacterBase")												//GAS_Plugin
 		void GetStaminaValues(float& Stamina, float& MaxStamina);										//GAS_Plugin
+	UFUNCTION(BlueprintPure, Category = "CharacterBase")												//GAS_Plugin
+		void GetDamagedValues(float& Damaged);										//GAS_Plugin
 
 	void OnHealthChangedNative(const FOnAttributeChangeData& Data);									//GAS_Plugin
 	void OnManaChangedNative(const FOnAttributeChangeData& Data);									//GAS_Plugin
 	void OnStaminaChangedNative(const FOnAttributeChangeData& Data);								//GAS_Plugin
+	void OnDamagedChangedNative(const FOnAttributeChangeData& Data);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")								//GAS_Plugin
 		void OnHealthChanged(float OldValue, float NewValue);											//GAS_Plugin
@@ -60,8 +63,9 @@ public:
 		void OnManaChanged(float OldValue, float NewValue);												//GAS_Plugin
 	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")								//GAS_Plugin
 		void OnStaminaChanged(float OldValue, float NewValue);											//GAS_Plugin
+	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")								//GAS_Plugin
+		void OnDamagedChanged(float OldValue, float NewValue);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterBase")
 		UInputMappingContext* MappingContext;
-
 };

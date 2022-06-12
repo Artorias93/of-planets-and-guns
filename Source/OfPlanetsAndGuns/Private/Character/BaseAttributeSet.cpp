@@ -29,3 +29,8 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
 	}
 }
+
+void UBaseAttributeSet::SetTesting(float Damage)
+{
+	SetDamaged(Damage);
+}
