@@ -14,9 +14,6 @@ GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
-/**
- *
- */
 UCLASS()
 class OFPLANETSANDGUNS_API UBaseAttributeSet : public UAttributeSet
 {
@@ -54,6 +51,13 @@ public:
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BaseAttribute")
 		FGameplayAttributeData MaxStamina;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MaxStamina)
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BaseAttribute")
+		FGameplayAttributeData Damaged;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Damaged)
+
+	UFUNCTION(BlueprintCallable)
+	void SetTesting(float Damage);
 
 		void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 };

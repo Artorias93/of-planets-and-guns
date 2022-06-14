@@ -24,6 +24,7 @@ void ACharacterBase::BeginPlay()
 		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetHealthAttribute()).AddUObject(this, &ACharacterBase::OnHealthChangedNative);			//GAS_Plugin
 		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetManaAttribute()).AddUObject(this, &ACharacterBase::OnManaChangedNative);				//GAS_Plugin
 		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetStaminaAttribute()).AddUObject(this, &ACharacterBase::OnStaminaChangedNative);			//GAS_Plugin
+		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetDamagedAttribute()).AddUObject(this, &ACharacterBase::OnDamagedChangedNative);			//GAS_Plugin
 	}
 }
 
@@ -81,6 +82,11 @@ void ACharacterBase::GetStaminaValues(float& Stamina, float& MaxStamina)
 	MaxStamina = BaseAttributeSetComp->GetMaxStamina();
 }
 
+void ACharacterBase::GetDamagedValues(float& Damaged)
+{
+	Damaged = BaseAttributeSetComp->GetDamaged();
+}
+
 //GAS_Plugin
 void ACharacterBase::OnHealthChangedNative(const FOnAttributeChangeData& Data)
 {
@@ -99,3 +105,7 @@ void ACharacterBase::OnStaminaChangedNative(const FOnAttributeChangeData& Data)
 	OnStaminaChanged(Data.OldValue, Data.NewValue);
 }
 
+void ACharacterBase::OnDamagedChangedNative(const FOnAttributeChangeData& Data)
+{
+	OnDamagedChanged(Data.OldValue, Data.NewValue);
+}
