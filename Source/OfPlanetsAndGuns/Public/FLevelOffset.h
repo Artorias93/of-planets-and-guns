@@ -18,7 +18,10 @@ struct FLevelOffset : public FTableRowBase
 		FName LevelName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int Exits;
+		int ExitCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExit))
+		int32 ExitSides;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FTransform Offset;
