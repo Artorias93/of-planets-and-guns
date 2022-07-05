@@ -18,6 +18,9 @@ struct FLevelOffset : public FTableRowBase
 		FName LevelName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int ExitCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExit))
