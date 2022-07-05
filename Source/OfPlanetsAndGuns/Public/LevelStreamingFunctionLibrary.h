@@ -7,12 +7,6 @@
 #include "FLevelOffset.h"
 #include "LevelStreamingFunctionLibrary.generated.h"
 
-/**
- * 
- */
-
-
-
 UCLASS()
 class OFPLANETSANDGUNS_API ULevelStreamingFunctionLibrary : public UBlueprintFunctionLibrary
 {
@@ -20,5 +14,5 @@ class OFPLANETSANDGUNS_API ULevelStreamingFunctionLibrary : public UBlueprintFun
 public:
 
 	UFUNCTION(BlueprintCallable)
-		static bool AddToDataTable(UPARAM(Ref) FLevelOffset& levelOffsetRow, UDataTable* dataTable);
+	static bool AddToDataTable(UPARAM(Ref) FLevelOffset& levelOffsetRow, UDataTable* dataTable);
 };
