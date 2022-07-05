@@ -59,5 +59,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTesting(float Damage);
 
+	UFUNCTION(BlueprintCallable)
+	void SetTestingHealth(float HealthValue);
+
+	UFUNCTION(BlueprintCallable)
+	void SetTestingMaxHealth(float HealthValue);
+
 		void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 };

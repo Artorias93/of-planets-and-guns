@@ -34,3 +34,13 @@ void UBaseAttributeSet::SetTesting(float Damage)
 {
 	SetDamaged(Damage);
 }
+
+void UBaseAttributeSet::SetTestingHealth(float HealthValue)
+{
+	SetHealth(HealthValue);
+}
+
+void UBaseAttributeSet::SetTestingMaxHealth(float HealthValue)
+{
+	SetMaxHealth(HealthValue);
+}
