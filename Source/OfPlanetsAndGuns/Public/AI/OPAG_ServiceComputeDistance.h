@@ -11,5 +11,5 @@ class OFPLANETSANDGUNS_API UOPAG_ServiceComputeDistance : public UBTService_Blac
 
 public:
 	UOPAG_ServiceComputeDistance(FObjectInitializer const& ObjectInitializer);
-	void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds);
+	void TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory, float DeltaSeconds);
 };
