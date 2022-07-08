@@ -20,10 +20,10 @@ void UOPAG_GameInstance::BindEvents()
 void UOPAG_GameInstance::LoadGenerationTable()
 {
 	FString context;
-	//StageGenerationTable->GetAllRows<FOPAG_StageGeneration>(context, StageGens);
+	StageGenerationTable->GetAllRows<FOPAG_StageGeneration>(context, StageGens);
 
 	//sort by StageIndex
-	//StageGens.Sort();
+	StageGens.Sort();
 }
 
 void UOPAG_GameInstance::Init()
@@ -41,7 +41,7 @@ void UOPAG_GameInstance::OnStageManagerReady()
 {
 
 
-	//GetEventManager()->GenerateStage.Broadcast(*StageGens[0]);
+	GetEventManager()->GenerateStage.Broadcast(*StageGens[0]);
 }
 
 void UOPAG_GameInstance::OnStageLoaded()
