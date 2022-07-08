@@ -13,16 +13,11 @@ void AOPAG_GameplayHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("1"));
-
 	if (PlayerViewWidgetClass)
 	{
 		PlayerViewWidget = CreateWidget<UOPAG_UWPlayerView>(GetWorld(), PlayerViewWidgetClass);
 
-		UE_LOG(LogTemp, Warning, TEXT("2"));
-
 		if (PlayerViewWidget) {
-			UE_LOG(LogTemp, Warning, TEXT("3"));
 			PlayerViewWidget->AddToViewport(1);
 		}
 	}

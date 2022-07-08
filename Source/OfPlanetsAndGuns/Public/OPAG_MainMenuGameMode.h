@@ -13,5 +13,7 @@ UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_MainMenuGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+	AOPAG_MainMenuGameMode();
+
 };
