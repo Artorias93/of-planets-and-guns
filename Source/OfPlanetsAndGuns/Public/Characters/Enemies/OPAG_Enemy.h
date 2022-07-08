@@ -8,9 +8,18 @@ UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Enemy : public AOPAG_CharacterBase
 {
 	GENERATED_BODY()
+
+	//Variables
 	
 public:
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	class UBehaviorTree* BehaviorTree;
+
+	//Functions
+
+public:
+
+	void UpdateSpeed(float NewSpeed);
+
 };

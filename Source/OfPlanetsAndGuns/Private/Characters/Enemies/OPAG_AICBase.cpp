@@ -13,7 +13,6 @@
 AOPAG_AICBase::AOPAG_AICBase()
 {
 	bStartAILogicOnPossess = true;
-	//bStopAILogicOnUnposses = true;
 
 	//Components Setup
 	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("AIC Blackboard Component"));
@@ -32,14 +31,13 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionComp->ConfigureSense(*PerceptionSightConfig);
 	PerceptionComp->ConfigureSense(*PerceptionDamageConfig);
 	PerceptionComp->SetDominantSense(PerceptionSightConfig->GetSenseImplementation());
-
 }
 
 void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 {
 	Super::OnPossess(ControlledPawn);
 
-	AOPAG_Enemy* ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
+	AOPAG_Enemy* const ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
 	if(ControlledEnemy && ControlledEnemy->BehaviorTree)
 	{
 		BlackboardComponent->InitializeBlackboard(*ControlledEnemy->BehaviorTree->BlackboardAsset);
@@ -52,7 +50,7 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 void AOPAG_AICBase::OnSightUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
 	//The sight sense only reacts to the player character
-	if (AOPAG_Player* Player = Cast<AOPAG_Player>(UpdatedActor))
+	if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))
 	{
 		if (Stimulus.WasSuccessfullySensed())
 		{

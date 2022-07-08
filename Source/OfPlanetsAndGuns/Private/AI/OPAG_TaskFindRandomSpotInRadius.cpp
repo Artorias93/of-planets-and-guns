@@ -12,28 +12,34 @@ UOPAG_TaskFindRandomSpotInRadius::UOPAG_TaskFindRandomSpotInRadius(FObjectInitia
 
 EBTNodeResult::Type UOPAG_TaskFindRandomSpotInRadius::ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
-	AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner());
-
-	if (AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
+	if(AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		FVector ActorLocation = Enemy->GetActorLocation();
-		if (UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
+		if (AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 		{
-			//Gets the random point and writes it on the blackboard
-			FVector PatrolLocation = NavSystem->GetRandomReachablePointInRadius(GetWorld(), ActorLocation, PatrolRadius);
-			AIController->GetBlackboardComponent()->SetValueAsVector("PatrolLocation", PatrolLocation);
+			FVector ActorLocation = Enemy->GetActorLocation();
+			if (UNavigationSystemV1* const NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
+			{
+				//Gets the random point and writes it on the blackboard
+				FVector PatrolLocation = NavSystem->GetRandomReachablePointInRadius(GetWorld(), ActorLocation, PatrolRadius);
+				AIController->GetBlackboardComponent()->SetValueAsVector("PatrolLocation", PatrolLocation);
+			}
+			else
+			{
+				FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
+				return EBTNodeResult::Failed;
+			}
+			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Succeeded);
+			return EBTNodeResult::Succeeded;
 		}
 		else
 		{
 			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 			return EBTNodeResult::Failed;
 		}
-		FinishLatentTask(OwnerBTComponent, EBTNodeResult::Succeeded);
-		return EBTNodeResult::Succeeded;
 	}
 	else
 	{
 		FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 		return EBTNodeResult::Failed;
-	}
+	}	
 }

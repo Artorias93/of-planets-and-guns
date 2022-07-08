@@ -59,6 +59,5 @@ public:
 	void OnPossess(APawn* ControlledPawn);
 	
 	UFUNCTION()
-	void OnSightUpdated(AActor* UpdatedActor, FAIStimulus Stimulus);	
-
+	void OnSightUpdated(AActor* UpdatedActor, FAIStimulus Stimulus);
 };

@@ -19,6 +19,10 @@ public:
 	//Functions
 
 public:
+
 	UOPAG_TaskFindRandomSpotInRadius(FObjectInitializer const& ObjectInitializer);
+
+private:
+
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 };

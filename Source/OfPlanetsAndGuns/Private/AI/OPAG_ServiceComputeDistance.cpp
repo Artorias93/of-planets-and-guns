@@ -1,10 +1,12 @@
 #include "AI/OPAG_ServiceComputeDistance.h"
-#include "AIController.h"
+#include "Characters/Enemies/OPAG_AICBase.h"
+#include "Characters/Player/OPAG_Player.h"
 //Components
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
-//BT Service: Computes distance between itself and BB's TargetActor, saving the result in BB's EnemyDistance
+//BT Service: Computes distance between itself and BB's TargetActor (the player), 
+//saving the result in BB's EnemyDistance
 
 UOPAG_ServiceComputeDistance::UOPAG_ServiceComputeDistance(FObjectInitializer const& ObjectInitializer)
 {
@@ -16,14 +18,15 @@ void UOPAG_ServiceComputeDistance::TickNode(UBehaviorTreeComponent& OwnerBTCompo
 {
 	Super::TickNode(OwnerBTComponent, NodeMemory, DeltaSeconds);
 
-	AAIController* AIController = Cast<AAIController>(OwnerBTComponent.GetAIOwner());
-
-	if(AActor* OtherActor = Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject("TargetActor")))
+	if(AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		FVector SelfLocation = AIController->GetPawn()->GetActorLocation();
-		FVector OtherLocation = OtherActor->GetActorLocation();
-		float ActorsDistance = FVector::Distance(SelfLocation, OtherLocation);
+		if (AOPAG_Player* const PlayerActor = Cast<AOPAG_Player>(AIController->GetBlackboardComponent()->GetValueAsObject("TargetActor")))
+		{
+			FVector SelfLocation = AIController->GetPawn()->GetActorLocation();
+			FVector PlayerLocation = PlayerActor->GetActorLocation();
+			float ActorsDistance = FVector::Distance(SelfLocation, PlayerLocation);
 
-		AIController->GetBlackboardComponent()->SetValueAsFloat("EnemyDistance", ActorsDistance);
-	}
+			AIController->GetBlackboardComponent()->SetValueAsFloat("EnemyDistance", ActorsDistance);
+		}
+	}	
 }
