@@ -1,10 +1,35 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
+
+#include "Weapons/Guns/OPAG_GunBase.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "OPAG_ModuleBase.generated.h"
+
+class USphereComponent;
+class UStaticMeshComponent;
+class AOPAG_GunBase;
+
+UENUM(BlueprintType)
+enum EModuleTypes 
+{
+	Barrel,
+	Stock,
+	Grip,
+	Magazine,
+	Sight,
+	Accessory,
+};
+
+UENUM(BlueprintType)
+enum EModuleRarity
+{
+	Common,
+	Uncommon,
+	Rare,
+	Epic,
+	Legendary,
+};
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_ModuleBase : public AActor
@@ -12,15 +37,34 @@ class OFPLANETSANDGUNS_API AOPAG_ModuleBase : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AOPAG_ModuleBase();
 
+	UPROPERTY(Category = "Module", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* SphereComponent;
+
+	UPROPERTY(Category = "Module", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* Mesh;
+
+public:
+	UPROPERTY(Category = "Module", VisibleAnywhere, BlueprintReadWrite)
+	TEnumAsByte<EModuleTypes> Type;
+
+	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<EModuleRarity> Rarity;
+
+	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
+	FGunStats Stats;
+
+	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
+	EFireTypes EquippableFireTypes;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
+	virtual void OnAttach(EModuleRarity NewRarity);
+
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 };

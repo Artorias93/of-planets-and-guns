@@ -1,27 +1,35 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Weapons/Modules/OPAG_ModuleBase.h"
+#include "Components/SphereComponent.h"
+#include "Components/StaticMeshComponent.h"
 
-// Sets default values
 AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	SphereComponent->SetSphereRadius(32.f);
+	SphereComponent->SetCollisionProfileName("Weapon");
+	RootComponent = SphereComponent;
+
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
+	Mesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
+	Mesh->SetCollisionProfileName("NoCollision");
+	Mesh->SetupAttachment(RootComponent);
 }
 
-// Called when the game starts or when spawned
 void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void AOPAG_ModuleBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
+void AOPAG_ModuleBase::OnAttach(EModuleRarity NewRarity)
+{
+	Rarity = NewRarity;
+}
