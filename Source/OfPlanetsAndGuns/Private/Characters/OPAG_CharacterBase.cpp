@@ -1,15 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Characters/OPAG_CharacterBase.h"
 #include "Character/BaseAttributeSet.h"			//GAS_Plugin
 
-
-// Sets default values
 AOPAG_CharacterBase::AOPAG_CharacterBase()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");			//GAS_Plugin
 }
 
@@ -27,13 +21,6 @@ void AOPAG_CharacterBase::BeginPlay()
 		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetStaminaAttribute()).AddUObject(this, &AOPAG_CharacterBase::OnStaminaChangedNative);			//GAS_Plugin
 		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetDamagedAttribute()).AddUObject(this, &AOPAG_CharacterBase::OnDamagedChangedNative);			//GAS_Plugin
 	}
-}
-
-// Called every frame
-void AOPAG_CharacterBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -83,6 +70,7 @@ void AOPAG_CharacterBase::GetStaminaValues(float& Stamina, float& MaxStamina)
 	MaxStamina = BaseAttributeSetComp->GetMaxStamina();
 }
 
+//GAS_Plugin
 void AOPAG_CharacterBase::GetDamagedValues(float& Damaged)
 {
 	Damaged = BaseAttributeSetComp->GetDamaged();
@@ -106,6 +94,7 @@ void AOPAG_CharacterBase::OnStaminaChangedNative(const FOnAttributeChangeData& D
 	OnStaminaChanged(Data.OldValue, Data.NewValue);
 }
 
+//GAS_Plugin
 void AOPAG_CharacterBase::OnDamagedChangedNative(const FOnAttributeChangeData& Data)
 {
 	OnDamagedChanged(Data.OldValue, Data.NewValue);

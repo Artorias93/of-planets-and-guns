@@ -1,14 +1,14 @@
 #include "Characters/Enemies/OPAG_AICBase.h"
-#include "Characters/Enemies/OPAG_Enemy.h"
-#include "Characters/Player/OPAG_Player.h"
-#include "BehaviorTree/BehaviorTree.h"
 #include "TimerManager.h"
-//Components
+#include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Damage.h"
+//My classes
+#include "Characters/Enemies/OPAG_Enemy.h"
+#include "Characters/Player/OPAG_Player.h"
 
 AOPAG_AICBase::AOPAG_AICBase()
 {
@@ -22,6 +22,7 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
 	PerceptionSightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AI Sight Config"));
 	PerceptionDamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("AI Damage Config"));
+	//TODO: Move this setup in the specialized sub-classes
 	PerceptionSightConfig->SightRadius = 3000.f;
 	PerceptionSightConfig->LoseSightRadius = 3500.f;
 	PerceptionSightConfig->PeripheralVisionAngleDegrees = 90.0f;
@@ -43,11 +44,11 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 		BlackboardComponent->InitializeBlackboard(*ControlledEnemy->BehaviorTree->BlackboardAsset);
 		BehaviorTreeComponent->StartTree(*ControlledEnemy->BehaviorTree);
 
-		PerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AOPAG_AICBase::OnSightUpdated);
+		PerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AOPAG_AICBase::OnPerceptionUpdated);
 	}
 }
 
-void AOPAG_AICBase::OnSightUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
+void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
 	//The sight sense only reacts to the player character
 	if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))

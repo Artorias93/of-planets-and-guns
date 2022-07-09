@@ -1,8 +1,10 @@
 #include "AI/OPAG_TaskFindRandomSpotInRadius.h"
-#include "Characters/Enemies/OPAG_AICBase.h"
-#include "Characters/Enemies/OPAG_Enemy.h"
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "BlueprintNodeHelpers.h"
+//My Classes
+#include "Characters/Enemies/OPAG_AICBase.h"
+#include "Characters/Enemies/OPAG_Enemy.h"
 
 UOPAG_TaskFindRandomSpotInRadius::UOPAG_TaskFindRandomSpotInRadius(FObjectInitializer const& ObjectInitializer)
 {
@@ -21,7 +23,7 @@ EBTNodeResult::Type UOPAG_TaskFindRandomSpotInRadius::ExecuteTask(UBehaviorTreeC
 			{
 				//Gets the random point and writes it on the blackboard
 				FVector PatrolLocation = NavSystem->GetRandomReachablePointInRadius(GetWorld(), ActorLocation, PatrolRadius);
-				AIController->GetBlackboardComponent()->SetValueAsVector("PatrolLocation", PatrolLocation);
+				AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyPatrolLocation.SelectedKeyName, PatrolLocation);
 			}
 			else
 			{

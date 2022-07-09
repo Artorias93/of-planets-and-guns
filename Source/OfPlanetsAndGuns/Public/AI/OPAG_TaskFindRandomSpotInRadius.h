@@ -1,22 +1,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
+#include "BehaviorTree/BTTaskNode.h"
 #include "OPAG_TaskFindRandomSpotInRadius.generated.h"
 
 UCLASS()
-class OFPLANETSANDGUNS_API UOPAG_TaskFindRandomSpotInRadius : public UBTTask_BlackboardBase
+class OFPLANETSANDGUNS_API UOPAG_TaskFindRandomSpotInRadius : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
-	//Variables
-
-public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-	float PatrolRadius;
-
+	/////////////////////////////
 	//Functions
+	/////////////////////////////
 
 public:
 
@@ -25,4 +20,16 @@ public:
 private:
 
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	/////////////////////////////
+	//Variables
+	/////////////////////////////
+
+public:
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard Keys")
+	FBlackboardKeySelector BBKeyPatrolLocation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Values")
+	float PatrolRadius;
 };
