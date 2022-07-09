@@ -51,12 +51,14 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
 	//The sight sense only reacts to the player character
-	if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))
+	//TODO: Swap these when OPAG_Player is ready
+	//if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))
+	if (ACharacter* const Player = Cast<ACharacter>(UpdatedActor))
 	{
 		if (Stimulus.WasSuccessfullySensed())
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LoseSightTimerHandle);
-			GetBlackboardComponent()->SetValueAsObject("EnemyActor", Player);
+			GetBlackboardComponent()->SetValueAsObject("TargetActor", Player);
 			SetFocus(Player, EAIFocusPriority::Gameplay);
 		}
 		else
@@ -68,6 +70,6 @@ void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimul
 
 void AOPAG_AICBase::LoseTarget()
 {
-	GetBlackboardComponent()->SetValueAsObject("EnemyActor", nullptr);
+	GetBlackboardComponent()->SetValueAsObject("TargetActor", nullptr);
 	ClearFocus(EAIFocusPriority::Gameplay);
 }
