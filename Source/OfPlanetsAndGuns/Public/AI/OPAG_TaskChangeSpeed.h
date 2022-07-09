@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
+#include "OPAG_TaskBase.h"
 #include "OPAG_TaskChangeSpeed.generated.h"
 
 UCLASS()
-class OFPLANETSANDGUNS_API UOPAG_TaskChangeSpeed : public UBTTaskNode
+class OFPLANETSANDGUNS_API UOPAG_TaskChangeSpeed : public UOPAG_TaskBase
 {
 	GENERATED_BODY()
 

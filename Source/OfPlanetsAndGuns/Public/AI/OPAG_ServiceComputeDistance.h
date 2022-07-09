@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/Services/BTService_BlackboardBase.h"
+#include "OPAG_ServiceBase.h"
 #include "OPAG_ServiceComputeDistance.generated.h"
 
 UCLASS()
-class OFPLANETSANDGUNS_API UOPAG_ServiceComputeDistance : public UBTService
+class OFPLANETSANDGUNS_API UOPAG_ServiceComputeDistance : public UOPAG_ServiceBase
 {
 	GENERATED_BODY()
 

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BehaviorTree/BTTaskNode.h"
+#include "OPAG_TaskBase.h"
 #include "OPAG_TaskFindRandomSpotInRadius.generated.h"
 
 UCLASS()
-class OFPLANETSANDGUNS_API UOPAG_TaskFindRandomSpotInRadius : public UBTTaskNode
+class OFPLANETSANDGUNS_API UOPAG_TaskFindRandomSpotInRadius : public UOPAG_TaskBase
 {
 	GENERATED_BODY()
 	
