@@ -12,15 +12,15 @@ struct FOPAG_StageGeneration : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
-		int StageIndex;
+		int32 StageIndex;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pathing)
-		int	TargetWeight;
+		int32 TargetWeight;
 	/** How many rooms out it will keep geometry loaded in */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level Streaming")
-		int	FarthestLoad;
+		int32	FarthestLoad;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Data")
-		int	MaxDoubleExitRooms;
+		int32	MaxDoubleExitRooms;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Data")
 		UDataTable* RoomTable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Data")

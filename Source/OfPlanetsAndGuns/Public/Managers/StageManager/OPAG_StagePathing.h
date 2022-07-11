@@ -15,7 +15,9 @@ struct FOPAG_StagePathing// : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FOPAG_StreamingRoom* CurrentRoom;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int PrevRoomID;
+		int32 PrevRoomID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<int> NextRoomIDs;
+		TArray<int32> NextRoomIDs;
+
+	~FOPAG_StagePathing() { delete CurrentRoom; };
 };

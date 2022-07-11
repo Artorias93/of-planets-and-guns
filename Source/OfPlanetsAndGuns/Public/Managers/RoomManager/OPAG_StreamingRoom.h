@@ -14,7 +14,7 @@ struct FOPAG_StreamingRoom : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int ID;
+		int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ULevelStreamingDynamic* LevelStreaming;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

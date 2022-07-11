@@ -10,6 +10,16 @@
  *
  */
 
+UENUM(BlueprintType, Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class ERoomExits : uint8
+{
+	None = 0x00,
+	Left = 0x01,
+	Right = 0x02
+};
+ENUM_CLASS_FLAGS(ERoomExits);
+
+
 USTRUCT(BlueprintType)
 struct FOPAG_RoomOffset : public FTableRowBase
 {
@@ -24,8 +34,9 @@ struct FOPAG_RoomOffset : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 ExitCount;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExit))
-		int32 ExitSides;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExits))
+		uint8 ExitSides;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FTransform Offset;
