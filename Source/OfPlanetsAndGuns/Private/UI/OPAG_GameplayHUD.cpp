@@ -47,4 +47,31 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		PauseViewWidget = CreateWidget<UOPAG_UWPauseView>(GetWorld(), PauseViewWidgetClass);
 	}
+
+	//Reference to EventManager?
+	//EventManager->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
+}
+
+void AOPAG_GameplayHUD::ShowPauseView() {
+
+	//Cache a FirstPlayerController reference?
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+
+	if (PauseViewWidget) {
+		PauseViewWidget->AddToViewport(2);
+	}
+}
+
+void AOPAG_GameplayHUD::HidePauseView() {
+
+	//Cache a FirstPlayerController reference?
+	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+
+	if (PauseViewWidget) {
+		PauseViewWidget->RemoveFromViewport();
+	}
+
+	//Event Dispatch->ResumeGame Event! (to Event Manager?)
 }

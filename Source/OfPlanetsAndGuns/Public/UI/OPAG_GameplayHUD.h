@@ -36,4 +36,9 @@ private:
 
 public:
 	virtual void DrawHUD() override;
+
+	UFUNCTION()
+	void ShowPauseView();
+	UFUNCTION()
+	void HidePauseView();
 };

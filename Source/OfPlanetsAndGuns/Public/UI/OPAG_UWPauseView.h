@@ -27,4 +27,14 @@ class OFPLANETSANDGUNS_API UOPAG_UWPauseView : public UUserWidget
 		UButton* OptionsButton;
 	UPROPERTY(meta = (BindWidget))
 		UButton* ExitButton;
+
+public:
+	void NativeConstruct();
+
+	UFUNCTION()
+		void ContinueButtonClicked();
+	UFUNCTION()
+		void OptionsButtonClicked(); 
+	UFUNCTION()
+		void ExitButtonClicked();
 };
