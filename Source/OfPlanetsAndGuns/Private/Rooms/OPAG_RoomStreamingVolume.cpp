@@ -16,6 +16,7 @@ AOPAG_RoomStreamingVolume::AOPAG_RoomStreamingVolume()
 	Volume = CreateDefaultSubobject<UBoxComponent>("Volume");
 	RootComponent = Volume;
 	Volume->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_RoomStreamingVolume::OnOverlapBegin);
+	Volume->OnComponentEndOverlap.AddDynamic(this, &AOPAG_RoomStreamingVolume::OnOverlapEnd);
 }
 
 // Called when the game starts or when spawned
@@ -39,6 +40,15 @@ void AOPAG_RoomStreamingVolume::Tick(float DeltaTime)
 void AOPAG_RoomStreamingVolume::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator())
+	if (GetWorld() && GetWorld()->GetFirstPlayerController() &&
+		OtherActor == GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator())
 		EventManager->EnteredRoomStreamingVolume.Broadcast(this);
+}
+
+void AOPAG_RoomStreamingVolume::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (GetWorld() && GetWorld()->GetFirstPlayerController() &&
+		OtherActor == GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator())
+		EventManager->LeftRoomStreamingVolume.Broadcast();
 }

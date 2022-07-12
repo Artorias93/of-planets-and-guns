@@ -61,6 +61,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay)
 		bool bDisableLevelUnloading;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSoftClassPtr<APawn> Pawn;
 	// Sets default values for this actor's properties
 	AOPAG_StageManager();
 
@@ -90,15 +92,18 @@ private:
 	int32 AddRandomBridge(FOPAG_StagePathing* Room, bool SecondaryExit = false);
 
 	void FinishedLoadingStage();
+	UFUNCTION()
 	void OnRoomSpawned(AOPAG_RoomManager* const RoomManager);
 
 	FOPAG_StagePathing* FindPathingToAssign(const ULevel* Level);
 	void AddRoom(int32 ID, AOPAG_RoomAttachPoint* AttachPoint);
+	static void GetAppliedTransform(const FTransform& PreviousEnd, const FTransform& NextStart, 
+		FTransform& OutAppliedTransform);
 
 	void PostRoomLoadingActions();
 
 	void LoadGeometryRooms();
-	void AddGeometryRoom(int32 ID, FName GeometryName);
+	void AddGeometryRoom(int32 ID, TSoftObjectPtr<UWorld> GeometryLevel);
 
 	void AssignVolumes();
 	void AddLevelsToVolume(AOPAG_RoomStreamingVolume* Volume, uint32 ID);
@@ -109,7 +114,9 @@ private:
 
 	void AssignClosedExits();
 	void ReplacePawn();
+	UFUNCTION()
 	void LoadLevels(AOPAG_RoomStreamingVolume* const Volume);
+	UFUNCTION()
 	void UnloadLevels();
 
 	void ScreenLog(FString Message, EMessageSeverity::Type Severity);

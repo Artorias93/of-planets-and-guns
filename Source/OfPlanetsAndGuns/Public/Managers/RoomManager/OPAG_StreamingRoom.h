@@ -16,7 +16,7 @@ struct FOPAG_StreamingRoom : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		ULevelStreamingDynamic* LevelStreaming;
+		ULevelStreamingDynamic* LevelStreaming = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FOPAG_RoomOffset RoomOffset;
 };

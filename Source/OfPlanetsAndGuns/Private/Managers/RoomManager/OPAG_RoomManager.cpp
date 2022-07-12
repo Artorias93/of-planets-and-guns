@@ -3,33 +3,24 @@
 
 #include "Managers/RoomManager/OPAG_RoomManager.h"
 
+#include "EngineUtils.h"
+#include "Engine/LevelStreaming.h"
 #include "GameFramework/GameStateBase.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Managers/RoomManager/OPAG_RoomOffset.h"
 #include "Rooms/OPAG_RoomAttachPoint.h"
+#include "Rooms/OPAG_RoomStreamingVolume.h"
+
 
 // Sets default values
 AOPAG_RoomManager::AOPAG_RoomManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	const auto world = AActor::GetWorld();
-	if (world != nullptr)
-	{
-		const auto gameState = world->GetGameState();;
-		if (gameState != nullptr && gameState->HasBegunPlay())
-		{
-			UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
-			if (GI)
-			{
-				GI->GetEventManager()->RoomSpawned.Broadcast(this);
-				return;
-			}
-		}
-	}
 	
-	UpdateData();
+	//UpdateData();
 }
 
 void AOPAG_RoomManager::SetExitAsSpecial(bool bIsLastRoom, bool bHasSafeRoom) const
@@ -49,21 +40,88 @@ void AOPAG_RoomManager::BeginPlay()
 	
 }
 
+void AOPAG_RoomManager::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+	const auto world = AActor::GetWorld();
+	if (world != nullptr)
+	{
+		const auto gameState = world->GetGameState();;
+		if (gameState != nullptr && gameState->HasBegunPlay())
+		{
+			UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
+			if (GI)
+			{
+				GI->GetEventManager()->RoomSpawned.Broadcast(this);
+				return;
+			}
+		}
+	}
+}
+
 // Called every frame
 void AOPAG_RoomManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AOPAG_RoomManager::UpdateData()
 {
-	
+	const auto World = GetWorld();
+	if (World != nullptr)
+	{
+		Level = World;
+		const auto Name = World->GetName();
+		if (GeometryLevel == nullptr)
+		{
+			for (const ULevelStreaming* StreamingLevel : World->GetStreamingLevels())
+			{
+				if (StreamingLevel->GetWorldAsset().GetAssetName().Contains(Name))
+				{
+					GeometryLevel = StreamingLevel->GetWorldAsset();
+					break;
+				}
+			}
+		}
+
+		for (TActorIterator<AOPAG_RoomStreamingVolume> It(World); It; ++It)
+		{
+			Volume = *It;
+			break;
+		}
+
+		for (TActorIterator<AOPAG_RoomAttachPoint> It(World); It; ++It)
+		{
+			It->UpdateAttachPointData(this);
+		}
+
+		if (DataTable != nullptr)
+		{
+			FOPAG_RoomOffset Row;
+			Row.Room = Level;
+			Row.Weight = Weight;
+			Row.ExitCount = Exits.Num();
+			Row.ExitSides = ExitSides;
+			Row.Offset = Entrance->RoomOffset;
+
+			DataTable->AddRow(FName(Name), Row);
+
+			UKismetSystemLibrary::PrintString(this, 
+				TEXT("Successfully updated Data Table"), 
+				true, true, FColor::Green, 3.f);
+		}
+		else
+		{
+			UKismetSystemLibrary::PrintString(this,
+				TEXT("Failed to update Data Table. Data Table not assigned"),
+				true, true, FColor::Red, 3.f);
+		}
+	}
 }
 
-void AOPAG_RoomManager::CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const
+void AOPAG_RoomManager::CloseExits(const bool bIsLastRoom, const bool bHasSafeRoom) const
 {
-	for (AOPAG_RoomAttachPoint* Exit : Exits)
+	for (const AOPAG_RoomAttachPoint* Exit : Exits)
 	{
 		if (Exit->bIsOpen) continue;
 

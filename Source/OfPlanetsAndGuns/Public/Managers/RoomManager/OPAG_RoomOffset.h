@@ -26,7 +26,7 @@ struct FOPAG_RoomOffset : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FName RoomName;
+		TSoftObjectPtr<UWorld> Room;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 Weight;

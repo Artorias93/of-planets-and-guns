@@ -4,6 +4,7 @@
 #include "Managers/StageManager/OPAG_StageManager.h"
 
 #include "Characters/Player/OPAG_Player.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/RoomManager/OPAG_RoomManager.h"
@@ -20,11 +21,16 @@ AOPAG_StageManager::AOPAG_StageManager()
 
 void AOPAG_StageManager::StartStageGeneration(FOPAG_StageGeneration GenData)
 {
+	if (!bOverrideGenData) BaseGenerationData = GenData;
+
 	LoadDataTables();
 	AddMoreRoomsFromListToHitWeightRequirements();
 
 	RoomsToAppend.Empty();
 	uint8 PreviousRoomTurn = 0;
+	StartingRoom = -1;
+	FinalRoom = -1;
+	SafeRoom = -1;
 
 	//loop until the weight has reached the target
 	while (BaseGenerationData.TargetWeight > TotalWeight)
@@ -38,8 +44,9 @@ void AOPAG_StageManager::StartStageGeneration(FOPAG_StageGeneration GenData)
 
 	//Spawn first room
 	bool bSuccess;
-	ULevelStreamingDynamic* Level = ULevelStreamingDynamic::LoadLevelInstance(this,
-		StagePathing[StartingRoom]->CurrentRoom->RoomOffset.RoomName.ToString(),
+	ULevelStreamingDynamic* Level = 
+		ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(this,
+		StagePathing[StartingRoom]->CurrentRoom->RoomOffset.Room,
 		FVector::ZeroVector, FRotator::ZeroRotator, bSuccess);
 
 	StagePathing[StartingRoom]->CurrentRoom->LevelStreaming = Level;
@@ -48,9 +55,9 @@ void AOPAG_StageManager::StartStageGeneration(FOPAG_StageGeneration GenData)
 void AOPAG_StageManager::LoadDataTables()
 {
 	const FString Context;
-	BaseGenerationData.RoomTable->GetAllRows(Context, Rooms);
-	BaseGenerationData.BridgeTable->GetAllRows(Context, Bridges);
-	BaseGenerationData.DoubleRoomChanceTable->GetAllRows(Context, DoubleExitChances);
+	if (BaseGenerationData.RoomTable) BaseGenerationData.RoomTable->GetAllRows(Context, Rooms);
+	if (BaseGenerationData.BridgeTable) BaseGenerationData.BridgeTable->GetAllRows(Context, Bridges);
+	if (BaseGenerationData.DoubleRoomChanceTable) BaseGenerationData.DoubleRoomChanceTable->GetAllRows(Context, DoubleExitChances);
 }
 
 void AOPAG_StageManager::AddMoreRoomsFromListToHitWeightRequirements()
@@ -292,12 +299,15 @@ int32 AOPAG_StageManager::AddRandomBridge(FOPAG_StagePathing* Room, const bool S
 {
 	FOPAG_StagePathing* RandomBridge = new FOPAG_StagePathing;
 
-	const FOPAG_RoomOffset* RandomBridgeOffset = Bridges[FMath::RandRange(0, Bridges.Num())];
+	const FOPAG_RoomOffset* RandomBridgeOffset = Bridges[FMath::RandRange(0, Bridges.Num()-1)];
 
 	RandomBridge->CurrentRoom = new FOPAG_StreamingRoom;
 	RandomBridge->CurrentRoom->ID = RoomLoadingCounter + (SecondaryExit ? BridgeID * 2 : BridgeID);
 	RandomBridge->CurrentRoom->RoomOffset = *RandomBridgeOffset;
+	//RandomBridge->CurrentRoom->LevelStreaming = nullptr;
 	RandomBridge->PrevRoomID = Room->CurrentRoom->ID;
+
+	StagePathing.Add(RandomBridge->CurrentRoom->ID, RandomBridge);
 
 	Room->NextRoomIDs.Add(RandomBridge->CurrentRoom->ID);
 	RoomsToAppend.Add(RandomBridge->CurrentRoom->ID);
@@ -315,16 +325,19 @@ void AOPAG_StageManager::FinishedLoadingStage()
 
 void AOPAG_StageManager::OnRoomSpawned(AOPAG_RoomManager* const RoomManager)
 {
+	if (RoomManagers.Contains(RoomManager)) return;
 	FOPAG_StagePathing* CurrentNode = FindPathingToAssign(RoomManager->GetLevel());
 	if (CurrentNode == nullptr)
 	{
 		ScreenLog("No Pathing found for RoomManager under level " +
 			RoomManager->GetLevel()->GetFullName(), EMessageSeverity::Error);
+		return;
 	}
 
 	if (StagePathing.Num() -1 > RoomManagers.Num())
 	{
 		RoomManagers.Add(RoomManager);
+		RoomManager->AssignedRoomID = CurrentNode->CurrentRoom->ID;
 
 		TArray<AOPAG_RoomAttachPoint*> Exits = RoomManager->Exits;
 		ShuffleArray(Exits);
@@ -340,6 +353,7 @@ void AOPAG_StageManager::OnRoomSpawned(AOPAG_RoomManager* const RoomManager)
 	else if (!bVolumesAssigned)
 	{
 		RoomManagers.Add(RoomManager);
+		RoomManager->AssignedRoomID = CurrentNode->CurrentRoom->ID;
 		PostRoomLoadingActions();
 	}
 }
@@ -348,14 +362,17 @@ FOPAG_StagePathing* AOPAG_StageManager::FindPathingToAssign(const ULevel* Level)
 {
 	TArray<uint32> Keys;
 	StagePathing.GetKeys(Keys);
+	FOPAG_StagePathing* Pathing = nullptr;
 	for (const auto Key : Keys)
 	{
-		if (StagePathing[Key]->CurrentRoom->LevelStreaming->GetLoadedLevel() == Level)
+		if (StagePathing[Key]->CurrentRoom->LevelStreaming != nullptr && 
+			StagePathing[Key]->CurrentRoom->LevelStreaming->GetLoadedLevel()->GetFullName() == Level->GetFullName())
 		{
-			return StagePathing[Key];
+			Pathing = StagePathing[Key];
+			break;
 		}
 	}
-	return nullptr;
+	return Pathing;
 }
 
 void AOPAG_StageManager::AddRoom(const int32 ID, AOPAG_RoomAttachPoint* AttachPoint)
@@ -365,20 +382,34 @@ void AOPAG_StageManager::AddRoom(const int32 ID, AOPAG_RoomAttachPoint* AttachPo
 
 	AttachPoint->bIsOpen = true;
 
+	FTransform AppliedOffset;
+	GetAppliedTransform(AttachPoint->GetActorTransform(),
+		Pathing->CurrentRoom->RoomOffset.Offset, AppliedOffset);
+
 	bool bSuccess;
-	ULevelStreamingDynamic* Level = ULevelStreamingDynamic::LoadLevelInstance(this,
-		Pathing->CurrentRoom->RoomOffset.RoomName.ToString(),
-		Pathing->CurrentRoom->RoomOffset.Offset.GetLocation(),
-		Pathing->CurrentRoom->RoomOffset.Offset.GetRotation().Rotator(),
+	ULevelStreamingDynamic* Level = 
+		ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(this,
+		Pathing->CurrentRoom->RoomOffset.Room,
+		AppliedOffset.GetLocation(),
+			AppliedOffset.Rotator(),
 		bSuccess);
 
 	Pathing->CurrentRoom->LevelStreaming = Level;
 }
 
+void AOPAG_StageManager::GetAppliedTransform(const FTransform& PreviousEnd, const FTransform& NextStart, 
+	FTransform& OutAppliedTransform)
+{
+	const FRotator NewRotation = PreviousEnd.Rotator() + NextStart.Rotator().GetInverse();
+
+	const FVector NewOffset = PreviousEnd.GetLocation() - NewRotation.RotateVector(NextStart.GetLocation());
+
+	OutAppliedTransform = FTransform(NewRotation, NewOffset, PreviousEnd.GetScale3D());
+}
+
 void AOPAG_StageManager::PostRoomLoadingActions()
 {
 	LoadGeometryRooms();
-	//delay somehow??
 	AssignVolumes();
 
 	PostGenerationActions();
@@ -390,18 +421,19 @@ void AOPAG_StageManager::LoadGeometryRooms()
 
 	for (const AOPAG_RoomManager* RoomManager : RoomManagers)
 	{
-		AddGeometryRoom(RoomManager->AssignedRoomID, RoomManager->GeometryLevelName);
+		AddGeometryRoom(RoomManager->AssignedRoomID, RoomManager->GeometryLevel);
 	}
 }
 
-void AOPAG_StageManager::AddGeometryRoom(int32 ID, FName GeometryName)
+void AOPAG_StageManager::AddGeometryRoom(int32 ID, TSoftObjectPtr<UWorld> GeometryLevel)
 {
 	const FOPAG_StagePathing* Pathing = StagePathing[ID];
 	if (Pathing == nullptr) return;
 
 	bool bSuccess;
-	ULevelStreamingDynamic* Level = ULevelStreamingDynamic::LoadLevelInstance(this,
-		GeometryName.ToString(),
+	ULevelStreamingDynamic* Level = 
+		ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(this,
+		GeometryLevel,
 		Pathing->CurrentRoom->LevelStreaming->LevelTransform.GetLocation(),
 		Pathing->CurrentRoom->LevelStreaming->LevelTransform.GetRotation().Rotator(),
 		bSuccess);
@@ -434,8 +466,8 @@ void AOPAG_StageManager::AssignVolumes()
 
 void AOPAG_StageManager::AddLevelsToVolume(AOPAG_RoomStreamingVolume* Volume, uint32 ID)
 {
+	if (!StagePathing.Contains(ID)) return;
 	const auto Pathing = StagePathing[ID];
-	if (Pathing == nullptr) return;
 
 	Volume->StreamingLevels.Add(Pathing->CurrentRoom->LevelStreaming);
 
@@ -448,8 +480,8 @@ void AOPAG_StageManager::AddLevelsAboveVolume(int32 ID, TArray<ULevelStreamingDy
 	int32 CurrentID = ID;
 	for (int32 i = 0; i < BaseGenerationData.FarthestLoad; ++i)
 	{
+		if (!StagePathing.Contains(CurrentID)) continue;
 		const auto Pathing = StagePathing[CurrentID];
-		if (Pathing == nullptr) continue;
 		StreamingVolumes.Add(Pathing->CurrentRoom->LevelStreaming);
 		CurrentID = Pathing->PrevRoomID;
 	}
@@ -464,8 +496,8 @@ void AOPAG_StageManager::AddLevelsBelowVolume(TArray<int32> IDs, TArray<ULevelSt
 	{
 		for (const int32 CurrentID : CurrentIDs)
 		{
+			if (!StagePathing.Contains(CurrentID)) continue;
 			const auto Pathing = StagePathing[CurrentID];
-			if (Pathing == nullptr) continue;
 			StreamingVolumes.Add(Pathing->CurrentRoom->LevelStreaming);
 			NextSet.Append(Pathing->NextRoomIDs);
 		}
@@ -498,8 +530,8 @@ void AOPAG_StageManager::ReplacePawn()
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	AActor* PawnToDestroy = PlayerController->GetPawnOrSpectator();
 	FActorSpawnParameters SpawnInfo;
-	APawn* PawnToPossess = GetWorld()->SpawnActor<AOPAG_Player>(
-		AOPAG_Player::StaticClass(), PawnToDestroy->GetActorTransform(), SpawnInfo);
+	APawn* PawnToPossess = GetWorld()->SpawnActor<APawn>(
+		Pawn.Get(), PawnToDestroy->GetActorTransform(), SpawnInfo);
 	PawnToDestroy->Destroy();
 	PlayerController->Possess(PawnToPossess);
 }
@@ -549,14 +581,15 @@ void AOPAG_StageManager::LoadLevels(AOPAG_RoomStreamingVolume* Volume)
 
 void AOPAG_StageManager::ScreenLog(FString Message, EMessageSeverity::Type Severity)
 {
-	if (!GEngine) return;
 	typedef EMessageSeverity::Type EMST;
-	GEngine->AddOnScreenDebugMessage(-1,
-		5.0f,
-		Severity == EMST::Warning ? FColor::Yellow : 
+
+	UKismetSystemLibrary::PrintString(this,
+		Message,
+		true, true, 
+		Severity == EMST::Warning ? FColor::Yellow :
 			(Severity == EMST::Error || Severity == EMST::CriticalError ? FColor::Red :
-			FColor::Green),
-		Message);
+			FColor::Green), 
+5.f);
 }
 
 template<typename T>

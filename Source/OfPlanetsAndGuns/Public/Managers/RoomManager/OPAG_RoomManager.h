@@ -29,10 +29,10 @@ public:
 		TArray<AOPAG_RoomAttachPoint*> Exits;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FName LevelName;
+		TSoftObjectPtr<UWorld> Level;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		FName GeometryLevelName;
+		TSoftObjectPtr<UWorld> GeometryLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		AOPAG_RoomStreamingVolume* Volume;
@@ -53,11 +53,13 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void PreInitializeComponents() override;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, CallInEditor)
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="OPAG Room Manager")
 		void UpdateData();
 
 	UFUNCTION(BlueprintCallable)
