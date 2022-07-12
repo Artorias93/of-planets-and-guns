@@ -18,9 +18,17 @@ class OFPLANETSANDGUNS_API AOPAG_GameplayHUD : public AHUD
 
 private:
 	UPROPERTY()
-		class UOPAG_UWPlayerView* PlayerViewWidget;
+		class UOPAG_UWPlayerStatsView* PlayerStatsViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UOPAG_UWPlayerView> PlayerViewWidgetClass;
+		TSubclassOf<UOPAG_UWPlayerStatsView> PlayerStatsViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWGunView* GunViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWGunView> GunViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWCurrencyView* CurrencyViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWCurrencyView> CurrencyViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;

@@ -2,7 +2,9 @@
 
 
 #include "UI/OPAG_GameplayHUD.h"
-#include "UI/OPAG_UWPlayerView.h"
+#include "UI/OPAG_UWGunView.h"
+#include "UI/OPAG_UWCurrencyView.h"
+#include "UI/OPAG_UWPlayerStatsView.h"
 
 void AOPAG_GameplayHUD::DrawHUD() 
 {
@@ -13,12 +15,30 @@ void AOPAG_GameplayHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (PlayerViewWidgetClass)
+	if (PlayerStatsViewWidgetClass)
 	{
-		PlayerViewWidget = CreateWidget<UOPAG_UWPlayerView>(GetWorld(), PlayerViewWidgetClass);
+		PlayerStatsViewWidget = CreateWidget<UOPAG_UWPlayerStatsView>(GetWorld(), PlayerStatsViewWidgetClass);
 
-		if (PlayerViewWidget) {
-			PlayerViewWidget->AddToViewport(1);
+		if (PlayerStatsViewWidget) {
+			PlayerStatsViewWidget->AddToViewport(1);
+		}
+	}
+
+	if (GunViewWidgetClass)
+	{
+		GunViewWidget = CreateWidget<UOPAG_UWGunView>(GetWorld(), GunViewWidgetClass);
+
+		if (GunViewWidget) {
+			GunViewWidget->AddToViewport(2);
+		}
+	}
+
+	if (CurrencyViewWidgetClass)
+	{
+		CurrencyViewWidget = CreateWidget<UOPAG_UWCurrencyView>(GetWorld(), CurrencyViewWidgetClass);
+
+		if (CurrencyViewWidget) {
+			CurrencyViewWidget->AddToViewport(3);
 		}
 	}
 }

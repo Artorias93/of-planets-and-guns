@@ -25,4 +25,7 @@ class OFPLANETSANDGUNS_API UOPAG_UWLoadingScreenView : public UUserWidget
 		UTextBlock* LoadingText;
 	UPROPERTY(meta = (BindWidget))
 		UProgressBar* LoadingBar;
+
+public:
+	void SetLoadingBar(float Percentage);
 };
