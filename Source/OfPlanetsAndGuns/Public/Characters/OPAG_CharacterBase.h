@@ -2,14 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "AbilitySystemComponent.h"			//GAS_Plugin
-#include "AbilitySystemInterface.h"			//GAS_Plugin
-#include "Abilities/GameplayAbility.h"		//GAS_Plugin
-#include <EnhancedInput/Public/EnhancedInputLibrary.h>
+#include <AbilitySystemInterface.h>
 #include "OPAG_CharacterBase.generated.h"
 
+class UAbilitySystemComponent;
+struct FOnAttributeChangeData;
+
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_CharacterBase : public ACharacter, public IAbilitySystemInterface		//GAS_Plugin (last element)
+class OFPLANETSANDGUNS_API AOPAG_CharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -17,53 +17,38 @@ class OFPLANETSANDGUNS_API AOPAG_CharacterBase : public ACharacter, public IAbil
 	//Functions
 	/////////////////////////////
 
-protected:
-
-	virtual void BeginPlay() override;
-
 public:
 
 	AOPAG_CharacterBase();
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION(BlueprintCallable, Category = "CharacterBase")										//GAS_Plugin
-	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);			//GAS_Plugin	
+	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
+	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);		
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;								//GAS_Plugin
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
 
-	UFUNCTION(BlueprintPure, Category = "CharacterBase")											//GAS_Plugin
-	void GetHealthValues(float& Health, float& MaxHealth);											//GAS_Plugin
+	UFUNCTION(BlueprintPure, Category = "CharacterBase")
+	void GetHealthValues(float& Health, float& MaxHealth);
 	
-	UFUNCTION(BlueprintPure, Category = "CharacterBase")											//GAS_Plugin
-	void GetManaValues(float& Mana, float& MaxMana);												//GAS_Plugin
+	UFUNCTION(BlueprintPure, Category = "CharacterBase")
+	void GetDamagedValues(float& Damaged);
 
-	UFUNCTION(BlueprintPure, Category = "CharacterBase")											//GAS_Plugin
-	void GetStaminaValues(float& Stamina, float& MaxStamina);										//GAS_Plugin
-	
-	UFUNCTION(BlueprintPure, Category = "CharacterBase")											//GAS_Plugin
-	void GetDamagedValues(float& Damaged);															//GAS_Plugin
+	void HealthChanged(const FOnAttributeChangeData& Data);	
 
-	void OnHealthChangedNative(const FOnAttributeChangeData& Data);									//GAS_Plugin
+	void DamageTakenAmountChanged(const FOnAttributeChangeData& Data);
 
-	void OnManaChangedNative(const FOnAttributeChangeData& Data);									//GAS_Plugin
+	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")
+	void OnHealthChanged(float OldValue, float NewValue);
 
-	void OnStaminaChangedNative(const FOnAttributeChangeData& Data);								//GAS_Plugin
+	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")
+	void OnDamageTakenAmountChanged(float OldValue, float NewValue);
 
-	void OnDamagedChangedNative(const FOnAttributeChangeData& Data);								//GAS_Plugin
+	void TakeDamage(float Damage);
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")								//GAS_Plugin
-	void OnHealthChanged(float OldValue, float NewValue);											//GAS_Plugin
+protected:
 
-	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")								//GAS_Plugin
-	void OnManaChanged(float OldValue, float NewValue);												//GAS_Plugin
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")								//GAS_Plugin
-	void OnStaminaChanged(float OldValue, float NewValue);											//GAS_Plugin
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")								//GAS_Plugin
-	void OnDamagedChanged(float OldValue, float NewValue);
+	virtual void BeginPlay() override;
 
 	/////////////////////////////
 	//Variables
@@ -71,12 +56,15 @@ public:
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterBase")						//GAS_Plugin
-	UAbilitySystemComponent* AbilitySystemComp;	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterBase")						
+	class UAbilitySystemComponent* AbilitySystemComp;														
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterBase")						//GAS_Plugin
-	const class UBaseAttributeSet* BaseAttributeSetComp;											//GAS_Plugin
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "CharacterBase")
+	const class UOPAG_AttributeSetBase* BaseAttributeSetComp;										
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterBase")
-	UInputMappingContext* MappingContext;
+	class UInputMappingContext* MappingContext;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterBase")
+	TSubclassOf<UGameplayAbility> BasicShot;
 };

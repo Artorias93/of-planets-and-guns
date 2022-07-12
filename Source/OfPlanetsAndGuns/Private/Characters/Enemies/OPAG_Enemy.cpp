@@ -33,6 +33,8 @@ void AOPAG_Enemy::TakeDamage(float DamageAmount)
 void AOPAG_Enemy::Attack()
 {
 	//Empty function for children's overrides
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("I am attacking!"));
 }
 
 void AOPAG_Enemy::Death()

@@ -1,11 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Character\BaseAttributeSet.h"
 #include "GameplayEffect.h"				//GAS_Plugin
 #include "GameplayEffectExtension.h"	//GAS_Plugin
 
-//GAS_Plugin
 UBaseAttributeSet::UBaseAttributeSet()
 {
 
