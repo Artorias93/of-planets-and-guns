@@ -6,21 +6,28 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
-	SphereComponent->SetSphereRadius(32.f);
-	SphereComponent->SetCollisionProfileName("Weapon");
-	RootComponent = SphereComponent;
+	// Temporary flag for pick module. When create interface for pickupable object.
+	Tags.Add("Interactable");
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
-	Mesh->SetRelativeScale3D(FVector(0.1f, 0.1f, 0.1f));
-	Mesh->SetCollisionProfileName("NoCollision");
-	Mesh->SetupAttachment(RootComponent);
+	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
+	Sphere->SetSphereRadius(32.f);
+	Sphere->SetCollisionProfileName("Weapon");
+	RootComponent = Sphere;
+
+	ModuleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
+	if (ModuleMesh)
+	{
+		ModuleMesh->SetCollisionProfileName("NoCollision");
+		ModuleMesh->SetupAttachment(Sphere);
+	}
 }
 
 void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// This method is call for activate physical behavior when module is in the scene
+	CheckIfPhysical();
 }
 
 void AOPAG_ModuleBase::Tick(float DeltaTime)
@@ -29,7 +36,23 @@ void AOPAG_ModuleBase::Tick(float DeltaTime)
 
 }
 
-void AOPAG_ModuleBase::OnAttach(EModuleRarity NewRarity)
+void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes)
+{
+	SetParameters(NewRarity, NewStats, NewEquippableFireTypes);
+}
+
+void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes)
 {
 	Rarity = NewRarity;
+	Stats = NewStats;
+	EquippableFireTypes = NewEquippableFireTypes;
+}
+
+void AOPAG_ModuleBase::CheckIfPhysical()
+{
+	// Control if module has parent gun -> is attached
+	if (GetParentActor() == nullptr)
+	{
+		Sphere->SetSimulatePhysics(true);
+	}
 }

@@ -5,7 +5,7 @@ AOPAG_SightBase::AOPAG_SightBase() : Super::AOPAG_ModuleBase()
 {
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SightCamera"));
 	CameraComponent->SetRelativeLocation(FVector(-0.000095f, -18.851955f, 6.571584f));
-	CameraComponent->SetRelativeRotation(FRotator(90.f, 0, 0));
+	CameraComponent->SetRelativeRotation(FRotator(0, 90.f, 0));
 	CameraComponent->SetRelativeScale3D(FVector(.2f, .2f, .2f));
 	CameraComponent->SetFieldOfView(50.f);
 	CameraComponent->SetupAttachment(RootComponent);
@@ -28,9 +28,9 @@ void AOPAG_SightBase::Tick(float DeltaTime)
 
 }
 
-void AOPAG_SightBase::OnAttach(EModuleRarity NewRarity)
+void AOPAG_SightBase::OnAttach(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes)
 {
-	Super::OnAttach(NewRarity);
+	Super::OnAttach(NewRarity, NewStats, NewEquippableFireTypes);
 
 	CameraComponent->SetComponentTickEnabled(true);
 }
