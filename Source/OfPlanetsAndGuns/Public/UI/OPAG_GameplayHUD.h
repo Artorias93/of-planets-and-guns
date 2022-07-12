@@ -29,8 +29,11 @@ private:
 		class UOPAG_UWCurrencyView* CurrencyViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWCurrencyView> CurrencyViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWPauseView* PauseViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWPauseView> PauseViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
-
 };
