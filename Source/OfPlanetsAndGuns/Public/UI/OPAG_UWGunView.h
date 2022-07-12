@@ -10,7 +10,7 @@
  * 
  */
 class UTextBlock;
-class UProgressBar;
+
 class UImage;
 
 UCLASS()

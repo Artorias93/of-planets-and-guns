@@ -10,7 +10,6 @@
  * 
  */
 class UTextBlock;
-class UProgressBar;
 class UImage;
 
 UCLASS()
@@ -26,4 +25,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
 		UImage* BoltsIcon;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* BoltsAmountText;
+
+public:
+	void UpdateBoltsValue(const int Value);
+	void UpdateGoldValue(const int Value);
 };

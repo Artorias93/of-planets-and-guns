@@ -23,10 +23,10 @@ class OFPLANETSANDGUNS_API UOPAG_UWPlayerStatsView : public UUserWidget
 
 	UPROPERTY(meta = (BindWidget))
 		UProgressBar* HealthBar;
-	//UPROPERTY(meta = (BindWidget))
-		//UTextBlock* HealthAmountText;
 	UPROPERTY(meta = (BindWidget))
 		UProgressBar* ShieldBar;
-	//UPROPERTY(meta = (BindWidget))
-		//UTextBlock* ShieldAmountText;
+
+public:
+	void UpdateHealthBar(const float CurrentValue, const float MaxValue);
+	void UpdateShieldBar(const float CurrentValue, const float MaxValue);
 };
