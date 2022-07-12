@@ -10,7 +10,7 @@
 
 AOPAG_CharacterBase::AOPAG_CharacterBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");
 
 	static ConstructorHelpers::FClassFinder<UGameplayAbility> BasicShotClass(TEXT("/Game/OfPlanetsAndGuns/Core/Abilities/GA_BasicShot"));
@@ -52,11 +52,6 @@ void AOPAG_CharacterBase::BeginPlay()
 void AOPAG_CharacterBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	TakeDamage(1);
-
-	if(GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::SanitizeFloat(GetHealth()));
-
 }
 
 float AOPAG_CharacterBase::GetHealth() const
@@ -85,36 +80,43 @@ void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> Abilit
 	}
 }
 
-void AOPAG_CharacterBase::TakeDamage(float Damage)
+void AOPAG_CharacterBase::InflictDamage(float Damage)
 {
-	if(BaseAttributeSet)
+	if(AbilitySystemComp && BaseAttributeSet)
 	{
-		if(AbilitySystemComp)
+		AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
+
+		//TODO: Rename BasicShot in AbilityTakeDamage
+		AbilitySystemComp->TryActivateAbilityByClass(BasicShot);
+
+		const FGameplayTag HitGameplayTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.ranged.hitEvent"));
+		FGameplayEventData HitEventData = FGameplayEventData();
+		HitEventData.Target = this;
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
+
+		if(GetHealth()<=0)
 		{
-			AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
-
-			float Temp = AbilitySystemComp->GetNumericAttribute(BaseAttributeSet->GetDamageTakenAmountAttribute());
-
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::SanitizeFloat(Temp));
-
-			//TODO: Rename BasicShot in AbilityTakeDamage
-			AbilitySystemComp->TryActivateAbilityByClass(BasicShot);
-
-			const FGameplayTag HitGameplayTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.ranged.hitEvent"));
-			FGameplayEventData HitEventData;
-			HitEventData.Target = this;
-
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
-
-			if(GetHealth()<=0)
-			{
-				UE_LOG(LogTemp, Error, TEXT("Oh No I'm Dead"));
-				//TODO: Implement this
-				//Death();
-			}
-			
-		}
+			UE_LOG(LogTemp, Error, TEXT("Oh No I'm Dead"));
+			//TODO: Implement this
+			//Death();
+		}	
 	}
+}
+
+void AOPAG_CharacterBase::InflictDamage(AActor* Throwable)
+{
+	//TODO: Implement
+}
+
+void AOPAG_CharacterBase::GetShootingDirection(float ShootingAccuracyTolerance)
+{
+	//Overridden by children
+}
+
+void AOPAG_CharacterBase::Death()
+{
+	//Overridden by children
 }
 
 //Called every time the value changes

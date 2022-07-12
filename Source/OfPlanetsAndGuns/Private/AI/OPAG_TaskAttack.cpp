@@ -20,10 +20,7 @@ EBTNodeResult::Type UOPAG_TaskAttack::ExecuteTask(UBehaviorTreeComponent& OwnerB
 				AIController->GetFocusActor()->GetActorLocation())
 			);
 
-			//TODO: This function is empty ATM, both in Enemy and Children
 			Enemy->Attack();
-
-			UE_LOG(LogTemp, Warning, TEXT("In attack function"));
 
 			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Succeeded);
 			return EBTNodeResult::Succeeded;

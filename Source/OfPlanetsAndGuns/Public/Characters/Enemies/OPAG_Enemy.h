@@ -19,9 +19,9 @@ public:
 
 	void UpdateSpeed(float NewSpeed);
 
-	void TakeDamage(float DamageAmount);
+	void InflictDamage(float DamageAmount);
 
-	void Attack();
+	virtual void Attack();
 
 	void Death();
 

@@ -17,11 +17,5 @@ public:
 
 	UOPAG_TaskAttack(FObjectInitializer const& ObjectInitializer);
 
-	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory);
-
-	/////////////////////////////
-	//Variables
-	/////////////////////////////
-	
-		
+	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory);		
 };

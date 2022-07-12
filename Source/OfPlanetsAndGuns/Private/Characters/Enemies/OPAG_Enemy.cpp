@@ -10,7 +10,7 @@
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void AOPAG_Enemy::BeginPlay()
@@ -26,9 +26,6 @@ void AOPAG_Enemy::BeginPlay()
 void AOPAG_Enemy::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::SanitizeFloat(GetHealth()));
 }
 
 void AOPAG_Enemy::UpdateSpeed(float NewSpeed)
@@ -36,19 +33,18 @@ void AOPAG_Enemy::UpdateSpeed(float NewSpeed)
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
-void AOPAG_Enemy::TakeDamage(float DamageAmount)
+void AOPAG_Enemy::InflictDamage(float DamageAmount)
 {
-	//Super::TakeDamage(DamageAmount);
-
+	Super::InflictDamage(DamageAmount);
+	//Triggers the damage sense on the AI controlled pawn
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this, UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount, UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(), GetActorLocation(), NAME_None);
-
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("I'm taking damage!"));
 }
 
 void AOPAG_Enemy::Attack()
 {
 	//Empty function for children's overrides
-	if(GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, TEXT("I am attacking!"));
 }
 
 void AOPAG_Enemy::Death()

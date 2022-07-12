@@ -1,23 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "AbilitySystemComponent.h"
-#include "Character\BaseAttributeSet.h"
+#include "Characters/OPAG_AttributeSetBase.h"
 
 #include "CoreMinimal.h"
 #include "GameplayEffectExecutionCalculation.h"
+
 #include "DamageExecutionGAS.generated.h"
 
 struct FDamageAttributes
 {
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Health);
-	DECLARE_ATTRIBUTE_CAPTUREDEF(Damaged);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(DamageTakenAmount);
 
 	FDamageAttributes()
 	{
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, Health, Target, false);
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, Damaged, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UOPAG_AttributeSetBase, Health, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UOPAG_AttributeSetBase, DamageTakenAmount, Source, true);
 	}
 };
 

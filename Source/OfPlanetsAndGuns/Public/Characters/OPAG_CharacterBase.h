@@ -33,19 +33,23 @@ public:
 	/*UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")
 	void OnHealthChanged(float OldValue, float NewValue);*/
 
-	void TakeDamage(float Damage);
+	void InflictDamage(float Damage);
+
+	void InflictDamage(AActor* Throwable);
 
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
 	float GetHealth() const;
 
-	UFUNCTION(BlueprintCallable)
 	void SetHealth(const float Health);
 
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void GetShootingDirection(float ShootingAccuracyTolerance = 0);
+
+	virtual void Death();
 
 	/////////////////////////////
 	//Variables
