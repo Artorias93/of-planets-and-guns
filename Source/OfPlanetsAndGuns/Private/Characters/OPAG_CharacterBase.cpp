@@ -3,13 +3,14 @@
 #include <AbilitySystemComponent.h>
 #include <Abilities/GameplayAbility.h>
 #include <GameplayTagsManager.h>
+#include <GameplayTagContainer.h>
 #include <EnhancedInput/Public/EnhancedInputLibrary.h>
 //My Classes
 #include "Characters/OPAG_AttributeSetBase.h"
 
 AOPAG_CharacterBase::AOPAG_CharacterBase()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");
 
 	static ConstructorHelpers::FClassFinder<UGameplayAbility> BasicShotClass(TEXT("/Game/OfPlanetsAndGuns/Core/Abilities/GA_BasicShot"));
@@ -30,20 +31,46 @@ UAbilitySystemComponent* AOPAG_CharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComp;
 }
 
-// Called when the game starts or when spawned
 void AOPAG_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (AbilitySystemComp)
 	{
-		BaseAttributeSetComp = AbilitySystemComp->GetSet<UOPAG_AttributeSetBase>();
+		BaseAttributeSet = AbilitySystemComp->GetSet<UOPAG_AttributeSetBase>();
 
-		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetHealthAttribute()).AddUObject(this, &AOPAG_CharacterBase::HealthChanged);
-		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetDamagedAttribute()).AddUObject(this, &AOPAG_CharacterBase::DamageTakenAmountChanged);
+		if (BaseAttributeSet)
+		{
+			/*AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(
+				BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AOPAG_CharacterBase::HealthChanged);*/
+		}
 
 		InitializeAbility(BasicShot, 0);
 	}
+}
+
+void AOPAG_CharacterBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	TakeDamage(1);
+
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::SanitizeFloat(GetHealth()));
+
+}
+
+float AOPAG_CharacterBase::GetHealth() const
+{
+	if(AbilitySystemComp)
+	{
+		return AbilitySystemComp->GetNumericAttribute(BaseAttributeSet->GetHealthAttribute());
+	}
+	return 1;
+}
+
+void AOPAG_CharacterBase::SetHealth(const float Health)
+{
+	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetHealthAttribute(), Health);
 }
 
 void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel)
@@ -60,44 +87,38 @@ void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> Abilit
 
 void AOPAG_CharacterBase::TakeDamage(float Damage)
 {
-	if(BaseAttributeSetComp)
+	if(BaseAttributeSet)
 	{
-		//BaseAttributeSetComp->SetAbilityDamage(Damage);
+		if(AbilitySystemComp)
+		{
+			AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
 
-		//if(AbilitySystemComp)
-		//{
-		//	//TODO: Change BasicShot name?
-		//	AbilitySystemComp->TryActivateAbilityByClass(BasicShot);
+			float Temp = AbilitySystemComp->GetNumericAttribute(BaseAttributeSet->GetDamageTakenAmountAttribute());
 
-		//	const FGameplayTag HitGameplayTag = UGameplayTagsManager::Get().RequestGameplayTag(TEXT("char.ability.ranged.hitEvent"));
-		//	FGameplayEventData HitEventData;
-		//	HitEventData.Target = this;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::SanitizeFloat(Temp));
 
-		//	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
-		//	
-		//}
+			//TODO: Rename BasicShot in AbilityTakeDamage
+			AbilitySystemComp->TryActivateAbilityByClass(BasicShot);
+
+			const FGameplayTag HitGameplayTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.ranged.hitEvent"));
+			FGameplayEventData HitEventData;
+			HitEventData.Target = this;
+
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
+
+			if(GetHealth()<=0)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Oh No I'm Dead"));
+				//TODO: Implement this
+				//Death();
+			}
+			
+		}
 	}
 }
 
-void AOPAG_CharacterBase::GetHealthValues(float& Health, float& MaxHealth)
-{
-	Health = BaseAttributeSetComp->GetHealth();
-	MaxHealth = BaseAttributeSetComp->GetMaxHealth();
-}
-
-void AOPAG_CharacterBase::GetDamagedValues(float& Damaged)
-{
-	Damaged = BaseAttributeSetComp->GetDamaged();
-}
-
 //Called every time the value changes
-void AOPAG_CharacterBase::HealthChanged(const FOnAttributeChangeData& Data)
-{
-	OnHealthChanged(Data.OldValue, Data.NewValue);
-}
-
-//Called every time the value changes
-void AOPAG_CharacterBase::DamageTakenAmountChanged(const FOnAttributeChangeData& Data)
-{
-	OnDamageTakenAmountChanged(Data.OldValue, Data.NewValue);
-}
+//void AOPAG_CharacterBase::HealthChanged(const FOnAttributeChangeData& Data)
+//{
+//	OnHealthChanged(Data.OldValue, Data.NewValue);
+//}

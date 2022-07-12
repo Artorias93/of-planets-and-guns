@@ -15,6 +15,8 @@ class OFPLANETSANDGUNS_API AOPAG_Enemy : public AOPAG_CharacterBase
 
 public:
 
+	AOPAG_Enemy();
+
 	void UpdateSpeed(float NewSpeed);
 
 	void TakeDamage(float DamageAmount);
@@ -23,10 +25,12 @@ public:
 
 	void Death();
 
+	virtual void Tick(float DeltaSeconds) override;
+
 protected:
 
 	virtual void BeginPlay() override;
-
+	
 private:
 
 	void DropAndDespawn();

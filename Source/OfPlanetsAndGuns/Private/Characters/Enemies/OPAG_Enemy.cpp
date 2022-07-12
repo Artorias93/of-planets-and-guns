@@ -6,6 +6,12 @@
 #include <BrainComponent.h>
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
+#include "Characters/OPAG_AttributeSetBase.h"
+
+AOPAG_Enemy::AOPAG_Enemy()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
 
 void AOPAG_Enemy::BeginPlay()
 {
@@ -15,6 +21,14 @@ void AOPAG_Enemy::BeginPlay()
 	{
 		AIController->GetBlackboardComponent()->SetValueAsBool("bUsingPatrolPath", bUsingPatrolPath);
 	}
+}
+
+void AOPAG_Enemy::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, FString::SanitizeFloat(GetHealth()));
 }
 
 void AOPAG_Enemy::UpdateSpeed(float NewSpeed)

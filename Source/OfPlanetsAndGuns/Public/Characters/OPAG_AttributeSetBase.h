@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
-#include "AbilitySystemComponent.h"			//GAS_Plugin
+#include "AbilitySystemComponent.h"
 #include "OPAG_AttributeSetBase.generated.h"
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
@@ -24,15 +24,6 @@ public:
 
 	UOPAG_AttributeSetBase();
 
-	UFUNCTION(BlueprintCallable)
-	void SetAbilityDamage(float Damage);
-
-	UFUNCTION(BlueprintCallable)
-	void SetAbilityHealth(float HealthValue);
-
-	UFUNCTION(BlueprintCallable)
-	void SetAbilityMaxHealth(float HealthValue);
-
 	void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 	/////////////////////////////
@@ -51,16 +42,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetBase, MaxHealth)
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BaseAttribute")
-	FGameplayAttributeData Damaged;
-	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetBase, Damaged)
-
-	//Attributes for Stamina
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BaseAttribute")
-	FGameplayAttributeData Stamina;
-	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetBase, Stamina)
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BaseAttribute")
-	FGameplayAttributeData MaxStamina;
-	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetBase, MaxStamina)*/
-
+	FGameplayAttributeData DamageTakenAmount;
+	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetBase, DamageTakenAmount)
 };
