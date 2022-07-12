@@ -39,6 +39,6 @@ void AOPAG_RoomStreamingVolume::Tick(float DeltaTime)
 void AOPAG_RoomStreamingVolume::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
+	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator())
 		EventManager->EnteredRoomStreamingVolume.Broadcast(this);
 }

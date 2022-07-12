@@ -6,6 +6,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Rooms/OPAG_RoomAttachPoint.h"
 
 // Sets default values
 AOPAG_RoomManager::AOPAG_RoomManager()
@@ -31,6 +32,16 @@ AOPAG_RoomManager::AOPAG_RoomManager()
 	UpdateData();
 }
 
+void AOPAG_RoomManager::SetExitAsSpecial(bool bIsLastRoom, bool bHasSafeRoom) const
+{
+}
+
+
+void AOPAG_RoomManager::BlockExit() const
+{
+
+}
+
 // Called when the game starts or when spawned
 void AOPAG_RoomManager::BeginPlay()
 {
@@ -48,5 +59,16 @@ void AOPAG_RoomManager::Tick(float DeltaTime)
 void AOPAG_RoomManager::UpdateData()
 {
 	
+}
+
+void AOPAG_RoomManager::CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const
+{
+	for (AOPAG_RoomAttachPoint* Exit : Exits)
+	{
+		if (Exit->bIsOpen) continue;
+
+		if (bIsLastRoom || bHasSafeRoom) SetExitAsSpecial(bIsLastRoom, bHasSafeRoom);
+		else BlockExit();
+	}
 }
 

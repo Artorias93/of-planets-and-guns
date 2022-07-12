@@ -27,7 +27,7 @@ class OFPLANETSANDGUNS_API AOPAG_StageManager : public AActor
 
 	// Room Streaming
 
-	TMap<uint32, AOPAG_RoomStreamingVolume*> RoomStreaingVolumes;
+	TMap<uint32, AOPAG_RoomStreamingVolume*> RoomStreamingVolumes;
 	bool bVolumesAssigned;
 	TArray<AOPAG_RoomManager*> RoomManagers;
 
@@ -90,14 +90,27 @@ private:
 	int32 AddRandomBridge(FOPAG_StagePathing* Room, bool SecondaryExit = false);
 
 	void FinishedLoadingStage();
-	void LoadMaps(AOPAG_RoomStreamingVolume* const Volume);
 	void OnRoomSpawned(AOPAG_RoomManager* const RoomManager);
 
 	FOPAG_StagePathing* FindPathingToAssign(const ULevel* Level);
 	void AddRoom(int32 ID, AOPAG_RoomAttachPoint* AttachPoint);
 
+	void PostRoomLoadingActions();
+
 	void LoadGeometryRooms();
 	void AddGeometryRoom(int32 ID, FName GeometryName);
+
+	void AssignVolumes();
+	void AddLevelsToVolume(AOPAG_RoomStreamingVolume* Volume, uint32 ID);
+	void AddLevelsAboveVolume(int32 ID, TArray<ULevelStreamingDynamic*>& StreamingVolumes);
+	void AddLevelsBelowVolume(TArray<int32> IDs, TArray<ULevelStreamingDynamic*>& StreamingVolumes);
+
+	void PostGenerationActions();
+
+	void AssignClosedExits();
+	void ReplacePawn();
+	void LoadLevels(AOPAG_RoomStreamingVolume* const Volume);
+	void UnloadLevels();
 
 	void ScreenLog(FString Message, EMessageSeverity::Type Severity);
 

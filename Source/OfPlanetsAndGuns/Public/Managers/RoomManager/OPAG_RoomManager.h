@@ -45,6 +45,9 @@ public:
 
 	int AssignedRoomID;
 
+private:
+	void SetExitAsSpecial(bool bIsLastRoom, bool bHasSafeRoom) const;
+	void BlockExit() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -57,4 +60,6 @@ public:
 	UFUNCTION(BlueprintCallable, CallInEditor)
 		void UpdateData();
 
+	UFUNCTION(BlueprintCallable)
+		void CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const;
 };

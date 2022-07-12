@@ -3,6 +3,7 @@
 
 #include "Managers/StageManager/OPAG_StageManager.h"
 
+#include "Characters/Player/OPAG_Player.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/RoomManager/OPAG_RoomManager.h"
@@ -312,17 +313,6 @@ void AOPAG_StageManager::FinishedLoadingStage()
 	}
 }
 
-void AOPAG_StageManager::LoadMaps(AOPAG_RoomStreamingVolume* const Volume)
-{
-	for (ULevelStreamingDynamic* StreamingLevel : Volume->StreamingLevels)
-	{
-		if (!StreamingLevel->ShouldBeVisible())
-		{
-			StreamingLevel->SetShouldBeVisible(true);
-		}
-	}
-}
-
 void AOPAG_StageManager::OnRoomSpawned(AOPAG_RoomManager* const RoomManager)
 {
 	FOPAG_StagePathing* CurrentNode = FindPathingToAssign(RoomManager->GetLevel());
@@ -350,7 +340,7 @@ void AOPAG_StageManager::OnRoomSpawned(AOPAG_RoomManager* const RoomManager)
 	else if (!bVolumesAssigned)
 	{
 		RoomManagers.Add(RoomManager);
-		//load geometry
+		PostRoomLoadingActions();
 	}
 }
 
@@ -385,6 +375,15 @@ void AOPAG_StageManager::AddRoom(const int32 ID, AOPAG_RoomAttachPoint* AttachPo
 	Pathing->CurrentRoom->LevelStreaming = Level;
 }
 
+void AOPAG_StageManager::PostRoomLoadingActions()
+{
+	LoadGeometryRooms();
+	//delay somehow??
+	AssignVolumes();
+
+	PostGenerationActions();
+}
+
 void AOPAG_StageManager::LoadGeometryRooms()
 {
 	ScreenLog("Spawning Geometry Rooms", EMessageSeverity::Info);
@@ -393,9 +392,6 @@ void AOPAG_StageManager::LoadGeometryRooms()
 	{
 		AddGeometryRoom(RoomManager->AssignedRoomID, RoomManager->GeometryLevelName);
 	}
-
-	//delay somehow??
-
 }
 
 void AOPAG_StageManager::AddGeometryRoom(int32 ID, FName GeometryName)
@@ -422,16 +418,133 @@ void AOPAG_StageManager::AssignVolumes()
 
 	for (const AOPAG_RoomManager* RoomManager : RoomManagers)
 	{
-		RoomStreaingVolumes.Add(RoomManager->AssignedRoomID, RoomManager->Volume);
+		RoomStreamingVolumes.Add(RoomManager->AssignedRoomID, RoomManager->Volume);
 	}
 
-	for (auto RoomStreamingVolume : RoomStreamingVolumes)
+	TArray<uint32> VolumeKeys;
+	RoomStreamingVolumes.GetKeys(VolumeKeys);
+	for (auto Key : VolumeKeys)
 	{
-		//add levels to volumes sdgjisdglsdhgsdg
+
+		AddLevelsToVolume(RoomStreamingVolumes[Key], Key);
 	}
 
 	bVolumesAssigned = true;
-	//post generation actions
+}
+
+void AOPAG_StageManager::AddLevelsToVolume(AOPAG_RoomStreamingVolume* Volume, uint32 ID)
+{
+	const auto Pathing = StagePathing[ID];
+	if (Pathing == nullptr) return;
+
+	Volume->StreamingLevels.Add(Pathing->CurrentRoom->LevelStreaming);
+
+	AddLevelsAboveVolume(Pathing->PrevRoomID, Volume->StreamingLevels);
+	AddLevelsBelowVolume(Pathing->NextRoomIDs, Volume->StreamingLevels);
+}
+
+void AOPAG_StageManager::AddLevelsAboveVolume(int32 ID, TArray<ULevelStreamingDynamic*>& StreamingVolumes)
+{
+	int32 CurrentID = ID;
+	for (int32 i = 0; i < BaseGenerationData.FarthestLoad; ++i)
+	{
+		const auto Pathing = StagePathing[CurrentID];
+		if (Pathing == nullptr) continue;
+		StreamingVolumes.Add(Pathing->CurrentRoom->LevelStreaming);
+		CurrentID = Pathing->PrevRoomID;
+	}
+}
+
+void AOPAG_StageManager::AddLevelsBelowVolume(TArray<int32> IDs, TArray<ULevelStreamingDynamic*>& StreamingVolumes)
+{
+	TArray<int32> CurrentIDs = IDs;
+	TArray<int32> NextSet;
+
+	for (int32 i = 0; i < BaseGenerationData.FarthestLoad; ++i)
+	{
+		for (const int32 CurrentID : CurrentIDs)
+		{
+			const auto Pathing = StagePathing[CurrentID];
+			if (Pathing == nullptr) continue;
+			StreamingVolumes.Add(Pathing->CurrentRoom->LevelStreaming);
+			NextSet.Append(Pathing->NextRoomIDs);
+		}
+		CurrentIDs = NextSet;
+		NextSet.Empty();
+	}
+}
+
+void AOPAG_StageManager::PostGenerationActions()
+{
+	AssignClosedExits();
+	UnloadLevels();
+	ReplacePawn();
+	FinishedLoadingStage();
+}
+
+void AOPAG_StageManager::AssignClosedExits()
+{
+	for (const AOPAG_RoomManager* RoomManager : RoomManagers)
+	{
+		const FOPAG_StagePathing* Pathing = StagePathing[RoomManager->AssignedRoomID];
+		if (Pathing == nullptr) continue;
+
+		RoomManager->CloseExits(Pathing->CurrentRoom->ID == FinalRoom, Pathing->CurrentRoom->ID == SafeRoom);
+	}
+}
+
+void AOPAG_StageManager::ReplacePawn()
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	AActor* PawnToDestroy = PlayerController->GetPawnOrSpectator();
+	FActorSpawnParameters SpawnInfo;
+	APawn* PawnToPossess = GetWorld()->SpawnActor<AOPAG_Player>(
+		AOPAG_Player::StaticClass(), PawnToDestroy->GetActorTransform(), SpawnInfo);
+	PawnToDestroy->Destroy();
+	PlayerController->Possess(PawnToPossess);
+}
+
+void AOPAG_StageManager::UnloadLevels()
+{
+	if (bDisableLevelUnloading || !bVolumesAssigned) return;
+
+	TArray<ULevelStreamingDynamic*> LevelsToUnload;
+	TArray<uint32> Keys;
+	StagePathing.GetKeys(Keys);
+	for (uint32 Key : Keys)
+	{
+		LevelsToUnload.Add(StagePathing[Key]->CurrentRoom->LevelStreaming);
+	}
+
+	Keys.Empty();
+	RoomStreamingVolumes.GetKeys(Keys);
+	AActor* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator();
+	for (uint32 Key : Keys)
+	{
+		if (RoomStreamingVolumes[Key]->IsOverlappingActor(PlayerPawn))
+		{
+			for (auto StreamingLevel : RoomStreamingVolumes[Key]->StreamingLevels)
+			{
+				LevelsToUnload.Remove(StreamingLevel);
+			}
+		}
+	}
+
+	for (ULevelStreamingDynamic* ToUnload : LevelsToUnload)
+	{
+		ToUnload->SetShouldBeVisible(false);
+	}
+}
+
+void AOPAG_StageManager::LoadLevels(AOPAG_RoomStreamingVolume* Volume)
+{
+	for (ULevelStreamingDynamic* StreamingLevel : Volume->StreamingLevels)
+	{
+		if (!StreamingLevel->ShouldBeVisible())
+		{
+			StreamingLevel->SetShouldBeVisible(true);
+		}
+	}
 }
 
 void AOPAG_StageManager::ScreenLog(FString Message, EMessageSeverity::Type Severity)
@@ -473,7 +586,8 @@ void AOPAG_StageManager::BeginPlay()
 		UOPAG_EventManagerSubsystem* const EventManager = GI->GetEventManager();
 		EventManager->GenerateStage.AddDynamic(this, &AOPAG_StageManager::StartStageGeneration);
 		EventManager->RoomSpawned.AddDynamic(this, &AOPAG_StageManager::OnRoomSpawned);
-		EventManager->EnteredRoomStreamingVolume.AddDynamic(this, &AOPAG_StageManager::LoadMaps);
+		EventManager->EnteredRoomStreamingVolume.AddDynamic(this, &AOPAG_StageManager::LoadLevels);
+		EventManager->LeftRoomStreamingVolume.AddDynamic(this, &AOPAG_StageManager::UnloadLevels);
 
 		EventManager->StageManagerReady.Broadcast();
 	}
