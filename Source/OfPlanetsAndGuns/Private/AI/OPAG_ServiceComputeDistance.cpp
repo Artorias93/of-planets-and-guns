@@ -3,6 +3,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
+#include "Characters/OPAG_CharacterBase.h" //Remove when player is ready
 #include "Characters/Player/OPAG_Player.h"
 
 UOPAG_ServiceComputeDistance::UOPAG_ServiceComputeDistance(FObjectInitializer const& ObjectInitializer)
@@ -17,7 +18,9 @@ void UOPAG_ServiceComputeDistance::TickNode(UBehaviorTreeComponent& OwnerBTCompo
 
 	if(AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		if (AOPAG_Player* const PlayerActor = Cast<AOPAG_Player>(AIController->GetBlackboardComponent()->GetValueAsObject(BBKeyTargetActor.SelectedKeyName)))
+		//Replace with the proper class when it's ready
+		if (AOPAG_CharacterBase* const PlayerActor = Cast<AOPAG_CharacterBase>(
+			AIController->GetBlackboardComponent()->GetValueAsObject(BBKeyTargetActor.SelectedKeyName)))
 		{
 			FVector SelfLocation = AIController->GetPawn()->GetActorLocation();
 			FVector PlayerLocation = PlayerActor->GetActorLocation();

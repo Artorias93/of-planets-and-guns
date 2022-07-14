@@ -30,8 +30,6 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
-	
-private:
 
 	void DropAndDespawn();
 
@@ -53,7 +51,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "AI")
 	float RagdollDurationSeconds;
 
-private:
+protected:
 
 	FTimerHandle RagdollTimerHandle;
 };

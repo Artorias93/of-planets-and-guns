@@ -12,7 +12,9 @@ AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
 
 void AOPAG_MeleeEnemy::BeginPlay()
 {
-	SwordMeshComponent->AttachTo(GetMesh(), "RightHandSocket", EAttachLocation::SnapToTarget, false);
+	Super::BeginPlay();
+	SwordMeshComponent->AttachTo(GetMesh(), "RightHandSocket", EAttachLocation::KeepRelativeOffset, false);
+	SwordMeshComponent->SetWorldScale3D(FVector(.2f));
 }
 
 void AOPAG_MeleeEnemy::Attack()
