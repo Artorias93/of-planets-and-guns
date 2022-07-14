@@ -19,7 +19,7 @@ public:
 
 	void UpdateSpeed(float NewSpeed);
 
-	void InflictDamage(float DamageAmount);
+	virtual void TakeDamage(float DamageAmount) override;
 
 	virtual void Attack();
 
@@ -46,10 +46,10 @@ public:
 	class AOPAG_PatrolPath* PatrolPath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "AI", meta = (ExposeOnSpawn))
-	bool bUsingPatrolPath;
+	bool bUsingPatrolPath = false;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
-	float RagdollDurationSeconds;
+	float RagdollDurationSeconds = 2.f;
 
 protected:
 

@@ -80,7 +80,7 @@ void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> Abilit
 	}
 }
 
-void AOPAG_CharacterBase::InflictDamage(float Damage)
+void AOPAG_CharacterBase::TakeDamage(float Damage)
 {
 	if(AbilitySystemComp && BaseAttributeSet)
 	{
@@ -104,7 +104,7 @@ void AOPAG_CharacterBase::InflictDamage(float Damage)
 	}
 }
 
-void AOPAG_CharacterBase::InflictDamage(AActor* Throwable)
+void AOPAG_CharacterBase::TakeDamage(AActor* Throwable)
 {
 	//TODO: Implement
 }

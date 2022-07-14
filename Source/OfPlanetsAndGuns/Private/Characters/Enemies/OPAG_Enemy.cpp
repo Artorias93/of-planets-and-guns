@@ -33,13 +33,13 @@ void AOPAG_Enemy::UpdateSpeed(float NewSpeed)
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
-void AOPAG_Enemy::InflictDamage(float DamageAmount)
+void AOPAG_Enemy::TakeDamage(float DamageAmount)
 {
-	Super::InflictDamage(DamageAmount);
+	Super::TakeDamage(DamageAmount);
 	//Triggers the damage sense on the AI controlled pawn
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this, UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount, UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(), GetActorLocation(), NAME_None);
 	if(GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("I'm taking damage!"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Player taking damage!"));
 }
 
 void AOPAG_Enemy::Attack()

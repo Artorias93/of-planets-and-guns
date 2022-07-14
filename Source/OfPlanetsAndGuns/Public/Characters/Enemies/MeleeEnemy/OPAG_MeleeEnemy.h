@@ -19,13 +19,12 @@ public:
 
 	void Attack() override;
 
-protected:
+private:
 
 	void BeginPlay() override;
 
-private:
-
-	float PlayMeleeAttackMontage();
+	UFUNCTION()
+	void OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload& NotifyPayload);
 
 	/////////////////////////////
 	//Variables
@@ -35,6 +34,16 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
 	class UAnimMontage* MeleeAttackMontage;
+
+	class UBoxComponent* DamageCollisionBoxComponent;
+
+	UPROPERTY(EditAnywhere, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	FVector DamageCollisionBoxComponentRelativeLocation = FVector(145.f, 0.f, 7.f);
+
+	UPROPERTY(EditAnywhere, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	FVector DamageCollisionBoxComponentExtent = FVector(95.f, 20.f, 90.f);
+
+	UAnimInstance* AnimInstance;
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* SwordMeshComponent;
