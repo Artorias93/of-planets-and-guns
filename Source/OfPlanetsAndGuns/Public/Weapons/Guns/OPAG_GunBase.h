@@ -13,6 +13,12 @@ class AOPAG_ModuleBase;
 enum class EModuleTypes : uint8;
 enum class EModuleRarity : uint8;
 
+class AOPAG_BarrelBase;
+class AOPAG_AccessoryBase;
+
+class ACharacterBase;
+class AOPAG_Grenade;
+
 UENUM(BlueprintType, meta = (Bitflags))
 enum class EFireTypes : uint8
 {
@@ -125,6 +131,10 @@ private:
 	TSubclassOf<AOPAG_ModuleBase> StandardGrip;
 	TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
 
+private:
+	FTimerHandle ResetShootHandle;
+	FTimerHandle ReloadHandle;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -132,14 +142,38 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent); 
-	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType);
+	// Utility for link modules and sockets
+	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const; 
+	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
+	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
+	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
+	// Mathematic Utility
+	const float CalculateRateInSeconds(const float FireRate);
+
+	// Main system for shooting
 	void Shoot(FVector StartShootLocation, FVector Direction);
 	void ShootLineTrace(FVector StartShootLocation, FVector Direction);
+	void ShootThrowable(const FRotator SpawnRotation);
+	void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
+	void ResetShootTimer();
 
+	// Subsystem for shooting
+	const float CalculateSpread();
+	const float CalculateSpreadRadius();
+	const FVector2D CalculateRandPointInCircle();
+	const FVector ApplyNoise(const FVector Direction);
+	const FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction);
+	TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
+	
+	// Ammo behavior
+	void UpdateAmmo();
+	void Reload();
+	void WaitReloadingTimer();
 
+	// Create and Attach module behavior
 	void CreateAndAttachAllModules();
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
 	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes);
+	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FGunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
 };
