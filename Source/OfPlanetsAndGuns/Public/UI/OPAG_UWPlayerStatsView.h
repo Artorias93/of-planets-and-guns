@@ -21,7 +21,11 @@ class OFPLANETSANDGUNS_API UOPAG_UWPlayerStatsView : public UUserWidget
 	void BindEvents();
 
 	UPROPERTY(meta = (BindWidget))
-		UImage* DashIcons;
+		UImage* DashIcon;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* DashAmountText;
+	UPROPERTY(meta = (BindWidget))
+		UProgressBar* DashChargeBar;
 
 	UPROPERTY(meta = (BindWidget))
 		UProgressBar* HealthBar;
@@ -33,6 +37,10 @@ public:
 	void UpdateHealthBar(const float CurrentValue, const float MaxValue);
 	UFUNCTION()
 	void UpdateShieldBar(const float CurrentValue, const float MaxValue);
+	UFUNCTION()
+	void UpdateDashAmountText(const int CurrentValue);
+	UFUNCTION()
+	void UpdateDashChargeBar(const float CurrentValue, const float MaxValue);
 
 	void NativeConstruct();
 };

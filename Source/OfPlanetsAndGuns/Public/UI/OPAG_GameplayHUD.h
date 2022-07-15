@@ -35,6 +35,10 @@ private:
 		class UOPAG_UWPauseView* PauseViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWPauseView> PauseViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWLoadingScreenView* LoadingScreenViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWLoadingScreenView> LoadingScreenViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
@@ -43,4 +47,8 @@ public:
 	void ShowPauseView();
 	UFUNCTION()
 	void HidePauseView();
+	UFUNCTION()
+	void ShowLoadingScreenView();
+	UFUNCTION()
+	void HideLoadingScreenView();
 };

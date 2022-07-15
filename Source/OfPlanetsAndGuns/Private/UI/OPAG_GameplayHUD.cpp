@@ -6,6 +6,7 @@
 #include "UI/OPAG_UWCurrencyView.h"
 #include "UI/OPAG_UWPlayerStatsView.h"
 #include "UI/OPAG_UWPauseView.h"
+#include "UI/OPAG_UWLoadingScreenView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 
@@ -18,6 +19,7 @@ void AOPAG_GameplayHUD::DrawHUD()
 void AOPAG_GameplayHUD::BindEvents() {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
+	EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
 }
 
 void AOPAG_GameplayHUD::BeginPlay()
@@ -53,6 +55,15 @@ void AOPAG_GameplayHUD::BeginPlay()
 		}
 	}
 
+	if (LoadingScreenViewWidgetClass)
+	{
+		LoadingScreenViewWidget = CreateWidget<UOPAG_UWLoadingScreenView>(GetWorld(), LoadingScreenViewWidgetClass); 
+		
+		if (LoadingScreenViewWidget) {
+			LoadingScreenViewWidget->AddToViewport(3);
+		}
+	}
+
 	if (PauseViewWidgetClass)
 	{
 		PauseViewWidget = CreateWidget<UOPAG_UWPauseView>(GetWorld(), PauseViewWidgetClass);
@@ -80,4 +91,16 @@ void AOPAG_GameplayHUD::HidePauseView() {
 
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	EMS->ResumeGame.Broadcast();
+}
+
+void AOPAG_GameplayHUD::ShowLoadingScreenView()
+{
+	
+}
+
+void AOPAG_GameplayHUD::HideLoadingScreenView()
+{
+	if (LoadingScreenViewWidget) {
+		LoadingScreenViewWidget->RemoveFromViewport();
+	}
 }

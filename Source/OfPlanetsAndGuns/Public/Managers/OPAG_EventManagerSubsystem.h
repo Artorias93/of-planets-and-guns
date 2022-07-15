@@ -28,6 +28,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentShiel
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
@@ -40,7 +42,7 @@ public:
 		//FGenerateStage GenerateStage;
 	//UPROPERTY(BlueprintAssignable, Category = StageManager)
 		//FRoomSpawned RoomSpawned;
-	UPROPERTY(BlueprintAssignable, Category = StageManager)
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
 		FStageLoaded StageLoaded;
 
 	UPROPERTY(BlueprintAssignable, Category = RoomManager)
@@ -49,6 +51,7 @@ public:
 	//UPROPERTY(BlueprintAssignable, Category = RoomManager)
 		//FEnteredRoomStreamingVolume EnteredRoomStreamingVolume;
 
+	//Player stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FHealthChanged HealthChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
@@ -57,6 +60,12 @@ public:
 		FAmmoChanged TotalAmmoChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FAmmoChanged CurrentAmmoChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FDashAmountChanged DashAmountChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FDashChargeChanged DashChargeChanged;
+
+	//Game stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FPauseGame PauseGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
