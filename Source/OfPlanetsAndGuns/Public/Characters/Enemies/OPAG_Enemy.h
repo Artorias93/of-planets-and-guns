@@ -23,7 +23,7 @@ public:
 
 	virtual void Attack();
 
-	void Death();
+	virtual void Death();
 
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -39,16 +39,16 @@ protected:
 
 public:
 
-	UPROPERTY(EditAnywhere, Category = "AI")
+	UPROPERTY(EditAnywhere, Category = "OPAG AI")
 	class UBehaviorTree* BehaviorTree;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI", meta = (ExposeOnSpawn))
+	UPROPERTY(EditAnywhere, BlueprintVisible, Category = "OPAG AI", meta = (ExposeOnSpawn))
 	class AOPAG_PatrolPath* PatrolPath;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "AI", meta = (ExposeOnSpawn))
+	UPROPERTY(EditAnywhere, BlueprintVisible, Category = "OPAG AI", meta = (ExposeOnSpawn))
 	bool bUsingPatrolPath = false;
 
-	UPROPERTY(EditAnywhere, Category = "AI")
+	UPROPERTY(EditAnywhere, Category = "OPAG AI")
 	float RagdollDurationSeconds = 2.f;
 
 protected:

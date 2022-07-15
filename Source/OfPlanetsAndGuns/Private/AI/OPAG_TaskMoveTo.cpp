@@ -5,11 +5,14 @@
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 
+//---------------------------------------------------------------------
+//THIS TASK IS CURRENTLY UNUSED
+//---------------------------------------------------------------------
+
 UOPAG_TaskMoveTo::UOPAG_TaskMoveTo(FObjectInitializer const& ObjectInitializer)
 {
 	NodeName = TEXT("Move To");
 }
-
 
 EBTNodeResult::Type UOPAG_TaskMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {

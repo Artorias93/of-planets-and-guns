@@ -4,6 +4,10 @@
 #include "OPAG_ServiceBase.h"
 #include "OPAG_ServiceComputeDistance.generated.h"
 
+//---------------------------------------------------------------------
+//THIS TASK IS CURRENTLY UNUSED
+//---------------------------------------------------------------------
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_ServiceComputeDistance : public UOPAG_ServiceBase
 {

@@ -6,6 +6,10 @@
 #include "Characters/OPAG_CharacterBase.h" //Remove when player is ready
 #include "Characters/Player/OPAG_Player.h"
 
+//---------------------------------------------------------------------
+//THIS TASK IS CURRENTLY UNUSED
+//---------------------------------------------------------------------
+
 UOPAG_ServiceComputeDistance::UOPAG_ServiceComputeDistance(FObjectInitializer const& ObjectInitializer)
 {
 	NodeName = TEXT("Compute Distance");

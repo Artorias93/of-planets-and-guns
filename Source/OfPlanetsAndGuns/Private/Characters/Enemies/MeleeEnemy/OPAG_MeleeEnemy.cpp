@@ -11,7 +11,6 @@ AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
 	DamageCollisionBoxComponent = CreateDefaultSubobject<UBoxComponent>("Damage Collision Box");
 	DamageCollisionBoxComponent->SetupAttachment(RootComponent);
 
-	//TODO: Is there a smart way to do this in C++ (especially setting relative location and rotation)?
 	SwordMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("SwordMeshComponent");
 }
 
@@ -19,9 +18,12 @@ void AOPAG_MeleeEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DamageCollisionBoxComponent->SetRelativeLocation(DamageCollisionBoxComponentRelativeLocation);
-	DamageCollisionBoxComponent->SetBoxExtent(DamageCollisionBoxComponentExtent);
-
+	//Components initialization
+	if(DamageCollisionBoxComponent)
+	{
+		DamageCollisionBoxComponent->SetRelativeLocation(DamageCollisionBoxComponentRelativeLocation);
+		DamageCollisionBoxComponent->SetBoxExtent(DamageCollisionBoxComponentExtent);
+	}
 	if (SwordMeshComponent)
 	{
 		SwordMeshComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "RightHandSocket");
@@ -40,19 +42,22 @@ void AOPAG_MeleeEnemy::BeginPlay()
 
 void AOPAG_MeleeEnemy::Attack()
 {
-	AnimInstance->Montage_Play(MeleeAttackMontage, 1.9f); //Montage speed = 1.9
+	AnimInstance->Montage_Play(MeleeAttackMontage, MeleeAttackMontagePlayRate /* = 1.9f */);
 }
 
+//Stops the bot's ability to turn in the direction of the focus actor during the attack animation 
 void AOPAG_MeleeEnemy::OnAttackBegin(UAnimMontage* Montage)
 {
 	bUseControllerRotationYaw = false;
 }
 
-void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool Idontknow)
+//Resumes the bot's ability to turn in the direction of the focus actor after the attack animation is done
+void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 {
 	bUseControllerRotationYaw = true;
 }
 
+//The attack collision & damage is computed when the animation montage's notify is reached
 void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload &NotifyPayload)
 {
 	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
@@ -62,10 +67,10 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("HIT!"));
 
-			//TODO: Check when player is done
-			if(AOPAG_CharacterBase* Act = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
+			//TODO: Change class when player is done
+			if(AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 			{
-				Act->TakeDamage(50.f);
+				Player->TakeDamage(50.f);
 			}
 
 			//TODO: Not working
@@ -78,4 +83,17 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("MISS..."));
 		}
 	}
+}
+
+void AOPAG_MeleeEnemy::Death()
+{
+	//Weapon Mesh ragdoll functions
+	if(SwordMeshComponent)
+	{
+		SwordMeshComponent->K2_DetachFromComponent(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld);
+		SwordMeshComponent->SetSimulatePhysics(true);
+		SwordMeshComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
+
+	Super::Death();
 }

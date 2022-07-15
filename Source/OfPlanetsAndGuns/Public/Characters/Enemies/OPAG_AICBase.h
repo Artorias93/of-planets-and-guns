@@ -53,15 +53,15 @@ protected:
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+	UPROPERTY(EditAnywhere, Category = "AI")
 		float LoseSightTimer = 3.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-		float SightSenseRadius = 3000.f;
+	UPROPERTY(EditAnywhere, Category = "AI")
+		float SightSenseRadius = 2500.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-		float LoseSightSenseRadius = 3500.f;
+	UPROPERTY(EditAnywhere, Category = "AI")
+		float LoseSightSenseRadius = 3000.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
-		float SightPeripheralVisionDegrees = 90.f;
+	UPROPERTY(EditAnywhere, Category = "AI")
+		float SightPeripheralVisionDegrees = 120.f;
 };

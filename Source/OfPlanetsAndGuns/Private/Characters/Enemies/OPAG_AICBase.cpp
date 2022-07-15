@@ -23,9 +23,9 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionSightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AI Sight Config"));
 	PerceptionDamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("AI Damage Config"));
 	//TODO: Move this setup in the specialized sub-classes
-	PerceptionSightConfig->SightRadius = 3000.f;
-	PerceptionSightConfig->LoseSightRadius = 3500.f;
-	PerceptionSightConfig->PeripheralVisionAngleDegrees = 90.0f;
+	PerceptionSightConfig->SightRadius = 2500.f;
+	PerceptionSightConfig->LoseSightRadius = 300.f;
+	PerceptionSightConfig->PeripheralVisionAngleDegrees = 120.0f;
 	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	PerceptionSightConfig->DetectionByAffiliation.bDetectFriendlies = true;

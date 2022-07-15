@@ -49,12 +49,13 @@ void AOPAG_Enemy::Attack()
 
 void AOPAG_Enemy::Death()
 {
+	//Stops executing AI tasks
 	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
-		AIController->GetBrainComponent()->StopLogic("");
+		AIController->GetBrainComponent()->StopLogic("Death");
 	}
 
-	//Ragdoll functions
+	//Mesh ragdoll functions
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetSimulatePhysics(true);
 	GetWorld()->GetTimerManager().SetTimer(RagdollTimerHandle, this, &AOPAG_Enemy::DropAndDespawn, RagdollDurationSeconds);

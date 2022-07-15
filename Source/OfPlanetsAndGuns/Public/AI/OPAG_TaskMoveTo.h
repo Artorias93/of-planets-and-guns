@@ -4,6 +4,10 @@
 #include "OPAG_TaskBase.h"
 #include "OPAG_TaskMoveTo.generated.h"
 
+//---------------------------------------------------------------------
+//THIS TASK IS CURRENTLY UNUSED
+//---------------------------------------------------------------------
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_TaskMoveTo : public UOPAG_TaskBase
 {

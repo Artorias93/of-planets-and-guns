@@ -19,6 +19,9 @@ public:
 
 	void Attack() override;
 
+	UFUNCTION(CallInEditor, Category = "OPAG AI")
+	void Death() override;
+
 	
 private:
 
@@ -31,26 +34,31 @@ private:
 	void OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload& NotifyPayload);
 
 	UFUNCTION()
-	void OnAttackEnd(UAnimMontage* Montage, bool Idontknow);
+	void OnAttackEnd(UAnimMontage* Montage, bool bInterrupted);
+
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
 
 private: 
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
 	class UAnimMontage* MeleeAttackMontage;
-
-	class UBoxComponent* DamageCollisionBoxComponent;
-
-	UPROPERTY(EditAnywhere, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	FVector DamageCollisionBoxComponentRelativeLocation = FVector(145.f, 0.f, 7.f);
-
-	UPROPERTY(EditAnywhere, Category = "AI", meta = (AllowPrivateAccess = "true"))
-	FVector DamageCollisionBoxComponentExtent = FVector(95.f, 20.f, 90.f);
 
 	UAnimInstance* AnimInstance;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
+	float MeleeAttackMontagePlayRate = 1.9f;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI")
+	FVector DamageCollisionBoxComponentRelativeLocation = FVector(145.f, 0.f, 7.f);
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI")
+	FVector DamageCollisionBoxComponentExtent = FVector(95.f, 20.f, 90.f);
+
+	UPROPERTY(VisibleAnywhere)
+	class UBoxComponent* DamageCollisionBoxComponent;
+
+	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* SwordMeshComponent;
 };
