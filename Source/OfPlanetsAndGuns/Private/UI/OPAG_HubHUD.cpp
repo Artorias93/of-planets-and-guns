@@ -13,6 +13,13 @@ void AOPAG_HubHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (PC) {
+		PC->SetInputMode(FInputModeUIOnly());
+		PC->bShowMouseCursor = true;
+	}
+
 	if (HubViewWidgetClass)
 	{
 		HubViewWidget = CreateWidget<UOPAG_UWHubView>(GetWorld(), HubViewWidgetClass);

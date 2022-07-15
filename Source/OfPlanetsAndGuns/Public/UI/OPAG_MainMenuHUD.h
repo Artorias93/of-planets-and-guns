@@ -22,6 +22,10 @@ private:
 		class UOPAG_UWMainMenuView* MainMenuViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWMainMenuView> MainMenuViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWHubView* HubViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWHubView> HubViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
