@@ -37,7 +37,7 @@ public:
 
 	virtual void TakeDamage(AActor* Throwable);
 
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	float GetHealth() const;
 
@@ -47,7 +47,7 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	virtual void GetShootingDirection(float ShootingAccuracyTolerance = 0);
+	virtual void GetShootingDirection(FVector& StartingLocation, FVector& Direction, float ShootingAccuracyTolerance = 0.f);
 
 	virtual void Death();
 

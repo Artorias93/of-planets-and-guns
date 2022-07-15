@@ -3,6 +3,7 @@
 #include <BehaviorTree/BlackboardComponent.h>
 #include <Perception/AISense_Damage.h>
 #include <Kismet/GameplayStatics.h>
+#include <Kismet/KismetMathLibrary.h>
 #include <BrainComponent.h>
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
@@ -67,4 +68,26 @@ void AOPAG_Enemy::DropAndDespawn()
 
 	GetWorld()->GetTimerManager().ClearTimer(RagdollTimerHandle);
 	Destroy();
+}
+
+void AOPAG_Enemy::GetShootingDirection(FVector& StartLocation, FVector& Direction, float ShootingAccuracyTolerance /* = 0 */)
+{
+	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	{
+		if(AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
+		{
+			//Start location is the front of the gun
+			StartLocation = GetActorLocation() + (GetActorForwardVector() * 50.f);
+
+			//Vector from player to enemy
+			const FVector PlayerToSelfVector = Player->GetActorLocation() - GetActorLocation();
+
+			//Not normalized vector with shooting accuracy computations applied
+			const FVector DirectionVector = FVector(PlayerToSelfVector.X + UKismetMathLibrary::RandomFloatInRange(-ShootingAccuracyTolerance, ShootingAccuracyTolerance),
+				PlayerToSelfVector.Y, PlayerToSelfVector.Z + UKismetMathLibrary::RandomFloatInRange(-ShootingAccuracyTolerance, ShootingAccuracyTolerance));
+			
+			//Normalized vector with shooting accuracy computations applied
+			Direction = UKismetMathLibrary::Normal(DirectionVector, 0.0001f); //2nd param is tolerance
+		}
+	}
 }

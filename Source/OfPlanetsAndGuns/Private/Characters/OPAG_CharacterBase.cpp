@@ -49,9 +49,9 @@ void AOPAG_CharacterBase::BeginPlay()
 	}
 }
 
-void AOPAG_CharacterBase::Tick(float DeltaTime)
+void AOPAG_CharacterBase::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(DeltaSeconds);
 }
 
 float AOPAG_CharacterBase::GetHealth() const
@@ -109,7 +109,7 @@ void AOPAG_CharacterBase::TakeDamage(AActor* Throwable)
 	//TODO: Implement
 }
 
-void AOPAG_CharacterBase::GetShootingDirection(float ShootingAccuracyTolerance)
+void AOPAG_CharacterBase::GetShootingDirection(FVector& StartingLocation, FVector& Direction, float ShootingAccuracyTolerance)
 {
 	//Overridden by children
 }

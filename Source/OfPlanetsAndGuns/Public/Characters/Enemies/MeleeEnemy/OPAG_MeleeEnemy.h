@@ -51,14 +51,14 @@ private:
 	float MeleeAttackMontagePlayRate = 1.9f;
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI")
-	FVector DamageCollisionBoxComponentRelativeLocation = FVector(145.f, 0.f, 7.f);
+	FVector DamageCollisionBoxRelativeLocation = FVector(145.f, 0.f, 7.f);
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI")
-	FVector DamageCollisionBoxComponentExtent = FVector(95.f, 20.f, 90.f);
+	FVector DamageCollisionBoxExtent = FVector(95.f, 20.f, 90.f);
 
 	UPROPERTY(VisibleAnywhere)
-	class UBoxComponent* DamageCollisionBoxComponent;
+	class UBoxComponent* DamageCollisionBox;
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* SwordMeshComponent;
+	UStaticMeshComponent* SwordMesh;
 };

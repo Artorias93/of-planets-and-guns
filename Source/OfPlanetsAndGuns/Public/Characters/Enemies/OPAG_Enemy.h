@@ -33,6 +33,7 @@ protected:
 
 	void DropAndDespawn();
 
+	virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float ShootingAccuracyTolerance /* = 0 */) override;
 	/////////////////////////////
 	//Variables
 	/////////////////////////////

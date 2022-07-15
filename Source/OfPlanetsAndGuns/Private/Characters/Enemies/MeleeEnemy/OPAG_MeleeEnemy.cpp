@@ -1,33 +1,30 @@
 #include "Characters/Enemies/MeleeEnemy/OPAG_MeleeEnemy.h"
 #include <Components/BoxComponent.h>
 //My Classes
-#include "Characters/Enemies/OPAG_AICBase.h"
+#include "Characters/Enemies/MeleeEnemy/OPAG_AICMeleeEnemy.h"
 
 AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	//Components creation
-	DamageCollisionBoxComponent = CreateDefaultSubobject<UBoxComponent>("Damage Collision Box");
-	DamageCollisionBoxComponent->SetupAttachment(RootComponent);
-
-	SwordMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("SwordMeshComponent");
+	DamageCollisionBox = CreateDefaultSubobject<UBoxComponent>("Damage Collision Box Component");
+	if(DamageCollisionBox)
+	{
+		DamageCollisionBox->SetupAttachment(RootComponent);
+		DamageCollisionBox->SetRelativeLocation(DamageCollisionBoxRelativeLocation);
+		DamageCollisionBox->SetBoxExtent(DamageCollisionBoxExtent);
+	}
+	SwordMesh = CreateDefaultSubobject<UStaticMeshComponent>("Sword Mesh Component");
+	if (SwordMesh)
+	{
+		SwordMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "RightHandSocket");
+	}
 }
 
 void AOPAG_MeleeEnemy::BeginPlay()
 {
-	Super::BeginPlay();
-
-	//Components initialization
-	if(DamageCollisionBoxComponent)
-	{
-		DamageCollisionBoxComponent->SetRelativeLocation(DamageCollisionBoxComponentRelativeLocation);
-		DamageCollisionBoxComponent->SetBoxExtent(DamageCollisionBoxComponentExtent);
-	}
-	if (SwordMeshComponent)
-	{
-		SwordMeshComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "RightHandSocket");
-	}
+	Super::BeginPlay();	
 
 	//Sets delegate functions that enable or disable the pawn rotation at the start and end of the attack animation.
 	//There's a notify in the middle of the animation that is when the collision checks and the damage should be evaluated.
@@ -60,9 +57,9 @@ void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 //The attack collision & damage is computed when the animation montage's notify is reached
 void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload &NotifyPayload)
 {
-	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	if (AOPAG_AICMeleeEnemy* const AIController = Cast<AOPAG_AICMeleeEnemy>(GetController()))
 	{
-		if (DamageCollisionBoxComponent->IsOverlappingActor(AIController->GetFocusActor()))
+		if (DamageCollisionBox->IsOverlappingActor(AIController->GetFocusActor()))
 		{
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("HIT!"));
@@ -88,11 +85,11 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 void AOPAG_MeleeEnemy::Death()
 {
 	//Weapon Mesh ragdoll functions
-	if(SwordMeshComponent)
+	if(SwordMesh)
 	{
-		SwordMeshComponent->K2_DetachFromComponent(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld);
-		SwordMeshComponent->SetSimulatePhysics(true);
-		SwordMeshComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		SwordMesh->K2_DetachFromComponent(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld);
+		SwordMesh->SetSimulatePhysics(true);
+		SwordMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	}
 
 	Super::Death();
