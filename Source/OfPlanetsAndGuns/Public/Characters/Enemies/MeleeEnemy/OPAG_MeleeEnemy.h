@@ -19,13 +19,19 @@ public:
 
 	void Attack() override;
 
+	
 private:
 
 	void BeginPlay() override;
 
 	UFUNCTION()
+	void OnAttackBegin(UAnimMontage* Montage);
+
+	UFUNCTION()
 	void OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload& NotifyPayload);
 
+	UFUNCTION()
+	void OnAttackEnd(UAnimMontage* Montage, bool Idontknow);
 	/////////////////////////////
 	//Variables
 	/////////////////////////////

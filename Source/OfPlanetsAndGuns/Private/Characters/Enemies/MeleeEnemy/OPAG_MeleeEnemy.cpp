@@ -27,21 +27,30 @@ void AOPAG_MeleeEnemy::BeginPlay()
 		SwordMeshComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "RightHandSocket");
 	}
 
-	//Sets a delegate function that processes the attack only when the animation notify is reached
+	//Sets delegate functions that enable or disable the pawn rotation at the start and end of the attack animation.
+	//There's a notify in the middle of the animation that is when the collision checks and the damage should be evaluated.
 	AnimInstance = (GetMesh()) ? GetMesh()->GetAnimInstance() : nullptr;
 	if (MeleeAttackMontage && AnimInstance)
 	{
+		AnimInstance->OnMontageStarted.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackBegin);
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackNotify);
+		AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackEnd);
 	}
-
-	
-	//SwordMeshComponent->SetRelativeLocation(FVector(21.6923f, -18.8085f, 0.9923f));
-	//SwordMeshComponent->SetRelativeRotation(FRotator(10.9306f, 49.441f, -107.246f));
 }
 
 void AOPAG_MeleeEnemy::Attack()
 {
 	AnimInstance->Montage_Play(MeleeAttackMontage, 1.9f); //Montage speed = 1.9
+}
+
+void AOPAG_MeleeEnemy::OnAttackBegin(UAnimMontage* Montage)
+{
+	bUseControllerRotationYaw = false;
+}
+
+void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool Idontknow)
+{
+	bUseControllerRotationYaw = true;
 }
 
 void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload &NotifyPayload)
@@ -58,8 +67,6 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 			{
 				Act->TakeDamage(50.f);
 			}
-
-
 
 			//TODO: Not working
 			//InflictDamage(50.f);
