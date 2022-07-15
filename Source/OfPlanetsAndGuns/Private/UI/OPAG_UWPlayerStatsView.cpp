@@ -5,6 +5,19 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+
+void UOPAG_UWPlayerStatsView::NativeConstruct() {
+	BindEvents();
+}
+
+void UOPAG_UWPlayerStatsView::BindEvents()
+{
+	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	EMS->HealthChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateHealthBar);
+	EMS->ShieldChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateShieldBar);
+}
 
 void UOPAG_UWPlayerStatsView::UpdateHealthBar(const float CurrentValue, const float MaxValue)
 {

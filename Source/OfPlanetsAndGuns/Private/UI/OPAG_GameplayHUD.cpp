@@ -6,15 +6,25 @@
 #include "UI/OPAG_UWCurrencyView.h"
 #include "UI/OPAG_UWPlayerStatsView.h"
 #include "UI/OPAG_UWPauseView.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+
 
 void AOPAG_GameplayHUD::DrawHUD() 
 {
 	Super::DrawHUD();
 }
 
+void AOPAG_GameplayHUD::BindEvents() {
+	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
+}
+
 void AOPAG_GameplayHUD::BeginPlay()
 {
 	Super::BeginPlay();
+
+	BindEvents();
 
 	if (PlayerStatsViewWidgetClass)
 	{
@@ -47,14 +57,10 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		PauseViewWidget = CreateWidget<UOPAG_UWPauseView>(GetWorld(), PauseViewWidgetClass);
 	}
-
-	//Reference to EventManager?
-	//EventManager->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
 }
 
 void AOPAG_GameplayHUD::ShowPauseView() {
 
-	//Cache a FirstPlayerController reference?
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 
@@ -65,7 +71,6 @@ void AOPAG_GameplayHUD::ShowPauseView() {
 
 void AOPAG_GameplayHUD::HidePauseView() {
 
-	//Cache a FirstPlayerController reference?
 	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 
@@ -73,5 +78,6 @@ void AOPAG_GameplayHUD::HidePauseView() {
 		PauseViewWidget->RemoveFromViewport();
 	}
 
-	//Event Dispatch->ResumeGame Event! (to Event Manager?)
+	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	EMS->ResumeGame.Broadcast();
 }

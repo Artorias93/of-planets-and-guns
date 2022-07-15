@@ -13,7 +13,9 @@ UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_GameplayHUD : public AHUD
 {
 	GENERATED_BODY()
-	
+
+	void BindEvents();
+
 	virtual void BeginPlay() override;
 
 private:

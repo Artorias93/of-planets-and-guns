@@ -11,5 +11,4 @@ AOPAG_BaseGameMode::AOPAG_BaseGameMode() {
 	if (GameplayHUDClass.Class != NULL) {
 		HUDClass = GameplayHUDClass.Class;
 	}
-
 }

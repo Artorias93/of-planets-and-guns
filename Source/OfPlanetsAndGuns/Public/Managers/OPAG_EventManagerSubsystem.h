@@ -23,6 +23,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnteredRoomStreamingVolume, AOPAG_RoomStreamingVolume* const, Volume);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentHealth, float, MaxHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentShield, float, MaxShield);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
@@ -43,4 +49,16 @@ public:
 	//UPROPERTY(BlueprintAssignable, Category = RoomManager)
 		//FEnteredRoomStreamingVolume EnteredRoomStreamingVolume;
 
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FHealthChanged HealthChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FShieldChanged ShieldChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FAmmoChanged TotalAmmoChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FAmmoChanged CurrentAmmoChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FPauseGame PauseGame;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FResumeGame ResumeGame;
 };

@@ -41,6 +41,11 @@ public:
 	UFUNCTION()
 		void OnRoomCleared();
 
+	UFUNCTION()
+		void OnPauseGame();
+	UFUNCTION()
+		void OnResumeGame();
+
 	UFUNCTION(BlueprintCallable, Category = "Event Manger")
 		UOPAG_EventManagerSubsystem* GetEventManager();
 

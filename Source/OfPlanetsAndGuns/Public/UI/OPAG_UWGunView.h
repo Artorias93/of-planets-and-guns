@@ -18,6 +18,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunView : public UUserWidget
 {
 	GENERATED_BODY()
 
+	void BindEvents();
+
 	UPROPERTY(meta = (BindWidget))
 		UImage* EquippedGunIcon;
 	UPROPERTY(meta = (BindWidget))
@@ -29,4 +31,11 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunView : public UUserWidget
 		UTextBlock* CurrentAmmoText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* TotalAmmoText;
+public:
+	UFUNCTION()
+		void UpdateCurrentAmmoText(const int CurrentValue);
+	UFUNCTION()
+		void UpdateTotalAmmoText(const int CurrentValue);
+
+	void NativeConstruct();
 };

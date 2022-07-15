@@ -18,7 +18,7 @@ void UOPAG_UWPauseView::NativeConstruct()
 void UOPAG_UWPauseView::ContinueButtonClicked()
 {
 	ContinueButton->OnClicked.RemoveDynamic(this, &UOPAG_UWPauseView::ContinueButtonClicked);
-	//How will i get it?
+
 	AOPAG_GameplayHUD* MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	if(MyHUD)
 		MyHUD->HidePauseView();

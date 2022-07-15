@@ -4,6 +4,7 @@
 #include "Managers/OPAG_GameInstance.h"
 
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 void UOPAG_GameInstance::BindEvents()
 {
@@ -12,6 +13,8 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->StageLoaded.AddDynamic(this, &UOPAG_GameInstance::OnStageLoaded);
 
 	EMS->RoomCleared.AddDynamic(this, &UOPAG_GameInstance::OnRoomCleared);
+	EMS->PauseGame.AddDynamic(this, &UOPAG_GameInstance::OnPauseGame);
+	EMS->ResumeGame.AddDynamic(this, &UOPAG_GameInstance::OnResumeGame);
 }
 
 void UOPAG_GameInstance::LoadGenerationTable()
@@ -49,6 +52,16 @@ void UOPAG_GameInstance::OnStageLoaded()
 void UOPAG_GameInstance::OnRoomCleared()
 {
 	StageDifficulty += 0.2f;
+}
+
+void UOPAG_GameInstance::OnPauseGame()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+}
+
+void UOPAG_GameInstance::OnResumeGame()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
 UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager()

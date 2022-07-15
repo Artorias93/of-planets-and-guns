@@ -18,6 +18,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWPlayerStatsView : public UUserWidget
 {
 	GENERATED_BODY()
 
+	void BindEvents();
+
 	UPROPERTY(meta = (BindWidget))
 		UImage* DashIcons;
 
@@ -27,6 +29,10 @@ class OFPLANETSANDGUNS_API UOPAG_UWPlayerStatsView : public UUserWidget
 		UProgressBar* ShieldBar;
 
 public:
+	UFUNCTION()
 	void UpdateHealthBar(const float CurrentValue, const float MaxValue);
+	UFUNCTION()
 	void UpdateShieldBar(const float CurrentValue, const float MaxValue);
+
+	void NativeConstruct();
 };
