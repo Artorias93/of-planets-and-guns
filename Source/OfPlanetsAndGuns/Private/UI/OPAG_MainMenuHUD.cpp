@@ -3,6 +3,7 @@
 
 #include "UI/OPAG_MainMenuHUD.h"
 #include "UI/OPAG_UWMainMenuView.h"
+#include "UI/OPAG_UWHubView.h"
 
 void AOPAG_MainMenuHUD::DrawHUD()
 {
