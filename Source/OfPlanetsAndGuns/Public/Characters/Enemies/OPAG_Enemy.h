@@ -42,10 +42,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "OPAG AI")
 	class UBehaviorTree* BehaviorTree;
 
-	UPROPERTY(EditAnywhere, BlueprintVisible, Category = "OPAG AI", meta = (ExposeOnSpawn))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn))
 	class AOPAG_PatrolPath* PatrolPath;
 
-	UPROPERTY(EditAnywhere, BlueprintVisible, Category = "OPAG AI", meta = (ExposeOnSpawn))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn))
 	bool bUsingPatrolPath = false;
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI")
