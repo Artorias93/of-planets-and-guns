@@ -18,8 +18,10 @@ void AOPAG_GameplayHUD::DrawHUD()
 
 void AOPAG_GameplayHUD::BindEvents() {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
-	EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
-	EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
+	if (EMS) {
+		EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
+		EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
+	}
 }
 
 void AOPAG_GameplayHUD::BeginPlay()
@@ -72,9 +74,13 @@ void AOPAG_GameplayHUD::BeginPlay()
 
 void AOPAG_GameplayHUD::ShowPauseView() {
 
-	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeUIOnly());
-	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
+	if (PC) {
+		PC->SetInputMode(FInputModeUIOnly());
+		PC->bShowMouseCursor = true;
+	}
+	
 	if (PauseViewWidget) {
 		PauseViewWidget->AddToViewport(2);
 	}
@@ -82,15 +88,21 @@ void AOPAG_GameplayHUD::ShowPauseView() {
 
 void AOPAG_GameplayHUD::HidePauseView() {
 
-	GetWorld()->GetFirstPlayerController()->SetInputMode(FInputModeGameOnly());
-	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (PC) {
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->bShowMouseCursor = false;
+	}
 
 	if (PauseViewWidget) {
 		PauseViewWidget->RemoveFromViewport();
 	}
 
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
-	EMS->ResumeGame.Broadcast();
+
+	if(EMS)
+		EMS->ResumeGame.Broadcast();
 }
 
 void AOPAG_GameplayHUD::ShowLoadingScreenView()

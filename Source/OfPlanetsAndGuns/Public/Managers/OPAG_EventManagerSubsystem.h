@@ -23,13 +23,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnteredRoomStreamingVolume, AOPAG_RoomStreamingVolume* const, Volume);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentHealth, float, MaxHealth);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentShield, float, MaxShield);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
@@ -64,6 +66,10 @@ public:
 		FDashAmountChanged DashAmountChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashChargeChanged DashChargeChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FGoldChanged GoldChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FBoltsChanged BoltsChanged;
 
 	//Game stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)

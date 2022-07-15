@@ -15,10 +15,13 @@ void UOPAG_UWPlayerStatsView::NativeConstruct() {
 void UOPAG_UWPlayerStatsView::BindEvents()
 {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
-	EMS->HealthChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateHealthBar);
-	EMS->ShieldChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateShieldBar);
-	EMS->DashAmountChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashAmountText);
-	EMS->DashChargeChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashChargeBar);
+	
+	if (EMS) {
+		EMS->HealthChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateHealthBar);
+		EMS->ShieldChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateShieldBar);
+		EMS->DashAmountChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashAmountText);
+		EMS->DashChargeChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashChargeBar);
+	}
 }
 
 void UOPAG_UWPlayerStatsView::UpdateHealthBar(const float CurrentValue, const float MaxValue)

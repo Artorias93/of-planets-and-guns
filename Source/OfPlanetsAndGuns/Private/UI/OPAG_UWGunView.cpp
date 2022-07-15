@@ -17,8 +17,11 @@ void UOPAG_UWGunView::NativeConstruct() {
 void UOPAG_UWGunView::BindEvents()
 {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
-	EMS->TotalAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateTotalAmmoText);
-	EMS->CurrentAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateCurrentAmmoText);
+
+	if (EMS) {
+		EMS->TotalAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateTotalAmmoText);
+		EMS->CurrentAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateCurrentAmmoText);
+	}
 }
 
 void UOPAG_UWGunView::UpdateCurrentAmmoText(const int CurrentValue)

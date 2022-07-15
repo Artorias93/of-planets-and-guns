@@ -17,6 +17,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
 {
 	GENERATED_BODY()
 
+	void BindEvents();
+
 	UPROPERTY(meta = (BindWidget))
 		UImage* GoldIcon;
 	UPROPERTY(meta = (BindWidget))
@@ -27,6 +29,10 @@ class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
 		UTextBlock* BoltsAmountText;
 
 public:
+	UFUNCTION()
 	void UpdateBoltsValue(const int Value);
+	UFUNCTION()
 	void UpdateGoldValue(const int Value);
+
+	void NativeConstruct();
 };

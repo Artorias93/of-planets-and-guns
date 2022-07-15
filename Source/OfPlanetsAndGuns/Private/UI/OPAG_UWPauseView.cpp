@@ -10,6 +10,7 @@
 void UOPAG_UWPauseView::NativeConstruct()
 {
 	Super::NativeConstruct();
+
 	ContinueButton->OnClicked.AddDynamic(this, &UOPAG_UWPauseView::ContinueButtonClicked);
 	OptionsButton->OnClicked.AddDynamic(this, &UOPAG_UWPauseView::OptionsButtonClicked);
 	ExitButton->OnClicked.AddDynamic(this, &UOPAG_UWPauseView::ExitButtonClicked);
