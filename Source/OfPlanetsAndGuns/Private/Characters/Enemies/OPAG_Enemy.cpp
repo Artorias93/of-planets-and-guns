@@ -29,7 +29,7 @@ void AOPAG_Enemy::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void AOPAG_Enemy::UpdateSpeed(float NewSpeed)
+void AOPAG_Enemy::UpdateSpeed(float NewSpeed) const
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
@@ -51,7 +51,7 @@ void AOPAG_Enemy::Attack()
 void AOPAG_Enemy::Death()
 {
 	//Stops executing AI tasks
-	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
 		AIController->GetBrainComponent()->StopLogic("Death");
 	}
@@ -72,9 +72,9 @@ void AOPAG_Enemy::DropAndDespawn()
 
 void AOPAG_Enemy::GetShootingDirection(FVector& StartLocation, FVector& Direction, float ShootingAccuracyTolerance /* = 0 */)
 {
-	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
-		if(AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
+		if(const AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 		{
 			//Start location is the front of the gun
 			StartLocation = GetActorLocation() + (GetActorForwardVector() * 50.f);

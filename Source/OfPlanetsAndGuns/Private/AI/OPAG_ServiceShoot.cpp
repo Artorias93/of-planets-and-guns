@@ -19,10 +19,10 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 
 	if(bIsAiming)
 	{
-		if (AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
+		if (const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
 		{
 			//TODO: Replace with player when ready
-			if (AOPAG_CharacterBase* const FocusActor = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
+			if (const AOPAG_CharacterBase* const FocusActor = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 			{
 				if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
 				{
@@ -31,7 +31,7 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 					ActorsToIgnore.Add(RangedEnemy);
 					FHitResult HitResult;
 					//TODO: Why is this a Sphere Trace with radius 0 and not a Line Trace?
-					bool TraceResult = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), RangedEnemy->GetActorLocation(), FocusActor->GetActorLocation(), 0.f, TraceTypeQuery2 /* = Camera*/, false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true);
+					const bool TraceResult = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), RangedEnemy->GetActorLocation(), FocusActor->GetActorLocation(), 0.f, TraceTypeQuery2 /* = Camera*/, false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true);
 
 					if (TraceResult)
 					{
@@ -49,9 +49,9 @@ void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTCompone
 {
 	Super::OnBecomeRelevant(OwnerBTComponent, NodeMemory);
 
-	if(AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
+	if(const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
 	{
-		if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
+		if(const AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
 		{
 			bIsAiming = true;
 

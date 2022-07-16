@@ -17,13 +17,13 @@ public:
 
 	AOPAG_Enemy();
 
-	void UpdateSpeed(float NewSpeed);
+	void UpdateSpeed(float NewSpeed) const;
 
 	virtual void TakeDamage(float DamageAmount) override;
 
 	virtual void Attack();
 
-	virtual void Death();
+	virtual void Death() override;
 
 	virtual void Tick(float DeltaSeconds) override;
 

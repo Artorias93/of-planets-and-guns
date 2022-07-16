@@ -38,7 +38,7 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 {
 	Super::OnPossess(ControlledPawn);
 
-	AOPAG_Enemy* const ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
+	const AOPAG_Enemy* const ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
 	if(ControlledEnemy && ControlledEnemy->BehaviorTree)
 	{
 		BlackboardComponent->InitializeBlackboard(*ControlledEnemy->BehaviorTree->BlackboardAsset);

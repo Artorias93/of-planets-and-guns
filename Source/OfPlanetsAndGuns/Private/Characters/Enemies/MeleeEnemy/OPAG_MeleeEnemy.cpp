@@ -42,13 +42,13 @@ void AOPAG_MeleeEnemy::Attack()
 	AnimInstance->Montage_Play(MeleeAttackMontage, MeleeAttackMontagePlayRate /* = 1.9f */);
 }
 
-//Stops the bot's ability to turn in the direction of the focus actor during the attack animation 
+//Stops the enemy's ability to turn in the direction of the focus actor during the attack animation 
 void AOPAG_MeleeEnemy::OnAttackBegin(UAnimMontage* Montage)
 {
 	bUseControllerRotationYaw = false;
 }
 
-//Resumes the bot's ability to turn in the direction of the focus actor after the attack animation is done
+//Resumes the enemy's ability to turn in the direction of the focus actor after the attack animation is done
 void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 {
 	bUseControllerRotationYaw = true;
@@ -57,13 +57,13 @@ void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 //The attack collision & damage is computed when the animation montage's notify is reached
 void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload &NotifyPayload)
 {
-	if (AOPAG_AICMeleeEnemy* const AIController = Cast<AOPAG_AICMeleeEnemy>(GetController()))
+	if (const AOPAG_AICMeleeEnemy* const AIController = Cast<AOPAG_AICMeleeEnemy>(GetController()))
 	{
 		if (DamageCollisionBox->IsOverlappingActor(AIController->GetFocusActor()))
 		{
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("HIT!"));
-
+			
 			//TODO: Change class when player is done
 			if(AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 			{

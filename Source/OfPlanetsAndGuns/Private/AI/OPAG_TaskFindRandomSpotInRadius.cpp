@@ -1,7 +1,6 @@
 #include "AI/OPAG_TaskFindRandomSpotInRadius.h"
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "BlueprintNodeHelpers.h"
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
@@ -16,32 +15,19 @@ EBTNodeResult::Type UOPAG_TaskFindRandomSpotInRadius::ExecuteTask(UBehaviorTreeC
 {
 	if(AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		if (AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
+		if (const AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 		{
-			FVector ActorLocation = Enemy->GetActorLocation();
-			if (UNavigationSystemV1* const NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
+			const FVector ActorLocation = Enemy->GetActorLocation();
+			if (const UNavigationSystemV1* const NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
 			{
 				//Gets the random point and writes it on the blackboard
-				FVector PatrolLocation = NavSystem->GetRandomReachablePointInRadius(GetWorld(), ActorLocation, PatrolRadius);
+				const FVector PatrolLocation = NavSystem->GetRandomReachablePointInRadius(GetWorld(), ActorLocation, PatrolRadius);
 				AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyPatrolLocation.SelectedKeyName, PatrolLocation);
+				return EBTNodeResult::Succeeded;
 			}
-			else
-			{
-				FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
-				return EBTNodeResult::Failed;
-			}
-			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Succeeded);
-			return EBTNodeResult::Succeeded;
-		}
-		else
-		{
-			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 			return EBTNodeResult::Failed;
 		}
-	}
-	else
-	{
-		FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 		return EBTNodeResult::Failed;
-	}	
+	}
+	return EBTNodeResult::Failed;
 }

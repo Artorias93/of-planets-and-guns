@@ -23,12 +23,12 @@ void UOPAG_ServiceComputeDistance::TickNode(UBehaviorTreeComponent& OwnerBTCompo
 	if(AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
 		//Replace with the proper class when it's ready
-		if (AOPAG_CharacterBase* const PlayerActor = Cast<AOPAG_CharacterBase>(
+		if (const AOPAG_CharacterBase* const PlayerActor = Cast<AOPAG_CharacterBase>(
 			AIController->GetBlackboardComponent()->GetValueAsObject(BBKeyTargetActor.SelectedKeyName)))
 		{
-			FVector SelfLocation = AIController->GetPawn()->GetActorLocation();
-			FVector PlayerLocation = PlayerActor->GetActorLocation();
-			float ActorsDistance = FVector::Distance(SelfLocation, PlayerLocation);
+			const FVector SelfLocation = AIController->GetPawn()->GetActorLocation();
+			const FVector PlayerLocation = PlayerActor->GetActorLocation();
+			const float ActorsDistance = FVector::Distance(SelfLocation, PlayerLocation);
 
 			AIController->GetBlackboardComponent()->SetValueAsFloat(BBKeyEnemyDistance.SelectedKeyName, ActorsDistance);
 		}

@@ -15,7 +15,7 @@ EBTNodeResult::Type UOPAG_TaskSetNextIndexPatrolPath::ExecuteTask(UBehaviorTreeC
 {
 	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		if (AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
+		if (const AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 		{
 			int CurrentPatrolPathIndex = AIController->GetBlackboardComponent()->GetValueAsInt(BBKeyPatrolPathIndex.SelectedKeyName);
 			TArray<FVector> const PatrolPathPointsArray = Enemy->PatrolPath->PatrolPathPoints;
@@ -33,23 +33,13 @@ EBTNodeResult::Type UOPAG_TaskSetNextIndexPatrolPath::ExecuteTask(UBehaviorTreeC
 
 			//Convert patrol path point location from local coordinates 
 			//(relative to the patrol path object) to world coordinates
-			FVector PointWorldLocation = UKismetMathLibrary::TransformLocation(Enemy->PatrolPath->GetTransform(), 
+			const FVector PointWorldLocation = UKismetMathLibrary::TransformLocation(Enemy->PatrolPath->GetTransform(), 
 				PatrolPathPointsArray[CurrentPatrolPathIndex]);
 
 			AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyPatrolLocation.SelectedKeyName, PointWorldLocation);
-
-			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Succeeded);
 			return EBTNodeResult::Succeeded;
 		}
-		else
-		{
-			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
-			return EBTNodeResult::Failed;
-		}
-	}
-	else
-	{
-		FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 		return EBTNodeResult::Failed;
 	}
+	return EBTNodeResult::Failed;
 }

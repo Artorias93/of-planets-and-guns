@@ -10,23 +10,20 @@ UOPAG_TaskChangeSpeed::UOPAG_TaskChangeSpeed(FObjectInitializer const& ObjectIni
 
 EBTNodeResult::Type UOPAG_TaskChangeSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
-	if(AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
+	if(const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		if (AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
+		if (const AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 		{
 			Enemy->UpdateSpeed(NewSpeed);
-			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Succeeded);
 			return EBTNodeResult::Succeeded;
 		}
 		else
 		{
-			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 			return EBTNodeResult::Failed;
 		}
 	}
 	else
 	{
-		FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 		return EBTNodeResult::Failed;
 	}
 }

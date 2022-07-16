@@ -18,7 +18,7 @@ EBTNodeResult::Type UOPAG_TaskMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerB
 {
 	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		if(UBlackboardComponent* const BlackBoard = Cast<UBlackboardComponent>(OwnerBTComponent.GetBlackboardComponent()))
+		if(const UBlackboardComponent* const BlackBoard = Cast<UBlackboardComponent>(OwnerBTComponent.GetBlackboardComponent()))
 		{			
 
 			if (AActor* const DestinationActor = Cast<AActor>(BlackBoard->GetValue<UBlackboardKeyType_Object>(BBKeyDestination.SelectedKeyName)))
@@ -27,22 +27,15 @@ EBTNodeResult::Type UOPAG_TaskMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerB
 				FinishLatentTask(OwnerBTComponent, EBTNodeResult::Succeeded);
 				return EBTNodeResult::Succeeded;
 			}
-			else if (BBKeyDestination.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
+			if (BBKeyDestination.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())
 			{
-				FVector DestinationLocation = BlackBoard->GetValueAsVector(BBKeyDestination.SelectedKeyName);
+				const FVector DestinationLocation = BlackBoard->GetValueAsVector(BBKeyDestination.SelectedKeyName);
 				AIController->MoveToLocation(DestinationLocation, AcceptedRadius);
-				FinishLatentTask(OwnerBTComponent, EBTNodeResult::Succeeded);
 				return EBTNodeResult::Succeeded;
 			}
-			FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 			return EBTNodeResult::Failed;
 		}
-		FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
 		return EBTNodeResult::Failed;		
 	}
-	else
-	{
-		FinishLatentTask(OwnerBTComponent, EBTNodeResult::Failed);
-		return EBTNodeResult::Failed;
-	}
+	return EBTNodeResult::Failed;
 }

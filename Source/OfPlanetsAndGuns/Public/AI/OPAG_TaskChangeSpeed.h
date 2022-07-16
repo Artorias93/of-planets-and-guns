@@ -19,7 +19,7 @@ public:
 
 private:
 
-	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory);
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory) override;
 
 	/////////////////////////////
 	//Variables

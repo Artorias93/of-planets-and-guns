@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include <AbilitySystemInterface.h>
+
+#include "Abilities/GameplayAbility.h"
 #include "OPAG_CharacterBase.generated.h"
 
 class UAbilitySystemComponent;
@@ -26,7 +28,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CharacterBase")
 	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);		
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	//void HealthChanged(const FOnAttributeChangeData& Data);	
 
@@ -41,7 +43,7 @@ public:
 
 	float GetHealth() const;
 
-	void SetHealth(const float Health);
+	void SetHealth(const float Health) const;
 
 protected:
 

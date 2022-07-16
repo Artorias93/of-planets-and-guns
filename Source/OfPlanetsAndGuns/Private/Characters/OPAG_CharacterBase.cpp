@@ -4,7 +4,6 @@
 #include <Abilities/GameplayAbility.h>
 #include <GameplayTagsManager.h>
 #include <GameplayTagContainer.h>
-#include <EnhancedInput/Public/EnhancedInputLibrary.h>
 //My Classes
 #include "Characters/OPAG_AttributeSetBase.h"
 
@@ -63,7 +62,7 @@ float AOPAG_CharacterBase::GetHealth() const
 	return 1;
 }
 
-void AOPAG_CharacterBase::SetHealth(const float Health)
+void AOPAG_CharacterBase::SetHealth(const float Health) const
 {
 	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetHealthAttribute(), Health);
 }

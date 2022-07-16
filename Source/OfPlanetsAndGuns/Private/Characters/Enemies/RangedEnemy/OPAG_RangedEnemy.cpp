@@ -29,10 +29,10 @@ void AOPAG_RangedEnemy::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(GetController()))
+	if (const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(GetController()))
 	{
 		//TODO: Replace with proper player class when ready
-		if(AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
+		if(const AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 		{
 			//TODO: This works like shit
 			LaserBeam->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(LaserBeam->K2_GetComponentLocation(), Player->GetActorLocation()));
@@ -55,7 +55,7 @@ void AOPAG_RangedEnemy::FireBullet()
 
 			GetShootingDirection(StartLocation, Direction, ShootAccuracyTolerance);
 
-			float ShotWaitTime = UKismetMathLibrary::RandomFloatInRange(ShotWaitTimeRandomIntervalBounds[0], ShotWaitTimeRandomIntervalBounds[1]);
+			const float ShotWaitTime = UKismetMathLibrary::RandomFloatInRange(ShotWaitTimeRandomIntervalBounds[0], ShotWaitTimeRandomIntervalBounds[1]);
 
 			GetWorld()->GetTimerManager().SetTimer(ShotTimerHandle, this, &AOPAG_RangedEnemy::StartShooting, ShotWaitTime);
 		}

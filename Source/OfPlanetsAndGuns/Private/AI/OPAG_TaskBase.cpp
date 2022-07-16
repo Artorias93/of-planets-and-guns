@@ -12,7 +12,7 @@ FString UOPAG_TaskBase::GetStaticDescription() const
 	//Inserts the name of the node
 	NodeDescription += Super::GetStaticDescription();
 
-	TArray<FProperty*> PropertiesToExclude;
+	const TArray<FProperty*> PropertiesToExclude;
 	FString PropertyDescription = BlueprintNodeHelpers::CollectPropertyDescription(this, UBTTaskNode::StaticClass(), PropertiesToExclude);
 	//If there re properties it adds them to the node's description
 	if (PropertyDescription.Len())

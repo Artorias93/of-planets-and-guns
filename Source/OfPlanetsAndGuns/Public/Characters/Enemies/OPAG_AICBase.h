@@ -23,7 +23,7 @@ public:
 
 	AOPAG_AICBase();
 
-	void OnPossess(APawn* ControlledPawn);
+	virtual void OnPossess(APawn* ControlledPawn) override;
 
 	UFUNCTION()
 	void OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus);
@@ -33,35 +33,35 @@ public:
 	/////////////////////////////
 
 	UPROPERTY(transient)
-		class UBehaviorTreeComponent* BehaviorTreeComponent;
+	class UBehaviorTreeComponent* BehaviorTreeComponent;
 
 	UPROPERTY(transient)
-		class UBlackboardComponent* BlackboardComponent;
+	UBlackboardComponent* BlackboardComponent;
 
 	FTimerHandle LoseSightTimerHandle;
 
 protected:
 
 	UPROPERTY(transient)
-		class UAIPerceptionComponent* PerceptionComp;
+	UAIPerceptionComponent* PerceptionComp;
 
 	UPROPERTY(transient)
-		class UAISenseConfig_Sight* PerceptionSightConfig;
+	class UAISenseConfig_Sight* PerceptionSightConfig;
 
 	UPROPERTY(transient)
-		class UAISenseConfig_Damage* PerceptionDamageConfig;
+	class UAISenseConfig_Damage* PerceptionDamageConfig;
 
 public:
 
 	UPROPERTY(EditAnywhere, Category = "AI")
-		float LoseSightTimer = 3.f;
+	float LoseSightTimer = 3.f;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
-		float SightSenseRadius = 2500.f;
+	float SightSenseRadius = 2500.f;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
-		float LoseSightSenseRadius = 3000.f;
+	float LoseSightSenseRadius = 3000.f;
 
 	UPROPERTY(EditAnywhere, Category = "AI")
-		float SightPeripheralVisionDegrees = 120.f;
+	float SightPeripheralVisionDegrees = 120.f;
 };

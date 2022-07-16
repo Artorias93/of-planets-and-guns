@@ -15,12 +15,11 @@ class OFPLANETSANDGUNS_API UOPAG_ServiceShoot : public UOPAG_ServiceBase
 	/////////////////////////////
 
 public:
-
 	UOPAG_ServiceShoot(FObjectInitializer const& ObjectInitializer);
 
-	void TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory, float DeltaSeconds) override;
+	virtual void TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory, float DeltaSeconds) override;
 
-	void OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory) override;
+	virtual void OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory) override;
 
 private:
 
@@ -39,7 +38,9 @@ private:
 
 	FTimerHandle StartShootingTimerHandle;
 
+	UPROPERTY()
 	UStaticMeshComponent* AimingLed;
 
+	UPROPERTY()
 	UNiagaraComponent* LaserBeam;
 };
