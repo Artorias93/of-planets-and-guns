@@ -6,6 +6,8 @@
 
 AOPAG_RangedEnemy::AOPAG_RangedEnemy()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	Weapon = CreateDefaultSubobject<UChildActorComponent>("Weapon Child Actor Component");
 	if(Weapon)
 	{
@@ -26,18 +28,20 @@ AOPAG_RangedEnemy::AOPAG_RangedEnemy()
 }
 
 void AOPAG_RangedEnemy::Tick(float DeltaSeconds)
-{
+{	
 	Super::Tick(DeltaSeconds);
-
+	
 	if (const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(GetController()))
 	{
 		//TODO: Replace with proper player class when ready
 		if(const AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 		{
-			//TODO: This works like shit
+			//Points the laser beam directly to the player
+			//TODO: Go back to this when player is implemented
 			LaserBeam->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(LaserBeam->K2_GetComponentLocation(), Player->GetActorLocation()));
 
-			//TODO: This also works like shit
+			//Scales the aiming led based on the distance from the player
+			//TODO: Go back to this when player is implemented
 			AimingLed->SetWorldScale3D((((GetActorLocation() - Player->GetActorLocation()).Size()) / -100.f) * FVector(.01f, .01f, .01f));
 		}
 	}

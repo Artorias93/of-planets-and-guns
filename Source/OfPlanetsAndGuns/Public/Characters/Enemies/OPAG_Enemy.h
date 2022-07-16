@@ -18,14 +18,15 @@ public:
 	AOPAG_Enemy();
 
 	void UpdateSpeed(float NewSpeed) const;
-
+	
 	virtual void TakeDamage(float DamageAmount) override;
+
+	UFUNCTION(CallInEditor, Category = "OPAG AI")
+	void DebugTake100Damage();
 
 	virtual void Attack();
 
-	virtual void Death() override;
-
-	virtual void Tick(float DeltaSeconds) override;
+	virtual void Death() override;	
 
 protected:
 
@@ -34,6 +35,10 @@ protected:
 	void DropAndDespawn();
 
 	virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float ShootingAccuracyTolerance /* = 0 */) override;
+
+private:
+
+	
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
@@ -49,10 +54,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn))
 	bool bUsingPatrolPath = false;
 
-	UPROPERTY(EditAnywhere, Category = "OPAG AI")
-	float RagdollDurationSeconds = 2.f;
-
 protected:
 
 	FTimerHandle RagdollTimerHandle;
+
+private:
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI")
+	float RagdollDurationSeconds = 2.f;
 };

@@ -17,15 +17,14 @@ public:
 
 	AOPAG_MeleeEnemy();
 
-	void Attack() override;
+	virtual void Attack() override;
 
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
-	void Death() override;
+	virtual void Death() override;
 
-	
 private:
 
-	void BeginPlay() override;
+	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void OnAttackBegin(UAnimMontage* Montage);
@@ -45,6 +44,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
 	class UAnimMontage* MeleeAttackMontage;
 
+	UPROPERTY()
 	UAnimInstance* AnimInstance;
 
 	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")

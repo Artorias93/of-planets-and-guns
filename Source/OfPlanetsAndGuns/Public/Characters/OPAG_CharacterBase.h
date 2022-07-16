@@ -35,11 +35,9 @@ public:
 	/*UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")
 	void OnHealthChanged(float OldValue, float NewValue);*/
 
-	virtual void TakeDamage(float Damage);
+	virtual void TakeDamage(const float Damage);
 
 	virtual void TakeDamage(AActor* Throwable);
-
-	virtual void Tick(float DeltaSeconds) override;
 
 	float GetHealth() const;
 

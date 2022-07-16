@@ -10,6 +10,7 @@
 AOPAG_CharacterBase::AOPAG_CharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");
 
 	static ConstructorHelpers::FClassFinder<UGameplayAbility> BasicShotClass(TEXT("/Game/OfPlanetsAndGuns/Core/Abilities/GA_BasicShot"));
@@ -48,11 +49,6 @@ void AOPAG_CharacterBase::BeginPlay()
 	}
 }
 
-void AOPAG_CharacterBase::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-}
-
 float AOPAG_CharacterBase::GetHealth() const
 {
 	if(AbilitySystemComp)
@@ -79,7 +75,7 @@ void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> Abilit
 	}
 }
 
-void AOPAG_CharacterBase::TakeDamage(float Damage)
+void AOPAG_CharacterBase::TakeDamage(const float Damage)
 {
 	if(AbilitySystemComp && BaseAttributeSet)
 	{
@@ -96,9 +92,7 @@ void AOPAG_CharacterBase::TakeDamage(float Damage)
 
 		if(GetHealth()<=0)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Oh No I'm Dead"));
-			//TODO: Implement this
-			//Death();
+			Death();
 		}	
 	}
 }
