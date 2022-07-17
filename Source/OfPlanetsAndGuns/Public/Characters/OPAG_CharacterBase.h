@@ -43,11 +43,15 @@ public:
 
 	void SetHealth(const float Health) const;
 
+	const float GetHealthMax() const;
+
+	void SetHealthMax(const float HealthMax);
+
 protected:
 
 	virtual void BeginPlay() override;
 
-	virtual void GetShootingDirection(FVector& StartingLocation, FVector& Direction, float ShootingAccuracyTolerance = 0.f);
+	virtual void GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance = 0);
 
 	virtual void Death();
 
@@ -71,4 +75,10 @@ public:
 
 	/*UPROPERTY(VisibleAnywhere, Category="CharacterBase")
 	TSubclassOf<UDataTable> DefaultDataTable;*/
+public:
+	UFUNCTION(BlueprintCallable)
+	const float GetAxisX() const;
+
+	UFUNCTION(BlueprintCallable)
+	const float GetAxisY() const;
 };

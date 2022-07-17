@@ -58,9 +58,23 @@ float AOPAG_CharacterBase::GetHealth() const
 	return 1;
 }
 
-void AOPAG_CharacterBase::SetHealth(const float Health) const
+void AOPAG_CharacterBase::SetHealth(const float Health)
 {
 	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetHealthAttribute(), Health);
+}
+
+const float AOPAG_CharacterBase::GetHealthMax() const
+{
+	if (AbilitySystemComp)
+	{
+		return AbilitySystemComp->GetNumericAttribute(BaseAttributeSet->GetMaxHealthAttribute());
+	}
+	return 1;
+}
+
+void AOPAG_CharacterBase::SetHealthMax(const float Health)
+{
+	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetMaxHealthAttribute(), Health);
 }
 
 void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel)
@@ -102,7 +116,7 @@ void AOPAG_CharacterBase::TakeDamage(AActor* Throwable)
 	//TODO: Implement
 }
 
-void AOPAG_CharacterBase::GetShootingDirection(FVector& StartingLocation, FVector& Direction, float ShootingAccuracyTolerance)
+void AOPAG_CharacterBase::GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance)
 {
 	//Overridden by children
 }
@@ -110,6 +124,18 @@ void AOPAG_CharacterBase::GetShootingDirection(FVector& StartingLocation, FVecto
 void AOPAG_CharacterBase::Death()
 {
 	//Overridden by children
+}
+
+const float AOPAG_CharacterBase::GetAxisX() const
+{
+	const float X = GetInputAxisValue("MoveForward");
+	return X;
+}
+
+const float AOPAG_CharacterBase::GetAxisY() const
+{
+	const float Y = GetInputAxisValue("MoveRight");
+	return Y;
 }
 
 //Called every time the value changes
