@@ -1,19 +1,17 @@
 #pragma once
 
 #include "Weapons/Guns/OPAG_GunBase.h"
-
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "OPAG_ModuleBase.generated.h"
 
 class USphereComponent;
 class UStaticMeshComponent;
-class AOPAG_GunBase;
 
 UENUM(BlueprintType)
-enum EModuleTypes 
+enum class EModuleTypes : uint8
 {
-	Barrel,
+	Barrel = 0x00,
 	Stock,
 	Grip,
 	Magazine,
@@ -22,9 +20,9 @@ enum EModuleTypes
 };
 
 UENUM(BlueprintType)
-enum EModuleRarity
+enum class EModuleRarity : uint8
 {
-	Common,
+	Common = 0x00,
 	Uncommon,
 	Rare,
 	Epic,
@@ -39,32 +37,37 @@ class OFPLANETSANDGUNS_API AOPAG_ModuleBase : public AActor
 public:	
 	AOPAG_ModuleBase();
 
-	UPROPERTY(Category = "Module", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USphereComponent* SphereComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	USphereComponent* Sphere;
 
-	UPROPERTY(Category = "Module", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* Mesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* ModuleMesh;
 
 public:
-	UPROPERTY(Category = "Module", VisibleAnywhere, BlueprintReadWrite)
-	TEnumAsByte<EModuleTypes> Type;
+	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
+	EModuleTypes Type;
 
 	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
-	TEnumAsByte<EModuleRarity> Rarity;
+	EModuleRarity Rarity;
 
 	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
 	FGunStats Stats;
 
-	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
-	EFireTypes EquippableFireTypes;
+	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = "EFireTypes"))
+	int EquippableFireTypes;
 
 protected:
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	virtual void OnAttach(EModuleRarity NewRarity);
-
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	virtual void OnAttach(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes);
+
+	UFUNCTION(BlueprintCallable)
+	void SetParameters(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes);
+
+private:
+	void CheckIfPhysical();
 };

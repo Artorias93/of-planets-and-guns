@@ -20,7 +20,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void OnAttach(EModuleRarity NewRarity) override;
+	virtual void OnAttach(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes) override;
 
 public:
 	virtual void Tick(float DeltaTime) override;

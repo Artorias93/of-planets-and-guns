@@ -1,26 +1,30 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "OPAG_AccessoryBase.generated.h"
 
+class UGameplayAbility;
+class AOPAG_Grenade;
+
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_AccessoryBase : public AActor
+class OFPLANETSANDGUNS_API AOPAG_AccessoryBase : public AOPAG_ModuleBase
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AOPAG_AccessoryBase();
 
+	UPROPERTY(Category = "Accessory Ability", EditDefaultsOnly, BlueprintReadWrite)
+	const TSubclassOf<UGameplayAbility> Ability;
+
+	UPROPERTY(Category = "Accessory Ability", EditAnywhere, BlueprintReadWrite)
+	const TSubclassOf<AOPAG_Grenade> Grenade;
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 };
