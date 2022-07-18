@@ -15,7 +15,10 @@ UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_SimpleDoor : public AOPAG_DoorBase
 {
 	GENERATED_BODY()
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		USceneComponent* Root;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* Frame;
 

@@ -8,12 +8,14 @@
 
 AOPAG_SimpleDoor::AOPAG_SimpleDoor()
 {
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = Root;
 	Frame = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Frame"));
-	RootComponent = Frame;
+	Frame->SetupAttachment(RootComponent);
 	Door = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Door"));
-	Door->SetupAttachment(Frame);
+	Door->SetupAttachment(RootComponent);
 	CollisionVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionVolume"));
-	CollisionVolume->SetupAttachment(Frame);
+	CollisionVolume->SetupAttachment(RootComponent);
 	CollisionVolume->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 	Timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Movement Timeline"));
 }
