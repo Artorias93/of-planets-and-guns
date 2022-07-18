@@ -39,7 +39,6 @@ EBTNodeResult::Type UOPAG_TaskSetNextIndexPatrolPath::ExecuteTask(UBehaviorTreeC
 			AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyPatrolLocation.SelectedKeyName, PointWorldLocation);
 			return EBTNodeResult::Succeeded;
 		}
-		return EBTNodeResult::Failed;
 	}
 	return EBTNodeResult::Failed;
 }

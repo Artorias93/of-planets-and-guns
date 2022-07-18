@@ -17,13 +17,6 @@ EBTNodeResult::Type UOPAG_TaskChangeSpeed::ExecuteTask(UBehaviorTreeComponent& O
 			Enemy->UpdateSpeed(NewSpeed);
 			return EBTNodeResult::Succeeded;
 		}
-		else
-		{
-			return EBTNodeResult::Failed;
-		}
 	}
-	else
-	{
-		return EBTNodeResult::Failed;
-	}
+	return EBTNodeResult::Failed;
 }

@@ -33,9 +33,7 @@ EBTNodeResult::Type UOPAG_TaskMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerB
 				AIController->MoveToLocation(DestinationLocation, AcceptedRadius);
 				return EBTNodeResult::Succeeded;
 			}
-			return EBTNodeResult::Failed;
-		}
-		return EBTNodeResult::Failed;		
+		}	
 	}
 	return EBTNodeResult::Failed;
 }

@@ -25,9 +25,7 @@ EBTNodeResult::Type UOPAG_TaskFindRandomSpotInRadius::ExecuteTask(UBehaviorTreeC
 				AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyPatrolLocation.SelectedKeyName, PatrolLocation);
 				return EBTNodeResult::Succeeded;
 			}
-			return EBTNodeResult::Failed;
 		}
-		return EBTNodeResult::Failed;
 	}
 	return EBTNodeResult::Failed;
 }

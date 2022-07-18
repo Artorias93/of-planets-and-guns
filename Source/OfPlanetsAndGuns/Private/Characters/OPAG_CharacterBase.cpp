@@ -72,9 +72,9 @@ const float AOPAG_CharacterBase::GetHealthMax() const
 	return 1;
 }
 
-void AOPAG_CharacterBase::SetHealthMax(const float Health)
+void AOPAG_CharacterBase::SetHealthMax(const float HealthMax)
 {
-	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetMaxHealthAttribute(), Health);
+	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetMaxHealthAttribute(), HealthMax);
 }
 
 void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel)
