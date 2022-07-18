@@ -20,7 +20,6 @@ EBTNodeResult::Type UOPAG_TaskMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerB
 	{
 		if(const UBlackboardComponent* const BlackBoard = Cast<UBlackboardComponent>(OwnerBTComponent.GetBlackboardComponent()))
 		{			
-
 			if (AActor* const DestinationActor = Cast<AActor>(BlackBoard->GetValue<UBlackboardKeyType_Object>(BBKeyDestination.SelectedKeyName)))
 			{
 				AIController->MoveToActor(DestinationActor, AcceptedRadius);

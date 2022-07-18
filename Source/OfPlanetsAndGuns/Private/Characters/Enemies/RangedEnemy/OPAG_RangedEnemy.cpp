@@ -7,18 +7,22 @@
 AOPAG_RangedEnemy::AOPAG_RangedEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
+
+	//Components creation
 	Weapon = CreateDefaultSubobject<UChildActorComponent>("Weapon Child Actor Component");
 	if(Weapon)
 	{
-		Weapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "RightHandSocket");
+		Weapon->AttachToComponent(GetMesh(),
+			FAttachmentTransformRules::KeepRelativeTransform, "RightHandSocket");
 		//TODO: Which class to put here???
 		Weapon->SetChildActorClass(AOPAG_GunBase::StaticClass());
+		
 		AimingLed = CreateDefaultSubobject<UStaticMeshComponent>("Aiming Led Static Mesh Component");		
 		if(AimingLed)
 		{
 			AimingLed->AttachToComponent(Weapon, FAttachmentTransformRules::KeepRelativeTransform);
 		}
+		
 		LaserBeam = CreateDefaultSubobject<UNiagaraComponent>("Laser Beam Niagara Component");
 		if(LaserBeam)
 		{
@@ -37,12 +41,14 @@ void AOPAG_RangedEnemy::Tick(float DeltaSeconds)
 		if(const AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 		{
 			//Points the laser beam directly to the player
-			//TODO: Go back to this when player is implemented
-			LaserBeam->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(LaserBeam->K2_GetComponentLocation(), Player->GetActorLocation()));
+			//TODO: Get back to this when player is implemented
+			LaserBeam->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(LaserBeam->K2_GetComponentLocation(),
+				Player->GetActorLocation()));
 
 			//Scales the aiming led based on the distance from the player
-			//TODO: Go back to this when player is implemented
-			AimingLed->SetWorldScale3D((((GetActorLocation() - Player->GetActorLocation()).Size()) / -100.f) * FVector(.01f, .01f, .01f));
+			//TODO: Get back to this when player is implemented
+			AimingLed->SetWorldScale3D((((GetActorLocation() - Player->GetActorLocation()).Size()) / -100.f)
+				* FVector(.01f, .01f, .01f));
 		}
 	}
 }
@@ -57,11 +63,15 @@ void AOPAG_RangedEnemy::FireBullet()
 			FVector StartLocation = FVector::ZeroVector;
 			FVector Direction = FVector::ZeroVector;
 
+			//The first 2 params are multiple "return values" passed by reference.
 			GetShootingDirection(StartLocation, Direction, ShootAccuracyTolerance);
 
-			const float ShotWaitTime = UKismetMathLibrary::RandomFloatInRange(ShotWaitTimeRandomIntervalBounds[0], ShotWaitTimeRandomIntervalBounds[1]);
+			//A random wait from the moment the enemy decides to shoot and when it actually shoots
+			const float ShotWaitTime = UKismetMathLibrary::RandomFloatInRange(ShotWaitTimeRandomIntervalBounds[0],
+				ShotWaitTimeRandomIntervalBounds[1]);
 
-			GetWorld()->GetTimerManager().SetTimer(ShotTimerHandle, this, &AOPAG_RangedEnemy::StartShooting, ShotWaitTime);
+			GetWorld()->GetTimerManager().SetTimer(ShotTimerHandle, this, &AOPAG_RangedEnemy::StartShooting,
+				ShotWaitTime);
 		}
 	}
 }
@@ -70,6 +80,6 @@ void AOPAG_RangedEnemy::StartShooting()
 {
 	GetWorld()->GetTimerManager().ClearTimer(ShotTimerHandle);
 
-	//Uncomment when Gun is implemented
+	//TODO: Uncomment when Gun is implemented
 	//EquippedWeapon.StartShooting(StartLocation, Direction);
 }

@@ -22,7 +22,8 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
 	PerceptionSightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AI Sight Config"));
 	PerceptionDamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("AI Damage Config"));
-	//TODO: Move this setup in the specialized sub-classes
+	
+	//TODO: Move all this setup in the specialized sub-classes
 	PerceptionSightConfig->SightRadius = 2500.f;
 	PerceptionSightConfig->LoseSightRadius = 300.f;
 	PerceptionSightConfig->PeripheralVisionAngleDegrees = 120.0f;
@@ -50,20 +51,22 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 
 void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
-	//The sight sense only reacts to the player character
-	//TODO: Swap these when OPAG_Player is ready
-	//if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))
+	//Senses only react to the player character
+	//TODO: Swap with correct class when OPAG_Player is ready
 	if (ACharacter* const Player = Cast<ACharacter>(UpdatedActor))
 	{
+		//If the player is seen set it to target actor
 		if (Stimulus.WasSuccessfullySensed())
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LoseSightTimerHandle);
 			GetBlackboardComponent()->SetValueAsObject("TargetActor", Player);
 			SetFocus(Player, EAIFocusPriority::Gameplay);
 		}
+		//If the player is lost remove it from target actor after a certain number of seconds
 		else
 		{
-			GetWorld()->GetTimerManager().SetTimer(LoseSightTimerHandle, this, &AOPAG_AICBase::LoseTarget, LoseSightTimer);
+			GetWorld()->GetTimerManager().SetTimer(LoseSightTimerHandle, this,
+				&AOPAG_AICBase::LoseTarget, LoseSightTimer);
 		}
 	}
 }

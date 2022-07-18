@@ -26,8 +26,8 @@ void AOPAG_MeleeEnemy::BeginPlay()
 {
 	Super::BeginPlay();	
 
-	//Sets delegate functions that enable or disable the pawn rotation at the start and end of the attack animation.
-	//There's a notify in the middle of the animation that is when the collision checks and the damage should be evaluated.
+	//Sets delegate functions that disable pawn rotation at the start of the attack animation and disables it at the end.
+	//Collision checks and damage computations are only executed when the notify is encountered in the animation.
 	AnimInstance = (GetMesh()) ? GetMesh()->GetAnimInstance() : nullptr;
 	if (MeleeAttackMontage && AnimInstance)
 	{
@@ -54,13 +54,14 @@ void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 	bUseControllerRotationYaw = true;
 }
 
-//The attack collision & damage is computed when the animation montage's notify is reached
+//The attack collision & damage is computed only when the animation montage's notify is reached
 void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload &NotifyPayload)
 {
 	if (const AOPAG_AICMeleeEnemy* const AIController = Cast<AOPAG_AICMeleeEnemy>(GetController()))
 	{
 		if (DamageCollisionBox->IsOverlappingActor(AIController->GetFocusActor()))
 		{
+			//TODO: Remove the print to screen
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("HIT!"));
 			
@@ -69,13 +70,10 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 			{
 				Player->ReceiveDamage(50.f);
 			}
-
-			//TODO: Not working
-			//InflictDamage(50.f);
-
 		}
 		else
 		{
+			//TODO: Remove the print to screen
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("MISS..."));
 		}
@@ -92,5 +90,6 @@ void AOPAG_MeleeEnemy::Death()
 		SwordMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	}
 
+	//Ragdoll stuff for the enemy mesh itself are done in the Super.
 	Super::Death();
 }

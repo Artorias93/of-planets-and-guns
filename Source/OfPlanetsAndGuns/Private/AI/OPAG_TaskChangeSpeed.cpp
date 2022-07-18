@@ -12,7 +12,7 @@ EBTNodeResult::Type UOPAG_TaskChangeSpeed::ExecuteTask(UBehaviorTreeComponent& O
 {
 	if(const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		if (const AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
+		if (AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 		{
 			Enemy->UpdateSpeed(NewSpeed);
 			return EBTNodeResult::Succeeded;

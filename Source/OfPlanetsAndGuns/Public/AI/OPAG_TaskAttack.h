@@ -17,5 +17,7 @@ public:
 
 	UOPAG_TaskAttack(FObjectInitializer const& ObjectInitializer);
 
+private:
+	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory) override;		
 };

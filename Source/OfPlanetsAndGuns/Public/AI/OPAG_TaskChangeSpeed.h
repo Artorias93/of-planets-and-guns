@@ -18,15 +18,15 @@ public:
 	UOPAG_TaskChangeSpeed(FObjectInitializer const& ObjectInitializer);
 
 private:
-
+	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory) override;
 
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
 
-public:
+private:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Values")
+	UPROPERTY(EditAnywhere, Category = "Values", meta = (AllowPrivateAccess = true))
 	float NewSpeed = 600.f;
 };

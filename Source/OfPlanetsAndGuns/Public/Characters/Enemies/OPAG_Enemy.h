@@ -17,10 +17,11 @@ public:
 
 	AOPAG_Enemy();
 
-	void UpdateSpeed(float NewSpeed) const;
+	void UpdateSpeed(float const NewSpeed) const;
 	
 	virtual void ReceiveDamage(float DamageAmount) override;
 
+	//TODO: Remove when the enemy takes damage normally
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
 	void DebugTake100Damage();
 
@@ -34,10 +35,7 @@ protected:
 
 	void DropAndDespawn();
 
-	virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float ShootingAccuracyTolerance /* = 0 */) override;
-
-private:
-
+	virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */) override;
 	
 	/////////////////////////////
 	//Variables
@@ -48,18 +46,17 @@ public:
 	UPROPERTY(EditAnywhere, Category = "OPAG AI")
 	class UBehaviorTree* BehaviorTree;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI")
 	class AOPAG_PatrolPath* PatrolPath;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn))
-	bool bUsingPatrolPath = false;
 
 protected:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn, AllowPrivateAccess = true))
+	bool bUsingPatrolPath = false;
+
+	UPROPERTY()
 	FTimerHandle RagdollTimerHandle;
 
-private:
-
-	UPROPERTY(EditAnywhere, Category = "OPAG AI")
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float RagdollDurationSeconds = 2.f;
 };

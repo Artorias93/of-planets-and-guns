@@ -20,17 +20,19 @@ class OFPLANETSANDGUNS_API UOPAG_ServiceComputeDistance : public UOPAG_ServiceBa
 public:
 	UOPAG_ServiceComputeDistance(FObjectInitializer const& ObjectInitializer);
 
+private:
+	
 	virtual void TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory, float DeltaSeconds) override;
 
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
 
-public:
+private:
 
-	UPROPERTY(EditAnywhere, Category = "Blackboard Keys")
+	UPROPERTY(EditAnywhere, Category = "Blackboard Keys", meta=(AllowPrivateAccess = true))
 	FBlackboardKeySelector BBKeyTargetActor;
 
-	UPROPERTY(EditAnywhere, Category = "Blackboard Keys")
+	UPROPERTY(EditAnywhere, Category = "Blackboard Keys", meta=(AllowPrivateAccess = true))
 	FBlackboardKeySelector BBKeyEnemyDistance;
 };

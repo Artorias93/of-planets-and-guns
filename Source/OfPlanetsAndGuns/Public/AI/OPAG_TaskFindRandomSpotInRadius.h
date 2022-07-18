@@ -19,17 +19,17 @@ public:
 
 private:
 
-	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory) override;
 
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
 
-public:
+private:
 
-	UPROPERTY(EditAnywhere, Category = "Blackboard Keys")
+	UPROPERTY(EditAnywhere, Category = "Blackboard Keys", meta=(AllowPrivateAccess = true))
 	FBlackboardKeySelector BBKeyPatrolLocation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Values")
-	float PatrolRadius;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Values", meta=(AllowPrivateAccess = true))
+	float PatrolRadius = 1000.f;
 };
