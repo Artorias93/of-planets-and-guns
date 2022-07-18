@@ -1,10 +1,9 @@
-#include "Weapons/Modules/OPAG_ModuleBase.h"
+#include "Weapons/Throwables/OPAG_Grenade.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
-#include "Weapons/Throwables/OPAG_Grenade.h"
 
 AOPAG_Grenade::AOPAG_Grenade()
 {
@@ -43,10 +42,5 @@ void AOPAG_Grenade::Tick(float DeltaTime)
 void AOPAG_Grenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, Hit.Location, FRotator::ZeroRotator, FVector(10.f, 10.f, 10.f), true, EPSCPoolMethod::None, true);
-
-	const AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(OtherActor);
-	if (!Module)
-	{
-		Destroy();
-	}
+	Destroy();
 }
