@@ -21,16 +21,7 @@ EBTNodeResult::Type UOPAG_TaskAttack::ExecuteTask(UBehaviorTreeComponent& OwnerB
 			);
 
 			Enemy->Attack();
-			
-			return EBTNodeResult::Succeeded;
-		}
-		else
-		{
-			return EBTNodeResult::Failed;
 		}
 	}
-	else
-	{
-		return EBTNodeResult::Failed;
-	}
+	return EBTNodeResult::Failed;
 }

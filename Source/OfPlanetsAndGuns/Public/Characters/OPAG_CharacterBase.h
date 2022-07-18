@@ -41,7 +41,7 @@ public:
 
 	float GetHealth() const;
 
-	void SetHealth(const float Health) const;
+	void SetHealth(const float Health);
 
 	const float GetHealthMax() const;
 
