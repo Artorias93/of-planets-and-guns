@@ -179,8 +179,8 @@ void AOPAG_Player::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	EIC->BindAction(InputActions.Interact, ETriggerEvent::Started, this, &AOPAG_Player::InteractWithItem);
 
 	// Binding event for interact with camera ads
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Started, this, &AOPAG_Player::SwitchToADSCamera);
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Completed, this, &AOPAG_Player::ResetFPSCamera);
+	//EIC->BindAction(InputActions.ADS, ETriggerEvent::Started, this, &AOPAG_Player::SwitchToADSCamera);
+	//EIC->BindAction(InputActions.ADS, ETriggerEvent::Completed, this, &AOPAG_Player::ResetFPSCamera);
 
 	// binding event for health 
 	EIC->BindAction(InputActions.ADS, ETriggerEvent::Triggered, this, &AOPAG_Player::Health);
@@ -279,7 +279,7 @@ void AOPAG_Player::Shoot(const FInputActionValue& Value)
 		FVector StartLocation;
 		FVector Direction;
 		GetShootingDirection(StartLocation, Direction);
-		// CurrentGun->Shoot(StartLocation, Direction);
+		CurrentGun->Shoot(StartLocation, Direction);
 		Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 	}
 }
@@ -287,9 +287,8 @@ void AOPAG_Player::Shoot(const FInputActionValue& Value)
 // Check if guns can shoot (control if gun is shooting, if player isn't reloading gun and gun has enough ammo)
 const bool AOPAG_Player::CheckCanShoot() const
 {
-	//const bool bCanShoot = CurrentGun->bCanShoot && !CurrentGun->bReloading && CurrentGun->AmmoCurent > 0;
-	//return bCanShoot;
-	return true;
+	const bool bCanShoot = CurrentGun->bCanShoot && !CurrentGun->bIsReloading && CurrentGun->AmmoCurrent > 0;
+	return bCanShoot;
 }
 
 // Override the default method gestshootingdirection 
@@ -357,23 +356,49 @@ void AOPAG_Player::MakingAimCameraRotate()
 
 void AOPAG_Player::SwitchToADSCamera(const FInputActionValue& Value)
 {
+	// Set ADS and initialize new camera view
+	AActor* NewViewTarget = nullptr;
 	bIsInADS = true;
-	//const AOPAG_SightBase* Sight = Cast<AOPAG_SightBase>(CurrentGun->Sigh)
+	if (CurrentGun->Sight->GetChildActor())
+	{
+		NewViewTarget = CurrentGun->Sight->GetChildActor();
+		CurrentCamera = CurrentGun->GetSightCamera();
+	}
+	else
+	{
+		NewViewTarget = CurrentGun;
+		CurrentCamera = CurrentGun->GetADSCamera();
+	}
+
+	// Set new camera view 
+	// If gun has the sight, so is possible to active sight camera else active ads camera 
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	PlayerController->SetViewTargetWithBlend(NewViewTarget, .2f, EViewTargetBlendFunction::VTBlend_Linear, 0, false);
+
+	// ADS hand animation play
 	if (!bIsPreADS)
 	{
 		GunPreADSRoll = CurrentGun->GetRootComponent()->GetComponentRotation().Pitch;
 		bIsPreADS = true;
 	}
-	ADSTimeline->Play();
+	if (ADSTimeline)
+	{
+		ADSTimeline->Play();
+	}
 }
 
 void AOPAG_Player::ResetFPSCamera(const FInputActionValue& Value)
 {
 	bIsInADS = false;
 	CurrentCamera = Camera;
+
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	PlayerController->SetViewTargetWithBlend(this, .2f, EViewTargetBlendFunction::VTBlend_Linear, 0, false);
-	ADSTimeline->Reverse();
+	
+	if (ADSTimeline)
+	{
+		ADSTimeline->Reverse();
+	}
 }
 
 #pragma endregion Camera

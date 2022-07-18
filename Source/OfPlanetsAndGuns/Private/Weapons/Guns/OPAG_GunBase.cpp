@@ -5,9 +5,11 @@
 #include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "Weapons/Modules/OPAG_BarrelBase.h"
 #include "Weapons/Modules/OPAG_AccessoryBase.h"
+#include "Weapons/Modules/OPAG_SightBase.h"
 #include "Weapons/Throwables/OPAG_Grenade.h"
 #include "DrawDebugHelpers.h"
 #include "Character\CharacterBase.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -151,6 +153,22 @@ const FName AOPAG_GunBase::GetSocketNameByModuleType(const EModuleTypes ModuleTy
 	SocketName.RemoveAt(0, 14, true);
 	return FName(*SocketName);
 }
+
+
+UCameraComponent* AOPAG_GunBase::GetSightCamera()
+{
+	if (Sight->GetChildActor())
+	{
+		AOPAG_SightBase* Module = Cast<AOPAG_SightBase>(Sight->GetChildActor());
+		return Module->GetCamera();
+	}
+	return nullptr;
+}
+
+UCameraComponent* AOPAG_GunBase::GetADSCamera()
+{
+	return ADSCamera;
+}
 #pragma endregion GET
 
 #pragma region Mathematic Utility
@@ -262,10 +280,8 @@ void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction
 	// Initialize out of hit and if check is true (hit object in scene) so the actor is cast to character and control the return value
 	FHitResult OutHit;
 	TArray<AActor*> ActorsToIgnore = CheckWhatActorsIgnoreLinetrace();
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActors(ActorsToIgnore);
-	const bool bIsHit = GetWorld()->LineTraceSingleByChannel(OutHit, StartShootLocation, EffectiveDirection, ECC_Visibility, Params);
-	DrawDebugLine(GetWorld(), StartShootLocation, EffectiveDirection, FColor::Orange, false, 2.0f);
+	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, Direction, ObjectTypesQuery, false,
+		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
 	// If Actor is inheritance by character base, invoke take damage
 	if (bIsHit)

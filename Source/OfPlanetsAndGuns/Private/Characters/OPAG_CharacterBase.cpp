@@ -49,7 +49,7 @@ void AOPAG_CharacterBase::BeginPlay()
 	}
 }
 
-float AOPAG_CharacterBase::GetHealth() const
+const float AOPAG_CharacterBase::GetHealth() const
 {
 	if(AbilitySystemComp)
 	{

@@ -15,9 +15,12 @@ enum class EModuleRarity : uint8;
 
 class AOPAG_BarrelBase;
 class AOPAG_AccessoryBase;
+class AOPAG_SightBase;
 
 class ACharacterBase;
 class AOPAG_Grenade;
+
+class UKismetSystemLibrary;
 
 UENUM(BlueprintType, meta = (Bitflags))
 enum class EFireTypes : uint8
@@ -125,6 +128,9 @@ public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	float ShootConeLenght = 100.f;
 
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
+
 private:
 	TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
 	TSubclassOf<AOPAG_ModuleBase> StandardStock;
@@ -141,6 +147,12 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	// Main system for shooting
+	void Shoot(FVector StartShootLocation, FVector Direction);
+
+	// Camera behavior
+	UCameraComponent* GetSightCamera();
+	UCameraComponent* GetADSCamera();
 private:
 	// Utility for link modules and sockets
 	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const; 
@@ -152,7 +164,6 @@ private:
 	const float CalculateRateInSeconds(const float FireRate);
 
 	// Main system for shooting
-	void Shoot(FVector StartShootLocation, FVector Direction);
 	void ShootLineTrace(FVector StartShootLocation, FVector Direction);
 	void ShootThrowable(const FRotator SpawnRotation);
 	void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);

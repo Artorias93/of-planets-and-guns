@@ -15,10 +15,6 @@ class OFPLANETSANDGUNS_API AOPAG_CharacterBase : public ACharacter, public IAbil
 {
 	GENERATED_BODY()
 
-	/////////////////////////////
-	//Functions
-	/////////////////////////////
-
 public:
 
 	AOPAG_CharacterBase();
@@ -30,34 +26,20 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	//void HealthChanged(const FOnAttributeChangeData& Data);	
-
-	/*UFUNCTION(BlueprintImplementableEvent, Category = "CharacterBase")
-	void OnHealthChanged(float OldValue, float NewValue);*/
-
 	virtual void TakeDamage(const float Damage);
 
 	virtual void TakeDamage(AActor* Throwable);
 
-	float GetHealth() const;
-
-	void SetHealth(const float Health) const;
+	const float GetHealth() const;
+	void SetHealth(const float Health);
 
 	const float GetHealthMax() const;
-
 	void SetHealthMax(const float HealthMax);
 
 protected:
-
 	virtual void BeginPlay() override;
-
 	virtual void GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance = 0);
-
 	virtual void Death();
-
-	/////////////////////////////
-	//Variables
-	/////////////////////////////
 
 public:
 
@@ -73,8 +55,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterBase")
 	TSubclassOf<UGameplayAbility> BasicShot;
 
-	/*UPROPERTY(VisibleAnywhere, Category="CharacterBase")
-	TSubclassOf<UDataTable> DefaultDataTable;*/
 public:
 	UFUNCTION(BlueprintCallable)
 	const float GetAxisX() const;

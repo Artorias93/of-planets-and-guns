@@ -9,6 +9,7 @@ class UStaticMeshComponent;
 class UProjectileMovementComponent;
 class UGameplayStatics;
 class UParticleSystem;
+class AOPAG_ModuleBase;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Grenade : public AActor

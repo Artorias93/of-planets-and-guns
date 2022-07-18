@@ -34,3 +34,8 @@ void AOPAG_SightBase::OnAttach(const EModuleRarity NewRarity, const FGunStats Ne
 
 	CameraComponent->SetComponentTickEnabled(true);
 }
+
+UCameraComponent* AOPAG_SightBase::GetCamera() const
+{
+	return CameraComponent;
+}
