@@ -4,6 +4,7 @@
 #include "Managers/StageManager/OPAG_StageManager.h"
 
 #include "Characters/Player/OPAG_Player.h"
+#include "Engine/LevelStreamingDynamic.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"

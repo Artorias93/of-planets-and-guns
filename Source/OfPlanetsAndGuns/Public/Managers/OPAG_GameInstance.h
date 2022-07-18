@@ -39,6 +39,8 @@ public:
 		void OnStageLoaded();
 
 	UFUNCTION()
+		void OnRoomEntered();
+	UFUNCTION()
 		void OnRoomCleared();
 
 	UFUNCTION()

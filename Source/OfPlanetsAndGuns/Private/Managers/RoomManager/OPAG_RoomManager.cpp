@@ -9,6 +9,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Managers/RoomManager/OPAG_DoorManagerComponent.h"
+#include "Managers/RoomManager/OPAG_EnemyManagerComponent.h"
 #include "Managers/RoomManager/OPAG_RoomOffset.h"
 #include "Rooms/OPAG_RoomAttachPoint.h"
 #include "Rooms/OPAG_RoomStreamingVolume.h"
@@ -20,7 +22,8 @@ AOPAG_RoomManager::AOPAG_RoomManager()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-	//UpdateData();
+	DoorManager = CreateDefaultSubobject<UOPAG_DoorManagerComponent>(TEXT("Door Manager"));
+	EnemyManager = CreateDefaultSubobject<UOPAG_EnemyManagerComponent>(TEXT("Enemy Manager"));
 }
 
 void AOPAG_RoomManager::SetExitAsSpecial(bool bIsLastRoom, bool bHasSafeRoom) const
@@ -37,7 +40,6 @@ void AOPAG_RoomManager::BlockExit() const
 void AOPAG_RoomManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AOPAG_RoomManager::PreInitializeComponents()
@@ -127,6 +129,30 @@ void AOPAG_RoomManager::CloseExits(const bool bIsLastRoom, const bool bHasSafeRo
 
 		if (bIsLastRoom || bHasSafeRoom) SetExitAsSpecial(bIsLastRoom, bHasSafeRoom);
 		else BlockExit();
+	}
+}
+
+void AOPAG_RoomManager::EnterRoom() const
+{
+	if (bIsRoomCleared) return;
+
+	EnemyManager->SpawnWave();
+	DoorManager->CloseDoors();
+	UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
+	if (GI != nullptr)
+	{
+		GI->GetEventManager()->RoomEntered.Broadcast();
+	}
+}
+
+void AOPAG_RoomManager::RoomCleared()
+{
+	bIsRoomCleared = true;
+	DoorManager->OpenDoors();
+	UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
+	if (GI != nullptr)
+	{
+		GI->GetEventManager()->RoomCleared.Broadcast();
 	}
 }
 

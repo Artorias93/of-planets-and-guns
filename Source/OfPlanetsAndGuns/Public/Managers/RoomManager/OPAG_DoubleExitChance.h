@@ -7,7 +7,7 @@
 #include "OPAG_DoubleExitChance.generated.h"
 
 USTRUCT(BlueprintType)
-struct FOPAG_DoubleExitChance : public FTableRowBase
+struct OFPLANETSANDGUNS_API FOPAG_DoubleExitChance : public FTableRowBase
 {
 	GENERATED_BODY()
 

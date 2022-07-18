@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "OPAG_RoomManager.generated.h"
 
+class UOPAG_EnemyManagerComponent;
+class UOPAG_DoorManagerComponent;
 class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomAttachPoint;
 UCLASS()
@@ -15,33 +17,43 @@ class OFPLANETSANDGUNS_API AOPAG_RoomManager : public AActor
 	GENERATED_BODY()
 
 
+	UPROPERTY(Category = "Door Manager", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UOPAG_DoorManagerComponent* DoorManager;
+
+	UPROPERTY(Category = "Enemy Manager", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UOPAG_EnemyManagerComponent* EnemyManager;
+
+
 public:	
 	// Sets default values for this actor's properties
 	AOPAG_RoomManager();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		UDataTable* DataTable;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		AOPAG_RoomAttachPoint* Entrance;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		TArray<AOPAG_RoomAttachPoint*> Exits;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		TSoftObjectPtr<UWorld> Level;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		TSoftObjectPtr<UWorld> GeometryLevel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		AOPAG_RoomStreamingVolume* Volume;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExit))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExit), Category = "Room Manager")
 		int ExitSides;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		int Weight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door Manager")
+		uint8 bIsRoomCleared : 1;
 
 	int AssignedRoomID;
 
@@ -59,9 +71,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable, CallInEditor, Category="OPAG Room Manager")
+	UFUNCTION(BlueprintCallable, CallInEditor, Category="Room Manager")
 		void UpdateData();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Room Manager")
 		void CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const;
+
+	UFUNCTION(BlueprintCallable, Category = "Door Manager")
+		void EnterRoom() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Enemy Manager")
+		void RoomCleared();
 };

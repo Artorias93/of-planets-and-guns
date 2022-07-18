@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "OPAG_RoomOffset.h"
 #include "Engine/DataTable.h"
-#include "Engine/LevelStreamingDynamic.h"
 #include "OPAG_StreamingRoom.generated.h"
 
+class ULevelStreamingDynamic;
 USTRUCT(BlueprintType)
-struct FOPAG_StreamingRoom : public FTableRowBase
+struct OFPLANETSANDGUNS_API FOPAG_StreamingRoom : public FTableRowBase
 {
 	GENERATED_BODY()
 

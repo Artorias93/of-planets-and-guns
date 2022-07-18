@@ -8,7 +8,7 @@
 //#include "OPAG_StagePathing.generated.h"
 
 //USTRUCT(BlueprintType)
-struct FOPAG_StagePathing// : public FTableRowBase
+struct OFPLANETSANDGUNS_API FOPAG_StagePathing// : public FTableRowBase
 {
 	//GENERATED_BODY()
 

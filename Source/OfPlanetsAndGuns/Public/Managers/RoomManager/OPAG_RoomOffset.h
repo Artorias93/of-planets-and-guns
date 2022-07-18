@@ -21,7 +21,7 @@ ENUM_CLASS_FLAGS(ERoomExits);
 
 
 USTRUCT(BlueprintType)
-struct FOPAG_RoomOffset : public FTableRowBase
+struct OFPLANETSANDGUNS_API FOPAG_RoomOffset : public FTableRowBase
 {
 	GENERATED_BODY()
 
