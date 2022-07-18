@@ -18,22 +18,28 @@ void AOPAG_Enemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Gets bUsingPatrolPath from the instance
 	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
 		AIController->GetBlackboardComponent()->SetValueAsBool("bUsingPatrolPath", bUsingPatrolPath);
 	}
 }
 
-void AOPAG_Enemy::UpdateSpeed(float NewSpeed) const
+void AOPAG_Enemy::UpdateSpeed(float const NewSpeed) const
 {
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
-void AOPAG_Enemy::TakeDamage(float DamageAmount)
+void AOPAG_Enemy::TakeDamage(float const DamageAmount)
 {
 	Super::TakeDamage(DamageAmount);
 	//Triggers the damage sense on the AI controlled pawn
-	UAISense_Damage::ReportDamageEvent(GetWorld(), this, UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount, UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(), GetActorLocation(), NAME_None);
+	//TODO: Does this work???
+	UAISense_Damage::ReportDamageEvent(GetWorld(), this,
+		UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount,
+		UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(),
+		GetActorLocation(), NAME_None);
+	//TODO: Remove the print to screen
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
 }
@@ -71,23 +77,29 @@ void AOPAG_Enemy::DropAndDespawn()
 	Destroy();
 }
 
-void AOPAG_Enemy::GetShootingDirection(FVector& StartLocation, FVector& Direction, float ShootingAccuracyTolerance /* = 0 */)
+void AOPAG_Enemy::GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */)
 {
 	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
 		if(const AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 		{
-			//Start location is the front of the gun
+			//Gets Start location, in front of the gun
 			StartLocation = GetActorLocation() + (GetActorForwardVector() * 50.f);
 
-			//Vector from player to enemy
+			//Gets Vector from player to enemy
 			const FVector PlayerToSelfVector = Player->GetActorLocation() - GetActorLocation();
 
-			//Not normalized vector with shooting accuracy computations applied
-			const FVector DirectionVector = FVector(PlayerToSelfVector.X + UKismetMathLibrary::RandomFloatInRange(-ShootingAccuracyTolerance, ShootingAccuracyTolerance),
-				PlayerToSelfVector.Y, PlayerToSelfVector.Z + UKismetMathLibrary::RandomFloatInRange(-ShootingAccuracyTolerance, ShootingAccuracyTolerance));
+			//Gets not normalized vector with shooting accuracy computations applied
+			const float DirectionVectorX =
+				PlayerToSelfVector.X + UKismetMathLibrary::RandomFloatInRange(
+					-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
+			const float DirectionVectorY = PlayerToSelfVector.Y;
+			const float DirectionVectorZ =
+				PlayerToSelfVector.Z + UKismetMathLibrary::RandomFloatInRange(
+					-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
+			const FVector DirectionVector = FVector(DirectionVectorX, DirectionVectorY, DirectionVectorZ);
 			
-			//Normalized vector with shooting accuracy computations applied
+			//Gets normalized vector with shooting accuracy computations applied
 			Direction = UKismetMathLibrary::Normal(DirectionVector, 0.0001f); //2nd param is tolerance
 		}
 	}

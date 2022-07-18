@@ -14,33 +14,43 @@ class OFPLANETSANDGUNS_API AOPAG_AICBase : public AAIController
 	//Functions
 	/////////////////////////////
 
-private:
-
-	UFUNCTION()
-	void LoseTarget();
-
 public:
 
 	AOPAG_AICBase();
+
+private:
 
 	virtual void OnPossess(APawn* ControlledPawn) override;
 
 	UFUNCTION()
 	void OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus);
 
+	UFUNCTION()
+	void LoseTarget();
+
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
+
+protected:
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	float LoseSightTimer = 3.f;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	float SightSenseRadius = 2500.f;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	float LoseSightSenseRadius = 3000.f;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	float SightPeripheralVisionDegrees = 120.f;
 
 	UPROPERTY(transient)
 	class UBehaviorTreeComponent* BehaviorTreeComponent;
 
 	UPROPERTY(transient)
 	UBlackboardComponent* BlackboardComponent;
-
-	FTimerHandle LoseSightTimerHandle;
-
-protected:
 
 	UPROPERTY(transient)
 	UAIPerceptionComponent* PerceptionComp;
@@ -49,19 +59,7 @@ protected:
 	class UAISenseConfig_Sight* PerceptionSightConfig;
 
 	UPROPERTY(transient)
-	class UAISenseConfig_Damage* PerceptionDamageConfig;
-
-public:
-
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float LoseSightTimer = 3.f;
-
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float SightSenseRadius = 2500.f;
-
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float LoseSightSenseRadius = 3000.f;
-
-	UPROPERTY(EditAnywhere, Category = "AI")
-	float SightPeripheralVisionDegrees = 120.f;
+	class UAISenseConfig_Damage* PerceptionDamageConfig;	
+	
+	FTimerHandle LoseSightTimerHandle;
 };

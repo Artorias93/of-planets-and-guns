@@ -25,11 +25,11 @@ private:
 	//Variables
 	/////////////////////////////
 
-public:
+private:
 
-	UPROPERTY(EditAnywhere, Category = "Blackboard Keys")
+	UPROPERTY(EditAnywhere, Category = "Blackboard Keys", meta=(AllowPrivateAccess = true))
 	FBlackboardKeySelector BBKeyPatrolPathIndex;
 
-	UPROPERTY(EditAnywhere, Category = "Blackboard Keys")
+	UPROPERTY(EditAnywhere, Category = "Blackboard Keys", meta=(AllowPrivateAccess = true))
 	FBlackboardKeySelector BBKeyPatrolLocation;	
 };

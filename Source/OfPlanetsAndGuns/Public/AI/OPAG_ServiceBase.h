@@ -13,5 +13,7 @@ class OFPLANETSANDGUNS_API UOPAG_ServiceBase : public UBTService
 	//Functions
 	/////////////////////////////
 
+private:
+
 	virtual FString GetStaticDescription() const override;	
 };

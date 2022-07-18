@@ -15,12 +15,12 @@ EBTNodeResult::Type UOPAG_TaskAttack::ExecuteTask(UBehaviorTreeComponent& OwnerB
 	{
 		if (AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 		{
-			Enemy->SetActorRotation(
-				UKismetMathLibrary::FindLookAtRotation(Enemy->GetActorLocation(), 
+			//Face the player
+			Enemy->SetActorRotation(UKismetMathLibrary::FindLookAtRotation(Enemy->GetActorLocation(), 
 				AIController->GetFocusActor()->GetActorLocation())
 			);
-
 			Enemy->Attack();
+			return EBTNodeResult::Succeeded;
 		}
 	}
 	return EBTNodeResult::Failed;

@@ -13,5 +13,7 @@ class OFPLANETSANDGUNS_API UOPAG_TaskBase : public UBTTaskNode
 	//Functions
 	/////////////////////////////
 
+private:
+	
 	virtual FString GetStaticDescription() const override;	
 };

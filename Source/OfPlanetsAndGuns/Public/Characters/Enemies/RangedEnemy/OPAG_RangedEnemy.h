@@ -18,9 +18,11 @@ public:
 
 	AOPAG_RangedEnemy();
 
-	virtual void Tick(float DeltaSeconds) override;
-
 	void FireBullet();
+
+private:
+
+	virtual void Tick(float DeltaSeconds) override;
 
 	void StartShooting();
 
@@ -39,13 +41,14 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UNiagaraComponent* LaserBeam;
 
-	UPROPERTY(EditAnywhere, Category = "OPAG AI")
-	float ShootAccuracyTolerance = 0;
-
 private:
 
-	FTimerHandle ShotTimerHandle;	
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	float ShootAccuracyTolerance = 0;
 
-	UPROPERTY(EditAnywhere, Category = "OPAG AI")
+	UPROPERTY()
+	FTimerHandle ShotTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float ShotWaitTimeRandomIntervalBounds[2] = {0.5f, 0.7f};
 };
