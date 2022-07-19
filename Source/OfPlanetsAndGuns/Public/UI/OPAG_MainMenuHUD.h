@@ -12,8 +12,9 @@
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_MainMenuHUD : public AHUD
 {
-	
 	GENERATED_BODY()
+
+	void BindEvents();
 	
 	virtual void BeginPlay() override;
 
@@ -29,6 +30,7 @@ private:
 
 public:
 	virtual void DrawHUD() override;
-	
-	void BoughtAbility();
+
+	UFUNCTION()
+	void ShowHubView();
 };

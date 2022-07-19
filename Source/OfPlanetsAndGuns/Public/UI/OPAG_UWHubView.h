@@ -14,4 +14,9 @@ class OFPLANETSANDGUNS_API UOPAG_UWHubView : public UUserWidget
 {
 	GENERATED_BODY()
 	
+	void BindEvents();
+
+public:
+
+	void NativeConstruct();
 };

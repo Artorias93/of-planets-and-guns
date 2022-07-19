@@ -28,6 +28,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartRun);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
@@ -76,4 +78,8 @@ public:
 		FPauseGame PauseGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FResumeGame ResumeGame;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FStartRun StartRun;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FQuitGame QuitGame;
 };

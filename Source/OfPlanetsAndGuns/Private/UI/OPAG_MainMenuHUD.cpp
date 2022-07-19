@@ -2,17 +2,14 @@
 
 
 #include "UI/OPAG_MainMenuHUD.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_GameInstance.h"
 #include "UI/OPAG_UWMainMenuView.h"
 #include "UI/OPAG_UWHubView.h"
 
 void AOPAG_MainMenuHUD::DrawHUD()
 {
 	Super::DrawHUD();
-}
-
-void AOPAG_MainMenuHUD::BoughtAbility()
-{
-
 }
 
 void AOPAG_MainMenuHUD::BeginPlay()
@@ -39,4 +36,20 @@ void AOPAG_MainMenuHUD::BeginPlay()
 	{
 		HubViewWidget = CreateWidget<UOPAG_UWHubView>(GetWorld(), HubViewWidgetClass);
 	}
+}
+
+void AOPAG_MainMenuHUD::ShowHubView()
+{
+	if (MainMenuViewWidget) {
+		MainMenuViewWidget->RemoveFromViewport();
+	}
+
+	if (HubViewWidget) {
+		HubViewWidget->AddToViewport(1);
+	}
+
+	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+
+	if (EMS)
+		EMS->StartRun.Broadcast();
 }

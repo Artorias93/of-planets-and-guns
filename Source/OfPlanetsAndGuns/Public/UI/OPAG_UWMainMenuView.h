@@ -16,12 +16,22 @@ class OFPLANETSANDGUNS_API UOPAG_UWMainMenuView : public UUserWidget
 {
 	GENERATED_BODY()
 
-	UPROPERTY(meta = (BindWidget))
-		UButton* ContinueRunButton;
+	void BindEvents();
+
 	UPROPERTY(meta = (BindWidget))
 		UButton* NewRunButton;
 	UPROPERTY(meta = (BindWidget))
 		UButton* OptionsButton;
 	UPROPERTY(meta = (BindWidget))
 		UButton* QuitButton;
+
+public:
+	UFUNCTION()
+		void NewRunButtonClicked();
+	UFUNCTION()
+		void OptionsButtonClicked();
+	UFUNCTION()
+		void QuitButtonClicked();
+
+	void NativeConstruct();
 };
