@@ -19,7 +19,7 @@ public:
 
 	void UpdateSpeed(float NewSpeed) const;
 	
-	virtual void TakeDamage(float DamageAmount) override;
+	virtual void ReceiveDamage(float DamageAmount) override;
 
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
 	void DebugTake100Damage();

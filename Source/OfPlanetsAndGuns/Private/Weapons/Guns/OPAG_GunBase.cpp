@@ -8,8 +8,8 @@
 #include "Weapons/Modules/OPAG_SightBase.h"
 #include "Weapons/Throwables/OPAG_Grenade.h"
 #include "DrawDebugHelpers.h"
-#include "Character\CharacterBase.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Characters/OPAG_CharacterBase.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -28,6 +28,8 @@ AOPAG_GunBase::AOPAG_GunBase()
 		ADSCamera->SetRelativeScale3D(FVector(.2f, .2f, .2f));
 		ADSCamera->SetProjectionMode(ECameraProjectionMode::Perspective);
 		ADSCamera->SetFieldOfView(60.f);
+		ADSCamera->Mobility = EComponentMobility::Movable;
+		ADSCamera->SetupAttachment(RootComponent);
 	}
 
 	Barrel = CreateDefaultSubobject<UChildActorComponent>(TEXT("Barrel"));
@@ -280,17 +282,17 @@ void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction
 	// Initialize out of hit and if check is true (hit object in scene) so the actor is cast to character and control the return value
 	FHitResult OutHit;
 	TArray<AActor*> ActorsToIgnore = CheckWhatActorsIgnoreLinetrace();
-	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, Direction, ObjectTypesQuery, false,
+	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
 		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
 	// If Actor is inheritance by character base, invoke take damage
 	if (bIsHit)
 	{
-		/*const ACharacterBase* Character = Cast<ACharacterBase>(OutHit.GetActor());
+		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 		if (Character)
 		{
-			Character->TakeDamage(Stats.Damage);
-		}*/
+			Character->ReceiveDamage(Stats.Damage);
+		}
 	}
 	AmmoCurrent--;
 }
@@ -330,14 +332,14 @@ void AOPAG_GunBase::ResetShootTimer()
 #pragma region Shooting Utility
 const float AOPAG_GunBase::CalculateSpread()
 {
-	const float Spread = SpreadMax * (ShootConeLenght - Stats.Accuracy) / 100;
+	const float Spread = (SpreadMax * (ShootConeLenght - Stats.Accuracy)) / 100;
 	return Spread;
 }
 
 const float AOPAG_GunBase::CalculateSpreadRadius()
 {
 	const float Spread = CalculateSpread();
-	const float SpreadRadius = FMath::Tan(Spread / 2) * 100;
+	const float SpreadRadius = FMath::Tan(Spread / 2) * ShootConeLenght;
 	return SpreadRadius;
 }
 
@@ -345,7 +347,7 @@ const FVector2D AOPAG_GunBase::CalculateRandPointInCircle()
 {
 	const float SpreadRadius = CalculateSpreadRadius();
 	const float Angle = FMath::RandRange(0.f, 2 * PI);
-	const float DistancefromCenter = SpreadRadius * FMath::Sqrt(FMath::RandRange(0, 1));
+	const float DistancefromCenter = SpreadRadius * FMath::Sqrt(FMath::RandRange(0.f, 1.f));
 	const FVector2D Point(DistancefromCenter * FMath::Cos(Angle), DistancefromCenter * FMath::Sin(Angle));
 	return Point;
 }

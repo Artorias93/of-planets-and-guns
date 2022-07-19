@@ -62,11 +62,9 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
 	virtual void OnAttach(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes);
-
-	UFUNCTION(BlueprintCallable)
 	void SetParameters(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes);
+	UPrimitiveComponent* GetSphereComponent() const;
 
 private:
 	void CheckIfPhysical();

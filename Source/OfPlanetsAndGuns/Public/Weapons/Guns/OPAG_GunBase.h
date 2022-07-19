@@ -17,7 +17,7 @@ class AOPAG_BarrelBase;
 class AOPAG_AccessoryBase;
 class AOPAG_SightBase;
 
-class ACharacterBase;
+class AOPAG_CharacterBase;
 class AOPAG_Grenade;
 
 class UKismetSystemLibrary;
@@ -107,7 +107,7 @@ public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	int AmmoMax = 0;
 
-	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "Gun", VisibleAnywhere, BlueprintReadWrite)
 	bool bCanShoot = true;
 
 	UPROPERTY(Category = "Gun", VisibleAnywhere, BlueprintReadWrite)
@@ -147,21 +147,27 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	// Mathematic Utility
+	const float CalculateRateInSeconds(const float FireRate);
+
 	// Main system for shooting
 	void Shoot(FVector StartShootLocation, FVector Direction);
+
+	// Reload system
+	void Reload();
 
 	// Camera behavior
 	UCameraComponent* GetSightCamera();
 	UCameraComponent* GetADSCamera();
+
+	// Module
+	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FGunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
 private:
 	// Utility for link modules and sockets
 	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const; 
 	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
 	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
 	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
-
-	// Mathematic Utility
-	const float CalculateRateInSeconds(const float FireRate);
 
 	// Main system for shooting
 	void ShootLineTrace(FVector StartShootLocation, FVector Direction);
@@ -171,7 +177,7 @@ private:
 
 	// Subsystem for shooting
 	const float CalculateSpread();
-	const float CalculateSpreadRadius();
+	UFUNCTION(BlueprintCallable) const float CalculateSpreadRadius();
 	const FVector2D CalculateRandPointInCircle();
 	const FVector ApplyNoise(const FVector Direction);
 	const FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction);
@@ -179,12 +185,10 @@ private:
 	
 	// Ammo behavior
 	void UpdateAmmo();
-	void Reload();
 	void WaitReloadingTimer();
 
 	// Create and Attach module behavior
 	void CreateAndAttachAllModules();
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
 	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes);
-	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FGunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
 };

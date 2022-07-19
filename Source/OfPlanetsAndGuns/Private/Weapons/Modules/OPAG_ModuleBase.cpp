@@ -48,6 +48,11 @@ void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FGunSt
 	EquippableFireTypes = NewEquippableFireTypes;
 }
 
+UPrimitiveComponent* AOPAG_ModuleBase::GetSphereComponent() const
+{
+	return Sphere;
+}
+
 void AOPAG_ModuleBase::CheckIfPhysical()
 {
 	// Control if module has parent gun -> is attached

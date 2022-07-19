@@ -2,11 +2,13 @@
 
 #include <Engine/EngineTypes.h>
 #include "Components/TimelineComponent.h"
+#include "Blueprint/UserWidget.h"
 
 #include "CoreMinimal.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Player.generated.h"
 
+class AOPAG_AccessoryBase;
 class UOPAG_AttributeSetBase;
 class UKismetMathLibrary;
 class UTimelineComponent;
@@ -29,35 +31,27 @@ struct FInputActions
 	GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Move;
+	UPROPERTY(EditDefaultsOnly) UInputAction* Move;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* CameraMove;
+	UPROPERTY(EditDefaultsOnly) UInputAction* CameraMove;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Jump;
+	UPROPERTY(EditDefaultsOnly) UInputAction* Jump;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Shoot;
+	UPROPERTY(EditDefaultsOnly) UInputAction* Shoot;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* SwapGun;
+	UPROPERTY(EditDefaultsOnly) UInputAction* SwapGun;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ReloadGun;
+	UPROPERTY(EditDefaultsOnly) UInputAction* ReloadGun;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Interact;
+	UPROPERTY(EditDefaultsOnly) UInputAction* Interact;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* ADS;
+	UPROPERTY(EditDefaultsOnly) UInputAction* ADS;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Health;
+	UPROPERTY(EditDefaultsOnly) UInputAction* Health;
 
-	UPROPERTY(EditDefaultsOnly)
-	UInputAction* Dash;
+	UPROPERTY(EditDefaultsOnly) UInputAction* Dash;
+
+	UPROPERTY(EditDefaultsOnly) UInputAction* GunAbility;
 };
 
 UCLASS()
@@ -88,6 +82,9 @@ public:
 	UInputMappingContext* InputMappingContext;
 
 	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
+	AOPAG_GunBase* PrimarytGun;
+
+	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
 	AOPAG_GunBase* CurrentGun;
 
 	UPROPERTY(Category = "Camera", VisibleAnywhere, BlueprintReadWrite)
@@ -96,14 +93,23 @@ public:
 	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
 	UAnimMontage* FireMontageToPlay;
 
-	UPROPERTY(Category = "Timeline", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
 	UTimelineComponent* ADSTimeline;
 
-	UPROPERTY(Category = "Timeline", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
 	UTimelineComponent* DashTimeline;
+
+	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
+	UTimelineComponent* RecoilTimeline;
 
 	UPROPERTY(Category = "Timeline", EditAnywhere, BlueprintReadWrite)
 	UCurveFloat* ADSCurveFloat;
+
+	UPROPERTY(Category = "Timeline", EditAnywhere, BlueprintReadWrite)
+	UCurveFloat* RecoilCurveFloat;
+
+	UPROPERTY(Category = "Widgets", EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UUserWidget> CrosshairClass;
 
 public:
 	UPROPERTY(Category = "Player", EditAnywhere, BlueprintReadWrite)
@@ -171,8 +177,7 @@ private:
 
 private:
 	FOnTimelineFloat OnADSTimelineProgress;
-	FOnTimelineEventStatic OnADSTimelineFinished;
-
+	FOnTimelineFloat OnRecoilTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
 protected:
@@ -188,6 +193,7 @@ private:
 	void InitDefaultValues();
 	void InitADSTimeline();
 	void InitDashTimeline();
+	void InitRecoilTimeline();
 
 	// Mathematics utility
 	const FVector CalculateThrowForce() const;
@@ -210,48 +216,45 @@ private:
 	// LookAt intractable items
 	void CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection); 
 	AActor* CheckLookAtInteractableItems();
+	const FVector CalculateModuleSpawnLocation() const;
+	void ThrowScrap(UPrimitiveComponent* Target);
 
 	// Interact with items
 	void InteractWithModule(AOPAG_ModuleBase* Module);
+	void PickupModule(AOPAG_ModuleBase* Module);
 
 public:
-	UFUNCTION()
-	void MoveForward(const FInputActionValue& Value);
+	UFUNCTION() void MoveForward(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void MoveRight(const FInputActionValue& Value);
+	UFUNCTION() void MoveRight(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void Lookup(const FInputActionValue& Value);
+	UFUNCTION() void Lookup(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void Turn(const FInputActionValue& Value);
+	UFUNCTION() void Turn(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void Jumping(const FInputActionValue& Value);
+	UFUNCTION() void Jumping(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void Shoot(const FInputActionValue& Value);
+	UFUNCTION() void Shoot(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void InteractWithItem(const FInputActionValue& Value);
+	UFUNCTION() void InteractWithItem(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void SwitchToADSCamera(const FInputActionValue& Value);
+	UFUNCTION() void SwitchToADSCamera(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void ResetFPSCamera(const FInputActionValue& Value);
+	UFUNCTION() void ResetFPSCamera(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void Health(const FInputActionValue& Value);
+	UFUNCTION() void Health(const FInputActionValue& Value);
 
-	UFUNCTION()
-	void ActiveDash(const FInputActionValue& Value);
+	UFUNCTION() void ActiveDash(const FInputActionValue& Value);
+
+	UFUNCTION() void ActiveGunAbility(const FInputActionValue& Value);
 
 public:
-	UFUNCTION()
-	void ADSTimelineProgress(float Value);
+	UFUNCTION() void ADSTimelineProgress(float Value);
 
-	UFUNCTION()
-	void DashTimelineFinished();
+	UFUNCTION() void DashTimelineFinished();
+
+	UFUNCTION() void RecoilTimelineProgress(float Value);
+
+public:
+	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
 };

@@ -29,9 +29,10 @@ void AOPAG_Enemy::UpdateSpeed(float NewSpeed) const
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
-void AOPAG_Enemy::TakeDamage(float DamageAmount)
+void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
 {
-	Super::TakeDamage(DamageAmount);
+	Super::ReceiveDamage(DamageAmount);
+	
 	//Triggers the damage sense on the AI controlled pawn
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this, UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount, UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(), GetActorLocation(), NAME_None);
 	if(GEngine)
@@ -41,7 +42,7 @@ void AOPAG_Enemy::TakeDamage(float DamageAmount)
 //TODO: Remove when the enemy will be able to take damage from the player
 void AOPAG_Enemy::DebugTake100Damage()
 {
-	TakeDamage(100.f);
+	ReceiveDamage(100.f);
 }
 
 void AOPAG_Enemy::Attack()

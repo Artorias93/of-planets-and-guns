@@ -25,10 +25,9 @@ public:
 	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);		
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	virtual void TakeDamage(const float Damage);
-
-	virtual void TakeDamage(AActor* Throwable);
+	
+	virtual void ReceiveDamage(const float Damage);
+	virtual void ReceiveDamage(AActor* Throwable);
 
 	const float GetHealth() const;
 	void SetHealth(const float Health);

@@ -67,7 +67,7 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 			//TODO: Change class when player is done
 			if(AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
 			{
-				Player->TakeDamage(50.f);
+				Player->ReceiveDamage(50.f);
 			}
 
 			//TODO: Not working
