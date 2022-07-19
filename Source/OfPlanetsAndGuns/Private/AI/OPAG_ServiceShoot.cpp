@@ -30,8 +30,10 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 					TArray<AActor*> ActorsToIgnore;
 					ActorsToIgnore.Add(RangedEnemy);
 					FHitResult HitResult;
-					//TODO: Why is this a Sphere Trace with radius 0 and not a Line Trace?
-					const bool TraceResult = UKismetSystemLibrary::SphereTraceSingle(GetWorld(), RangedEnemy->GetActorLocation(), FocusActor->GetActorLocation(), 0.f, TraceTypeQuery2 /* = Camera*/, false, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true);
+					const bool TraceResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(),
+						RangedEnemy->GetActorLocation(), FocusActor->GetActorLocation(),
+						TraceTypeQuery2 /* = Camera*/, false, ActorsToIgnore,
+						EDrawDebugTrace::None, HitResult, true);
 
 					if (TraceResult)
 					{
