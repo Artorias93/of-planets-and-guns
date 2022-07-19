@@ -8,7 +8,6 @@
 #include "OPAG_CharacterBase.generated.h"
 
 class UAbilitySystemComponent;
-struct FOnAttributeChangeData;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_CharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -36,6 +35,8 @@ public:
 	void SetHealthMax(const float HealthMax);
 
 protected:
+	class UOPAG_EventManagerSubsystem* EMS;
+
 	virtual void BeginPlay() override;
 	virtual void GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance = 0);
 	virtual void Death();

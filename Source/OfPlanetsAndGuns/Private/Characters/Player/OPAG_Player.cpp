@@ -14,6 +14,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Characters/OPAG_AttributeSetBase.h"
 #include "Weapons/Modules/OPAG_AccessoryBase.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_GameInstance.h"
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -63,7 +65,11 @@ void AOPAG_Player::BeginPlay()
 	UUserWidget* Crosshair = CreateWidget<UUserWidget>(GetWorld(), CrosshairClass);
 	Crosshair->AddToViewport();
 	
-	//TODO: EventManagerSubSystem reference
+	if (BaseAttributeSet && AbilitySystemComp)
+	{
+		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(
+			BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AOPAG_Player::HealthChanged);
+	}
 
 	InitializeAbilities();
 	InitDefaultValues();
@@ -603,4 +609,13 @@ void AOPAG_Player::RecoilTimelineProgress(float Value)
 
 	UE_LOG(LogTemp, Warning, TEXT("%f"), RecoilPitch);
 }
+
+void AOPAG_Player::HealthChanged(const FOnAttributeChangeData& Data)
+{
+	UE_LOG(LogTemp, Warning, TEXT("New Health: %f"), Data.NewValue);
+	UE_LOG(LogTemp, Warning, TEXT("Max Health: %f"), GetHealthMax());
+	
+	EMS->HealthChanged.Broadcast(Data.NewValue, GetHealthMax());
+}
+
 #pragma endregion Timeline

@@ -4,9 +4,11 @@
 #include "Components/TimelineComponent.h"
 #include "Blueprint/UserWidget.h"
 
+#include "GameplayEffectTypes.h"
 #include "CoreMinimal.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Player.generated.h"
+
 
 class AOPAG_AccessoryBase;
 class UOPAG_AttributeSetBase;
@@ -23,7 +25,6 @@ class AOPAG_GunBase;
 class UDataTable;
 class UKismetSystemLibrary;
 class UAbilitySystemComponent;
-struct FOnAttributeChangeData;
 
 USTRUCT(BlueprintType)
 struct FInputActions
@@ -257,4 +258,6 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
+
+	void HealthChanged(const FOnAttributeChangeData& Data);
 };
