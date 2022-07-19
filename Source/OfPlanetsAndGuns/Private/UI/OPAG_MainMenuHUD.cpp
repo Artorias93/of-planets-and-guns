@@ -10,6 +10,11 @@ void AOPAG_MainMenuHUD::DrawHUD()
 	Super::DrawHUD();
 }
 
+void AOPAG_MainMenuHUD::BoughtAbility()
+{
+
+}
+
 void AOPAG_MainMenuHUD::BeginPlay()
 {
 	Super::BeginPlay();

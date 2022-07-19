@@ -30,4 +30,5 @@ private:
 public:
 	virtual void DrawHUD() override;
 	
+	void BoughtAbility();
 };
