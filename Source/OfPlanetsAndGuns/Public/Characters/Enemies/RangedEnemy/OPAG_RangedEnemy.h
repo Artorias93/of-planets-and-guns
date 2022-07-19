@@ -5,6 +5,8 @@
 #include <../../../FX/Niagara/Source/Niagara/Public/NiagaraComponent.h>
 #include "OPAG_RangedEnemy.generated.h"
 
+class AOPAG_GunBase;
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_RangedEnemy : public AOPAG_Enemy
 {
@@ -18,12 +20,14 @@ public:
 
 	AOPAG_RangedEnemy();
 
-	void FireBullet();
+	virtual void Attack() override;
 
 private:
 
+	virtual void BeginPlay() override;
+	
 	virtual void Tick(float DeltaSeconds) override;
-
+	
 	void StartShooting();
 
 	/////////////////////////////
@@ -51,4 +55,13 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float ShotWaitTimeRandomIntervalBounds[2] = {0.5f, 0.7f};
+
+	UPROPERTY()
+	AOPAG_GunBase* EquippedWeapon;
+
+	UPROPERTY()
+	FVector StartLocation = FVector::ZeroVector;
+
+	UPROPERTY()
+	FVector Direction = FVector::ZeroVector;
 };

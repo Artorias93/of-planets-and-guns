@@ -44,7 +44,7 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 }
 
 
-//On activation???
+//Executed on service activation
 void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
 	Super::OnBecomeRelevant(OwnerBTComponent, NodeMemory);
