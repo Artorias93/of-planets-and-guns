@@ -45,6 +45,9 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UNiagaraComponent* LaserBeam;
 
+	UPROPERTY()
+	bool bIsShooting = false;
+
 private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
@@ -54,17 +57,21 @@ private:
 	FTimerHandle ShotTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	float ShotWaitTimeRandomIntervalBounds[2] = {0.5f, 0.7f};
+	float ShotWaitTimeRandomIntervalBounds[2] = {0.4f, 0.6f};
 
 	UPROPERTY()
 	AOPAG_GunBase* EquippedWeapon;
 
+	//Vectors for LaserBeam
 	UPROPERTY()
 	FVector StartLocation = FVector::ZeroVector;
-
 	UPROPERTY()
 	FVector Direction = FVector::ZeroVector;
 
+	//Modifies the Laser Beam direction 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess=true))
 	FVector LaserBeamDestinationModifier = FVector::ZeroVector;
+
+	UPROPERTY()
+	bool bIsShooting;
 };

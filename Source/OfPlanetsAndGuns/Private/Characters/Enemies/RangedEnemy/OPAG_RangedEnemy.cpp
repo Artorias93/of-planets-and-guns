@@ -57,6 +57,7 @@ void AOPAG_RangedEnemy::Tick(float DeltaSeconds)
 			LaserBeam->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(LaserBeam->K2_GetComponentLocation(),
 				Player->GetActorLocation() + LaserBeamDestinationModifier));
 
+			//TODO: Check out these amazing magic numbers! Hmmm so spicy :P
 			//Scales the aiming led based on the distance from the player
 			AimingLed->SetWorldScale3D((((GetActorLocation() - Player->GetActorLocation()).Size()) / -100.f)
 				* FVector(.01f, .01f, .01f));

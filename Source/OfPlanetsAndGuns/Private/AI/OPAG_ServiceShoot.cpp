@@ -45,7 +45,6 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 	}
 }
 
-
 //Executed on service activation
 void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
@@ -66,14 +65,15 @@ void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTCompone
 			LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->LaserBeam);
 			if (LaserBeam)
 			{
+				LaserBeam->SetVisibility(true);
+				
 				//What is this????
-				if (/*!RangedEnemy->Shoot*/ true)
-				{
-					LaserBeam->SetVisibility(true);
-					//RangedEnemy->Shoot = true;
-				}
+				// if (RangedEnemy->Shoot)
+				// {
+				LaserBeam->SetVisibility(true);
+				// 	RangedEnemy->Shoot = true;
+				// }
 			}
-
 			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::DisableAimingSignals, StartShootingTimer, false);
 		}
 	}
