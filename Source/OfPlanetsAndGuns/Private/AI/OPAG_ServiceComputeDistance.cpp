@@ -1,10 +1,14 @@
 #include "AI/OPAG_ServiceComputeDistance.h"
-#include "AIController.h"
-//Components
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+//My Classes
+#include "Characters/Enemies/OPAG_AICBase.h"
+#include "Characters/OPAG_CharacterBase.h" //Remove when player is ready
+#include "Characters/Player/OPAG_Player.h"
 
-//BT Service: Computes distance between itself and BB's TargetActor, saving the result in BB's EnemyDistance
+//---------------------------------------------------------------------
+//THIS TASK IS CURRENTLY UNUSED
+//---------------------------------------------------------------------
 
 UOPAG_ServiceComputeDistance::UOPAG_ServiceComputeDistance(FObjectInitializer const& ObjectInitializer)
 {
@@ -16,14 +20,17 @@ void UOPAG_ServiceComputeDistance::TickNode(UBehaviorTreeComponent& OwnerBTCompo
 {
 	Super::TickNode(OwnerBTComponent, NodeMemory, DeltaSeconds);
 
-	AAIController* AIController = Cast<AAIController>(OwnerBTComponent.GetAIOwner());
-
-	if(AActor* OtherActor = Cast<AActor>(AIController->GetBlackboardComponent()->GetValueAsObject("TargetActor")))
+	if(AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		FVector SelfLocation = AIController->GetPawn()->GetActorLocation();
-		FVector OtherLocation = OtherActor->GetActorLocation();
-		float ActorsDistance = FVector::Distance(SelfLocation, OtherLocation);
+		//Replace with the proper class when it's ready
+		if (const AOPAG_CharacterBase* const PlayerActor = Cast<AOPAG_CharacterBase>(
+			AIController->GetBlackboardComponent()->GetValueAsObject(BBKeyTargetActor.SelectedKeyName)))
+		{
+			const FVector SelfLocation = AIController->GetPawn()->GetActorLocation();
+			const FVector PlayerLocation = PlayerActor->GetActorLocation();
+			const float ActorsDistance = FVector::Distance(SelfLocation, PlayerLocation);
 
-		AIController->GetBlackboardComponent()->SetValueAsFloat("EnemyDistance", ActorsDistance);
-	}
+			AIController->GetBlackboardComponent()->SetValueAsFloat(BBKeyEnemyDistance.SelectedKeyName, ActorsDistance);
+		}
+	}	
 }

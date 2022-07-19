@@ -1,49 +1,82 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Characters/OPAG_CharacterBase.h"
-#include "Character/BaseAttributeSet.h"			//GAS_Plugin
+#include <AbilitySystemBlueprintLibrary.h>
+#include <AbilitySystemComponent.h>
+#include <Abilities/GameplayAbility.h>
+#include <GameplayTagsManager.h>
+#include <GameplayTagContainer.h>
+//My Classes
+#include "Characters/OPAG_AttributeSetBase.h"
 
-
-// Sets default values
 AOPAG_CharacterBase::AOPAG_CharacterBase()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");			//GAS_Plugin
+	PrimaryActorTick.bCanEverTick = false;
+	
+	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");
+
+	static ConstructorHelpers::FClassFinder<UGameplayAbility> BasicShotClass(TEXT("/Game/OfPlanetsAndGuns/Core/Abilities/GA_BasicShot"));
+	if (BasicShotClass.Succeeded())
+	{
+		BasicShot = BasicShotClass.Class;
+	}
 }
 
-// Called when the game starts or when spawned
+//Binds functionality to input
+void AOPAG_CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
+
+UAbilitySystemComponent* AOPAG_CharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComp;
+}
+
 void AOPAG_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
 	if (AbilitySystemComp)
 	{
-		BaseAttributeSetComp = AbilitySystemComp->GetSet<UBaseAttributeSet>();
+		BaseAttributeSet = AbilitySystemComp->GetSet<UOPAG_AttributeSetBase>();
 
-		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetHealthAttribute()).AddUObject(this, &AOPAG_CharacterBase::OnHealthChangedNative);			//GAS_Plugin
-		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetManaAttribute()).AddUObject(this, &AOPAG_CharacterBase::OnManaChangedNative);				//GAS_Plugin
-		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetStaminaAttribute()).AddUObject(this, &AOPAG_CharacterBase::OnStaminaChangedNative);			//GAS_Plugin
-		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSetComp->GetDamagedAttribute()).AddUObject(this, &AOPAG_CharacterBase::OnDamagedChangedNative);			//GAS_Plugin
+		if (BaseAttributeSet)
+		{
+			/*AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(
+				BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AOPAG_CharacterBase::HealthChanged);*/
+		}
+
+		InitializeAbility(BasicShot, 0);
 	}
 }
 
-// Called every frame
-void AOPAG_CharacterBase::Tick(float DeltaTime)
+const float AOPAG_CharacterBase::GetHealth() const
 {
-	Super::Tick(DeltaTime);
-
+	if(AbilitySystemComp)
+	{
+		return AbilitySystemComp->GetNumericAttribute(BaseAttributeSet->GetHealthAttribute());
+	}
+	return 1;
 }
 
-// Called to bind functionality to input
-void AOPAG_CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AOPAG_CharacterBase::SetHealth(const float Health)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetHealthAttribute(), Health);
 }
 
-//GAS_Plugin
+const float AOPAG_CharacterBase::GetHealthMax() const
+{
+	if (AbilitySystemComp)
+	{
+		return AbilitySystemComp->GetNumericAttribute(BaseAttributeSet->GetMaxHealthAttribute());
+	}
+	return 1;
+}
+
+void AOPAG_CharacterBase::SetHealthMax(const float HealthMax)
+{
+	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetMaxHealthAttribute(), HealthMax);
+}
+
 void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel)
 {
 	if (AbilitySystemComp)
@@ -56,57 +89,57 @@ void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> Abilit
 	}
 }
 
-//GAS_Plugin
-UAbilitySystemComponent* AOPAG_CharacterBase::GetAbilitySystemComponent() const
+void AOPAG_CharacterBase::ReceiveDamage(const float Damage)
 {
-	return AbilitySystemComp;
+	if(AbilitySystemComp && BaseAttributeSet)
+	{
+		AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
+
+		//TODO: Rename BasicShot in AbilityTakeDamage
+		AbilitySystemComp->TryActivateAbilityByClass(BasicShot);
+
+		const FGameplayTag HitGameplayTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.ranged.hitEvent"));
+		FGameplayEventData HitEventData = FGameplayEventData();
+		HitEventData.Target = this;
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
+
+		if(GetHealth()<=0)
+		{
+			Death();
+		}	
+	}
 }
 
-//GAS_Plugin
-void AOPAG_CharacterBase::GetHealthValues(float& Health, float& MaxHealth)
+void AOPAG_CharacterBase::ReceiveDamage(AActor* Throwable)
 {
-	Health = BaseAttributeSetComp->GetHealth();
-	MaxHealth = BaseAttributeSetComp->GetMaxHealth();
+	//TODO: Implement
 }
 
-//GAS_Plugin
-void AOPAG_CharacterBase::GetManaValues(float& Mana, float& MaxMana)
+void AOPAG_CharacterBase::GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance)
 {
-	Mana = BaseAttributeSetComp->GetMana();
-	MaxMana = BaseAttributeSetComp->GetMaxMana();
+	//Overridden by children
 }
 
-//GAS_Plugin
-void AOPAG_CharacterBase::GetStaminaValues(float& Stamina, float& MaxStamina)
+void AOPAG_CharacterBase::Death()
 {
-	Stamina = BaseAttributeSetComp->GetStamina();
-	MaxStamina = BaseAttributeSetComp->GetMaxStamina();
+	//Overridden by children
 }
 
-void AOPAG_CharacterBase::GetDamagedValues(float& Damaged)
+const float AOPAG_CharacterBase::GetAxisX() const
 {
-	Damaged = BaseAttributeSetComp->GetDamaged();
+	const float X = GetInputAxisValue("MoveForward");
+	return X;
 }
 
-//GAS_Plugin
-void AOPAG_CharacterBase::OnHealthChangedNative(const FOnAttributeChangeData& Data)
+const float AOPAG_CharacterBase::GetAxisY() const
 {
-	OnHealthChanged(Data.OldValue, Data.NewValue);
+	const float Y = GetInputAxisValue("MoveRight");
+	return Y;
 }
 
-//GAS_Plugin
-void AOPAG_CharacterBase::OnManaChangedNative(const FOnAttributeChangeData& Data)
-{
-	OnManaChanged(Data.OldValue, Data.NewValue);
-}
-
-//GAS_Plugin
-void AOPAG_CharacterBase::OnStaminaChangedNative(const FOnAttributeChangeData& Data)
-{
-	OnStaminaChanged(Data.OldValue, Data.NewValue);
-}
-
-void AOPAG_CharacterBase::OnDamagedChangedNative(const FOnAttributeChangeData& Data)
-{
-	OnDamagedChanged(Data.OldValue, Data.NewValue);
-}
+//Called every time the value changes
+//void AOPAG_CharacterBase::HealthChanged(const FOnAttributeChangeData& Data)
+//{
+//	OnHealthChanged(Data.OldValue, Data.NewValue);
+//}

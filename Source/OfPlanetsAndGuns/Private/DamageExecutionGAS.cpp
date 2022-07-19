@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "DamageExecutionGAS.h"
 
 UDamageExecutionGAS::UDamageExecutionGAS(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -10,7 +7,7 @@ UDamageExecutionGAS::UDamageExecutionGAS(const FObjectInitializer& ObjectInitial
 	RelevantAttributesToCapture.Add(DamageStruct.HealthDef);
 	InvalidScopedModifierAttributes.Add(DamageStruct.HealthDef);
 
-	RelevantAttributesToCapture.Add(DamageStruct.DamagedDef);
+	RelevantAttributesToCapture.Add(DamageStruct.DamageTakenAmountDef);
 }
 
 void UDamageExecutionGAS::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -35,10 +32,11 @@ void UDamageExecutionGAS::Execute_Implementation(const FGameplayEffectCustomExec
 	float Health = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStruct.HealthDef, EvaluationParameters, Health);
 
-	float AttackMultiplier = 0.f; 
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStruct.DamagedDef, EvaluationParameters, AttackMultiplier);
+	float DamageTaken = 0.f; 
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStruct.DamageTakenAmountDef, EvaluationParameters, DamageTaken);
 
-	float DamageDone = 1 * AttackMultiplier;
+	//Replace 1 with an optional attack multiplier
+	float EffectiveDamageTaken = 1 * DamageTaken;
 
-	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStruct.HealthProperty, EGameplayModOp::Additive, -DamageDone));
+	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStruct.HealthProperty, EGameplayModOp::Additive, -EffectiveDamageTaken));
 }

@@ -1,19 +1,18 @@
 #include "Characters/Enemies/OPAG_AICBase.h"
-#include "Characters/Enemies/OPAG_Enemy.h"
-#include "Characters/Player/OPAG_Player.h"
-#include "BehaviorTree/BehaviorTree.h"
 #include "TimerManager.h"
-//Components
+#include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Damage.h"
+//My classes
+#include "Characters/Enemies/OPAG_Enemy.h"
+#include "Characters/Player/OPAG_Player.h"
 
 AOPAG_AICBase::AOPAG_AICBase()
 {
 	bStartAILogicOnPossess = true;
-	//bStopAILogicOnUnposses = true;
 
 	//Components Setup
 	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("AIC Blackboard Component"));
@@ -23,52 +22,57 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
 	PerceptionSightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AI Sight Config"));
 	PerceptionDamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("AI Damage Config"));
-	PerceptionSightConfig->SightRadius = 3000.f;
-	PerceptionSightConfig->LoseSightRadius = 3500.f;
-	PerceptionSightConfig->PeripheralVisionAngleDegrees = 90.0f;
+	
+	//TODO: Move all this setup in the specialized sub-classes
+	PerceptionSightConfig->SightRadius = 2500.f;
+	PerceptionSightConfig->LoseSightRadius = 300.f;
+	PerceptionSightConfig->PeripheralVisionAngleDegrees = 120.0f;
 	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
 	PerceptionSightConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	PerceptionComp->ConfigureSense(*PerceptionSightConfig);
 	PerceptionComp->ConfigureSense(*PerceptionDamageConfig);
 	PerceptionComp->SetDominantSense(PerceptionSightConfig->GetSenseImplementation());
-
 }
 
 void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 {
 	Super::OnPossess(ControlledPawn);
 
-	AOPAG_Enemy* ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
+	const AOPAG_Enemy* const ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
 	if(ControlledEnemy && ControlledEnemy->BehaviorTree)
 	{
 		BlackboardComponent->InitializeBlackboard(*ControlledEnemy->BehaviorTree->BlackboardAsset);
 		BehaviorTreeComponent->StartTree(*ControlledEnemy->BehaviorTree);
 
-		PerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AOPAG_AICBase::OnSightUpdated);
+		PerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AOPAG_AICBase::OnPerceptionUpdated);
 	}
 }
 
-void AOPAG_AICBase::OnSightUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
+void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
-	//The sight sense only reacts to the player character
-	if (AOPAG_Player* Player = Cast<AOPAG_Player>(UpdatedActor))
+	//Senses only react to the player character
+	//TODO: Swap with correct class when OPAG_Player is ready
+	if (ACharacter* const Player = Cast<ACharacter>(UpdatedActor))
 	{
+		//If the player is seen set it to target actor
 		if (Stimulus.WasSuccessfullySensed())
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LoseSightTimerHandle);
-			GetBlackboardComponent()->SetValueAsObject("EnemyActor", Player);
+			GetBlackboardComponent()->SetValueAsObject("TargetActor", Player);
 			SetFocus(Player, EAIFocusPriority::Gameplay);
 		}
+		//If the player is lost remove it from target actor after a certain number of seconds
 		else
 		{
-			GetWorld()->GetTimerManager().SetTimer(LoseSightTimerHandle, this, &AOPAG_AICBase::LoseTarget, LoseSightTimer);
+			GetWorld()->GetTimerManager().SetTimer(LoseSightTimerHandle, this,
+				&AOPAG_AICBase::LoseTarget, LoseSightTimer);
 		}
 	}
 }
 
 void AOPAG_AICBase::LoseTarget()
 {
-	GetBlackboardComponent()->SetValueAsObject("EnemyActor", nullptr);
+	GetBlackboardComponent()->SetValueAsObject("TargetActor", nullptr);
 	ClearFocus(EAIFocusPriority::Gameplay);
 }

@@ -35,6 +35,15 @@ void ACharacterBase::Tick(float DeltaTime)
 
 }
 
+float ACharacterBase::GetHealth() const
+{
+	if (AbilitySystemComp)
+	{
+		return AbilitySystemComp->GetNumericAttribute(BaseAttributeSetComp->GetHealthAttribute());
+	}
+	return 0;
+}
+
 // Called to bind functionality to input
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
