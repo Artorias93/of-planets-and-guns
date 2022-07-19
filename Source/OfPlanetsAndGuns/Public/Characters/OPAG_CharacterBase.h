@@ -55,9 +55,9 @@ public:
 	TSubclassOf<UGameplayAbility> BasicShot;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	const float GetAxisX() const;
+	UPROPERTY(Category = "Movement", VisibleAnywhere, BlueprintReadWrite)
+		float AxisX;
 
-	UFUNCTION(BlueprintCallable)
-	const float GetAxisY() const;
+	UPROPERTY(Category = "Movement", VisibleAnywhere, BlueprintReadWrite)
+		float AxisY;
 };

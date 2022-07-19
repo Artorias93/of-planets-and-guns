@@ -337,19 +337,19 @@ void AOPAG_Player::GetShootingDirection(FVector& OutStartLocation, FVector& OutD
 #pragma region Movement Input
 void AOPAG_Player::MoveForward(const FInputActionValue& Value)
 {
-	const float MoveForwardScale = Value[1];
-	if (MoveForwardScale != 0.0f)
+	AxisY = Value[1];
+	if (AxisY != 0.0f)
 	{
-		AddMovementInput(GetActorForwardVector(), MoveForwardScale);
+		AddMovementInput(GetActorForwardVector(), AxisY);
 	}
 }
 
 void AOPAG_Player::MoveRight(const FInputActionValue& Value)
 {
-	const float MoveRightScale = Value[0];
-	if (MoveRightScale != 0.0f)
+	AxisX = Value[0];
+	if (AxisX != 0.0f)
 	{
-		AddMovementInput(GetActorRightVector(), MoveRightScale);
+		AddMovementInput(GetActorRightVector(), AxisX);
 	}
 }
 

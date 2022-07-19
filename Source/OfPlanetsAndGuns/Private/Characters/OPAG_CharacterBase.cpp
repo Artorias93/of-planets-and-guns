@@ -126,18 +126,6 @@ void AOPAG_CharacterBase::Death()
 	//Overridden by children
 }
 
-const float AOPAG_CharacterBase::GetAxisX() const
-{
-	const float X = GetInputAxisValue("MoveForward");
-	return X;
-}
-
-const float AOPAG_CharacterBase::GetAxisY() const
-{
-	const float Y = GetInputAxisValue("MoveRight");
-	return Y;
-}
-
 //Called every time the value changes
 //void AOPAG_CharacterBase::HealthChanged(const FOnAttributeChangeData& Data)
 //{
