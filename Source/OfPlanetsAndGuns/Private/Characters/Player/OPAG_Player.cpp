@@ -82,6 +82,8 @@ void AOPAG_Player::Tick(float DeltaTime)
 	}
 	// Initialize the object seen by the player
 	InteractableObject = CheckLookAtInteractableItems();
+
+	UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), GetHealth());
 }
 
 void AOPAG_Player::InitDefaultValues()
