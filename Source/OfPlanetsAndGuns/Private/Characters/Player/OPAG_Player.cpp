@@ -63,6 +63,8 @@ void AOPAG_Player::BeginPlay()
 	UUserWidget* Crosshair = CreateWidget<UUserWidget>(GetWorld(), CrosshairClass);
 	Crosshair->AddToViewport();
 	
+	//TODO: EventManagerSubSystem reference
+
 	InitializeAbilities();
 	InitDefaultValues();
 	InitADSTimeline();
