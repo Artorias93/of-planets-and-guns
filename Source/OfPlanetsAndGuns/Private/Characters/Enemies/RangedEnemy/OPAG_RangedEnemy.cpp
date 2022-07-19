@@ -31,13 +31,14 @@ AOPAG_RangedEnemy::AOPAG_RangedEnemy()
 void AOPAG_RangedEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//Attaches gun to the mesh
 	if(Weapon)
 	{
 		if(Weapon->GetChildActor())
 		{
 			Weapon->AttachToComponent(GetMesh(),
 				FAttachmentTransformRules::SnapToTargetNotIncludingScale, "RightHandSocketGun");
-
 			EquippedWeapon = Cast<AOPAG_GunBase>(Weapon->GetChildActor());
 		}
 	}	
@@ -51,13 +52,12 @@ void AOPAG_RangedEnemy::Tick(float DeltaSeconds)
 	{
 		if(const AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 		{
+			//TODO: Add a PingPong function to this so it is more realistic?
 			//Points the laser beam directly to the player
-			//TODO: Get back to this when player is implemented
 			LaserBeam->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(LaserBeam->K2_GetComponentLocation(),
-				Player->GetActorLocation()));
+				Player->GetActorLocation() + LaserBeamDestinationModifier));
 
 			//Scales the aiming led based on the distance from the player
-			//TODO: Get back to this when player is implemented
 			AimingLed->SetWorldScale3D((((GetActorLocation() - Player->GetActorLocation()).Size()) / -100.f)
 				* FVector(.01f, .01f, .01f));
 		}

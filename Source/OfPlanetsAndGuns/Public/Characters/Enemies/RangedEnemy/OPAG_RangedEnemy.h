@@ -64,4 +64,7 @@ private:
 
 	UPROPERTY()
 	FVector Direction = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess=true))
+	FVector LaserBeamDestinationModifier = FVector::ZeroVector;
 };
