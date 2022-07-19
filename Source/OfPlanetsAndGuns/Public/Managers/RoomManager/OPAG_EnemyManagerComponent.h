@@ -26,7 +26,7 @@ public:
 	UOPAG_EnemyManagerComponent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager")
-		TArray<TSoftObjectPtr<AOPAG_EnemySpawnPoint>> Spawners;
+		TArray<AOPAG_EnemySpawnPoint*> Spawners;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager")
 		UDataTable* EnemyTypes;
@@ -46,10 +46,8 @@ private:
 	void GetMappedEnemies(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyProbabilityMap);
 
 	UFUNCTION()
-		void OnEnemyDeath(AOPAG_Enemy* Enemy);
-
-	template<typename T>
-	static void ShuffleArray(TArray<T>& Array);
+		void OnEnemyDeath(const AOPAG_Enemy* const Enemy);
+	
 
 protected:
 	// Called when the game starts

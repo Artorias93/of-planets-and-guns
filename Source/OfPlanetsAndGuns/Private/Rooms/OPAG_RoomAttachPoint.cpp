@@ -27,11 +27,11 @@ AOPAG_RoomAttachPoint::AOPAG_RoomAttachPoint()
 	Arrow->ScreenSize = 0.0005f;
 	Arrow->bIsScreenSizeScaled = true;
 
-	auto startSpriteFinder = ConstructorHelpers::FObjectFinder<UTexture2D>(
+    const auto StartSpriteFinder = ConstructorHelpers::FObjectFinder<UTexture2D>(
 		TEXT("Texture2D'/Engine/MobileResources/HUD/AnalogHat.AnalogHat'"));
-	if (startSpriteFinder.Succeeded()) StartSprite = startSpriteFinder.Object;
+	if (StartSpriteFinder.Succeeded()) StartSprite = StartSpriteFinder.Object;
 
-	auto ExitSpriteFinder = ConstructorHelpers::FObjectFinder<UTexture2D>(
+    const auto ExitSpriteFinder = ConstructorHelpers::FObjectFinder<UTexture2D>(
 		TEXT("Texture2D'/Engine/EditorMaterials/Anchor.Anchor'"));
 	if (ExitSpriteFinder.Succeeded()) ExitSprite = ExitSpriteFinder.Object;
 

@@ -64,7 +64,7 @@ void UOPAG_GameInstance::OnResumeGame()
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
-UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager()
+UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager() const
 {
 	return GetSubsystem<UOPAG_EventManagerSubsystem>();
 }

@@ -20,7 +20,7 @@ AOPAG_SimpleDoor::AOPAG_SimpleDoor()
 	Timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Movement Timeline"));
 }
 
-void AOPAG_SimpleDoor::TimelineCallback(float Height) const
+void AOPAG_SimpleDoor::TimelineCallback(const float Height) const
 {
 	Door->SetRelativeLocation(InitialDoorLocation + FVector::UpVector * Height);
 }
@@ -33,9 +33,9 @@ void AOPAG_SimpleDoor::BeginPlay()
 
 	if (MovementCurve != nullptr)
 	{
-		FOnTimelineFloat onTimelineCallback;
-		onTimelineCallback.BindUFunction(this, FName{ TEXT("TimelineCallback") });
-		Timeline->AddInterpFloat(MovementCurve, onTimelineCallback);
+		FOnTimelineFloat OnTimelineCallback;
+		OnTimelineCallback.BindUFunction(this, FName{ TEXT("TimelineCallback") });
+		Timeline->AddInterpFloat(MovementCurve, OnTimelineCallback);
 		Timeline->RegisterComponent();
 	}
 

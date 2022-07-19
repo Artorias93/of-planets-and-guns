@@ -9,6 +9,7 @@
 #include "Managers/RoomManager/OPAG_EnemyLevel.h"
 #include "Managers/RoomManager/OPAG_RoomManager.h"
 #include "Rooms/OPAG_EnemySpawnPoint.h"
+#include "Util/OPAG_UtilityFunctionLibrary.h"
 
 // Sets default values for this component's properties
 UOPAG_EnemyManagerComponent::UOPAG_EnemyManagerComponent()
@@ -21,7 +22,7 @@ UOPAG_EnemyManagerComponent::UOPAG_EnemyManagerComponent()
 }
 
 
-float UOPAG_EnemyManagerComponent::GaussianProbabilityModifier(float Level) const
+float UOPAG_EnemyManagerComponent::GaussianProbabilityModifier(const float Level) const
 {
 	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
 		UGameplayStatics::GetGameInstance(GetWorld()));
@@ -60,38 +61,23 @@ void UOPAG_EnemyManagerComponent::GetMappedEnemies(TMap<TSoftClassPtr<AOPAG_Enem
 	}
 }
 
-void UOPAG_EnemyManagerComponent::OnEnemyDeath(AOPAG_Enemy* Enemy)
+void UOPAG_EnemyManagerComponent::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 {
 	if (EnemiesInRoom.Remove(Enemy) > 0)
+	{
 		EnemyDeathCount++;
 
-	if (EnemyDeathCount >= TotalEnemyAmount)
-	{
-		AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
-		if (RoomManager)
+		if (EnemyDeathCount >= TotalEnemyAmount)
 		{
-			RoomManager->RoomCleared();
-		}
-	}
-	else
-	{
-		SpawnWave();
-	}
-}
-
-template<typename T>
-void UOPAG_EnemyManagerComponent::ShuffleArray(TArray<T>& Array)
-{
-	if (Array.Num() > 1)
-	{
-		const int32 LastIndex = Array.Num() - 1;
-		for (int32 i = 0; i <= LastIndex; ++i)
-		{
-			int32 Index = FMath::RandRange(i, LastIndex);
-			if (i != Index)
+			AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
+			if (RoomManager)
 			{
-				Array.Swap(i, Index);
+				RoomManager->RoomCleared();
 			}
+		}
+		else
+		{
+			SpawnWave();
 		}
 	}
 }
@@ -101,9 +87,9 @@ void UOPAG_EnemyManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	const FString Context;
-	EnemyTypes->GetAllRows(Context, BaseEnemyLevels);
+	if (EnemyTypes) EnemyTypes->GetAllRows(Context, BaseEnemyLevels);
 
-	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
+	const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
 		UGameplayStatics::GetGameInstance(GetWorld()));
 	if (GI != nullptr)
 	{
@@ -134,7 +120,7 @@ void UOPAG_EnemyManagerComponent::SpawnWave()
 	{
 		float EnemiesToSpawnNextWave = GetSpawnerCount();
 
-		ShuffleArray(Spawners);
+		UOPAG_UtilityFunctionLibrary::ShuffleArray(Spawners);
 
 		TMap<TSoftClassPtr<AOPAG_Enemy>, float> EnemyProbabilityMap;
 		GetMappedEnemies(EnemyProbabilityMap);

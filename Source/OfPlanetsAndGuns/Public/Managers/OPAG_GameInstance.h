@@ -49,7 +49,7 @@ public:
 		void OnResumeGame();
 
 	UFUNCTION(BlueprintCallable, Category = "Event Manger")
-		UOPAG_EventManagerSubsystem* GetEventManager();
+		UOPAG_EventManagerSubsystem* GetEventManager() const;
 
 	UFUNCTION(BlueprintCallable)
 		float GetStageDifficulty();

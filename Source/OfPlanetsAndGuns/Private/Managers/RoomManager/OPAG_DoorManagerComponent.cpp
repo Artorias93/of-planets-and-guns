@@ -28,7 +28,8 @@ void UOPAG_DoorManagerComponent::BeginPlay()
 
 
 // Called every frame
-void UOPAG_DoorManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UOPAG_DoorManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
+	FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 

@@ -83,15 +83,15 @@ private:
 	void FilterDoubleExitRooms(const TArray<FOPAG_RoomOffset*>& RoomList, 
 		TArray<FOPAG_RoomOffset*>& FilteredRooms, bool bHasDoubleExits);
 
-	FOPAG_RoomOffset* GetRandomRoom(bool bIsNotFirst, uint8& PreviousRoomTurn);
-	FOPAG_RoomOffset* GetRandomSpecialRoom(uint8& PreviousRoomTurn);
+	FOPAG_RoomOffset* GetRandomRoom(bool bIsNotFirst, const uint8& PreviousRoomTurn);
+	FOPAG_RoomOffset* GetRandomSpecialRoom(const uint8& PreviousRoomTurn);
 	bool IsRoomDouble();
 
-	void UpdateRoomTurnBitmask(uint8& Previous, uint8 Next);
+	static void UpdateRoomTurnBitmask(uint8& Previous, uint8 Next);
 
 	int32 AddRandomBridge(FOPAG_StagePathing* Room, bool SecondaryExit = false);
 
-	void FinishedLoadingStage();
+	void FinishedLoadingStage() const;
 	UFUNCTION()
 	void OnRoomSpawned(AOPAG_RoomManager* const RoomManager);
 
@@ -113,16 +113,11 @@ private:
 	void PostGenerationActions();
 
 	void AssignClosedExits();
-	void ReplacePawn();
+	void ReplacePawn() const;
 	UFUNCTION()
 	void LoadLevels(AOPAG_RoomStreamingVolume* const Volume);
 	UFUNCTION()
 	void UnloadLevels();
-
-	void ScreenLog(FString Message, EMessageSeverity::Type Severity);
-
-	template<typename T>
-	void ShuffleArray(TArray<T>& Array);
 
 protected:
 	// Called when the game starts or when spawned

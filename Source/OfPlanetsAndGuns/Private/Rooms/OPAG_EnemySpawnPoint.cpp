@@ -21,7 +21,7 @@ AOPAG_EnemySpawnPoint::AOPAG_EnemySpawnPoint()
 
 TSoftClassPtr<AOPAG_Enemy> AOPAG_EnemySpawnPoint::GetRandomEnemy(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap)
 {
-	float RandomChance = FMath::FRandRange(0.f, 100.f);
+	const float RandomChance = FMath::FRandRange(0.f, 1.f);
 	float Sum = 0.f;
 	TArray<TSoftClassPtr<AOPAG_Enemy>> Keys;
 	EnemyMap.GetKeys(Keys);
@@ -55,8 +55,8 @@ void AOPAG_EnemySpawnPoint::Tick(float DeltaTime)
 TArray<TSoftObjectPtr<AOPAG_Enemy>> AOPAG_EnemySpawnPoint::SpawnEnemies(
 	TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const
 {
-	TSoftClassPtr<AOPAG_Enemy> EnemyToSpawn = GetRandomEnemy(EnemyMap);
-	FActorSpawnParameters SpawnInfo;
+	const TSoftClassPtr<AOPAG_Enemy> EnemyToSpawn = GetRandomEnemy(EnemyMap);
+	const FActorSpawnParameters SpawnInfo;
 	TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnedEnemies;
 	SpawnedEnemies.Add(GetWorld()->SpawnActor<AOPAG_Enemy>(EnemyToSpawn.Get(), GetActorLocation(),
 		FRotator::ZeroRotator, SpawnInfo));

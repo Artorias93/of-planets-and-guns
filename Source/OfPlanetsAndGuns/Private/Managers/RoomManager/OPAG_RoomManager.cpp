@@ -45,13 +45,13 @@ void AOPAG_RoomManager::BeginPlay()
 void AOPAG_RoomManager::PreInitializeComponents()
 {
 	Super::PreInitializeComponents();
-	const auto world = AActor::GetWorld();
-	if (world != nullptr)
+	const auto World = AActor::GetWorld();
+	if (World != nullptr)
 	{
-		const auto gameState = world->GetGameState();;
-		if (gameState != nullptr && gameState->HasBegunPlay())
+		const auto GameState = World->GetGameState();;
+		if (GameState != nullptr && GameState->HasBegunPlay())
 		{
-			UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
+			const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
 			if (GI)
 			{
 				GI->GetEventManager()->RoomSpawned.Broadcast(this);
@@ -138,7 +138,7 @@ void AOPAG_RoomManager::EnterRoom() const
 
 	EnemyManager->SpawnWave();
 	DoorManager->CloseDoors();
-	UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
+	const UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
 	if (GI != nullptr)
 	{
 		GI->GetEventManager()->RoomEntered.Broadcast();
@@ -149,7 +149,7 @@ void AOPAG_RoomManager::RoomCleared()
 {
 	bIsRoomCleared = true;
 	DoorManager->OpenDoors();
-	UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
+	const UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
 	if (GI != nullptr)
 	{
 		GI->GetEventManager()->RoomCleared.Broadcast();

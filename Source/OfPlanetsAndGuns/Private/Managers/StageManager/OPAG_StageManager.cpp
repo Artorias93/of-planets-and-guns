@@ -11,6 +11,7 @@
 #include "Managers/RoomManager/OPAG_RoomManager.h"
 #include "Rooms/OPAG_RoomAttachPoint.h"
 #include "Rooms/OPAG_RoomStreamingVolume.h"
+#include "Util/OPAG_UtilityFunctionLibrary.h"
 
 // Sets default values
 AOPAG_StageManager::AOPAG_StageManager()
@@ -20,7 +21,7 @@ AOPAG_StageManager::AOPAG_StageManager()
 
 }
 
-void AOPAG_StageManager::StartStageGeneration(FOPAG_StageGeneration GenData)
+void AOPAG_StageManager::StartStageGeneration(const FOPAG_StageGeneration GenData)
 {
 	if (!bOverrideGenData) BaseGenerationData = GenData;
 
@@ -39,7 +40,7 @@ void AOPAG_StageManager::StartStageGeneration(FOPAG_StageGeneration GenData)
 		FindRoomToSpawn(RoomsToAppend.Num() > 0 ? RoomsToAppend[0] : -1, PreviousRoomTurn);
 	}
 
-	ScreenLog(FString::Printf(
+	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, FString::Printf(
 		TEXT("Spawning Persistent Rooms, Count: %i"),
 		RoomLoadingCounter), EMessageSeverity::Info);
 
@@ -57,7 +58,9 @@ void AOPAG_StageManager::LoadDataTables()
 {
 	const FString Context;
 	if (BaseGenerationData.RoomTable) BaseGenerationData.RoomTable->GetAllRows(Context, Rooms);
+	checkf(Rooms.Num() > 0, TEXT("Room table can't be empty"));
 	if (BaseGenerationData.BridgeTable) BaseGenerationData.BridgeTable->GetAllRows(Context, Bridges);
+	checkf(Bridges.Num() > 0, TEXT("Bridge table can't be empty"));
 	if (BaseGenerationData.DoubleRoomChanceTable) BaseGenerationData.DoubleRoomChanceTable->GetAllRows(Context, DoubleExitChances);
 }
 
@@ -73,7 +76,7 @@ void AOPAG_StageManager::AddMoreRoomsFromListToHitWeightRequirements()
 	if (CurrentWeight >= BaseGenerationData.TargetWeight)
 		return;
 
-	ScreenLog(FString::Printf(
+	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, FString::Printf(
 		TEXT("Not Enough rooms in Data table. Missing weight of %i to reach target weight"),
 		BaseGenerationData.TargetWeight - CurrentWeight), EMessageSeverity::Error);
 
@@ -91,11 +94,11 @@ void AOPAG_StageManager::AddMoreRoomsFromListToHitWeightRequirements()
 	}
 }
 
-void AOPAG_StageManager::FindRoomToSpawn(int32 Previous, uint8& PreviousRoomTurn)
+void AOPAG_StageManager::FindRoomToSpawn(const int32 Previous, uint8& PreviousRoomTurn)
 {
 	FOPAG_StreamingRoom* RandomRoom = new FOPAG_StreamingRoom;
 	FOPAG_RoomOffset* RandomRoomOffset;
-	bool bIsNotFirst = Previous != -1;
+	const bool bIsNotFirst = Previous != -1;
 	if (SpecialRoomBridges.Contains(Previous))
 	{
 		RandomRoom->ID = SpecialRoomID + RoomLoadingCounter;
@@ -121,19 +124,20 @@ void AOPAG_StageManager::FindRoomToSpawn(int32 Previous, uint8& PreviousRoomTurn
 	}
 
 
-	const auto appendIndex = RoomsToAppend.Find(Previous);
-	if (appendIndex >= 0)
-		RoomsToAppend.RemoveAt(appendIndex);
+	const auto AppendIndex = RoomsToAppend.Find(Previous);
+	if (AppendIndex >= 0)
+		RoomsToAppend.RemoveAt(AppendIndex);
 
 	if (RandomRoom->ID >= SpecialRoomID)
 	{
-		ScreenLog("Pretending to remove room from special table", EMessageSeverity::Info);
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
+			"Pretending to remove room from special table", EMessageSeverity::Info);
 	}
 	//else
 	{
-		const auto offsetIndex = Rooms.Find(RandomRoomOffset);
-		if (offsetIndex >= 0)
-			Rooms.RemoveAt(offsetIndex);
+		const auto OffsetIndex = Rooms.Find(RandomRoomOffset);
+		if (OffsetIndex >= 0)
+			Rooms.RemoveAt(OffsetIndex);
 		if (RandomRoom->ID < SpecialRoomID) //check is temp for special room
 		{
 			TotalWeight += RandomRoom->RoomOffset.Weight;
@@ -170,7 +174,7 @@ void AOPAG_StageManager::FindRoomToSpawn(int32 Previous, uint8& PreviousRoomTurn
 }
 
 void AOPAG_StageManager::FilterRoomsByExitType(const TArray<FOPAG_RoomOffset*>& RoomList,
-	TArray<FOPAG_RoomOffset*>& FilteredRooms, uint8 LastRoomTurn)
+	TArray<FOPAG_RoomOffset*>& FilteredRooms, const uint8 LastRoomTurn)
 {
 	for (FOPAG_RoomOffset* Room : Rooms)
 	{
@@ -195,7 +199,7 @@ void AOPAG_StageManager::FilterRoomsByRemainingWeight(const TArray<FOPAG_RoomOff
 }
 
 void AOPAG_StageManager::FilterDoubleExitRooms(const TArray<FOPAG_RoomOffset*>& RoomList,
-	TArray<FOPAG_RoomOffset*>& FilteredRooms, bool bHasDoubleExits)
+	TArray<FOPAG_RoomOffset*>& FilteredRooms, const bool bHasDoubleExits)
 {
 	for (FOPAG_RoomOffset* Room : Rooms)
 	{
@@ -207,7 +211,7 @@ void AOPAG_StageManager::FilterDoubleExitRooms(const TArray<FOPAG_RoomOffset*>& 
 	}
 }
 
-FOPAG_RoomOffset* AOPAG_StageManager::GetRandomRoom(bool bIsNotFirst, uint8& PreviousRoomTurn)
+FOPAG_RoomOffset* AOPAG_StageManager::GetRandomRoom(bool bIsNotFirst, const uint8& PreviousRoomTurn)
 {
 	TArray<FOPAG_RoomOffset*> InputRooms = Rooms;
 	TArray<FOPAG_RoomOffset*> FilteredRooms;
@@ -215,7 +219,8 @@ FOPAG_RoomOffset* AOPAG_StageManager::GetRandomRoom(bool bIsNotFirst, uint8& Pre
 	FilterDoubleExitRooms(Rooms, FilteredRooms, IsRoomDouble());
 	if (FilteredRooms.Num() == 0)
 	{
-		ScreenLog(FString::Printf(TEXT("%i - DoubleRoom filter was empty!"), StagePathing.Num()),
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
+			FString::Printf(TEXT("%i - DoubleRoom filter was empty!"), StagePathing.Num()),
 			EMessageSeverity::Error);
 	}
 	else
@@ -228,7 +233,8 @@ FOPAG_RoomOffset* AOPAG_StageManager::GetRandomRoom(bool bIsNotFirst, uint8& Pre
 	FilterRoomsByExitType(InputRooms, FilteredRooms, PreviousRoomTurn);
 	if (FilteredRooms.Num() == 0)
 	{
-		ScreenLog(FString::Printf(TEXT("%i - ExitType filter was empty!"), StagePathing.Num()),
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
+			FString::Printf(TEXT("%i - ExitType filter was empty!"), StagePathing.Num()),
 			EMessageSeverity::Error);
 	}
 	else
@@ -240,7 +246,8 @@ FOPAG_RoomOffset* AOPAG_StageManager::GetRandomRoom(bool bIsNotFirst, uint8& Pre
 	FilterRoomsByRemainingWeight(InputRooms, FilteredRooms);
 	if (FilteredRooms.Num() == 0)
 	{
-		ScreenLog(FString::Printf(TEXT("%i - Weight filter was empty!"), StagePathing.Num()),
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
+			FString::Printf(TEXT("%i - Weight filter was empty!"), StagePathing.Num()),
 			EMessageSeverity::Error);
 		FilteredRooms = InputRooms;
 	}
@@ -248,10 +255,11 @@ FOPAG_RoomOffset* AOPAG_StageManager::GetRandomRoom(bool bIsNotFirst, uint8& Pre
 	return FilteredRooms[FMath::RandRange(0, FilteredRooms.Num() - 1)];
 }
 
-FOPAG_RoomOffset* AOPAG_StageManager::GetRandomSpecialRoom(uint8& PreviousRoomTurn)
+FOPAG_RoomOffset* AOPAG_StageManager::GetRandomSpecialRoom(const uint8& PreviousRoomTurn)
 {
 	//should have special room logic here instead of call to random room
-	ScreenLog("Pretending to get special room", EMessageSeverity::Info);
+	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
+		"Pretending to get special room", EMessageSeverity::Info);
 	return GetRandomRoom(true, PreviousRoomTurn);
 }
 
@@ -260,21 +268,21 @@ bool AOPAG_StageManager::IsRoomDouble()
 	if (DoubleExitRoomCounter >= BaseGenerationData.MaxDoubleExitRooms) return false;
 
 	float Chance = 0.f;
-	FOPAG_DoubleExitChance* item;
+	FOPAG_DoubleExitChance* Item;
 	for (int i = 0; i < DoubleExitChances.Num(); ++i)
 	{
-		item = DoubleExitChances[i];
+		Item = DoubleExitChances[i];
 
 		//check if we are guaranteed a double room
-		if (item->GuaranteedSpawnRoomIndex >= 0 && item->GuaranteedSpawnRoomIndex <= RoomLoadingCounter)
+		if (Item->GuaranteedSpawnRoomIndex >= 0 && Item->GuaranteedSpawnRoomIndex <= RoomLoadingCounter)
 		{
 			Chance = 100.f;
 			break;
 		}
 
-		if (item->Chance > Chance && item->MinCountForChance > DoubleExitRoomCounter)
+		if (Item->Chance > Chance && Item->MinCountForChance > DoubleExitRoomCounter)
 		{
-			Chance = item->Chance;
+			Chance = Item->Chance;
 		}
 	}
 
@@ -315,9 +323,9 @@ int32 AOPAG_StageManager::AddRandomBridge(FOPAG_StagePathing* Room, const bool S
 	return RandomBridge->CurrentRoom->ID;
 }
 
-void AOPAG_StageManager::FinishedLoadingStage()
+void AOPAG_StageManager::FinishedLoadingStage() const
 {
-	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
+	const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
 	if (GI)
 	{
 		GI->GetEventManager()->StageLoaded.Broadcast();
@@ -330,7 +338,8 @@ void AOPAG_StageManager::OnRoomSpawned(AOPAG_RoomManager* const RoomManager)
 	FOPAG_StagePathing* CurrentNode = FindPathingToAssign(RoomManager->GetLevel());
 	if (CurrentNode == nullptr)
 	{
-		ScreenLog("No Pathing found for RoomManager under level " +
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
+			"No Pathing found for RoomManager under level " +
 			RoomManager->GetLevel()->GetFullName(), EMessageSeverity::Error);
 		return;
 	}
@@ -341,7 +350,7 @@ void AOPAG_StageManager::OnRoomSpawned(AOPAG_RoomManager* const RoomManager)
 		RoomManager->AssignedRoomID = CurrentNode->CurrentRoom->ID;
 
 		TArray<AOPAG_RoomAttachPoint*> Exits = RoomManager->Exits;
-		ShuffleArray(Exits);
+		UOPAG_UtilityFunctionLibrary::ShuffleArray(Exits);
 		for (int32 i = 0; i < CurrentNode->NextRoomIDs.Num(); ++i)
 		{
 			if (i < Exits.Num())
@@ -418,7 +427,8 @@ void AOPAG_StageManager::PostRoomLoadingActions()
 
 void AOPAG_StageManager::LoadGeometryRooms()
 {
-	ScreenLog("Spawning Geometry Rooms", EMessageSeverity::Info);
+	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
+		"Spawning Geometry Rooms", EMessageSeverity::Info);
 
 	for (const AOPAG_RoomManager* RoomManager : RoomManagers)
 	{
@@ -426,7 +436,7 @@ void AOPAG_StageManager::LoadGeometryRooms()
 	}
 }
 
-void AOPAG_StageManager::AddGeometryRoom(int32 ID, TSoftObjectPtr<UWorld> GeometryLevel)
+void AOPAG_StageManager::AddGeometryRoom(const int32 ID, const TSoftObjectPtr<UWorld> GeometryLevel)
 {
 	const FOPAG_StagePathing* Pathing = StagePathing[ID];
 	if (Pathing == nullptr) return;
@@ -447,7 +457,8 @@ void AOPAG_StageManager::AssignVolumes()
 {
 	if (bVolumesAssigned) return;
 
-	ScreenLog("Assigning Volumes", EMessageSeverity::Info);
+	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
+		"Assigning Volumes", EMessageSeverity::Info);
 
 	for (const AOPAG_RoomManager* RoomManager : RoomManagers)
 	{
@@ -465,7 +476,7 @@ void AOPAG_StageManager::AssignVolumes()
 	bVolumesAssigned = true;
 }
 
-void AOPAG_StageManager::AddLevelsToVolume(AOPAG_RoomStreamingVolume* Volume, uint32 ID)
+void AOPAG_StageManager::AddLevelsToVolume(AOPAG_RoomStreamingVolume* Volume, const uint32 ID)
 {
 	if (!StagePathing.Contains(ID)) return;
 	const auto Pathing = StagePathing[ID];
@@ -476,7 +487,7 @@ void AOPAG_StageManager::AddLevelsToVolume(AOPAG_RoomStreamingVolume* Volume, ui
 	AddLevelsBelowVolume(Pathing->NextRoomIDs, Volume->StreamingLevels);
 }
 
-void AOPAG_StageManager::AddLevelsAboveVolume(int32 ID, TArray<ULevelStreamingDynamic*>& StreamingVolumes)
+void AOPAG_StageManager::AddLevelsAboveVolume(const int32 ID, TArray<ULevelStreamingDynamic*>& StreamingVolumes)
 {
 	int32 CurrentID = ID;
 	for (int32 i = 0; i < BaseGenerationData.FarthestLoad; ++i)
@@ -488,7 +499,7 @@ void AOPAG_StageManager::AddLevelsAboveVolume(int32 ID, TArray<ULevelStreamingDy
 	}
 }
 
-void AOPAG_StageManager::AddLevelsBelowVolume(TArray<int32> IDs, TArray<ULevelStreamingDynamic*>& StreamingVolumes)
+void AOPAG_StageManager::AddLevelsBelowVolume(const TArray<int32> IDs, TArray<ULevelStreamingDynamic*>& StreamingVolumes)
 {
 	TArray<int32> CurrentIDs = IDs;
 	TArray<int32> NextSet;
@@ -526,11 +537,11 @@ void AOPAG_StageManager::AssignClosedExits()
 	}
 }
 
-void AOPAG_StageManager::ReplacePawn()
+void AOPAG_StageManager::ReplacePawn() const
 {
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	AActor* PawnToDestroy = PlayerController->GetPawnOrSpectator();
-	FActorSpawnParameters SpawnInfo;
+	const FActorSpawnParameters SpawnInfo;
 	APawn* PawnToPossess = GetWorld()->SpawnActor<APawn>(
 		Pawn.Get(), PawnToDestroy->GetActorTransform(), SpawnInfo);
 	PawnToDestroy->Destroy();
@@ -544,15 +555,15 @@ void AOPAG_StageManager::UnloadLevels()
 	TArray<ULevelStreamingDynamic*> LevelsToUnload;
 	TArray<uint32> Keys;
 	StagePathing.GetKeys(Keys);
-	for (uint32 Key : Keys)
+	for (const uint32 Key : Keys)
 	{
 		LevelsToUnload.Add(StagePathing[Key]->CurrentRoom->LevelStreaming);
 	}
 
 	Keys.Empty();
 	RoomStreamingVolumes.GetKeys(Keys);
-	AActor* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator();
-	for (uint32 Key : Keys)
+	const AActor* PlayerPawn = GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator();
+	for (const uint32 Key : Keys)
 	{
 		if (RoomStreamingVolumes[Key]->IsOverlappingActor(PlayerPawn))
 		{
@@ -580,41 +591,13 @@ void AOPAG_StageManager::LoadLevels(AOPAG_RoomStreamingVolume* Volume)
 	}
 }
 
-void AOPAG_StageManager::ScreenLog(FString Message, EMessageSeverity::Type Severity)
-{
-	typedef EMessageSeverity::Type EMST;
 
-	UKismetSystemLibrary::PrintString(this,
-		Message,
-		true, true, 
-		Severity == EMST::Warning ? FColor::Yellow :
-			(Severity == EMST::Error || Severity == EMST::CriticalError ? FColor::Red :
-			FColor::Green), 
-5.f);
-}
-
-template<typename T>
-void AOPAG_StageManager::ShuffleArray(TArray<T>& Array)
-{
-	if (Array.Num() > 1)
-	{
-		int32 LastIndex = Array.Num() - 1;
-		for (int32 i = 0; i <= LastIndex; ++i)
-		{
-			int32 Index = FMath::RandRange(i, LastIndex);
-			if (i != Index)
-			{
-				Array.Swap(i, Index);
-			}
-		}
-	}
-}
 
 // Called when the game starts or when spawned
 void AOPAG_StageManager::BeginPlay()
 {
 	Super::BeginPlay();
-	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
+	const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
 	if (GI)
 	{
 		UOPAG_EventManagerSubsystem* const EventManager = GI->GetEventManager();
