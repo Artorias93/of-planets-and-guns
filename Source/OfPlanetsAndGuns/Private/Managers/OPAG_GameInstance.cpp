@@ -12,6 +12,7 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->StageManagerReady.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerReady);
 	EMS->StageLoaded.AddDynamic(this, &UOPAG_GameInstance::OnStageLoaded);
 
+	EMS->RoomEntered.AddDynamic(this, &UOPAG_GameInstance::OnRoomEntered);
 	EMS->RoomCleared.AddDynamic(this, &UOPAG_GameInstance::OnRoomCleared);
 	EMS->PauseGame.AddDynamic(this, &UOPAG_GameInstance::OnPauseGame);
 	EMS->ResumeGame.AddDynamic(this, &UOPAG_GameInstance::OnResumeGame);
@@ -49,9 +50,13 @@ void UOPAG_GameInstance::OnStageLoaded()
 	UE_LOG(LogTemp, Warning, TEXT("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"));
 }
 
-void UOPAG_GameInstance::OnRoomCleared()
+void UOPAG_GameInstance::OnRoomEntered()
 {
 	StageDifficulty += 0.2f;
+}
+
+void UOPAG_GameInstance::OnRoomCleared()
+{
 }
 
 void UOPAG_GameInstance::OnPauseGame()

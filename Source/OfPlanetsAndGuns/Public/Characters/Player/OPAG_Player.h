@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 
 #include "CoreMinimal.h"
+#include "InputActionValue.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Player.generated.h"
 

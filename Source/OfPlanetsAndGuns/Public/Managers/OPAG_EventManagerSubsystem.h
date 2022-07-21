@@ -4,24 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-//#include "Managers/StageManager/OPAG_StageGeneration.h"
+#include "Managers/StageManager/OPAG_StageGeneration.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
 /**
  * 
  */
 
-//class AOPAG_RoomStreamingVolume;
-//class AOPAG_RoomManager;
+class AOPAG_RoomStreamingVolume;
+class AOPAG_RoomManager;
+class AOPAG_Enemy;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageManagerReady);
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneration, StageGenData);
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomSpawned, AOPAG_RoomManager* const, RoomManager);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneration, StageGenData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomSpawned, AOPAG_RoomManager* const, RoomManager);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageLoaded);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomEntered);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnteredRoomStreamingVolume, AOPAG_RoomStreamingVolume* const, Volume);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnteredRoomStreamingVolume, AOPAG_RoomStreamingVolume* const, Volume);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLeftRoomStreamingVolume);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
@@ -35,6 +38,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentV
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
@@ -42,18 +47,22 @@ class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSub
 public:
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
 		FStageManagerReady StageManagerReady;
-	//UPROPERTY(BlueprintAssignable, Category = StageManager)
-		//FGenerateStage GenerateStage;
-	//UPROPERTY(BlueprintAssignable, Category = StageManager)
-		//FRoomSpawned RoomSpawned;
+	UPROPERTY(BlueprintAssignable, Category = StageManager)
+		FGenerateStage GenerateStage;
+	UPROPERTY(BlueprintAssignable, Category = StageManager)
+		FRoomSpawned RoomSpawned;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
 		FStageLoaded StageLoaded;
 
 	UPROPERTY(BlueprintAssignable, Category = RoomManager)
+		FRoomEntered RoomEntered;
+	UPROPERTY(BlueprintAssignable, Category = RoomManager)
 		FRoomCleared RoomCleared;
 
-	//UPROPERTY(BlueprintAssignable, Category = RoomManager)
-		//FEnteredRoomStreamingVolume EnteredRoomStreamingVolume;
+	UPROPERTY(BlueprintAssignable, Category = RoomManager)
+		FEnteredRoomStreamingVolume EnteredRoomStreamingVolume;
+	UPROPERTY(BlueprintAssignable, Category = RoomManager)
+		FLeftRoomStreamingVolume LeftRoomStreamingVolume;
 
 	//Player stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
@@ -72,6 +81,10 @@ public:
 		FGoldChanged GoldChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FBoltsChanged BoltsChanged;
+
+    //Enemy stuff
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
+		FEnemyKilled EnemyKilled;
 
 	//Game stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
