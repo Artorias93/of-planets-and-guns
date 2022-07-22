@@ -17,7 +17,8 @@ UOPAG_EnemyManagerComponent::UOPAG_EnemyManagerComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	SpawnMode = ESpawnMode::MultipleWaves;
+	SpawningPercentage = 100.f;
 	// ...
 }
 
@@ -89,6 +90,7 @@ void UOPAG_EnemyManagerComponent::BeginPlay()
 	const FString Context;
 	if (EnemyTypes) EnemyTypes->GetAllRows(Context, BaseEnemyLevels);
 
+
 	const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
 		UGameplayStatics::GetGameInstance(GetWorld()));
 	if (GI != nullptr)
@@ -118,14 +120,20 @@ void UOPAG_EnemyManagerComponent::SpawnWave()
 	}
 	if (EnemiesInRoom.Num() == 0)
 	{
-		float EnemiesToSpawnNextWave = GetSpawnerCount();
+		int32 EnemiesToSpawnNextWave = FMath::RoundToInt(
+			GetSpawnerCount() * (SpawningPercentage * 0.01f));
+		if (EnemiesToSpawnNextWave > TotalEnemyAmount - EnemyDeathCount)
+			EnemiesToSpawnNextWave = TotalEnemyAmount - EnemyDeathCount;
+
+		// if single wave mode, adjust total enemies to not spawn a second wave
+		if (SpawnMode == ESpawnMode::SingleWave) TotalEnemyAmount = EnemiesToSpawnNextWave;
 
 		UOPAG_UtilityFunctionLibrary::ShuffleArray(Spawners);
 
 		TMap<TSoftClassPtr<AOPAG_Enemy>, float> EnemyProbabilityMap;
 		GetMappedEnemies(EnemyProbabilityMap);
 
-		for (TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)
+		for (const TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)
 		{
 			if (EnemiesToSpawnNextWave <= 0)
 			{

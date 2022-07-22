@@ -11,6 +11,14 @@ class UDataTable;
 struct FOPAG_EnemyLevel;
 class AOPAG_Enemy;
 class AOPAG_EnemySpawnPoint;
+
+UENUM(BlueprintType)
+enum class ESpawnMode : uint8
+{
+	SingleWave,
+	MultipleWaves
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OFPLANETSANDGUNS_API UOPAG_EnemyManagerComponent : public UActorComponent
 {
@@ -19,11 +27,19 @@ class OFPLANETSANDGUNS_API UOPAG_EnemyManagerComponent : public UActorComponent
 	TArray<TSoftObjectPtr<AOPAG_Enemy>> EnemiesInRoom;
 
 	TArray<FOPAG_EnemyLevel*> BaseEnemyLevels;
-	int EnemyDeathCount;
+	int32 EnemyDeathCount;
 
 public:	
 	// Sets default values for this component's properties
 	UOPAG_EnemyManagerComponent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager")
+		ESpawnMode SpawnMode;
+
+	//Percentage of how many spawners will be spawning out of the list of spawners
+	//(Eg: 70% will use 7/10 available spawners to spawn the wave)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager", meta = (UIMin = 1.f, UIMax = 100.f))
+		float SpawningPercentage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager")
 		TArray<AOPAG_EnemySpawnPoint*> Spawners;
@@ -35,7 +51,7 @@ public:
 		float Spread;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager")
-		int TotalEnemyAmount;
+		int32 TotalEnemyAmount;
 
 private:
 

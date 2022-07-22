@@ -3,6 +3,8 @@
 
 #include "Rooms/OPAG_EnemySpawnCluster.h"
 
+#include "Util/OPAG_UtilityFunctionLibrary.h"
+
 // Sets default values
 AOPAG_EnemySpawnCluster::AOPAG_EnemySpawnCluster()
 {
@@ -34,10 +36,12 @@ TArray<TSoftObjectPtr<AOPAG_Enemy>> AOPAG_EnemySpawnCluster::SpawnEnemies(
 	TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const
 {
 	TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnedEnemies;
-	for (TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)
+	TArray<AOPAG_EnemySpawnPoint*> ShuffledSpawners = Spawners;
+	UOPAG_UtilityFunctionLibrary::ShuffleArray(ShuffledSpawners);
+	for (const TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : ShuffledSpawners)
 	{
 		if (Amount == 0) break;
-		SpawnedEnemies.Append(Super::SpawnEnemies(EnemyMap, Amount));
+		SpawnedEnemies.Append(Spawner->SpawnEnemies(EnemyMap, Amount));
 		Amount--;
 	}
 	return SpawnedEnemies;
