@@ -17,7 +17,7 @@ public:
 	AOPAG_EnemySpawnCluster();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TArray<TSoftObjectPtr<AOPAG_EnemySpawnPoint>> Spawners;
+		TArray<AOPAG_EnemySpawnPoint*> Spawners;
 
 protected:
 	// Called when the game starts or when spawned

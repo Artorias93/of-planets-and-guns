@@ -20,7 +20,7 @@ public:
 	// Sets default values for this actor's properties
 	AOPAG_DoorEntranceVolume();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Room Manager")
 	AOPAG_RoomManager* RoomManager;
 
 protected:
