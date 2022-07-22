@@ -22,17 +22,6 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
 	PerceptionSightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AI Sight Config"));
 	PerceptionDamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("AI Damage Config"));
-	
-	//TODO: Move all this setup in the specialized sub-classes
-	PerceptionSightConfig->SightRadius = 2500.f;
-	PerceptionSightConfig->LoseSightRadius = 300.f;
-	PerceptionSightConfig->PeripheralVisionAngleDegrees = 120.0f;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	PerceptionComp->ConfigureSense(*PerceptionSightConfig);
-	PerceptionComp->ConfigureSense(*PerceptionDamageConfig);
-	PerceptionComp->SetDominantSense(PerceptionSightConfig->GetSenseImplementation());
 }
 
 void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)

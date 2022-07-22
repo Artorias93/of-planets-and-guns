@@ -87,6 +87,18 @@ void AOPAG_RangedEnemy::Attack()
 	}
 }
 
+void AOPAG_RangedEnemy::StartShooting()
+{
+	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
+	
+	EquippedWeapon->Shoot(StartLocation, Direction);
+
+	if(AimingLed)
+		AimingLed->SetVisibility(false);
+
+	UE_LOG(LogTemp, Warning, TEXT("I'm shooting dude"));
+}
+
 void AOPAG_RangedEnemy::Death()
 {
 	if(AimingLed)
@@ -107,16 +119,4 @@ void AOPAG_RangedEnemy::Death()
 	}
 	
 	Super::Death();
-}
-
-void AOPAG_RangedEnemy::StartShooting()
-{
-	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
-	
-	EquippedWeapon->Shoot(StartLocation, Direction);
-
-	if(AimingLed)
-		AimingLed->SetVisibility(false);
-
-	UE_LOG(LogTemp, Warning, TEXT("I'm shooting dude"));
 }
