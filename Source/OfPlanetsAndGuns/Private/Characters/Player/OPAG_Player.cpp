@@ -610,12 +610,15 @@ void AOPAG_Player::RecoilTimelineProgress(float Value)
 	UE_LOG(LogTemp, Warning, TEXT("%f"), RecoilPitch);
 }
 
+#pragma endregion Timeline
+
+#pragma region Health
+
 void AOPAG_Player::HealthChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Warning, TEXT("New Health: %f"), Data.NewValue);
 	UE_LOG(LogTemp, Warning, TEXT("Max Health: %f"), GetHealthMax());
-	
+
 	EMS->HealthChanged.Broadcast(Data.NewValue, GetHealthMax());
 }
-
-#pragma endregion Timeline
+#pragma endregion
