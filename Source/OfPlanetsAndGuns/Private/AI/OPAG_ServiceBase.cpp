@@ -8,9 +8,6 @@ FString UOPAG_ServiceBase::GetStaticDescription() const
 {
 	FString NodeDescription;
 
-	//TODO: Remove when finished with the porting!
-	NodeDescription += TEXT("THIS IS A C++ NODE\n\n");
-
 	//Inserts the name of the node in the description
 	NodeDescription += Super::GetStaticDescription();
 
