@@ -32,7 +32,7 @@ private:
 private:
 
 	bool bIsAiming = false;
-
+	
 	UPROPERTY(EditAnywhere, Category = "Values")
 	float StartShootingTimer = 3.f;
 

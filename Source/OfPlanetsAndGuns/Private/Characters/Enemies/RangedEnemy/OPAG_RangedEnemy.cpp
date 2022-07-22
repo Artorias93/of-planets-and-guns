@@ -69,7 +69,7 @@ void AOPAG_RangedEnemy::Attack()
 {
 	if(EquippedWeapon)
 	{
-		if(EquippedWeapon->bCanShoot)
+		if(EquippedWeapon->bCanShoot && !GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
 		{
 			//The first 2 params are multiple "return values" passed by reference.
 			GetShootingDirection(StartLocation, Direction, ShootAccuracyTolerance);
@@ -78,7 +78,10 @@ void AOPAG_RangedEnemy::Attack()
 			const float ShotWaitTime = UKismetMathLibrary::RandomFloatInRange(ShotWaitTimeRandomIntervalBounds[0],
 				ShotWaitTimeRandomIntervalBounds[1]);
 
-			GetWorld()->GetTimerManager().SetTimer(ShotTimerHandle, this, &AOPAG_RangedEnemy::StartShooting,
+			if(AimingLed)
+				AimingLed->SetVisibility(true);
+
+			GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &AOPAG_RangedEnemy::StartShooting,
 				ShotWaitTime);
 		}
 	}
@@ -86,9 +89,12 @@ void AOPAG_RangedEnemy::Attack()
 
 void AOPAG_RangedEnemy::StartShooting()
 {
-	GetWorld()->GetTimerManager().ClearTimer(ShotTimerHandle);
+	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 	
 	EquippedWeapon->Shoot(StartLocation, Direction);
+
+	if(AimingLed)
+		AimingLed->SetVisibility(false);
 
 	UE_LOG(LogTemp, Warning, TEXT("I'm shooting dude"));
 }

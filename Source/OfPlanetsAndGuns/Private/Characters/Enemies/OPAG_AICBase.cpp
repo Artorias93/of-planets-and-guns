@@ -52,8 +52,7 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
 	//Senses only react to the player character
-	//TODO: Swap with correct class when OPAG_Player is ready
-	if (ACharacter* const Player = Cast<ACharacter>(UpdatedActor))
+	if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))
 	{
 		//If the player is seen set it to target actor
 		if (Stimulus.WasSuccessfullySensed())

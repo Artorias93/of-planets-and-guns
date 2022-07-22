@@ -3,6 +3,7 @@
 //My Classes
 #include "Characters/Enemies/RangedEnemy/OPAG_AICRangedEnemy.h"
 #include "Characters/Enemies/RangedEnemy/OPAG_RangedEnemy.h"
+#include "Characters/Player/OPAG_Player.h"
 
 UOPAG_ServiceShoot::UOPAG_ServiceShoot(FObjectInitializer const& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -17,12 +18,11 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 {
 	Super::TickNode(OwnerBTComponent, NodeMemory, DeltaSeconds);
 
-	if(bIsAiming)
+	if(!bIsAiming)
 	{
 		if (const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
 		{
-			//TODO: Replace with player when ready
-			if (const AOPAG_CharacterBase* const FocusActor = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
+			if (const AOPAG_Player* const FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
 				if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
 				{
@@ -48,11 +48,9 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 //Executed on service activation
 void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
-	Super::OnBecomeRelevant(OwnerBTComponent, NodeMemory);
-
 	if(const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
 	{
-		if(const AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
+		if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
 		{
 			bIsAiming = true;
 
@@ -61,19 +59,16 @@ void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTCompone
 			{
 				AimingLed->SetVisibility(true);
 			}
-
-			LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->LaserBeam);
-			if (LaserBeam)
+			
+			if(!RangedEnemy->bIsShooting)
 			{
-				LaserBeam->SetVisibility(true);
-				
-				//What is this????
-				// if (RangedEnemy->Shoot)
-				// {
-				LaserBeam->SetVisibility(true);
-				// 	RangedEnemy->Shoot = true;
-				// }
-			}
+				LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->LaserBeam);
+				if (LaserBeam)
+				{
+					LaserBeam->SetVisibility(true);
+					RangedEnemy->bIsShooting = true;
+				}
+			}			
 			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::DisableAimingSignals, StartShootingTimer, false);
 		}
 	}

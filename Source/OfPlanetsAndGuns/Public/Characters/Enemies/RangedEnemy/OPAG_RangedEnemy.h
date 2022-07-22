@@ -45,15 +45,15 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	UNiagaraComponent* LaserBeam;
 
-	UPROPERTY()
 	bool bIsShooting = false;
 
 private:
 
+	//bool bIsTimerActive = true;
+
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float ShootAccuracyTolerance = 0;
-
-	UPROPERTY()
+	
 	FTimerHandle ShotTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
@@ -71,7 +71,4 @@ private:
 	//Modifies the Laser Beam direction 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess=true))
 	FVector LaserBeamDestinationModifier = FVector::ZeroVector;
-
-	UPROPERTY()
-	bool bIsShooting;
 };
