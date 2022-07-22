@@ -79,6 +79,7 @@ void AOPAG_Player::BeginPlay()
 
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
+	EMS->DashAmountChanged.Broadcast(DashCount);
 }
 
 void AOPAG_Player::Tick(float DeltaTime)
@@ -241,6 +242,9 @@ void AOPAG_Player::ActiveDash(const FInputActionValue& Value)
 		if (bSuccess)
 		{
 			DashCount--;
+
+			EMS->DashAmountChanged.Broadcast(DashCount);
+
 			if (bIsFirstDash)
 			{
 				bIsFirstDash = false;
@@ -297,6 +301,9 @@ void AOPAG_Player::SwapGuns()
 			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
 			CurrentGun = PrimaryGun;
 		}
+
+		EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
+		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 	}
 }
 
