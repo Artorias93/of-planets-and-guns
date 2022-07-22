@@ -22,6 +22,8 @@ public:
 
 	virtual void Attack() override;
 
+	virtual void Death() override;
+
 private:
 
 	virtual void BeginPlay() override;
@@ -48,8 +50,6 @@ public:
 	bool bIsShooting = false;
 
 private:
-
-	//bool bIsTimerActive = true;
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float ShootAccuracyTolerance = 0;

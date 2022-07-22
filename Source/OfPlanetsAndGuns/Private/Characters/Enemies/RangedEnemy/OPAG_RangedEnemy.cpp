@@ -87,6 +87,28 @@ void AOPAG_RangedEnemy::Attack()
 	}
 }
 
+void AOPAG_RangedEnemy::Death()
+{
+	if(AimingLed)
+		AimingLed->SetVisibility(false);
+	if(LaserBeam)
+		LaserBeam->SetVisibility(false);
+
+	if(Weapon)
+	{
+		Weapon->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+
+		if(USkeletalMeshComponent* WeaponSkeletalMesh = Cast<USkeletalMeshComponent>(
+			Weapon->GetChildActor()->GetComponentByClass(USkeletalMeshComponent::StaticClass())))
+		{
+			WeaponSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+			WeaponSkeletalMesh->SetSimulatePhysics(true);
+		}	
+	}
+	
+	Super::Death();
+}
+
 void AOPAG_RangedEnemy::StartShooting()
 {
 	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
