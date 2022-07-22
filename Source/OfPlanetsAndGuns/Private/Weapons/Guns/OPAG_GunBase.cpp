@@ -417,7 +417,7 @@ void AOPAG_GunBase::WaitReloadingTimer()
 {
 	bIsReloading = false;
 
-	const AOPAG_Player* const player = Cast<AOPAG_Player>(this->GetParentActor());
+	const AOPAG_Player* const Player = Cast<AOPAG_Player>(this->GetParentActor());
 
 	const int BulletDifference = Stats.ClipSize - AmmoCurrent;
 	if (BulletDifference < AmmoMax)
@@ -425,9 +425,9 @@ void AOPAG_GunBase::WaitReloadingTimer()
 		AmmoCurrent = Stats.ClipSize;
 		AmmoMax -= BulletDifference;
 
-		if (player) {
-			player->EMS->TotalAmmoChanged.Broadcast(AmmoMax);
-			player->EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+		if (Player) {
+			Player->EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+			Player->EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
 		}
 	}
 	else
@@ -435,9 +435,9 @@ void AOPAG_GunBase::WaitReloadingTimer()
 		AmmoCurrent += AmmoMax;
 		AmmoMax = 0;
 
-		if (player) {
-			player->EMS->TotalAmmoChanged.Broadcast(AmmoMax);
-			player->EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+		if (Player) {
+			Player->EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+			Player->EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
 		}
 	}
 }

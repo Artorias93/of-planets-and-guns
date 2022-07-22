@@ -64,6 +64,9 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 public:
 	AOPAG_Player();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
+	class UOPAG_InventorySystemComponent* InventorySystemComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
 

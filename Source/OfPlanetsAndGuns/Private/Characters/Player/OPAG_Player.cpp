@@ -16,10 +16,13 @@
 #include "Weapons/Modules/OPAG_AccessoryBase.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Characters/Player/OPAG_InventorySystemComponent.h"
 
 AOPAG_Player::AOPAG_Player()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	InventorySystemComp = CreateDefaultSubobject<UOPAG_InventorySystemComponent>("InventorySystemComp");
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	if (Camera)
