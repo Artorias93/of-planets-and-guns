@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
-//#include "StageManager/OPAG_StageGeneration.h"
+#include "StageManager/OPAG_StageGeneration.h"
 #include "OPAG_GameInstance.generated.h"
 
 class UOPAG_EventManagerSubsystem;
@@ -18,7 +18,7 @@ class OFPLANETSANDGUNS_API UOPAG_GameInstance : public UGameInstance
 	GENERATED_BODY()
 
 	float StageDifficulty;
-	//TArray<FOPAG_StageGeneration*> StageGens;
+	TArray<FOPAG_StageGeneration*> StageGens;
 
 public:
 
@@ -39,6 +39,8 @@ public:
 		void OnStageLoaded();
 
 	UFUNCTION()
+		void OnRoomEntered();
+	UFUNCTION()
 		void OnRoomCleared();
 
 	UFUNCTION()
@@ -47,7 +49,7 @@ public:
 		void OnResumeGame();
 
 	UFUNCTION(BlueprintCallable, Category = "Event Manger")
-		UOPAG_EventManagerSubsystem* GetEventManager();
+		UOPAG_EventManagerSubsystem* GetEventManager() const;
 
 	UFUNCTION(BlueprintCallable)
 		float GetStageDifficulty();

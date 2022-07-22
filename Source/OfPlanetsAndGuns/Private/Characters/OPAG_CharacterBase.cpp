@@ -6,6 +6,10 @@
 #include <GameplayTagContainer.h>
 //My Classes
 #include "Characters/OPAG_AttributeSetBase.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_GameInstance.h"
+
+
 
 AOPAG_CharacterBase::AOPAG_CharacterBase()
 {
@@ -35,15 +39,12 @@ void AOPAG_CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	check(EMS);
+
 	if (AbilitySystemComp)
 	{
 		BaseAttributeSet = AbilitySystemComp->GetSet<UOPAG_AttributeSetBase>();
-
-		if (BaseAttributeSet)
-		{
-			/*AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(
-				BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AOPAG_CharacterBase::HealthChanged);*/
-		}
 
 		InitializeAbility(BasicShot, 0);
 	}
@@ -137,9 +138,3 @@ const float AOPAG_CharacterBase::GetAxisY() const
 	const float Y = GetInputAxisValue("MoveRight");
 	return Y;
 }
-
-//Called every time the value changes
-//void AOPAG_CharacterBase::HealthChanged(const FOnAttributeChangeData& Data)
-//{
-//	OnHealthChanged(Data.OldValue, Data.NewValue);
-//}

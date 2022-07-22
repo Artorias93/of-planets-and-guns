@@ -12,6 +12,7 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->StageManagerReady.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerReady);
 	EMS->StageLoaded.AddDynamic(this, &UOPAG_GameInstance::OnStageLoaded);
 
+	EMS->RoomEntered.AddDynamic(this, &UOPAG_GameInstance::OnRoomEntered);
 	EMS->RoomCleared.AddDynamic(this, &UOPAG_GameInstance::OnRoomCleared);
 	EMS->PauseGame.AddDynamic(this, &UOPAG_GameInstance::OnPauseGame);
 	EMS->ResumeGame.AddDynamic(this, &UOPAG_GameInstance::OnResumeGame);
@@ -20,10 +21,10 @@ void UOPAG_GameInstance::BindEvents()
 void UOPAG_GameInstance::LoadGenerationTable()
 {
 	FString context;
-	//StageGenerationTable->GetAllRows<FOPAG_StageGeneration>(context, StageGens);
+	StageGenerationTable->GetAllRows<FOPAG_StageGeneration>(context, StageGens);
 
 	//sort by StageIndex
-	//StageGens.Sort();
+	StageGens.Sort();
 }
 
 void UOPAG_GameInstance::Init()
@@ -41,7 +42,7 @@ void UOPAG_GameInstance::OnStageManagerReady()
 {
 
 
-	//GetEventManager()->GenerateStage.Broadcast(*StageGens[0]);
+	GetEventManager()->GenerateStage.Broadcast(*StageGens[0]);
 }
 
 void UOPAG_GameInstance::OnStageLoaded()
@@ -49,9 +50,13 @@ void UOPAG_GameInstance::OnStageLoaded()
 	UE_LOG(LogTemp, Warning, TEXT("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"));
 }
 
-void UOPAG_GameInstance::OnRoomCleared()
+void UOPAG_GameInstance::OnRoomEntered()
 {
 	StageDifficulty += 0.2f;
+}
+
+void UOPAG_GameInstance::OnRoomCleared()
+{
 }
 
 void UOPAG_GameInstance::OnPauseGame()
@@ -64,7 +69,7 @@ void UOPAG_GameInstance::OnResumeGame()
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
-UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager()
+UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager() const
 {
 	return GetSubsystem<UOPAG_EventManagerSubsystem>();
 }
