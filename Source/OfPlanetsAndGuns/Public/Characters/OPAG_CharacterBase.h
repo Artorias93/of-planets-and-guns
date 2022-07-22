@@ -24,6 +24,8 @@ public:
 	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);		
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	class UOPAG_EventManagerSubsystem* EMS;
 	
 	virtual void ReceiveDamage(const float Damage);
 	virtual void ReceiveDamage(AActor* Throwable);
@@ -35,7 +37,6 @@ public:
 	void SetHealthMax(const float HealthMax);
 
 protected:
-	class UOPAG_EventManagerSubsystem* EMS;
 
 	virtual void BeginPlay() override;
 	virtual void GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance = 0);

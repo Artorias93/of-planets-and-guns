@@ -76,6 +76,9 @@ void AOPAG_Player::BeginPlay()
 	InitADSTimeline();
 	InitRecoilTimeline();
 	AttachDefaultGuns();
+
+	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
+	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 }
 
 void AOPAG_Player::Tick(float DeltaTime)
@@ -320,6 +323,9 @@ void AOPAG_Player::Shoot(const FInputActionValue& Value)
 		CurrentGun->Shoot(StartLocation, Direction);
 		Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 		RecoilTimeline->PlayFromStart();
+
+		EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
+		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 	}
 }
 
@@ -330,7 +336,7 @@ const bool AOPAG_Player::CheckCanShoot() const
 	return bCanShoot;
 }
 
-// Override the default method gestshootingdirection 
+// Override the default method GetShootingDirection 
 // The start location is equal to the camera's world location
 // The direction is equal to camera's rotation with vector x
 void AOPAG_Player::GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance)
