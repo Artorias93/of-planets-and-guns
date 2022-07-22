@@ -6,6 +6,7 @@
 #include "OPAG_StageGeneration.h"
 #include "OPAG_StagePathing.h"
 #include "GameFramework/Actor.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/RoomManager/OPAG_DoubleExitChance.h"
 #include "Managers/RoomManager/OPAG_RoomOffset.h"
 #include "OPAG_StageManager.generated.h"
@@ -18,6 +19,8 @@ class OFPLANETSANDGUNS_API AOPAG_StageManager : public AActor
 {
 	GENERATED_BODY()
 
+
+	FLoadingProgress* LoadingProgress;
 
 	// Room Data
 
@@ -68,6 +71,12 @@ public:
 
 	static constexpr uint32 BridgeID = 100;
 	static constexpr uint32 SpecialRoomID = 900;
+
+	static constexpr float LoadingProgress_Pathing = 0.2f;
+	static constexpr float LoadingProgress_Rooms = 0.8f;
+	static constexpr float LoadingProgress_Geometry = 0.9f;
+	static constexpr float LoadingProgress_Volumes = 0.95f;
+	static constexpr float LoadingProgress_Full = 1.f;
 
 private:
 	UFUNCTION()

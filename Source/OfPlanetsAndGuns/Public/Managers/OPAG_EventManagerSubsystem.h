@@ -26,6 +26,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnteredRoomStreamingVolume, AOPAG_RoomStreamingVolume* const, Volume);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLeftRoomStreamingVolume);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLoadingProgress, float, Percent);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
@@ -63,6 +65,9 @@ public:
 		FEnteredRoomStreamingVolume EnteredRoomStreamingVolume;
 	UPROPERTY(BlueprintAssignable, Category = RoomManager)
 		FLeftRoomStreamingVolume LeftRoomStreamingVolume;
+
+	UPROPERTY(BlueprintAssignable, Category = StageManager)
+		FLoadingProgress LoadingProgress;
 
 	//Player stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)

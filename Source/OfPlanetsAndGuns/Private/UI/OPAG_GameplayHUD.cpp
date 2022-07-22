@@ -20,6 +20,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	if (EMS) {
 		EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
+		EMS->LoadingProgress.AddDynamic(this, &AOPAG_GameplayHUD::UpdateLoadingScreenBar);
 		EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
 	}
 }
@@ -103,6 +104,12 @@ void AOPAG_GameplayHUD::HidePauseView() {
 
 	if(EMS)
 		EMS->ResumeGame.Broadcast();
+}
+
+void AOPAG_GameplayHUD::UpdateLoadingScreenBar(float Percentage)
+{
+	if (LoadingScreenViewWidget)
+		LoadingScreenViewWidget->SetLoadingBar(Percentage);
 }
 
 void AOPAG_GameplayHUD::ShowLoadingScreenView()

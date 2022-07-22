@@ -39,6 +39,7 @@ void AOPAG_StageManager::StartStageGeneration(const FOPAG_StageGeneration GenDat
 	{
 		FindRoomToSpawn(RoomsToAppend.Num() > 0 ? RoomsToAppend[0] : -1, PreviousRoomTurn);
 	}
+	LoadingProgress->Broadcast(LoadingProgress_Pathing);
 
 	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, FString::Printf(
 		TEXT("Spawning Persistent Rooms, Count: %i"),
@@ -335,6 +336,10 @@ void AOPAG_StageManager::FinishedLoadingStage() const
 void AOPAG_StageManager::OnRoomSpawned(AOPAG_RoomManager* const RoomManager)
 {
 	if (RoomManagers.Contains(RoomManager)) return;
+
+	LoadingProgress->Broadcast(LoadingProgress_Pathing +
+		(LoadingProgress_Rooms- LoadingProgress_Pathing) / StagePathing.Num() * RoomManagers.Num());
+
 	FOPAG_StagePathing* CurrentNode = FindPathingToAssign(RoomManager->GetLevel());
 	if (CurrentNode == nullptr)
 	{
@@ -402,7 +407,7 @@ void AOPAG_StageManager::AddRoom(const int32 ID, AOPAG_RoomAttachPoint* AttachPo
 		Pathing->CurrentRoom->RoomOffset.Room,
 		AppliedOffset.GetLocation(),
 			AppliedOffset.Rotator(),
-		bSuccess);
+		bSuccess);	
 
 	Pathing->CurrentRoom->LevelStreaming = Level;
 }
@@ -420,7 +425,9 @@ void AOPAG_StageManager::GetAppliedTransform(const FTransform& PreviousEnd, cons
 void AOPAG_StageManager::PostRoomLoadingActions()
 {
 	LoadGeometryRooms();
+	LoadingProgress->Broadcast(LoadingProgress_Geometry);
 	AssignVolumes();
+	LoadingProgress->Broadcast(LoadingProgress_Volumes);
 
 	PostGenerationActions();
 }
@@ -522,8 +529,12 @@ void AOPAG_StageManager::PostGenerationActions()
 {
 	AssignClosedExits();
 	UnloadLevels();
-	ReplacePawn();
-	FinishedLoadingStage();
+	LoadingProgress->Broadcast(LoadingProgress_Full);
+	//ReplacePawn();
+	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateLambda([this]()
+	{
+		FinishedLoadingStage();
+	}));
 }
 
 void AOPAG_StageManager::AssignClosedExits()
@@ -605,7 +616,7 @@ void AOPAG_StageManager::BeginPlay()
 		EventManager->RoomSpawned.AddDynamic(this, &AOPAG_StageManager::OnRoomSpawned);
 		EventManager->EnteredRoomStreamingVolume.AddDynamic(this, &AOPAG_StageManager::LoadLevels);
 		EventManager->LeftRoomStreamingVolume.AddDynamic(this, &AOPAG_StageManager::UnloadLevels);
-
+		LoadingProgress = &(EventManager->LoadingProgress);
 		EventManager->StageManagerReady.Broadcast();
 	}
 }

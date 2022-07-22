@@ -48,6 +48,8 @@ public:
 	UFUNCTION()
 	void HidePauseView();
 	UFUNCTION()
+	void UpdateLoadingScreenBar(float Percentage);
+	UFUNCTION()
 	void ShowLoadingScreenView();
 	UFUNCTION()
 	void HideLoadingScreenView();
