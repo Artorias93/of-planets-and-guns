@@ -12,7 +12,7 @@ UOPAG_TaskSetNextIndexPatrolPath::UOPAG_TaskSetNextIndexPatrolPath(FObjectInitia
 }
 
 //Increments the index of the patrol path, and sets it to 0 if it's on the last element already.
-//TODO: ATM it starts from 1
+//TODO: ATM it starts from 1 (BUG)
 EBTNodeResult::Type UOPAG_TaskSetNextIndexPatrolPath::ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
 	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))

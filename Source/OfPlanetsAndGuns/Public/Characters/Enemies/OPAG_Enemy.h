@@ -21,10 +21,6 @@ public:
 	
 	virtual void ReceiveDamage(float DamageAmount) override;
 
-	//TODO: Remove when the enemy takes damage normally
-	UFUNCTION(CallInEditor, Category = "OPAG AI")
-	void DebugTake100Damage();
-
 	virtual void Attack();
 
 	virtual void Death() override;	
@@ -41,15 +37,13 @@ protected:
 	//Variables
 	/////////////////////////////
 
-public:
+protected:
 
-	UPROPERTY(EditAnywhere, Category = "OPAG AI")
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	class UBehaviorTree* BehaviorTree;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	class AOPAG_PatrolPath* PatrolPath;
-
-protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn, AllowPrivateAccess = true))
 	bool bUsingPatrolPath = false;

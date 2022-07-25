@@ -35,7 +35,6 @@ void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
 	Super::ReceiveDamage(DamageAmount);
 	
 	//Triggers the damage sense on the AI controlled pawn
-	//TODO: Does this work???
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this,
 		UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount,
 		UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(),
@@ -43,12 +42,6 @@ void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
 	//TODO: Remove the print to screen
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
-}
-
-//TODO: Remove when the enemy will be able to take damage from the player
-void AOPAG_Enemy::DebugTake100Damage()
-{
-	ReceiveDamage(100.f);
 }
 
 void AOPAG_Enemy::Attack()

@@ -42,7 +42,7 @@ private:
 private: 
 
 	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
-	class UAnimMontage* MeleeAttackMontage;
+	UAnimMontage* MeleeAttackMontage;
 
 	UPROPERTY()
 	UAnimInstance* AnimInstance;

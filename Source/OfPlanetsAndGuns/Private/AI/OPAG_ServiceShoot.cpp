@@ -56,19 +56,19 @@ void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTCompone
 		{
 			bIsAiming = true;
 
-			AimingLed = Cast<UStaticMeshComponent>(RangedEnemy->AimingLed);
+			AimingLed = Cast<UStaticMeshComponent>(RangedEnemy->GetAimingLed());
 			if(AimingLed)
 			{
 				AimingLed->SetVisibility(true);
 			}
 			
-			if(!RangedEnemy->bIsShooting)
+			if(!RangedEnemy->GetHasShotSinceSpawning())
 			{
-				LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->LaserBeam);
+				LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->GetLaserBeam());
 				if (LaserBeam)
 				{
 					LaserBeam->SetVisibility(true);
-					RangedEnemy->bIsShooting = true;
+					RangedEnemy->SetHasShotSinceSpawning(true);
 				}
 			}
 			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::DisableAimingSignals, StartShootingTimer, false);

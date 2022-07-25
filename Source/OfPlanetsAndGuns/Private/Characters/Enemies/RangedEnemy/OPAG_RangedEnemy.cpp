@@ -120,3 +120,32 @@ void AOPAG_RangedEnemy::Death()
 	
 	Super::Death();
 }
+
+#pragma region Getters & Setters
+
+bool AOPAG_RangedEnemy::GetHasShotSinceSpawning() const
+{
+	return bHasShotSinceSpawning;
+}
+
+void AOPAG_RangedEnemy::SetHasShotSinceSpawning(const bool Value)
+{
+	this->bHasShotSinceSpawning = Value;
+}
+
+UChildActorComponent* AOPAG_RangedEnemy::GetWeapon() const
+{
+	return Weapon;
+}
+
+UStaticMeshComponent* AOPAG_RangedEnemy::GetAimingLed() const
+{
+	return AimingLed;
+}
+
+UNiagaraComponent* AOPAG_RangedEnemy::GetLaserBeam() const
+{
+	return LaserBeam;
+}
+
+#pragma endregion
