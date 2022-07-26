@@ -4,6 +4,9 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Enemy.generated.h"
 
+class UBehaviorTree;
+class AOPAG_PatrolPath;
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Enemy : public AOPAG_CharacterBase
 {
@@ -23,7 +26,11 @@ public:
 
 	virtual void Attack();
 
-	virtual void Death() override;	
+	virtual void Death() override;
+
+	UBehaviorTree* GetBehaviorTree() const;
+
+	AOPAG_PatrolPath* GetPatrolPath() const;
 
 protected:
 
@@ -31,14 +38,13 @@ protected:
 
 	void DropAndDespawn();
 
-	virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */) override;
+	//virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */) override;
 	
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
 
-protected:
-
+private:
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	class UBehaviorTree* BehaviorTree;
 

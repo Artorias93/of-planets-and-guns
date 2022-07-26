@@ -3,11 +3,12 @@
 #include <BehaviorTree/BlackboardComponent.h>
 #include <Perception/AISense_Damage.h>
 #include <Kismet/GameplayStatics.h>
-#include <Kismet/KismetMathLibrary.h>
+//#include <Kismet/KismetMathLibrary.h>
 #include <BrainComponent.h>
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/OPAG_AttributeSetBase.h"
+#include "Characters/Player/OPAG_Player.h"
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
@@ -71,30 +72,16 @@ void AOPAG_Enemy::DropAndDespawn()
 	Destroy();
 }
 
-void AOPAG_Enemy::GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */)
+#pragma region Getters & Setters
+
+UBehaviorTree* AOPAG_Enemy::GetBehaviorTree() const
 {
-	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
-	{
-		if(const AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
-		{
-			//Gets Start location, in front of the gun
-			StartLocation = GetActorLocation() + (GetActorForwardVector() * 50.f);
-
-			//Gets Vector from player to enemy
-			const FVector PlayerToSelfVector = Player->GetActorLocation() - GetActorLocation();
-
-			//Gets not normalized vector with shooting accuracy computations applied
-			const float DirectionVectorX =
-				PlayerToSelfVector.X + UKismetMathLibrary::RandomFloatInRange(
-					-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
-			const float DirectionVectorY = PlayerToSelfVector.Y;
-			const float DirectionVectorZ =
-				PlayerToSelfVector.Z + UKismetMathLibrary::RandomFloatInRange(
-					-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
-			const FVector DirectionVector = FVector(DirectionVectorX, DirectionVectorY, DirectionVectorZ);
-			
-			//Gets normalized vector with shooting accuracy computations applied
-			Direction = UKismetMathLibrary::Normal(DirectionVector, 0.0001f); //2nd param is tolerance
-		}
-	}
+	return BehaviorTree;
 }
+
+AOPAG_PatrolPath* AOPAG_Enemy::GetPatrolPath() const
+{
+	return PatrolPath;
+}
+
+#pragma endregion

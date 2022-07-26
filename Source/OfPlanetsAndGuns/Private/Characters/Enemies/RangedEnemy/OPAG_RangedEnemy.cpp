@@ -121,6 +121,37 @@ void AOPAG_RangedEnemy::Death()
 	Super::Death();
 }
 
+void AOPAG_RangedEnemy::GetShootingDirection(FVector& Start, FVector& ShootDirection, float const ShootingAccuracyTolerance /* = 0 */)
+{
+	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	{
+		if(const AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
+		{
+			if(EquippedWeapon)
+			{
+				//Gets Start location, in front of the gun
+				Start = EquippedWeapon->GetActorLocation() + (GetActorForwardVector() * 50.f);
+
+				//Gets Vector from player to enemy
+				const FVector PlayerToSelfVector = Player->GetActorLocation() - GetActorLocation();
+
+				//Gets not normalized vector with shooting accuracy computations applied
+				const float DirectionVectorX =
+					PlayerToSelfVector.X + UKismetMathLibrary::RandomFloatInRange(
+						-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
+				const float DirectionVectorY = PlayerToSelfVector.Y;
+				const float DirectionVectorZ =
+					PlayerToSelfVector.Z + UKismetMathLibrary::RandomFloatInRange(
+						-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
+				const FVector DirectionVector = FVector(DirectionVectorX, DirectionVectorY, DirectionVectorZ);
+			
+				//Gets normalized vector with shooting accuracy computations applied
+				ShootDirection = UKismetMathLibrary::Normal(DirectionVector, 0.0001f); //2nd param is tolerance
+			}
+		}
+	}
+}
+
 #pragma region Getters & Setters
 
 bool AOPAG_RangedEnemy::GetHasShotSinceSpawning() const

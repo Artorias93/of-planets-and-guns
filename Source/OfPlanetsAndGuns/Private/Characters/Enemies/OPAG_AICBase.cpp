@@ -29,10 +29,10 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 	Super::OnPossess(ControlledPawn);
 
 	const AOPAG_Enemy* const ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
-	if(ControlledEnemy && ControlledEnemy->BehaviorTree)
+	if(ControlledEnemy && ControlledEnemy->GetBehaviorTree())
 	{
-		BlackboardComponent->InitializeBlackboard(*ControlledEnemy->BehaviorTree->BlackboardAsset);
-		BehaviorTreeComponent->StartTree(*ControlledEnemy->BehaviorTree);
+		BlackboardComponent->InitializeBlackboard(*ControlledEnemy->GetBehaviorTree()->BlackboardAsset);
+		BehaviorTreeComponent->StartTree(*ControlledEnemy->GetBehaviorTree());
 
 		PerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AOPAG_AICBase::OnPerceptionUpdated);
 	}

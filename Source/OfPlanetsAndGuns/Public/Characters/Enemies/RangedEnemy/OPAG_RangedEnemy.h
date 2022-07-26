@@ -34,6 +34,8 @@ public:
 
 	UNiagaraComponent* GetLaserBeam() const;
 
+	virtual void GetShootingDirection(FVector& Start, FVector& ShootDirection, float const ShootingAccuracyTolerance /* = 0 */) override;
+
 private:
 
 	virtual void BeginPlay() override;

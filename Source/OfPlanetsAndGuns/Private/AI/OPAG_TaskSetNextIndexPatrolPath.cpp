@@ -21,7 +21,7 @@ EBTNodeResult::Type UOPAG_TaskSetNextIndexPatrolPath::ExecuteTask(UBehaviorTreeC
 		{
 			int CurrentPatrolPathIndex =
 				AIController->GetBlackboardComponent()->GetValueAsInt(BBKeyPatrolPathIndex.SelectedKeyName);
-			TArray<FVector> const PatrolPathPointsArray = Enemy->PatrolPath->PatrolPathPoints;
+			TArray<FVector> const PatrolPathPointsArray = Enemy->GetPatrolPath()->PatrolPathPoints;
 
 			//If we are at the last index go back to 0, else increment
 			if(CurrentPatrolPathIndex >= PatrolPathPointsArray.Num() - 1)
@@ -37,7 +37,7 @@ EBTNodeResult::Type UOPAG_TaskSetNextIndexPatrolPath::ExecuteTask(UBehaviorTreeC
 
 			//Convert patrol path point location from local coordinates 
 			//(relative to the patrol path object) to world coordinates
-			const FVector PointWorldLocation = UKismetMathLibrary::TransformLocation(Enemy->PatrolPath->GetTransform(), 
+			const FVector PointWorldLocation = UKismetMathLibrary::TransformLocation(Enemy->GetPatrolPath()->GetTransform(), 
 				PatrolPathPointsArray[CurrentPatrolPathIndex]);
 
 			AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyPatrolLocation.SelectedKeyName,
