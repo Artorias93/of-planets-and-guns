@@ -1,15 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Managers/StageManager/OPAG_StageGeneration.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
-
-/**
- * 
- */
 
 class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomManager;
@@ -40,6 +34,22 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveForward, const FInputActionValue&, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveRight, const FInputActionValue&, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLookUp, const FInputActionValue&, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTurn, const FInputActionValue&, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumping);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopJumping);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwapGuns);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadGun);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShoot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractWithItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwitchToADSCamera);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetFPSCamera);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
@@ -100,4 +110,50 @@ public:
 		FStartRun StartRun;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQuitGame QuitGame;
+
+	// Player Enhanced
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+	FMoveForward MoveForward;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+	FMoveForward MoveRight;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FLookUp Lookup;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FTurn Turn;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FShoot Shoot;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FSwapGuns SwapGuns;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FReloadGun ReloadGun;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FJumping Jumping;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FStopJumping StopJumping;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FInteractWithItem InteractWithItem;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FSwitchToADSCamera SwitchToADSCamera;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FResetFPSCamera ResetFPSCamera;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FHealth Health;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FActiveDash ActiveDash;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FActiveGunAbility ActiveGunAbility;
 };

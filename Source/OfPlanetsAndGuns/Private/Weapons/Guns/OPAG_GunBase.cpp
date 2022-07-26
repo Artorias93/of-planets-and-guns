@@ -76,21 +76,23 @@ void AOPAG_GunBase::BeginPlay()
 	Super::BeginPlay();
 	
 	CreateAndAttachAllModules();
-
-	
-	const FString Context;
-	if (AmmoReloadingMultipliersTable) 
-		AmmoReloadingMultipliersTable->GetAllRows(Context, AmmoReloadingMultipliers);
-
-	//checkf(AmmoReloadingMultipliersTable.Num() > 0, TEXT("AmmoReloadingMultipliersTable can't be empty"));
-
-
+	PopulateAmmoTable();
 }
 
 void AOPAG_GunBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AOPAG_GunBase::PopulateAmmoTable()
+{
+	const FString Context;
+	if (AmmoReloadingMultipliersTable)
+	{
+		AmmoReloadingMultipliersTable->GetAllRows(Context, AmmoReloadingMultipliers);
+	}
+	//checkf(AmmoReloadingMultipliersTable.Num() > 0, TEXT("AmmoReloadingMultipliersTable can't be empty"));
 }
 
 #pragma region GET
@@ -423,21 +425,13 @@ void AOPAG_GunBase::Reload()
 
 void AOPAG_GunBase::IncrementAmmo()
 {
-	switch (FireType) {
-		case EFireTypes::FullyAutomatic : 
+	for (int i = 0; i < AmmoReloadingMultipliers.Num(); i++)
+	{
+		if (AmmoReloadingMultipliers[i]->FireType == FireType)
+		{
+			AmmoMax += AmmoReloadingMultipliers[i]->ReloadingFactor;
 			break;
-
-		case EFireTypes::SingleShot :
-			break;
-
-		case EFireTypes::Burst3 :
-			break;
-
-		case EFireTypes::Shotgun :
-			break;
-
-		default:
-			break;
+		}
 	}
 }
 

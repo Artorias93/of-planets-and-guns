@@ -80,15 +80,8 @@ void AOPAG_Player::BeginPlay()
 	InitRecoilTimeline();
 	AttachDefaultGuns();
 
+	BroadEvents();
 	BindEvents();
-
-	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
-	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
-	EMS->DashAmountChanged.Broadcast(DashCount);
-}
-
-void AOPAG_Player::BindEvents() {
-	EMS->AmmoPickedUp.AddDynamic(this, &AOPAG_Player::IncrementPrimaryGunAmmo);
 }
 
 void AOPAG_Player::Tick(float DeltaTime)
@@ -101,6 +94,35 @@ void AOPAG_Player::Tick(float DeltaTime)
 	}
 	// Initialize the object seen by the player
 	InteractableObject = CheckLookAtInteractableItems();
+}
+
+void AOPAG_Player::BroadEvents()
+{
+	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
+	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
+	EMS->DashAmountChanged.Broadcast(DashCount);
+}
+
+void AOPAG_Player::BindEvents() 
+{
+	// Enhanced
+	EMS->MoveForward.AddDynamic(this, &AOPAG_Player::MoveForward);
+	EMS->MoveRight.AddDynamic(this, &AOPAG_Player::MoveRight);
+	EMS->Lookup.AddDynamic(this, &AOPAG_Player::Lookup);
+	EMS->Turn.AddDynamic(this, &AOPAG_Player::Turn);
+	EMS->Jumping.AddDynamic(this, &AOPAG_Player::Jumping);
+	EMS->StopJumping.AddDynamic(this, &AOPAG_Player::StopJumping);
+	EMS->Shoot.AddDynamic(this, &AOPAG_Player::Shoot);
+	EMS->SwapGuns.AddDynamic(this, &AOPAG_Player::SwapGuns);
+	EMS->ReloadGun.AddDynamic(this, &AOPAG_Player::ReloadGun);
+	EMS->InteractWithItem.AddDynamic(this, &AOPAG_Player::InteractWithItem);
+	EMS->SwitchToADSCamera.AddDynamic(this, &AOPAG_Player::SwitchToADSCamera);
+	EMS->ResetFPSCamera.AddDynamic(this, &AOPAG_Player::ResetFPSCamera);
+	EMS->Health.AddDynamic(this, &AOPAG_Player::Health);
+	EMS->ActiveDash.AddDynamic(this, &AOPAG_Player::ActiveDash);
+	EMS->ActiveGunAbility.AddDynamic(this, &AOPAG_Player::ActiveGunAbility);
+
+	EMS->AmmoPickedUp.AddDynamic(this, &AOPAG_Player::IncrementPrimaryGunAmmo);
 }
 
 void AOPAG_Player::InitDefaultValues()
@@ -193,7 +215,7 @@ void AOPAG_Player::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	/*UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	check(EIC);
 
 	// All binding events for player's ability
@@ -222,7 +244,7 @@ void AOPAG_Player::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 	EIC->BindAction(InputActions.ADS, ETriggerEvent::Completed, this, &AOPAG_Player::ResetFPSCamera);
 
 	// binding event for health 
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Triggered, this, &AOPAG_Player::Health);
+	EIC->BindAction(InputActions.ADS, ETriggerEvent::Triggered, this, &AOPAG_Player::Health);*/
 }
 #pragma endregion EnhanchedInput
 
@@ -243,7 +265,7 @@ void AOPAG_Player::InitializeAbilities()
 	InitializeAbility(HealthPotion, 0);
 }
 
-void AOPAG_Player::ActiveDash(const FInputActionValue& Value)
+void AOPAG_Player::ActiveDash()
 {
 	if (AbilitySystemComp && DashTimeline && DashCount > 0)
 	{
@@ -263,7 +285,7 @@ void AOPAG_Player::ActiveDash(const FInputActionValue& Value)
 	}
 }
 
-void AOPAG_Player::ActiveGunAbility(const FInputActionValue& Value)
+void AOPAG_Player::ActiveGunAbility()
 {
 	if (AbilitySystemComp && CurrentGun == PrimaryGun && CurrentGun->Accessory->GetChildActor())
 	{
@@ -327,7 +349,8 @@ void AOPAG_Player::ReloadGun()
 
 void AOPAG_Player::IncrementPrimaryGunAmmo()
 {
-	if (PrimaryGun) {
+	if (PrimaryGun) 
+	{
 		PrimaryGun->IncrementAmmo();
 	}
 }
@@ -336,7 +359,7 @@ void AOPAG_Player::IncrementPrimaryGunAmmo()
 #pragma region Shooting Behavior
 // This method is link with input fire 
 // Calculate standard direction for shoot and invoke shoot behavior with gun and star fire's animation
-void AOPAG_Player::Shoot(const FInputActionValue& Value)
+void AOPAG_Player::Shoot()
 {
 	if (CheckCanShoot())
 	{
@@ -406,7 +429,7 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 	}
 }
 
-void AOPAG_Player::Jumping(const FInputActionValue& Value)
+void AOPAG_Player::Jumping()
 {
 	if (JumpCurrentCount < JumpMaxCount)
 	{
@@ -422,7 +445,7 @@ void AOPAG_Player::MakingAimCameraRotate()
 	Camera->SetWorldRotation(ControlRotation, false, nullptr, ETeleportType::None);
 }
 
-void AOPAG_Player::SwitchToADSCamera(const FInputActionValue& Value)
+void AOPAG_Player::SwitchToADSCamera()
 {
 	// Set ADS and initialize new camera view
 	AActor* NewViewTarget = nullptr;
@@ -455,7 +478,7 @@ void AOPAG_Player::SwitchToADSCamera(const FInputActionValue& Value)
 	}
 }
 
-void AOPAG_Player::ResetFPSCamera(const FInputActionValue& Value)
+void AOPAG_Player::ResetFPSCamera()
 {
 	bIsInADS = false;
 	CurrentCamera = Camera;
@@ -472,7 +495,7 @@ void AOPAG_Player::ResetFPSCamera(const FInputActionValue& Value)
 #pragma endregion Camera
 
 #pragma region LookAtInteractable
-void AOPAG_Player::InteractWithItem(const FInputActionValue& Value)
+void AOPAG_Player::InteractWithItem()
 {
 	if (InteractableObject)
 	{
@@ -586,7 +609,7 @@ void AOPAG_Player::ThrowScrap(UPrimitiveComponent* Target)
 #pragma endregion LookAtInteractable
 
 #pragma region Others Input
-void AOPAG_Player::Health(const FInputActionValue& Value)
+void AOPAG_Player::Health()
 {
 	if (PotionCount > 0 && AbilitySystemComp)
 	{

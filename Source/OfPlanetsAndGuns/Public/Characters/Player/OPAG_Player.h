@@ -27,35 +27,6 @@ class UDataTable;
 class UKismetSystemLibrary;
 class UAbilitySystemComponent;
 
-USTRUCT(BlueprintType)
-struct FInputActions
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly) UInputAction* Move;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* CameraMove;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Jump;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Shoot;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* SwapGun;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* ReloadGun;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Interact;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* ADS;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Health;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Dash;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* GunAbility;
-};
-
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 {
@@ -80,12 +51,6 @@ public:
 	UChildActorComponent* SecondaryGunComponent;
 
 public:
-	UPROPERTY(Category = "Enhanced Input", EditDefaultsOnly, BlueprintReadWrite)
-	FInputActions InputActions;
-
-	UPROPERTY(Category = "Enhanced Input", EditDefaultsOnly, BlueprintReadWrite)
-	UInputMappingContext* InputMappingContext;
-
 	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
 	AOPAG_GunBase* PrimaryGun;
 
@@ -194,6 +159,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	// Events system
+	void BroadEvents();
 	void BindEvents();
 
 	// Init standard values
@@ -210,9 +177,6 @@ private:
 
 	// Guns behavior 
 	void AttachDefaultGuns();
-	void SwapGuns();
-	void ReloadGun();
-	void IncrementPrimaryGunAmmo();
 
 	//Camera behavior
 	void MakingAimCameraRotate();
@@ -240,21 +204,27 @@ public:
 
 	UFUNCTION() void Turn(const FInputActionValue& Value);
 
-	UFUNCTION() void Jumping(const FInputActionValue& Value);
+	UFUNCTION() void Jumping();
 
-	UFUNCTION() void Shoot(const FInputActionValue& Value);
+	UFUNCTION() void Shoot();
 
-	UFUNCTION() void InteractWithItem(const FInputActionValue& Value);
+	UFUNCTION() void SwapGuns();
 
-	UFUNCTION() void SwitchToADSCamera(const FInputActionValue& Value);
+	UFUNCTION() void ReloadGun();
 
-	UFUNCTION() void ResetFPSCamera(const FInputActionValue& Value);
+	UFUNCTION() void InteractWithItem();
 
-	UFUNCTION() void Health(const FInputActionValue& Value);
+	UFUNCTION() void SwitchToADSCamera();
 
-	UFUNCTION() void ActiveDash(const FInputActionValue& Value);
+	UFUNCTION() void ResetFPSCamera();
 
-	UFUNCTION() void ActiveGunAbility(const FInputActionValue& Value);
+	UFUNCTION() void Health();
+
+	UFUNCTION() void ActiveDash();
+
+	UFUNCTION() void ActiveGunAbility();
+
+	UFUNCTION() void IncrementPrimaryGunAmmo();
 
 public:
 	UFUNCTION() void ADSTimelineProgress(float Value);

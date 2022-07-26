@@ -178,6 +178,7 @@ public:
 	void Reload();
 
 	// Increment ammo system
+	void PopulateAmmoTable();
 	void IncrementAmmo();
 
 	// Camera behavior
