@@ -24,6 +24,18 @@ public:
 
 	virtual void Death() override;
 
+	bool GetHasShotSinceSpawning() const;
+
+	void SetHasShotSinceSpawning(const bool Value);
+
+	UChildActorComponent* GetWeapon() const;
+
+	UStaticMeshComponent* GetAimingLed() const;
+
+	UNiagaraComponent* GetLaserBeam() const;
+
+	virtual void GetShootingDirection(FVector& Start, FVector& ShootDirection, float const ShootingAccuracyTolerance /* = 0 */) override;
+
 private:
 
 	virtual void BeginPlay() override;
@@ -35,21 +47,17 @@ private:
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
-
-public:
+	
+private:
 
 	UPROPERTY(VisibleAnywhere)
 	UChildActorComponent* Weapon;
-
+	
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* AimingLed;
 
 	UPROPERTY(VisibleAnywhere)
 	UNiagaraComponent* LaserBeam;
-
-	bool bIsShooting = false;
-
-private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float ShootAccuracyTolerance = 0;
@@ -71,4 +79,7 @@ private:
 	//Modifies the Laser Beam direction 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess=true))
 	FVector LaserBeamDestinationModifier = FVector::ZeroVector;
+
+	//Used in BTService_Shoot to check if the laser beam has to be rendered
+	bool bHasShotSinceSpawning = false;
 };

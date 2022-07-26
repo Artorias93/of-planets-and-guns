@@ -15,6 +15,9 @@ AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
 		DamageCollisionBox->SetupAttachment(RootComponent);
 		DamageCollisionBox->SetRelativeLocation(DamageCollisionBoxRelativeLocation);
 		DamageCollisionBox->SetBoxExtent(DamageCollisionBoxExtent);
+		DamageCollisionBox->BodyInstance.SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		DamageCollisionBox->BodyInstance.SetResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+		DamageCollisionBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
 	}
 	SwordMesh = CreateDefaultSubobject<UStaticMeshComponent>("Sword Mesh Component");
 	if (SwordMesh)

@@ -1,5 +1,6 @@
 #include "AI/OPAG_ServiceShoot.h"
 #include <Kismet/KismetSystemLibrary.h>
+#include "GameFramework/Actor.h"
 //My Classes
 #include "Characters/Enemies/RangedEnemy/OPAG_AICRangedEnemy.h"
 #include "Characters/Enemies/RangedEnemy/OPAG_RangedEnemy.h"
@@ -10,6 +11,7 @@ UOPAG_ServiceShoot::UOPAG_ServiceShoot(FObjectInitializer const& ObjectInitializ
 	NodeName = TEXT("Shoot");
 	bNotifyTick = true;
 	bNotifyBecomeRelevant = true;
+	bCreateNodeInstance = true; //This way it create separate instances for the service for different objects, and the timer works as intended
 }
 
 //Every service tick it checks if there's a SphereTrace between the RangedEnemy and the player.
@@ -54,21 +56,21 @@ void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTCompone
 		{
 			bIsAiming = true;
 
-			AimingLed = Cast<UStaticMeshComponent>(RangedEnemy->AimingLed);
+			AimingLed = Cast<UStaticMeshComponent>(RangedEnemy->GetAimingLed());
 			if(AimingLed)
 			{
 				AimingLed->SetVisibility(true);
 			}
 			
-			if(!RangedEnemy->bIsShooting)
+			if(!RangedEnemy->GetHasShotSinceSpawning())
 			{
-				LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->LaserBeam);
+				LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->GetLaserBeam());
 				if (LaserBeam)
 				{
 					LaserBeam->SetVisibility(true);
-					RangedEnemy->bIsShooting = true;
+					RangedEnemy->SetHasShotSinceSpawning(true);
 				}
-			}			
+			}
 			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::DisableAimingSignals, StartShootingTimer, false);
 		}
 	}
