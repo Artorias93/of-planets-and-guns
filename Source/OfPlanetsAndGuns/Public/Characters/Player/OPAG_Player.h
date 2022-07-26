@@ -234,6 +234,11 @@ public:
 	UFUNCTION() void RecoilTimelineProgress(float Value);
 
 public:
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
+			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
 
 	void HealthChanged(const FOnAttributeChangeData& Data);

@@ -19,8 +19,6 @@ public:
 
 	void AnalyzeItem(AOPAG_Drop* Target);
 
-	void IncrementAmmo() const;
-
 protected:
 	virtual void BeginPlay() override;
 

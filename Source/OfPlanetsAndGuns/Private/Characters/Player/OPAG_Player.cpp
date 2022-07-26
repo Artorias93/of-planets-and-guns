@@ -17,10 +17,14 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
+#include "Items/OPAG_Drop.h"
+#include "Components/CapsuleComponent.h"
 
 AOPAG_Player::AOPAG_Player()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Player::OnOverlapBegin);
 
 	InventorySystemComp = CreateDefaultSubobject<UOPAG_InventorySystemComponent>("InventorySystemComp");
 
@@ -503,12 +507,6 @@ void AOPAG_Player::InteractWithItem()
 		{
 			InteractWithModule(Module);
 		}
-
-		else
-		{
-			//PotionCount++;
-			//InteractableObject->Destroy();
-		}
 	}
 }
 
@@ -660,6 +658,14 @@ void AOPAG_Player::RecoilTimelineProgress(float Value)
 	AddControllerPitchInput(RecoilPitch);
 
 	UE_LOG(LogTemp, Warning, TEXT("%f"), RecoilPitch);
+}
+
+void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AOPAG_Drop* object = Cast<AOPAG_Drop>(OtherActor);
+	if (object) {
+		InventorySystemComp->AnalyzeItem(object);
+	}
 }
 
 #pragma endregion Timeline

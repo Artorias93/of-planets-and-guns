@@ -13,6 +13,8 @@
 #include "Util/OPAG_UtilityFunctionLibrary.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Items/OPAG_Drop.h"
+#include "Managers/OPAG_GameInstance.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -75,6 +77,9 @@ void AOPAG_GunBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	check(EMS);
+
 	CreateAndAttachAllModules();
 	PopulateAmmoTable();
 }
@@ -433,6 +438,9 @@ void AOPAG_GunBase::IncrementAmmo()
 			break;
 		}
 	}
+
+	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+	
 }
 
 // When player reload the gun is impossible to shoot and reload, because of this player will have to wait this timer

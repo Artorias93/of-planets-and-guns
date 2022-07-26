@@ -21,6 +21,8 @@ class AOPAG_SightBase;
 class AOPAG_CharacterBase;
 class AOPAG_Grenade;
 
+class UOPAG_EventManagerSubsystem;
+
 class UKismetSystemLibrary;
 class UDataTable;
 
@@ -161,6 +163,9 @@ private:
 
 private:
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
+
+private:
+	UOPAG_EventManagerSubsystem* EMS;
 
 protected:
 	virtual void BeginPlay() override;

@@ -4,6 +4,7 @@
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Items/OPAG_Drop.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
 
 UOPAG_InventorySystemComponent::UOPAG_InventorySystemComponent()
 {
@@ -20,7 +21,6 @@ void UOPAG_InventorySystemComponent::BeginPlay()
 	}
 }
 
-//WIP
 void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 {
 	if (Target) {
@@ -28,27 +28,29 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 
 		case EDropType::Bolts:
 			BoltsAmount++;
-			//EMS -> Broadcast
+			if (Owner && Owner->EMS) {
+				Owner->EMS->BoltsChanged.Broadcast(BoltsAmount);
+			}
 			Target->Destroy();
 			break;
 
 		case EDropType::Gold:
-			GoldAmount++;
-			//EMS -> Broadcast
+			GoldAmount++; 
+			if (Owner && Owner->EMS) {
+				Owner->EMS->GoldChanged.Broadcast(GoldAmount);
+			}
 			Target->Destroy();
 			break;
 
 		case EDropType::Ammo:
-			IncrementAmmo();
+			if (Owner && Owner->EMS) {
+				Owner->EMS->AmmoPickedUp.Broadcast();
+			}
+			Target->Destroy();
 			break;
 
 		default:
 			break;
 		}
 	}
-}
-
-void UOPAG_InventorySystemComponent::IncrementAmmo() const
-{
-	//EMS->AmmoPickedUp.Broadcast();
 }
