@@ -305,6 +305,7 @@ void AOPAG_Player::ReloadGun()
 	if (!CheckIsReloading)
 	{
 		CurrentGun->Reload();
+		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 	}
 }
 #pragma endregion Guns

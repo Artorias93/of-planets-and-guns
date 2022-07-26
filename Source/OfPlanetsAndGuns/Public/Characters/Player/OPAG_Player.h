@@ -95,6 +95,9 @@ public:
 	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
 	UAnimMontage* FireMontageToPlay;
 
+	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* ReloadMontageToPlay;
+
 	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
 	UTimelineComponent* ADSTimeline;
 
