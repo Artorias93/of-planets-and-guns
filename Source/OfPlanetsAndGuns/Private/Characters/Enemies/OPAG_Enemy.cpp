@@ -8,6 +8,8 @@
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/OPAG_AttributeSetBase.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_GameInstance.h"
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
@@ -75,6 +77,8 @@ void AOPAG_Enemy::DropAndDespawn()
 	//Fill with everything from drops to enemy manager stuff
 
 	GetWorld()->GetTimerManager().ClearTimer(RagdollTimerHandle);
+	const auto GI = GetGameInstance<UOPAG_GameInstance>();
+	if (GI) GI->GetEventManager()->EnemyKilled.Broadcast(this);
 	Destroy();
 }
 
