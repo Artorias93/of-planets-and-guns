@@ -18,12 +18,23 @@ AOPAG_RangedEnemy::AOPAG_RangedEnemy()
 		if(AimingLed)
 		{
 			AimingLed->AttachToComponent(Weapon, FAttachmentTransformRules::KeepRelativeTransform);
+			AimingLed->SetVisibility(false);
 		}
 		
 		LaserBeam = CreateDefaultSubobject<UNiagaraComponent>("Laser Beam Niagara Component");
 		if(LaserBeam)
 		{
 			LaserBeam->AttachToComponent(Weapon, FAttachmentTransformRules::KeepRelativeTransform);
+
+			//Gets the Niagara System asset for the laser beam
+			static ConstructorHelpers::FObjectFinder<UNiagaraSystem> LaserNiagaraSystem(
+				TEXT("NiagaraSystem'/Game/OfPlanetsAndGuns/Characters/RangedEnemy/NS_LaserBeam.NS_LaserBeam'"));
+			if(LaserNiagaraSystem.Succeeded())
+			{
+				LaserBeam->SetAsset(LaserNiagaraSystem.Object);
+			}
+			
+			LaserBeam->SetVisibility(false);
 		}
 	}
 }
