@@ -264,17 +264,17 @@ const bool AOPAG_GunBase::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewMo
 #pragma region Shooting Behavior
 // Main method to to call when a shooting event is triggered
 // Call line trace method and set fire rate of gun with timer manager
-void AOPAG_GunBase::Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterActor)
+void AOPAG_GunBase::Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
 	bCanShoot = false;
 
-	ShootLineTrace(StartShootLocation, Direction, ShooterActor);
+	ShootLineTrace(StartShootLocation, Direction, ShooterCharacter);
 
 	const float Seconds = CalculateRateInSeconds(Stats.FireRate);
 	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
 }
 
-void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterActor)
+void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
 	//TODO: Recoil Event
 	const FVector NoiseDirection = ApplyNoise(Direction);
@@ -286,7 +286,7 @@ void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
 		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
-	// If Actor is inheritance by character base, invoke take damage
+	// If Actor is inherited by character base, invoke take damage
 	if (bIsHit)
 	{
 		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
@@ -294,7 +294,7 @@ void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction
 		{
 			//Checks for friendly fire
 			//If both the shooter and the target are enemies, damage is not applied
-			const AOPAG_Enemy* const EnemyShooter = Cast<AOPAG_Enemy>(ShooterActor);
+			const AOPAG_Enemy* const EnemyShooter = Cast<AOPAG_Enemy>(ShooterCharacter);
 			const AOPAG_Enemy* const EnemyShot = Cast<AOPAG_Enemy>(Character);
 			if(!(EnemyShooter && EnemyShot))
 				Character->ReceiveDamage(Stats.Damage);
