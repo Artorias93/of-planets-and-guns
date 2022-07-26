@@ -61,4 +61,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* SwordMesh;
+
+	UPROPERTY(EditAnywhere)
+	float MeleeWeaponDamage = 50.f;
 };

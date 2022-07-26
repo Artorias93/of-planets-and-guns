@@ -320,7 +320,7 @@ void AOPAG_Player::Shoot(const FInputActionValue& Value)
 		FVector StartLocation;
 		FVector Direction;
 		GetShootingDirection(StartLocation, Direction);
-		CurrentGun->Shoot(StartLocation, Direction);
+		CurrentGun->Shoot(StartLocation, Direction, this);
 		Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 		RecoilTimeline->PlayFromStart();
 	}

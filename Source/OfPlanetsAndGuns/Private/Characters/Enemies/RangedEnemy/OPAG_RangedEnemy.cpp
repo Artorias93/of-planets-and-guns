@@ -91,7 +91,7 @@ void AOPAG_RangedEnemy::StartShooting()
 {
 	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 	
-	EquippedWeapon->Shoot(StartLocation, Direction);
+	EquippedWeapon->Shoot(StartLocation, Direction, this);
 
 	if(AimingLed)
 		AimingLed->SetVisibility(false);

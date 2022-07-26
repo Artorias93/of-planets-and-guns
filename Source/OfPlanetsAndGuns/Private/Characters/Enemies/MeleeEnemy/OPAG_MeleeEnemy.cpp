@@ -77,7 +77,7 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 			
 			if(AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
-				Player->ReceiveDamage(50.f);
+				Player->ReceiveDamage(MeleeWeaponDamage);
 			}
 		}
 		else
@@ -99,6 +99,6 @@ void AOPAG_MeleeEnemy::Death()
 		SwordMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	}
 
-	//Ragdoll stuff for the enemy mesh itself are done in the Super.
+	//Ragdoll stuff for the enemy mesh itself are done in the parent.
 	Super::Death();
 }

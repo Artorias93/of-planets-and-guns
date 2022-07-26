@@ -151,7 +151,7 @@ public:
 	const float CalculateRateInSeconds(const float FireRate);
 
 	// Main system for shooting
-	void Shoot(FVector StartShootLocation, FVector Direction);
+	void Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterActor);
 
 	// Reload system
 	void Reload();
@@ -170,7 +170,7 @@ private:
 	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
 	// Main system for shooting
-	void ShootLineTrace(FVector StartShootLocation, FVector Direction);
+	void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterActor);
 	void ShootThrowable(const FRotator SpawnRotation);
 	void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
 	void ResetShootTimer();

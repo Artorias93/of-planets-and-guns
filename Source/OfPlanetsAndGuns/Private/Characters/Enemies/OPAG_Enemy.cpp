@@ -71,6 +71,7 @@ void AOPAG_Enemy::DropAndDespawn()
 	//Fill with everything from drops to enemy manager stuff
 
 	GetWorld()->GetTimerManager().ClearTimer(RagdollTimerHandle);
+	//Broadcasts the kill to the event manager
 	const auto GI = GetGameInstance<UOPAG_GameInstance>();
 	if (GI) GI->GetEventManager()->EnemyKilled.Broadcast(this);
 	Destroy();
