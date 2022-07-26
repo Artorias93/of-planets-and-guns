@@ -13,6 +13,7 @@
 #include "Animation/AnimInstance.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Characters/OPAG_AttributeSetBase.h"
+#include "Interactables/OPAG_InteractableInterface.h"
 #include "Weapons/Modules/OPAG_AccessoryBase.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
@@ -89,7 +90,7 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// Initialize the object seen by the player
 	InteractableObject = CheckLookAtInteractableItems();
 
-	UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), GetHealth());
+	//UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), GetHealth());
 }
 
 void AOPAG_Player::InitDefaultValues()
@@ -448,17 +449,20 @@ void AOPAG_Player::ResetFPSCamera(const FInputActionValue& Value)
 #pragma region LookAtInteractable
 void AOPAG_Player::InteractWithItem(const FInputActionValue& Value)
 {
-	if (InteractableObject)
+	if (InteractableObject && 
+		InteractableObject->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()) &&
+		IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
 	{
 		if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
 		{
 			InteractWithModule(Module);
 		}
-		// TODO: Potion check
 		else
 		{
-			PotionCount++;
-			InteractableObject->Destroy();
+			IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
+			// TODO: Potion check
+			//PotionCount++;
+			//InteractableObject->Destroy();
 		}
 	}
 }
@@ -541,9 +545,9 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 		false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 	if (bHasHit && OutHits.Num() > 0)
 	{
-		// TODO: change control tag with interface check [OutHits[0].GetActor()->GetClass()->ImplementsInterface(UMyInterface::StaticClass())]
-		const bool bActorHasTag = OutHits[0].GetActor()->ActorHasTag("Interactable");
-		if (bActorHasTag)
+		const bool bActorImplementsInterface = OutHits[0].GetActor()->GetClass()->
+		ImplementsInterface(UOPAG_InteractableInterface::StaticClass());
+		if (bActorImplementsInterface)
 		{	
 			return OutHits[0].GetActor();
 		}

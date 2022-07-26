@@ -14,9 +14,7 @@ AOPAG_DoorEntranceVolume::AOPAG_DoorEntranceVolume()
 	PrimaryActorTick.bCanEverTick = true;
 	Volume = CreateDefaultSubobject<UBoxComponent>(TEXT("Volume"));
 	RootComponent = Volume;
-	Volume->BodyInstance.SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Volume->BodyInstance.SetResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-	Volume->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+	Volume->BodyInstance.SetCollisionProfileName(TEXT("Volume"));
 	Volume->SetWorldScale3D(FVector::OneVector * 20.f);
 	Volume->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_DoorEntranceVolume::OnOverlapBegin);
 }
@@ -25,7 +23,13 @@ AOPAG_DoorEntranceVolume::AOPAG_DoorEntranceVolume()
 void AOPAG_DoorEntranceVolume::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (GetWorld()->GetFirstPlayerController()->GetPawn()->IsOverlappingActor(this))
+	{
+		if (RoomManager)
+		{
+			RoomManager->EnterRoom();
+		}
+	}
 }
 
 // Called every frame

@@ -12,6 +12,7 @@
 #include "Managers/RoomManager/OPAG_DoorManagerComponent.h"
 #include "Managers/RoomManager/OPAG_EnemyManagerComponent.h"
 #include "Managers/RoomManager/OPAG_RoomOffset.h"
+#include "Rooms/OPAG_Portal.h"
 #include "Rooms/OPAG_RoomAttachPoint.h"
 #include "Rooms/OPAG_RoomStreamingVolume.h"
 
@@ -26,15 +27,6 @@ AOPAG_RoomManager::AOPAG_RoomManager()
 	EnemyManager = CreateDefaultSubobject<UOPAG_EnemyManagerComponent>(TEXT("Enemy Manager"));
 }
 
-void AOPAG_RoomManager::SetExitAsSpecial(bool bIsLastRoom, bool bHasSafeRoom) const
-{
-}
-
-
-void AOPAG_RoomManager::BlockExit() const
-{
-
-}
 
 // Called when the game starts or when spawned
 void AOPAG_RoomManager::BeginPlay()
@@ -121,14 +113,20 @@ void AOPAG_RoomManager::UpdateData()
 	}
 }
 
-void AOPAG_RoomManager::CloseExits(const bool bIsLastRoom, const bool bHasSafeRoom) const
+void AOPAG_RoomManager::CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const
 {
 	for (const AOPAG_RoomAttachPoint* Exit : Exits)
 	{
 		if (Exit->bIsOpen) continue;
 
-		if (bIsLastRoom || bHasSafeRoom) SetExitAsSpecial(bIsLastRoom, bHasSafeRoom);
-		else BlockExit();
+		if (bIsLastRoom || bHasSafeRoom)
+		{
+			DoorManager->SetExitAsSpecial(bIsLastRoom, bHasSafeRoom,
+				Exit->GetActorLocation(), Exit->GetActorRotation());
+			bIsLastRoom = false;
+			bHasSafeRoom = false;
+		}
+		else DoorManager->BlockExit(Exit->GetActorLocation(), Exit->GetActorRotation());
 	}
 }
 

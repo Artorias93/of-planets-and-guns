@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "OPAG_RoomManager.generated.h"
 
+class AOPAG_Portal;
 class UOPAG_EnemyManagerComponent;
 class UOPAG_DoorManagerComponent;
 class AOPAG_RoomStreamingVolume;
@@ -57,9 +58,6 @@ public:
 
 	int AssignedRoomID;
 
-private:
-	void SetExitAsSpecial(bool bIsLastRoom, bool bHasSafeRoom) const;
-	void BlockExit() const;
 
 protected:
 	// Called when the game starts or when spawned

@@ -178,7 +178,7 @@ private:
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
 	float GunPreADSRoll = 0;
-	AActor* InteractableObject = nullptr; // TODO: change with InteractableInterface
+	AActor* InteractableObject = nullptr;
 
 private:
 	FOnTimelineFloat OnADSTimelineProgress;

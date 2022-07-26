@@ -5,6 +5,7 @@
 
 #include "Environment/OPAG_DoorBase.h"
 #include "Managers/RoomManager/OPAG_RoomManager.h"
+#include "Rooms/OPAG_Portal.h"
 
 // Sets default values for this component's properties
 UOPAG_DoorManagerComponent::UOPAG_DoorManagerComponent()
@@ -36,6 +37,26 @@ void UOPAG_DoorManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	// ...
 }
 
+void UOPAG_DoorManagerComponent::SetExitAsSpecial(bool bIsLastRoom, bool bHasSafeRoom, const FVector Location,
+	const FRotator Rotation)
+{
+	if (bIsLastRoom)
+	{
+		ExitPortal = AOPAG_Portal::SpawnPortal(GetWorld(), PortalClass,
+			EPortalType::BossRoom, Location, Rotation);
+	}
+	else if (bHasSafeRoom)
+	{
+		ExitPortal = AOPAG_Portal::SpawnPortal(GetWorld(), PortalClass,
+			EPortalType::SafeZone, Location, Rotation);
+	}
+}
+
+void UOPAG_DoorManagerComponent::BlockExit(const FVector Location, const FRotator Rotation) const
+{
+	GetWorld()->SpawnActor<AActor>(ExitWallClass, Location, Rotation);
+}
+
 void UOPAG_DoorManagerComponent::CloseDoors()
 {
 	for (AOPAG_DoorBase* Door : Doors)
@@ -56,5 +77,6 @@ void UOPAG_DoorManagerComponent::OpenDoors()
 			Door->OpenDoor();
 		}
 	}
+	if (ExitPortal != nullptr) ExitPortal->UnlockPortal();
 }
 

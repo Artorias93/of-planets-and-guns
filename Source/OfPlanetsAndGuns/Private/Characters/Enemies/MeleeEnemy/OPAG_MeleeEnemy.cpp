@@ -15,6 +15,7 @@ AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
 		DamageCollisionBox->SetupAttachment(RootComponent);
 		DamageCollisionBox->SetRelativeLocation(DamageCollisionBoxRelativeLocation);
 		DamageCollisionBox->SetBoxExtent(DamageCollisionBoxExtent);
+		DamageCollisionBox->BodyInstance.SetCollisionProfileName(TEXT("Volume"));
 	}
 	SwordMesh = CreateDefaultSubobject<UStaticMeshComponent>("Sword Mesh Component");
 	if (SwordMesh)
@@ -35,15 +36,6 @@ void AOPAG_MeleeEnemy::BeginPlay()
 		AnimInstance->OnMontageStarted.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackBegin);
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackNotify);
 		AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackEnd);
-	}
-
-	if(DamageCollisionBox)
-	{
-		//Makes sure that the enemy doesn't take damage if the player shoots the sword collision box
-		//TODO: Why doesn't this work in the constructor?
-		DamageCollisionBox->BodyInstance.SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		DamageCollisionBox->BodyInstance.SetResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-		DamageCollisionBox->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
 	}
 }
 
