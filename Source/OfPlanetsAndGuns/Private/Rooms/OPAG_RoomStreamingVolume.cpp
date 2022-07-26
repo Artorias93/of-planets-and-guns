@@ -15,6 +15,9 @@ AOPAG_RoomStreamingVolume::AOPAG_RoomStreamingVolume()
 	PrimaryActorTick.bCanEverTick = true;
 	Volume = CreateDefaultSubobject<UBoxComponent>("Volume");
 	RootComponent = Volume;
+	Volume->BodyInstance.SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Volume->BodyInstance.SetResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	Volume->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
 	Volume->SetWorldScale3D(FVector::OneVector * 20.f);
 	Volume->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_RoomStreamingVolume::OnOverlapBegin);
 	Volume->OnComponentEndOverlap.AddDynamic(this, &AOPAG_RoomStreamingVolume::OnOverlapEnd);
