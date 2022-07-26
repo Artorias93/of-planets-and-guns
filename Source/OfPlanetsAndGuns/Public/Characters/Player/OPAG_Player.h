@@ -87,7 +87,7 @@ public:
 	UInputMappingContext* InputMappingContext;
 
 	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
-	AOPAG_GunBase* PrimarytGun;
+	AOPAG_GunBase* PrimaryGun;
 
 	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
 	AOPAG_GunBase* CurrentGun;
@@ -194,6 +194,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	void BindEvents();
+
 	// Init standard values
 	void InitDefaultValues();
 	void InitADSTimeline();
@@ -210,6 +212,7 @@ private:
 	void AttachDefaultGuns();
 	void SwapGuns();
 	void ReloadGun();
+	void IncrementPrimaryGunAmmo();
 
 	//Camera behavior
 	void MakingAimCameraRotate();

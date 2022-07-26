@@ -33,6 +33,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartRun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
@@ -82,17 +83,21 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FBoltsChanged BoltsChanged;
 
+	//Gun stuff
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FAmmoPickedUp AmmoPickedUp;
+
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
 		FEnemyKilled EnemyKilled;
 
 	//Game stuff
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FPauseGame PauseGame;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FResumeGame ResumeGame;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FStartRun StartRun;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQuitGame QuitGame;
 };

@@ -3,7 +3,6 @@
 
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Items/OPAG_Drop.h"
-#include "Items/OPAG_Ammo.h"
 #include "Characters/Player/OPAG_Player.h"
 
 UOPAG_InventorySystemComponent::UOPAG_InventorySystemComponent()
@@ -40,10 +39,16 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			break;
 
 		case EDropType::Ammo:
+			IncrementAmmo();
 			break;
 
 		default:
 			break;
 		}
 	}
+}
+
+void UOPAG_InventorySystemComponent::IncrementAmmo() const
+{
+	//EMS->AmmoPickedUp.Broadcast();
 }

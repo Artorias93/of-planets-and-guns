@@ -76,6 +76,15 @@ void AOPAG_GunBase::BeginPlay()
 	Super::BeginPlay();
 	
 	CreateAndAttachAllModules();
+
+	
+	const FString Context;
+	if (AmmoReloadingMultipliersTable) 
+		AmmoReloadingMultipliersTable->GetAllRows(Context, AmmoReloadingMultipliers);
+
+	//checkf(AmmoReloadingMultipliersTable.Num() > 0, TEXT("AmmoReloadingMultipliersTable can't be empty"));
+
+
 }
 
 void AOPAG_GunBase::Tick(float DeltaTime)
@@ -410,6 +419,26 @@ void AOPAG_GunBase::Reload()
 {
 	bIsReloading = true;
 	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_GunBase::WaitReloadingTimer, Stats.ReloadingTime, false);
+}
+
+void AOPAG_GunBase::IncrementAmmo()
+{
+	switch (FireType) {
+		case EFireTypes::FullyAutomatic : 
+			break;
+
+		case EFireTypes::SingleShot :
+			break;
+
+		case EFireTypes::Burst3 :
+			break;
+
+		case EFireTypes::Shotgun :
+			break;
+
+		default:
+			break;
+	}
 }
 
 // When player reload the gun is impossible to shoot and reload, because of this player will have to wait this timer

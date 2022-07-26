@@ -3,6 +3,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <Engine/DataTable.h>
 #include "OPAG_GunBase.generated.h"
 
 class USkeletalMeshComponent;
@@ -21,6 +22,7 @@ class AOPAG_CharacterBase;
 class AOPAG_Grenade;
 
 class UKismetSystemLibrary;
+class UDataTable;
 
 UENUM(BlueprintType, meta = (Bitflags))
 enum class EFireTypes : uint8
@@ -33,9 +35,22 @@ enum class EFireTypes : uint8
 ENUM_CLASS_FLAGS(EFireTypes);
 
 USTRUCT(BlueprintType)
-struct FGunStats
+struct OFPLANETSANDGUNS_API FOPAG_ReloadStats : public FTableRowBase
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EFireTypes FireType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int ReloadingFactor;
+
+};
+
+USTRUCT(BlueprintType)
+struct OFPLANETSANDGUNS_API FGunStats : public FTableRowBase
+{
+	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -96,7 +111,7 @@ public:
 	FName Name;
 
 	UPROPERTY(Category = "Gun", EditDefaultsOnly, BlueprintReadWrite)
-	EFireTypes Type;
+	EFireTypes FireType;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	FGunStats Stats;
@@ -131,6 +146,9 @@ public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	UDataTable* AmmoReloadingMultipliersTable;
+
 private:
 	TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
 	TSubclassOf<AOPAG_ModuleBase> StandardStock;
@@ -140,6 +158,9 @@ private:
 private:
 	FTimerHandle ResetShootHandle;
 	FTimerHandle ReloadHandle;
+
+private:
+	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
 
 protected:
 	virtual void BeginPlay() override;
@@ -155,6 +176,9 @@ public:
 
 	// Reload system
 	void Reload();
+
+	// Increment ammo system
+	void IncrementAmmo();
 
 	// Camera behavior
 	UCameraComponent* GetSightCamera();

@@ -80,9 +80,15 @@ void AOPAG_Player::BeginPlay()
 	InitRecoilTimeline();
 	AttachDefaultGuns();
 
+	BindEvents();
+
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 	EMS->DashAmountChanged.Broadcast(DashCount);
+}
+
+void AOPAG_Player::BindEvents() {
+	EMS->AmmoPickedUp.AddDynamic(this, &AOPAG_Player::IncrementPrimaryGunAmmo);
 }
 
 void AOPAG_Player::Tick(float DeltaTime)
@@ -107,7 +113,7 @@ void AOPAG_Player::InitDefaultValues()
 	if (PrimaryGunComponent->GetChildActor())
 	{
 		CurrentGun = Cast<AOPAG_GunBase>(PrimaryGunComponent->GetChildActor());
-		PrimarytGun = CurrentGun;
+		PrimaryGun = CurrentGun;
 	}
 	if (Camera)
 	{
@@ -259,7 +265,7 @@ void AOPAG_Player::ActiveDash(const FInputActionValue& Value)
 
 void AOPAG_Player::ActiveGunAbility(const FInputActionValue& Value)
 {
-	if (AbilitySystemComp && CurrentGun == PrimarytGun && CurrentGun->Accessory->GetChildActor())
+	if (AbilitySystemComp && CurrentGun == PrimaryGun && CurrentGun->Accessory->GetChildActor())
 	{
 		AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(CurrentGun->Accessory->GetChildActor());
 		if (Module->Ability)
@@ -290,9 +296,9 @@ void AOPAG_Player::SwapGuns()
 {
 	if (PrimaryGunComponent->GetChildActor() && SecondaryGunComponent->GetChildActor())
 	{
-		AOPAG_GunBase* PrimaryGun = Cast<AOPAG_GunBase>(PrimaryGunComponent->GetChildActor());
+		AOPAG_GunBase* PrimaryGunPtr = Cast<AOPAG_GunBase>(PrimaryGunComponent->GetChildActor());
 		AOPAG_GunBase* SecondaryGun = Cast<AOPAG_GunBase>(SecondaryGunComponent->GetChildActor());
-		if (CurrentGun == PrimaryGun)
+		if (CurrentGun == PrimaryGunPtr)
 		{
 			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
 			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
@@ -302,7 +308,7 @@ void AOPAG_Player::SwapGuns()
 		{
 			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
 			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
-			CurrentGun = PrimaryGun;
+			CurrentGun = PrimaryGunPtr;
 		}
 
 		EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
@@ -316,6 +322,13 @@ void AOPAG_Player::ReloadGun()
 	if (!CheckIsReloading)
 	{
 		CurrentGun->Reload();
+	}
+}
+
+void AOPAG_Player::IncrementPrimaryGunAmmo()
+{
+	if (PrimaryGun) {
+		PrimaryGun->IncrementAmmo();
 	}
 }
 #pragma endregion Guns
@@ -467,11 +480,11 @@ void AOPAG_Player::InteractWithItem(const FInputActionValue& Value)
 		{
 			InteractWithModule(Module);
 		}
-		// TODO: Potion check
+
 		else
 		{
-			PotionCount++;
-			InteractableObject->Destroy();
+			//PotionCount++;
+			//InteractableObject->Destroy();
 		}
 	}
 }
@@ -479,7 +492,7 @@ void AOPAG_Player::InteractWithItem(const FInputActionValue& Value)
 void AOPAG_Player::InteractWithModule(AOPAG_ModuleBase* Module)
 {
 	const int EquippableType = Module->EquippableFireTypes;
-	const int FireType = (int)CurrentGun->Type;
+	const int FireType = (int)CurrentGun->FireType;
 	const int FireMask = 1 << FireType;
 	if (FireMask & EquippableType)
 	{
@@ -489,7 +502,7 @@ void AOPAG_Player::InteractWithModule(AOPAG_ModuleBase* Module)
 
 void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 {
-	if (PrimarytGun)
+	if (PrimaryGun)
 	{
 		// Initialize new module params
 		const FGunStats NewModuleStats = Module->Stats;
@@ -503,7 +516,7 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 		int OldModuleEquippable;
 		TSubclassOf<AOPAG_ModuleBase> OldModuleClass;
 		
-		const bool bResult = PrimarytGun->AddNewModule(NewModuleClass, NewModuleRarity, NewModuleStats, NewModuleEquippable, OldModuleClass, OldModuleRarity, OldModuleStats, OldModuleEquippable);
+		const bool bResult = PrimaryGun->AddNewModule(NewModuleClass, NewModuleRarity, NewModuleStats, NewModuleEquippable, OldModuleClass, OldModuleRarity, OldModuleStats, OldModuleEquippable);
 		if (bResult)
 		{
 			Module->Destroy();
