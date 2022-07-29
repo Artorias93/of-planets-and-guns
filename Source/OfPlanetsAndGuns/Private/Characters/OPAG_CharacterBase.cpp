@@ -5,6 +5,7 @@
 #include <GameplayTagsManager.h>
 #include <GameplayTagContainer.h>
 //My Classes
+#include "Abilities/OPAG_BasicShot.h"
 #include "Characters/OPAG_AttributeSetBase.h"
 
 AOPAG_CharacterBase::AOPAG_CharacterBase()
@@ -13,11 +14,13 @@ AOPAG_CharacterBase::AOPAG_CharacterBase()
 	
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");
 
-	static ConstructorHelpers::FClassFinder<UGameplayAbility> BasicShotClass(TEXT("/Game/OfPlanetsAndGuns/Core/Abilities/GA_BasicShot"));
+	/*static ConstructorHelpers::FClassFinder<UGameplayAbility> BasicShotClass(TEXT("/Game/OfPlanetsAndGuns/Core/Abilities/GA_BasicShot"));
 	if (BasicShotClass.Succeeded())
 	{
 		BasicShot = BasicShotClass.Class;
-	}
+	}*/
+
+	
 }
 
 //Binds functionality to input
@@ -39,6 +42,8 @@ void AOPAG_CharacterBase::BeginPlay()
 	{
 		BaseAttributeSet = AbilitySystemComp->GetSet<UOPAG_AttributeSetBase>();
 
+		BasicShot = UOPAG_BasicShot::StaticClass();
+		
 		if (BaseAttributeSet)
 		{
 			/*AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(

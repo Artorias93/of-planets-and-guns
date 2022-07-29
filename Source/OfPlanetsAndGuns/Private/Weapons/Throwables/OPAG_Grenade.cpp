@@ -42,5 +42,6 @@ void AOPAG_Grenade::Tick(float DeltaTime)
 void AOPAG_Grenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, Hit.Location, FRotator::ZeroRotator, FVector(10.f, 10.f, 10.f), true, EPSCPoolMethod::None, true);
+	ImpactPoint = Hit.ImpactPoint;
 	Destroy();
 }
