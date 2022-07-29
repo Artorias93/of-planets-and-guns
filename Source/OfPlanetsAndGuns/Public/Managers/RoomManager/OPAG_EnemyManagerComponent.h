@@ -57,8 +57,6 @@ private:
 
 	float GaussianProbabilityModifier(float Level) const;
 
-	int32 GetSpawnerCount();
-
 	void GetMappedEnemies(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyProbabilityMap);
 
 	UFUNCTION()
@@ -76,5 +74,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy Manager")
 		void SpawnWave();
-		
+
+	int32 GetSpawnerCount() const;
+
 };

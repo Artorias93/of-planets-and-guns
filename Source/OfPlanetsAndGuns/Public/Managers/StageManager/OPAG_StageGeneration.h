@@ -6,10 +6,21 @@
 #include "Engine/DataTable.h"
 #include "OPAG_StageGeneration.generated.h"
 
+UENUM(BlueprintType)
+enum class EStageType : uint8
+{
+	Stage,
+	SafeRoom,
+	BossRoom
+};
+
 USTRUCT(BlueprintType)
 struct FOPAG_StageGeneration : public FTableRowBase
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
+		EStageType StageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stage)
 		int32 StageIndex;

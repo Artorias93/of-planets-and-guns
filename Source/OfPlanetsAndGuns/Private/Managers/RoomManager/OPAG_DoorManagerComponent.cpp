@@ -43,12 +43,12 @@ void UOPAG_DoorManagerComponent::SetExitAsSpecial(bool bIsLastRoom, bool bHasSaf
 	if (bIsLastRoom)
 	{
 		ExitPortal = AOPAG_Portal::SpawnPortal(GetWorld(), PortalClass,
-			EPortalType::BossRoom, Location, Rotation);
+			EStageType::Stage, Location, Rotation);
 	}
 	else if (bHasSafeRoom)
 	{
 		ExitPortal = AOPAG_Portal::SpawnPortal(GetWorld(), PortalClass,
-			EPortalType::SafeZone, Location, Rotation);
+			EStageType::SafeRoom, Location, Rotation);
 	}
 }
 

@@ -19,24 +19,42 @@ class OFPLANETSANDGUNS_API UOPAG_GameInstance : public UGameInstance
 
 	float StageDifficulty;
 	TArray<FOPAG_StageGeneration*> StageGens;
+	TArray<FOPAG_StageGeneration*> BossStages;
+	TArray<FOPAG_StageGeneration*> SafeStages;
+	int32 CurrentStage;
+	uint8 bNextStageIsSafe : 1;
 
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stage Data")
 		UDataTable* StageGenerationTable;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Planet Data")
+		TSoftObjectPtr<UWorld> PlanetPersistentLevel;
+
 private:
 	void BindEvents();
 	void LoadGenerationTable();
+
+	void SplitStageGens();
 
 public:
 
 	virtual void Init() override;
 
+	UFUNCTION(BlueprintCallable)
+		void StartStage(const EStageType StageType);
+
+	UFUNCTION(BlueprintCallable)
+		void SavePlayerState();
+
 	UFUNCTION()
 		void OnStageManagerReady();
 	UFUNCTION()
 		void OnStageLoaded();
+
+	UFUNCTION()
+		void OnStageCleared(const EStageType NextStageType);
 
 	UFUNCTION()
 		void OnRoomEntered();

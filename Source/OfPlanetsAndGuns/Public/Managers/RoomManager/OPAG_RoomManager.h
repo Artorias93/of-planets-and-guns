@@ -76,7 +76,7 @@ public:
 		void CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Door Manager")
-		void EnterRoom() const;
+		void EnterRoom();
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy Manager")
 		void RoomCleared();

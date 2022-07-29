@@ -20,6 +20,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneratio
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomSpawned, AOPAG_RoomManager* const, RoomManager);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageLoaded);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageCleared, const EStageType, NextStageType);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomEntered);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 
@@ -55,6 +57,9 @@ public:
 		FRoomSpawned RoomSpawned;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
 		FStageLoaded StageLoaded;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
+		FStageCleared StageCleared;
 
 	UPROPERTY(BlueprintAssignable, Category = RoomManager)
 		FRoomEntered RoomEntered;

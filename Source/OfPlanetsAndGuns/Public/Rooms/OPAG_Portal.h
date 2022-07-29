@@ -5,15 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interactables/OPAG_InteractableInterface.h"
+#include "Managers/StageManager/OPAG_StageGeneration.h"
 #include "OPAG_Portal.generated.h"
-
-UENUM(BlueprintType)
-enum class EPortalType : uint8
-{
-	SafeZone,
-	BossRoom,
-	NextStage
-};
 
 
 UCLASS()
@@ -28,7 +21,7 @@ public:
 	AOPAG_Portal();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Portal, Meta=(ExposeOnSpawn = true))
-	EPortalType PortalType;
+	EStageType PortalType;
 
 
 private:
@@ -40,7 +33,7 @@ protected:
 
 public:
 
-	static AOPAG_Portal* SpawnPortal(UWorld* World, TSubclassOf<AOPAG_Portal> Class, const EPortalType Type,
+	static AOPAG_Portal* SpawnPortal(UWorld* World, TSubclassOf<AOPAG_Portal> Class, const EStageType Type,
 		const FVector& Location, const FRotator& Rotation);
 
 	// Called every frame

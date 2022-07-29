@@ -11,6 +11,7 @@ void UOPAG_GameInstance::BindEvents()
 	UOPAG_EventManagerSubsystem* EMS = GetSubsystem<UOPAG_EventManagerSubsystem>();
 	EMS->StageManagerReady.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerReady);
 	EMS->StageLoaded.AddDynamic(this, &UOPAG_GameInstance::OnStageLoaded);
+	EMS->StageCleared.AddDynamic(this, &UOPAG_GameInstance::OnStageCleared);
 
 	EMS->RoomEntered.AddDynamic(this, &UOPAG_GameInstance::OnRoomEntered);
 	EMS->RoomCleared.AddDynamic(this, &UOPAG_GameInstance::OnRoomCleared);
@@ -23,8 +24,29 @@ void UOPAG_GameInstance::LoadGenerationTable()
 	FString context;
 	StageGenerationTable->GetAllRows<FOPAG_StageGeneration>(context, StageGens);
 
+	SplitStageGens();
+
 	//sort by StageIndex
 	StageGens.Sort();
+}
+
+void UOPAG_GameInstance::SplitStageGens()
+{
+	for (FOPAG_StageGeneration* StageGen : StageGens)
+	{
+		switch (StageGen->StageType) {
+			case EStageType::Stage: break;
+			case EStageType::SafeRoom:
+				SafeStages.Add(StageGen);
+				StageGens.RemoveSingle(StageGen);
+				break;
+			case EStageType::BossRoom:
+				BossStages.Add(StageGen);
+				StageGens.RemoveSingle(StageGen);
+				break;
+			default: ;
+		}
+	}
 }
 
 void UOPAG_GameInstance::Init()
@@ -32,22 +54,62 @@ void UOPAG_GameInstance::Init()
 	Super::Init();
 
 	StageDifficulty = 1.f;
+	CurrentStage = 0;
+	bNextStageIsSafe = false;
 
 	BindEvents();
 
 	LoadGenerationTable();
 }
 
+void UOPAG_GameInstance::StartStage(const EStageType StageType)
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), PlanetPersistentLevel);
+}
+
+void UOPAG_GameInstance::SavePlayerState()
+{
+	//TODO: add player state
+}
+
 void UOPAG_GameInstance::OnStageManagerReady()
 {
 
+	if (bNextStageIsSafe)
+	{
+		bNextStageIsSafe = false;
+		GetEventManager()->GenerateStage.Broadcast(*SafeStages[0]);
+	}
 
-	GetEventManager()->GenerateStage.Broadcast(*StageGens[0]);
+	if (StageGens.Last()->StageIndex < CurrentStage)
+	{
+		GetEventManager()->GenerateStage.Broadcast(*BossStages[0]);
+	}
+	else
+	{
+		GetEventManager()->GenerateStage.Broadcast(*StageGens[CurrentStage]);
+	}
 }
 
 void UOPAG_GameInstance::OnStageLoaded()
 {
 	UE_LOG(LogTemp, Warning, TEXT("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"));
+}
+
+void UOPAG_GameInstance::OnStageCleared(const EStageType NextStageType)
+{
+	switch (NextStageType) { case EStageType::Stage: 
+		CurrentStage++;
+		break;
+	case EStageType::SafeRoom:
+		bNextStageIsSafe = true;
+		break;
+	case EStageType::BossRoom: break;
+	default: ;
+	}
+
+
+	StartStage(NextStageType);
 }
 
 void UOPAG_GameInstance::OnRoomEntered()

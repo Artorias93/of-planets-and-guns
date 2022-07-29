@@ -32,7 +32,7 @@ float UOPAG_EnemyManagerComponent::GaussianProbabilityModifier(const float Level
 	return FMath::Exp(FMath::Pow(ModifiedLevel, 2.f) * -0.5f);
 }
 
-int32 UOPAG_EnemyManagerComponent::GetSpawnerCount()
+int32 UOPAG_EnemyManagerComponent::GetSpawnerCount() const
 {
 	int32 SpawnCount = 0;
 	for (const TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)

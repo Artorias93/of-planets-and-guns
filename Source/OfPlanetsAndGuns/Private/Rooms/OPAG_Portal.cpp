@@ -3,6 +3,8 @@
 
 #include "Rooms/OPAG_Portal.h"
 
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_GameInstance.h"
 #include "Util/OPAG_UtilityFunctionLibrary.h"
 
 // Sets default values
@@ -13,7 +15,7 @@ AOPAG_Portal::AOPAG_Portal()
 
 }
 
-AOPAG_Portal* AOPAG_Portal::SpawnPortal(UWorld* World, const TSubclassOf<AOPAG_Portal> Class, const EPortalType Type, 
+AOPAG_Portal* AOPAG_Portal::SpawnPortal(UWorld* World, const TSubclassOf<AOPAG_Portal> Class, const EStageType Type,
 	const FVector& Location, const FRotator& Rotation)
 {
 	AOPAG_Portal* Portal =  World->SpawnActor<AOPAG_Portal>(Class, Location, Rotation);
@@ -44,21 +46,15 @@ void AOPAG_Portal::Interact_Implementation()
 {
 	if (!bIsOpen) return;
 
-	switch (PortalType) {
-	case EPortalType::SafeZone:
-		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, "SAFE ZONE", 
-			EMessageSeverity::Info);
-			break;
-		case EPortalType::BossRoom: 
-			UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, "BOSS ROOM", 
-				EMessageSeverity::Info);
-			break;
-		case EPortalType::NextStage: 
-			UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, "NEXT STAGE", 
-				EMessageSeverity::Info);
-			break;
-		default: ;
-	}
+	if (PortalType == EStageType::BossRoom)
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this,
+			"BOSS ROOM CALLED DIRECTLY FROM PORTAL",
+			EMessageSeverity::Error);
+
+	const auto GI = GetGameInstance<UOPAG_GameInstance>();
+	if (!GI) return;
+
+	GI->GetEventManager()->StageCleared.Broadcast(PortalType);
 }
 
 bool AOPAG_Portal::CanInteract_Implementation()
