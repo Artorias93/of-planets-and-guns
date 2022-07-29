@@ -96,7 +96,8 @@ void AOPAG_RoomManager::UpdateData()
 			Row.Weight = Weight;
 			Row.ExitCount = Exits.Num();
 			Row.ExitSides = ExitSides;
-			Row.Offset = Entrance->RoomOffset;
+			Row.bIsStartingRoom = bIsStartingRoom;
+			Row.Offset = Entrance != nullptr ? Entrance->RoomOffset : FTransform::Identity;
 
 			DataTable->AddRow(FName(Name), Row);
 

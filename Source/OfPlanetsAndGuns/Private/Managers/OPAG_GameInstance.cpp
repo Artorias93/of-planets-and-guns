@@ -38,14 +38,22 @@ void UOPAG_GameInstance::SplitStageGens()
 			case EStageType::Stage: break;
 			case EStageType::SafeRoom:
 				SafeStages.Add(StageGen);
-				StageGens.RemoveSingle(StageGen);
 				break;
 			case EStageType::BossRoom:
 				BossStages.Add(StageGen);
-				StageGens.RemoveSingle(StageGen);
 				break;
 			default: ;
 		}
+	}
+
+	for (FOPAG_StageGeneration* StageGen : SafeStages)
+	{
+		StageGens.RemoveSingle(StageGen);
+	}
+
+	for (FOPAG_StageGeneration* StageGen : BossStages)
+	{
+		StageGens.RemoveSingle(StageGen);
 	}
 }
 
