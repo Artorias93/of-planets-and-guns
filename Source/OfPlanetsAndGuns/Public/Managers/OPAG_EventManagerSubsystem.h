@@ -4,6 +4,8 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Managers/StageManager/OPAG_StageGeneration.h"
 #include "InputActionValue.h"
+#include "Weapons/Guns/OPAG_GunStats.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
 class AOPAG_RoomStreamingVolume;
@@ -33,6 +35,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FLookedAtModule, const FOPAG_GunStats&, CurrentModule, const FOPAG_GunStats&, OtherModule, 
+const FString, CurrentModuleName, const EModuleRarity, CurrentModuleRarity, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
 
@@ -102,7 +107,9 @@ public:
 	//Gun stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
 		FAmmoPickedUp AmmoPickedUp;
-
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FLookedAtModule LookedAtModule;
+	
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
 		FEnemyKilled EnemyKilled;

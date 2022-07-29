@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include <Engine/DataTable.h>
+#include "OPAG_GunStats.h"
 #include "OPAG_GunBase.generated.h"
 
 class USkeletalMeshComponent;
@@ -26,55 +27,7 @@ class UOPAG_EventManagerSubsystem;
 class UKismetSystemLibrary;
 class UDataTable;
 
-UENUM(BlueprintType, meta = (Bitflags))
-enum class EFireTypes : uint8
-{
-	FullyAutomatic = 0x00,
-	SingleShot = 0x01,
-	Burst3 = 0x02,
-	Shotgun = 0x03,
-};
-ENUM_CLASS_FLAGS(EFireTypes);
 
-USTRUCT(BlueprintType)
-struct OFPLANETSANDGUNS_API FOPAG_ReloadStats : public FTableRowBase
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		EFireTypes FireType;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int ReloadingFactor;
-
-};
-
-USTRUCT(BlueprintType)
-struct OFPLANETSANDGUNS_API FGunStats : public FTableRowBase
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Damage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float FireRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Accuracy;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RecoilRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ReloadingTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ClipSize;
-
-	FGunStats() : Damage(0), FireRate(0), Accuracy(0), RecoilRate(0), ReloadingTime(0), ClipSize(0) {}
-};
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_GunBase : public AActor
@@ -116,7 +69,7 @@ public:
 	EFireTypes FireType;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
-	FGunStats Stats;
+	FOPAG_GunStats Stats;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	int AmmoCurrent = 0;
@@ -191,7 +144,7 @@ public:
 	UCameraComponent* GetADSCamera();
 
 	// Module
-	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FGunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
+	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
 private:
 	// Utility for link modules and sockets
 	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const; 
@@ -220,5 +173,5 @@ private:
 	// Create and Attach module behavior
 	void CreateAndAttachAllModules();
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
-	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes);
+	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes);
 };

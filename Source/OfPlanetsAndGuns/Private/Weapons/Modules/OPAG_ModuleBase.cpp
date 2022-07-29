@@ -36,12 +36,12 @@ void AOPAG_ModuleBase::Tick(float DeltaTime)
 
 }
 
-void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes)
+void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
 {
 	SetParameters(NewRarity, NewStats, NewEquippableFireTypes);
 }
 
-void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FGunStats NewStats, const int NewEquippableFireTypes)
+void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
 {
 	Rarity = NewRarity;
 	Stats = NewStats;

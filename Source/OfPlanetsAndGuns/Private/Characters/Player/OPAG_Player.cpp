@@ -539,13 +539,13 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 	if (PrimaryGun)
 	{
 		// Initialize new module params
-		const FGunStats NewModuleStats = Module->Stats;
+		const FOPAG_GunStats NewModuleStats = Module->Stats;
 		const EModuleRarity NewModuleRarity = Module->Rarity;
 		const int NewModuleEquippable = Module->EquippableFireTypes;
 		const TSubclassOf<AOPAG_ModuleBase> NewModuleClass = Module->GetClass();
 
 		// Create old module params
-		FGunStats OldModuleStats;
+		FOPAG_GunStats OldModuleStats;
 		EModuleRarity OldModuleRarity;
 		int OldModuleEquippable;
 		TSubclassOf<AOPAG_ModuleBase> OldModuleClass;

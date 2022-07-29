@@ -219,7 +219,7 @@ void AOPAG_GunBase::CreateModule(UChildActorComponent* ModuleSlot, const TSubcla
 		if (Base)
 		{
 			const EModuleRarity ModuleRarity = Base->Rarity;
-			const FGunStats ModuleStats = Base->Stats;
+			const FOPAG_GunStats ModuleStats = Base->Stats;
 			const int ModuleEquippableFireTypes = Base->EquippableFireTypes;
 
 			AttachModule(ModuleSlot, Module, ModuleRarity, ModuleStats, ModuleEquippableFireTypes);
@@ -229,7 +229,7 @@ void AOPAG_GunBase::CreateModule(UChildActorComponent* ModuleSlot, const TSubcla
 
 // Set child create the object in scene and set the actor's child
 // After this is important set the specific params of module (when invoke setchild... the module has the default params, not the values in scene)
-const bool AOPAG_GunBase::AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes)
+const bool AOPAG_GunBase::AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes)
 {
 	ModuleSlot->SetChildActorClass(NewModule);
 
@@ -246,7 +246,7 @@ const bool AOPAG_GunBase::AttachModule(UChildActorComponent* ModuleSlot, const T
 }
 
 // When player pick new module in scene, the event call this method 
-const bool AOPAG_GunBase::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FGunStats& OldModuleStats, int& OldModuleEquippableFireTypes)
+const bool AOPAG_GunBase::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes)
 {
 	if (NewModule)
 	{
