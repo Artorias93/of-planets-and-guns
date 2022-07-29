@@ -133,7 +133,11 @@ void AOPAG_RoomManager::CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const
 
 void AOPAG_RoomManager::EnterRoom()
 {
-	if (bIsRoomCleared) return;
+	if (bIsRoomCleared)
+	{
+		DoorManager->OpenDoors();
+		return;
+	}
 
 	if (EnemyManager->GetSpawnerCount() == 0)
 	{

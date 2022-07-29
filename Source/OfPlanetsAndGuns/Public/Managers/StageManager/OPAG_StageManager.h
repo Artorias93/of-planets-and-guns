@@ -83,7 +83,7 @@ private:
 	void StartStageGeneration(FOPAG_StageGeneration GenData);
 	void LoadDataTables();
 	void AddMoreRoomsFromListToHitWeightRequirements();
-	void FindRoomToSpawn(int32 Previous, uint8& PreviousRoomTurn);
+	void FindRoomToSpawn(const int32 Previous, uint8& PreviousRoomTurn);
 
 	void FilterRoomsByExitType(const TArray<FOPAG_RoomOffset*>& RoomList,
 		TArray<FOPAG_RoomOffset*>& FilteredRooms, uint8 LastRoomTurn) const;

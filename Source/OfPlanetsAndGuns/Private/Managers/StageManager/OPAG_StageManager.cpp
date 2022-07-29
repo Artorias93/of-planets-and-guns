@@ -33,12 +33,22 @@ void AOPAG_StageManager::StartStageGeneration(const FOPAG_StageGeneration GenDat
 	StartingRoom = -1;
 	FinalRoom = -1;
 	SafeRoom = -1;
+	TotalWeight = 0;
 
 	//loop until the weight has reached the target
-	while (BaseGenerationData.TargetWeight > TotalWeight)
+	if (BaseGenerationData.StageType == EStageType::Stage)
 	{
-		FindRoomToSpawn(RoomsToAppend.Num() > 0 ? RoomsToAppend[0] : -1, PreviousRoomTurn);
+		while (BaseGenerationData.TargetWeight > TotalWeight)
+		{
+			FindRoomToSpawn(RoomsToAppend.Num() > 0 ? RoomsToAppend[0] : -1, PreviousRoomTurn);
+		}
 	}
+	else
+	{
+		TotalWeight = BaseGenerationData.TargetWeight;
+		FindRoomToSpawn(-1, PreviousRoomTurn);
+	}
+
 	LoadingProgress->Broadcast(LoadingProgress_Pathing);
 
 	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, FString::Printf(
@@ -67,6 +77,8 @@ void AOPAG_StageManager::LoadDataTables()
 
 void AOPAG_StageManager::AddMoreRoomsFromListToHitWeightRequirements()
 {
+	if (BaseGenerationData.StageType != EStageType::Stage) return;
+
 	int32 CurrentWeight = 0;
 	for (const FOPAG_RoomOffset* Room : Rooms)
 	{
@@ -152,28 +164,26 @@ void AOPAG_StageManager::FindRoomToSpawn(const int32 Previous, uint8& PreviousRo
 
 	if (StartingRoom == -1) StartingRoom = RandomRoom->ID;
 
-	if (RandomRoom->ID < SpecialRoomID) //again.. temp check
+
 	if (RandomRoom->ID != FinalRoom && RandomRoom->RoomOffset.ExitCount > 0)
 	{
-		AddRandomBridge(PathingItem);
-		if (RandomRoom->RoomOffset.ExitCount > 1)
+		if (RandomRoom->ID < SpecialRoomID)
 		{
-			//Not deleting any endbridges from this array. this means that this will be true only at the first entry.
-			if (SpecialRoomBridges.Num() == 0)
+			AddRandomBridge(PathingItem);
+			if (RandomRoom->RoomOffset.ExitCount > 1)
 			{
-				SpecialRoomBridges.Add(AddRandomBridge(PathingItem, true));
-			}
-			else
-			{
-				if (SafeRoom < 0) //can add more check for some rng
+				//Not deleting any endbridges from this array. this means that this will be true only at the first entry.
+				if (SpecialRoomBridges.Num() == 0)
 				{
-					SafeRoom = RandomRoom->ID;
+					SpecialRoomBridges.Add(AddRandomBridge(PathingItem, true));
 				}
 			}
 		}
+		else if (SafeRoom < 0) //can add more check for some rng
+		{
+			SafeRoom = RandomRoom->ID;
+		}
 	}
-
-
 }
 
 void AOPAG_StageManager::FilterRoomsByExitType(const TArray<FOPAG_RoomOffset*>& RoomList,

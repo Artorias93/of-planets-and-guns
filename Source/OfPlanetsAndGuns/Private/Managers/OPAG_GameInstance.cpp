@@ -88,8 +88,7 @@ void UOPAG_GameInstance::OnStageManagerReady()
 		bNextStageIsSafe = false;
 		GetEventManager()->GenerateStage.Broadcast(*SafeStages[0]);
 	}
-
-	if (StageGens.Last()->StageIndex < CurrentStage)
+	else if (StageGens.Last()->StageIndex < CurrentStage)
 	{
 		GetEventManager()->GenerateStage.Broadcast(*BossStages[0]);
 	}
