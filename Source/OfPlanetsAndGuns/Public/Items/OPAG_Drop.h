@@ -24,9 +24,9 @@ class OFPLANETSANDGUNS_API AOPAG_Drop : public AActor
 public:	
 	AOPAG_Drop();
 
-	UPROPERTY(Category = "Drop stuff", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Drop stuff", EditAnywhere, BlueprintReadWrite)
 		UStaticMeshComponent* DropMesh;
-	UPROPERTY(Category = "Drop stuff", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Drop stuff", EditAnywhere, BlueprintReadWrite)
 		USphereComponent* Sphere;
 	UPROPERTY(Category = "Drop stuff", EditDefaultsOnly, BlueprintReadWrite)
 		EDropType DropType;
