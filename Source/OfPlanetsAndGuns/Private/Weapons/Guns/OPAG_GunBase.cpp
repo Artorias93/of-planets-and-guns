@@ -15,6 +15,7 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Characters/Enemies/OPAG_Enemy.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -280,19 +281,19 @@ const bool AOPAG_GunBase::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewMo
 #pragma endregion Create and Attach Modules
 
 #pragma region Shooting Behavior
-// Is the main method to invoke when event is trigger for shoot
+// Main method to to call when a shooting event is triggered
 // Call line trace method and set fire rate of gun with timer manager
-void AOPAG_GunBase::Shoot(FVector StartShootLocation, FVector Direction)
+void AOPAG_GunBase::Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
 	bCanShoot = false;
 
-	ShootLineTrace(StartShootLocation, Direction);
+	ShootLineTrace(StartShootLocation, Direction, ShooterCharacter);
 
 	const float Seconds = CalculateRateInSeconds(Stats.FireRate);
 	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
 }
 
-void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction)
+void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
 	//TODO: Recoil Event
 	const FVector NoiseDirection = ApplyNoise(Direction);
@@ -300,17 +301,22 @@ void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction
 
 	// Initialize out of hit and if check is true (hit object in scene) so the actor is cast to character and control the return value
 	FHitResult OutHit;
-	TArray<AActor*> ActorsToIgnore = CheckWhatActorsIgnoreLinetrace();
+	const TArray<AActor*> ActorsToIgnore = CheckWhatActorsIgnoreLinetrace();	
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
 		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
-	// If Actor is inheritance by character base, invoke take damage
+	// If Actor is inherited by character base, invoke take damage
 	if (bIsHit)
 	{
 		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 		if (Character)
 		{
-			Character->ReceiveDamage(Stats.Damage);
+			//Checks for friendly fire
+			//If both the shooter and the target are enemies, damage is not applied
+			const AOPAG_Enemy* const EnemyShooter = Cast<AOPAG_Enemy>(ShooterCharacter);
+			const AOPAG_Enemy* const EnemyShot = Cast<AOPAG_Enemy>(Character);
+			if(!(EnemyShooter && EnemyShot))
+				Character->ReceiveDamage(Stats.Damage);
 		}
 	}
 	AmmoCurrent--;

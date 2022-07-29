@@ -1,14 +1,17 @@
 #include "AI/OPAG_ServiceShoot.h"
 #include <Kismet/KismetSystemLibrary.h>
+#include "GameFramework/Actor.h"
 //My Classes
 #include "Characters/Enemies/RangedEnemy/OPAG_AICRangedEnemy.h"
 #include "Characters/Enemies/RangedEnemy/OPAG_RangedEnemy.h"
+#include "Characters/Player/OPAG_Player.h"
 
 UOPAG_ServiceShoot::UOPAG_ServiceShoot(FObjectInitializer const& ObjectInitializer) : Super(ObjectInitializer)
 {
 	NodeName = TEXT("Shoot");
 	bNotifyTick = true;
 	bNotifyBecomeRelevant = true;
+	bCreateNodeInstance = true; //This way it create separate instances for the service for different objects, and the timer works as intended
 }
 
 //Every service tick it checks if there's a SphereTrace between the RangedEnemy and the player.
@@ -17,12 +20,11 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 {
 	Super::TickNode(OwnerBTComponent, NodeMemory, DeltaSeconds);
 
-	if(bIsAiming)
+	if(!bIsAiming)
 	{
 		if (const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
 		{
-			//TODO: Replace with player when ready
-			if (const AOPAG_CharacterBase* const FocusActor = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
+			if (const AOPAG_Player* const FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
 				if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
 				{
@@ -45,35 +47,30 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 	}
 }
 
-
 //Executed on service activation
 void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
-	Super::OnBecomeRelevant(OwnerBTComponent, NodeMemory);
-
 	if(const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
 	{
-		if(const AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
+		if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
 		{
 			bIsAiming = true;
 
-			AimingLed = Cast<UStaticMeshComponent>(RangedEnemy->AimingLed);
+			AimingLed = Cast<UStaticMeshComponent>(RangedEnemy->GetAimingLed());
 			if(AimingLed)
 			{
 				AimingLed->SetVisibility(true);
 			}
-
-			LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->LaserBeam);
-			if (LaserBeam)
+			
+			if(!RangedEnemy->GetHasShotSinceSpawning())
 			{
-				//What is this????
-				if (/*!RangedEnemy->Shoot*/ true)
+				LaserBeam = Cast<UNiagaraComponent>(RangedEnemy->GetLaserBeam());
+				if (LaserBeam)
 				{
 					LaserBeam->SetVisibility(true);
-					//RangedEnemy->Shoot = true;
+					RangedEnemy->SetHasShotSinceSpawning(true);
 				}
 			}
-
 			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::DisableAimingSignals, StartShootingTimer, false);
 		}
 	}

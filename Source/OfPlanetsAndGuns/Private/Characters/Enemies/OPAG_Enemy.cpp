@@ -8,6 +8,9 @@
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/OPAG_AttributeSetBase.h"
+#include "Characters/Player/OPAG_Player.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_GameInstance.h"
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
@@ -35,7 +38,6 @@ void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
 	Super::ReceiveDamage(DamageAmount);
 	
 	//Triggers the damage sense on the AI controlled pawn
-	//TODO: Does this work???
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this,
 		UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount,
 		UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(),
@@ -43,12 +45,6 @@ void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
 	//TODO: Remove the print to screen
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
-}
-
-//TODO: Remove when the enemy will be able to take damage from the player
-void AOPAG_Enemy::DebugTake100Damage()
-{
-	ReceiveDamage(100.f);
 }
 
 void AOPAG_Enemy::Attack()
@@ -75,33 +71,22 @@ void AOPAG_Enemy::DropAndDespawn()
 	//Fill with everything from drops to enemy manager stuff
 
 	GetWorld()->GetTimerManager().ClearTimer(RagdollTimerHandle);
+	//Broadcasts the kill to the event manager
+	const auto GI = GetGameInstance<UOPAG_GameInstance>();
+	if (GI) GI->GetEventManager()->EnemyKilled.Broadcast(this);
 	Destroy();
 }
 
-void AOPAG_Enemy::GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */)
+#pragma region Getters & Setters
+
+UBehaviorTree* AOPAG_Enemy::GetBehaviorTree() const
 {
-	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
-	{
-		if(const AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
-		{
-			//Gets Start location, in front of the gun
-			StartLocation = GetActorLocation() + (GetActorForwardVector() * 50.f);
-
-			//Gets Vector from player to enemy
-			const FVector PlayerToSelfVector = Player->GetActorLocation() - GetActorLocation();
-
-			//Gets not normalized vector with shooting accuracy computations applied
-			const float DirectionVectorX =
-				PlayerToSelfVector.X + UKismetMathLibrary::RandomFloatInRange(
-					-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
-			const float DirectionVectorY = PlayerToSelfVector.Y;
-			const float DirectionVectorZ =
-				PlayerToSelfVector.Z + UKismetMathLibrary::RandomFloatInRange(
-					-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
-			const FVector DirectionVector = FVector(DirectionVectorX, DirectionVectorY, DirectionVectorZ);
-			
-			//Gets normalized vector with shooting accuracy computations applied
-			Direction = UKismetMathLibrary::Normal(DirectionVector, 0.0001f); //2nd param is tolerance
-		}
-	}
+	return BehaviorTree;
 }
+
+AOPAG_PatrolPath* AOPAG_Enemy::GetPatrolPath() const
+{
+	return PatrolPath;
+}
+
+#pragma endregion

@@ -9,6 +9,10 @@ AOPAG_AICRangedEnemy::AOPAG_AICRangedEnemy()
 	PerceptionSightConfig->LoseSightRadius = LoseSightSenseRadius;
 	PerceptionSightConfig->PeripheralVisionAngleDegrees = SightPeripheralVisionDegrees;
 
+	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	PerceptionSightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+
 	PerceptionComp->ConfigureSense(*PerceptionSightConfig);
 	PerceptionComp->ConfigureSense(*PerceptionDamageConfig);
 	PerceptionComp->SetDominantSense(PerceptionSightConfig->GetSenseImplementation());

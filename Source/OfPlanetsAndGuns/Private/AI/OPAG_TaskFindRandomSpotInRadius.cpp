@@ -20,12 +20,13 @@ EBTNodeResult::Type UOPAG_TaskFindRandomSpotInRadius::ExecuteTask(UBehaviorTreeC
 			if (const UNavigationSystemV1* const NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
 			{
 				//Gets the random point and writes it on the blackboard
-				//TODO: Method is deprecated, swap with the new one!
-				const FVector PatrolLocation = NavSystem->GetRandomReachablePointInRadius(GetWorld()
-					, ActorLocation, PatrolRadius);
-				AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyPatrolLocation.SelectedKeyName,
-					PatrolLocation);
-				return EBTNodeResult::Succeeded;
+				FNavLocation PatrolLocation;
+				if(NavSystem->GetRandomPointInNavigableRadius(ActorLocation, PatrolRadius, PatrolLocation))
+				{
+					AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyPatrolLocation.SelectedKeyName,
+					PatrolLocation.Location);
+					return EBTNodeResult::Succeeded;
+				}
 			}
 		}
 	}

@@ -63,6 +63,9 @@ public:
 	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
 	UAnimMontage* FireMontageToPlay;
 
+	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* ReloadMontageToPlay;
+
 	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
 	UTimelineComponent* ADSTimeline;
 
@@ -143,7 +146,7 @@ private:
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
 	float GunPreADSRoll = 0;
-	AActor* InteractableObject = nullptr; // TODO: change with InteractableInterface
+	AActor* InteractableObject = nullptr;
 
 private:
 	FOnTimelineFloat OnADSTimelineProgress;

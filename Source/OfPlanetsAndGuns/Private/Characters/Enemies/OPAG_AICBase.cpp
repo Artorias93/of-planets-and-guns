@@ -22,17 +22,6 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
 	PerceptionSightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AI Sight Config"));
 	PerceptionDamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("AI Damage Config"));
-	
-	//TODO: Move all this setup in the specialized sub-classes
-	PerceptionSightConfig->SightRadius = 2500.f;
-	PerceptionSightConfig->LoseSightRadius = 300.f;
-	PerceptionSightConfig->PeripheralVisionAngleDegrees = 120.0f;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	PerceptionComp->ConfigureSense(*PerceptionSightConfig);
-	PerceptionComp->ConfigureSense(*PerceptionDamageConfig);
-	PerceptionComp->SetDominantSense(PerceptionSightConfig->GetSenseImplementation());
 }
 
 void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
@@ -40,10 +29,10 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 	Super::OnPossess(ControlledPawn);
 
 	const AOPAG_Enemy* const ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
-	if(ControlledEnemy && ControlledEnemy->BehaviorTree)
+	if(ControlledEnemy && ControlledEnemy->GetBehaviorTree())
 	{
-		BlackboardComponent->InitializeBlackboard(*ControlledEnemy->BehaviorTree->BlackboardAsset);
-		BehaviorTreeComponent->StartTree(*ControlledEnemy->BehaviorTree);
+		BlackboardComponent->InitializeBlackboard(*ControlledEnemy->GetBehaviorTree()->BlackboardAsset);
+		BehaviorTreeComponent->StartTree(*ControlledEnemy->GetBehaviorTree());
 
 		PerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AOPAG_AICBase::OnPerceptionUpdated);
 	}
@@ -52,8 +41,7 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
 	//Senses only react to the player character
-	//TODO: Swap with correct class when OPAG_Player is ready
-	if (ACharacter* const Player = Cast<ACharacter>(UpdatedActor))
+	if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))
 	{
 		//If the player is seen set it to target actor
 		if (Stimulus.WasSuccessfullySensed())

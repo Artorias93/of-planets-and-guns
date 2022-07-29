@@ -2,6 +2,7 @@
 #include <Components/BoxComponent.h>
 //My Classes
 #include "Characters/Enemies/MeleeEnemy/OPAG_AICMeleeEnemy.h"
+#include "Characters/Player/OPAG_Player.h"
 
 AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
 {
@@ -14,6 +15,7 @@ AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
 		DamageCollisionBox->SetupAttachment(RootComponent);
 		DamageCollisionBox->SetRelativeLocation(DamageCollisionBoxRelativeLocation);
 		DamageCollisionBox->SetBoxExtent(DamageCollisionBoxExtent);
+		DamageCollisionBox->BodyInstance.SetCollisionProfileName(TEXT("Volume"));
 	}
 	SwordMesh = CreateDefaultSubobject<UStaticMeshComponent>("Sword Mesh Component");
 	if (SwordMesh)
@@ -65,10 +67,9 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 			if (GEngine)
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("HIT!"));
 			
-			//TODO: Change class when player is done
-			if(AOPAG_CharacterBase* const Player = Cast<AOPAG_CharacterBase>(AIController->GetFocusActor()))
+			if(AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
-				Player->ReceiveDamage(50.f);
+				Player->ReceiveDamage(MeleeWeaponDamage);
 			}
 		}
 		else
@@ -90,6 +91,6 @@ void AOPAG_MeleeEnemy::Death()
 		SwordMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	}
 
-	//Ragdoll stuff for the enemy mesh itself are done in the Super.
+	//Ragdoll stuff for the enemy mesh itself are done in the parent.
 	Super::Death();
 }

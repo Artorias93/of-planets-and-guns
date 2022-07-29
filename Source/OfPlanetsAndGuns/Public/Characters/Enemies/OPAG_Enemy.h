@@ -4,6 +4,9 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Enemy.generated.h"
 
+class UBehaviorTree;
+class AOPAG_PatrolPath;
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Enemy : public AOPAG_CharacterBase
 {
@@ -21,13 +24,13 @@ public:
 	
 	virtual void ReceiveDamage(float DamageAmount) override;
 
-	//TODO: Remove when the enemy takes damage normally
-	UFUNCTION(CallInEditor, Category = "OPAG AI")
-	void DebugTake100Damage();
-
 	virtual void Attack();
 
-	virtual void Death() override;	
+	virtual void Death() override;
+
+	UBehaviorTree* GetBehaviorTree() const;
+
+	AOPAG_PatrolPath* GetPatrolPath() const;
 
 protected:
 
@@ -35,21 +38,18 @@ protected:
 
 	void DropAndDespawn();
 
-	virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */) override;
+	//virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */) override;
 	
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
 
-public:
-
-	UPROPERTY(EditAnywhere, Category = "OPAG AI")
+private:
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	class UBehaviorTree* BehaviorTree;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	class AOPAG_PatrolPath* PatrolPath;
-
-protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn, AllowPrivateAccess = true))
 	bool bUsingPatrolPath = false;

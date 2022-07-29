@@ -42,7 +42,7 @@ private:
 private: 
 
 	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
-	class UAnimMontage* MeleeAttackMontage;
+	UAnimMontage* MeleeAttackMontage;
 
 	UPROPERTY()
 	UAnimInstance* AnimInstance;
@@ -61,4 +61,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* SwordMesh;
+
+	UPROPERTY(EditAnywhere)
+	float MeleeWeaponDamage = 50.f;
 };
