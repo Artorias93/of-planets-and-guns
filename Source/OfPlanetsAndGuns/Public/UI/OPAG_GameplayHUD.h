@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "Weapons/Guns/OPAG_GunStats.h"
 #include "OPAG_GameplayHUD.generated.h"
 
 /**

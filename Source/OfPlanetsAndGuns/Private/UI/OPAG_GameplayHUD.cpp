@@ -10,6 +10,7 @@
 #include "UI/OPAG_UWModuleCompareView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Weapons/Guns/OPAG_GunStats.h"
 
 
 void AOPAG_GameplayHUD::DrawHUD() 
@@ -136,8 +137,6 @@ void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats& CurrentModul
 {
 	if (ModuleCompareViewWidget) {
 		ModuleCompareViewWidget->AddToViewport(2);
-		//MCVW->DoStuff();
+		ModuleCompareViewWidget->UpdateModulesValues(CurrentModule, OtherModule, CurrentModuleName, CurrentModuleRarity, OtherModuleName, OtherModuleRarity);
 	}
-
-	//Updatare la UI con i valori delle stats etc.
 }

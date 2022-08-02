@@ -17,8 +17,6 @@ UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWModuleCompareView : public UUserWidget
 {
 	GENERATED_BODY()
-		
-	//void BindEvents();
 
 	UPROPERTY(meta = (BindWidget))
 		UOPAG_ModuleViewUW* CurrentModuleWidget;

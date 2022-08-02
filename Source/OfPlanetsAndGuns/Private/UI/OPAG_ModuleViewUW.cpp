@@ -23,4 +23,14 @@ void UOPAG_ModuleViewUW::UpdateModuleValues(const FOPAG_GunStats& Stats, const F
 	ReloadingAmount->SetText(FText::FromString(FString::SanitizeFloat(_Reloading)));
 	ClipSizeAmount->SetText(FText::FromString(FString::FromInt(_ClipSize)));
 	*/
+
+	ModuleName->SetText(FText::FromString(Name));
+	ModuleRarity->SetText(FText::FromString("No Method - Do it"));
+	DamageAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.Damage)));
+	FireRateAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.FireRate)));
+	AccuracyAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.Accuracy)));
+	RecoilAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.RecoilRate)));
+	ReloadingAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.ReloadingTime)));
+	ClipSizeAmount->SetText(FText::FromString(FString::FromInt(Stats.ClipSize)));
+
 }
