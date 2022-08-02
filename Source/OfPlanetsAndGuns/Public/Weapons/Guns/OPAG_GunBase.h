@@ -44,26 +44,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* ADSCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Barrel;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Stock;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Grip;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Magazine;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Sight;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Accessory;
-
 public:
-	UPROPERTY(Category = "Gun", VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "Gun", EditDefaultsOnly, BlueprintReadWrite)
 	FName Name;
 
 	UPROPERTY(Category = "Gun", EditDefaultsOnly, BlueprintReadWrite)
@@ -102,24 +84,12 @@ public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
-	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
-	UDataTable* AmmoReloadingMultipliersTable;
+protected:
+	UOPAG_EventManagerSubsystem* EMS;
 
-private:
-	TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
-	TSubclassOf<AOPAG_ModuleBase> StandardStock;
-	TSubclassOf<AOPAG_ModuleBase> StandardGrip;
-	TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
-
-private:
+protected:
 	FTimerHandle ResetShootHandle;
 	FTimerHandle ReloadHandle;
-
-private:
-	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
-
-private:
-	UOPAG_EventManagerSubsystem* EMS;
 
 protected:
 	virtual void BeginPlay() override;
@@ -131,32 +101,13 @@ public:
 	const float CalculateRateInSeconds(const float FireRate);
 
 	// Main system for shooting
-	void Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
-
-	// Reload system
-	void Reload();
-
-	// Increment ammo system
-	void PopulateAmmoTable();
-	void IncrementAmmo();
+	virtual void Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
 
 	// Camera behavior
-	UCameraComponent* GetSightCamera();
 	UCameraComponent* GetADSCamera();
-
-	// Module
-	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
-private:
-	// Utility for link modules and sockets
-	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const; 
-	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
-	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
-	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
-
+protected:
 	// Main system for shooting
-	void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
-	void ShootThrowable(const FRotator SpawnRotation);
-	void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
+	virtual void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
 	void ResetShootTimer();
 
 	// Subsystem for shooting
@@ -165,14 +116,5 @@ private:
 	const FVector2D CalculateRandPointInCircle();
 	const FVector ApplyNoise(const FVector Direction);
 	const FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction);
-	TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
-	
-	// Ammo behavior
-	void UpdateAmmo();
-	void WaitReloadingTimer();
-
-	// Create and Attach module behavior
-	void CreateAndAttachAllModules();
-	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
-	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes);
+	virtual TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
 };
