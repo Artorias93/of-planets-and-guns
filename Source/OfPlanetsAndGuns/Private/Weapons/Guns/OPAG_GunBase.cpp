@@ -154,6 +154,16 @@ const float AOPAG_GunBase::CalculateSpreadRadius()
 {
 	const float Spread = CalculateSpread();
 	const float SpreadRadius = FMath::Tan(Spread / 2) * ShootConeLenght;
+	
+	const AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(GetParentActor());
+	if (Character)
+	{
+		const float Velocity = Character->GetVelocity().Size();
+		if (Velocity > .1f)
+		{
+			return SpreadRadius * ReductionSpreadRadius;
+		}
+	}
 	return SpreadRadius;
 }
 

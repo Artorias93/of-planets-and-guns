@@ -68,6 +68,9 @@ public:
 	float ShootConeLenght = 100.f;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	int ReductionSpreadRadius = 10;
+
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
 public:
