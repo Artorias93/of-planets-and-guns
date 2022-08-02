@@ -39,14 +39,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float LoseSightTimer = 3.f;
 
-	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	float SightSenseRadius = 2500.f;
-
-	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	float LoseSightSenseRadius = 3000.f;
-
-	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	float SightPeripheralVisionDegrees = 120.f;
+	// UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	// float SightSenseRadius = 2500.f;
+	//
+	// UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	// float LoseSightSenseRadius = 3000.f;
+	//
+	// UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	// float SightPeripheralVisionDegrees = 120.f;
 
 	UPROPERTY(transient)
 	class UBehaviorTreeComponent* BehaviorTreeComponent;
