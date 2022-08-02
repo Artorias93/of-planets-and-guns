@@ -5,15 +5,15 @@
 
 AOPAG_AICMeleeEnemy::AOPAG_AICMeleeEnemy()
 {
-	PerceptionSightConfig->SightRadius = SightSenseRadius;
-	PerceptionSightConfig->LoseSightRadius = LoseSightSenseRadius;
-	PerceptionSightConfig->PeripheralVisionAngleDegrees = SightPeripheralVisionDegrees;
-
-	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-
-	PerceptionComp->ConfigureSense(*PerceptionSightConfig);
-	PerceptionComp->ConfigureSense(*PerceptionDamageConfig);
-	PerceptionComp->SetDominantSense(PerceptionSightConfig->GetSenseImplementation());
+	// PerceptionSightConfig->SightRadius = SightSenseRadius;
+	// PerceptionSightConfig->LoseSightRadius = LoseSightSenseRadius;
+	// PerceptionSightConfig->PeripheralVisionAngleDegrees = SightPeripheralVisionDegrees;
+	//
+	// PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	// PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	// PerceptionSightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	//
+	// PerceptionComp->ConfigureSense(*PerceptionSightConfig);
+	// PerceptionComp->ConfigureSense(*PerceptionDamageConfig);
+	// PerceptionComp->SetDominantSense(PerceptionSightConfig->GetSenseImplementation());
 }
