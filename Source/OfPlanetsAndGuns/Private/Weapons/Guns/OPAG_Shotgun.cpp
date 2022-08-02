@@ -1,6 +1,7 @@
 #include "Weapons/Guns/OPAG_Shotgun.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include <Kismet/GameplayStatics.h>
 
 AOPAG_Shotgun::AOPAG_Shotgun()
 {
@@ -11,7 +12,6 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 {
 	for (int i = 0; i < ConsecutiveProjectile; i++)
 	{
-		//TODO: Recoil Event
 		const FVector NoiseDirection = ApplyNoise(Direction);
 		const FVector EffectiveDirection = ApplyWeaponRange(StartShootLocation, NoiseDirection);
 
@@ -19,11 +19,13 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 		FHitResult OutHit;
 		TArray<AActor*> ActorsToIgnore = CheckWhatActorsIgnoreLinetrace();
 		const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
-			ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+			ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
 		// If Actor is inheritance by character base, invoke take damage
 		if (bIsHit)
 		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitPartile, OutHit.Location, FRotator::ZeroRotator, true, EPSCPoolMethod::None, true);
+
 			AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 			if (Character)
 			{
@@ -32,5 +34,10 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 			}
 		}
 	}
+
+	// Spawn emitter
+	// const FVector MuzzleLocation = GetMuzzle()->GetActorLocation();
+	UGameplayStatics::SpawnEmitterAttached(MuzzlePartile, GetMuzzle(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None, true);
+
 	AmmoCurrent--;
 }

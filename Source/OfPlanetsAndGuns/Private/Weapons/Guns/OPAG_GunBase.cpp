@@ -16,6 +16,8 @@
 #include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
+#include <Kismet/GameplayStatics.h>
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -79,6 +81,7 @@ void AOPAG_GunBase::Shoot(FVector StartShootLocation, FVector Direction, const A
 
 	const float Seconds = CalculateRateInSeconds(Stats.FireRate);
 	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
+	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 }
 
 void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
@@ -91,11 +94,24 @@ void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction
 	FHitResult OutHit;
 	const TArray<AActor*> ActorsToIgnore = CheckWhatActorsIgnoreLinetrace();	
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
-		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+		ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
 	// If Actor is inherited by character base, invoke take damage
 	if (bIsHit)
 	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitPartile, OutHit.Location, FRotator::ZeroRotator, true, EPSCPoolMethod::None, true);
+		/*
+		FHitResult OutHit2;
+		const bool bIsHit2 = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), MuzzleLocation, OutHit.Location, ObjectTypesQuery, false,
+			ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit2, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+		
+		const FVector LookDirection = bIsHit2 ? OutHit2.ImpactPoint : OutHit2.TraceEnd;
+		const FRotator LookRotator = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, LookDirection);
+		const FTransform TracerTransform(MuzzleLocation, LookRotator, FVector(.3f, .3f, .3f));
+
+		// Spawn trace in the space
+	    GetWorld()->SpawnActor(TracerClass, TracerTransform);*/
+
 		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 		if (Character)
 		{
@@ -107,7 +123,18 @@ void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction
 				Character->ReceiveDamage(Stats.Damage);
 		}
 	}
+	
+	// Spawn emitter
+	// const FVector MuzzleLocation = GetMuzzle()->GetActorLocation();
+	UGameplayStatics::SpawnEmitterAttached(MuzzlePartile, GetMuzzle(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None, true);
+
+	// Decrement Ammo
 	AmmoCurrent--;
+}
+
+USceneComponent* AOPAG_GunBase::GetMuzzle() const
+{
+	return nullptr;
 }
 
 void AOPAG_GunBase::ResetShootTimer()

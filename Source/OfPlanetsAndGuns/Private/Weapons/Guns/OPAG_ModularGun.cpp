@@ -15,6 +15,8 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
+#include <Engine/StaticMeshActor.h>
+#include <Kismet/GameplayStatics.h>
 
 AOPAG_ModularGun::AOPAG_ModularGun()
 {
@@ -191,6 +193,21 @@ void AOPAG_ModularGun::SpawnThrowable(const FVector SpawnLocation, const FRotato
 		GetWorld()->SpawnActor(GrenadeClass, &SpawnLocation, &SpawnRotation, SpawnInfo);
 	}
 }
+
+USceneComponent* AOPAG_ModularGun::GetMuzzle() const
+{
+	AOPAG_BarrelBase* Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
+	if (Module)
+	{
+		UChildActorComponent* Muzzle = Module->MuzzleComponent;
+		if (Muzzle)
+		{
+			AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(Muzzle->GetChildActor());
+			return StaticMeshActor->GetStaticMeshComponent();
+		}
+	}
+	return nullptr;
+}
 #pragma endregion Shoot Behavior
 
 #pragma region Shoot Utility
@@ -289,7 +306,7 @@ void AOPAG_ModularGun::UpdateStats()
 		Modules.Add(ModuleAccessory);
 	}
 
-	Stats = FOPAG_GunStats();
+	Stats = BaseStats;
 
 	// Update stats
 	for (int i = 0; i < Modules.Num(); i++)
@@ -356,6 +373,7 @@ void AOPAG_ModularGun::Reload()
 {
 	bIsReloading = true;
 	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_ModularGun::WaitReloadingTimer, Stats.ReloadingTime, false);
+	UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
 }
 
 void AOPAG_ModularGun::IncrementAmmo()

@@ -15,8 +15,12 @@ class OFPLANETSANDGUNS_API AOPAG_Pistol : public AOPAG_GunBase
 public:
 	AOPAG_Pistol();
 
+	UPROPERTY(Category = "Pistol", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UChildActorComponent* MuzzleComponent;
+
 protected:
 	virtual void BeginPlay() override;
+	virtual USceneComponent* GetMuzzle() const override;
 
 public:
 	virtual void Tick(float DeltaTime) override;

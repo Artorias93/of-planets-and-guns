@@ -48,7 +48,13 @@ public:
 
 public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	FOPAG_GunStats BaseStats;
+
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
     UDataTable* AmmoReloadingMultipliersTable;
+
+	UPROPERTY(Category = "Sound", EditDefaultsOnly, BlueprintReadWrite)
+	USoundBase* ReloadSound;
 
 private:
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
@@ -61,6 +67,7 @@ private:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual USceneComponent* GetMuzzle() const override;
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -78,8 +85,8 @@ public:
 	UCameraComponent* GetSightCamera();
 protected:
 	// Shoot behavior
-	void ShootThrowable(const FRotator SpawnRotation);
-	void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
+	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
+	UFUNCTION(BlueprintCallable) void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
 
 	// Shoot utility
 	virtual TArray<AActor*> CheckWhatActorsIgnoreLinetrace() override;

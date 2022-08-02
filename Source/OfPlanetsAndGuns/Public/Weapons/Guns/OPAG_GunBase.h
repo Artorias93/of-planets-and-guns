@@ -1,34 +1,20 @@
 #pragma once
 
 #include "UObject/ConstructorHelpers.h"
+#include <Engine/DataTable.h>
+
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include <Engine/DataTable.h>
 #include "OPAG_GunStats.h"
-#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_GunBase.generated.h"
 
 class USkeletalMeshComponent;
 class UChildActorComponent;
 class UCameraComponent;
-
-class AOPAG_ModuleBase;
-enum class EModuleTypes : uint8;
-enum class EModuleRarity : uint8;
-
-class AOPAG_BarrelBase;
-class AOPAG_AccessoryBase;
-class AOPAG_SightBase;
-
 class AOPAG_CharacterBase;
-class AOPAG_Grenade;
-
 class UOPAG_EventManagerSubsystem;
-
-class UKismetSystemLibrary;
-class UDataTable;
-
-
+class UParticleSystem;
+class USoundBase;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_GunBase : public AActor
@@ -84,6 +70,16 @@ public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
+public:
+	UPROPERTY(Category = "Emitter", EditDefaultsOnly, BlueprintReadWrite)
+	UParticleSystem* MuzzlePartile;
+
+	UPROPERTY(Category = "Emitter", EditDefaultsOnly, BlueprintReadWrite)
+	UParticleSystem* HitPartile;
+
+	UPROPERTY(Category = "Sound", EditDefaultsOnly, BlueprintReadWrite)
+	USoundBase* ShootSound;
+
 protected:
 	UOPAG_EventManagerSubsystem* EMS;
 
@@ -103,16 +99,19 @@ public:
 	// Main system for shooting
 	virtual void Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
 
+	// Subsystem shooting
+	UFUNCTION(BlueprintCallable) const float CalculateSpreadRadius();
+
 	// Camera behavior
 	UCameraComponent* GetADSCamera();
 protected:
 	// Main system for shooting
 	virtual void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
+	virtual USceneComponent* GetMuzzle() const;
 	void ResetShootTimer();
 
 	// Subsystem for shooting
 	const float CalculateSpread();
-	UFUNCTION(BlueprintCallable) const float CalculateSpreadRadius();
 	const FVector2D CalculateRandPointInCircle();
 	const FVector ApplyNoise(const FVector Direction);
 	const FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction);

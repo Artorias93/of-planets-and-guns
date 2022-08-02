@@ -9,6 +9,7 @@ class UStaticMeshComponent;
 class UProjectileMovementComponent;
 class UGameplayStatics;
 class UParticleSystem;
+class USoundBase;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Grenade : public AActor
@@ -30,6 +31,9 @@ public:
 public:
 	UPROPERTY(Category = "Grenade", EditDefaultsOnly, BlueprintReadOnly)
 		UParticleSystem* EmitterTemplate;
+
+	UPROPERTY(Category = "Sound", EditDefaultsOnly, BlueprintReadWrite)
+		USoundBase* ExplosionSound;
 
 	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadOnly)
 		float Damage = 0;

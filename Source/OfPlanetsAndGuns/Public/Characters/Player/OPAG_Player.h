@@ -10,20 +10,13 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Player.generated.h"
 
-class AOPAG_AccessoryBase;
 class UOPAG_AttributeSetBase;
-class UKismetMathLibrary;
 class UTimelineComponent;
 class UCurveFloat;
 class AOPAG_ModuleBase;
-class USpringArmComponent;
 class UCameraComponent;
 class UChildActorComponent;
-class UInputAction;
 class AOPAG_GunBase;
-class UDataTable;
-class UKismetSystemLibrary;
-class UAbilitySystemComponent;
 class AOPAG_ModularGun;
 
 UCLASS()
