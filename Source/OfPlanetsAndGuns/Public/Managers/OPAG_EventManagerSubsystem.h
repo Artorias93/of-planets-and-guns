@@ -35,8 +35,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, const FOPAG_GunStats, OtherModule, 
-const FString, CurrentModuleName, const EModuleRarity, CurrentModuleRarity, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FLookedAtModule, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, CurrentModule, const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);

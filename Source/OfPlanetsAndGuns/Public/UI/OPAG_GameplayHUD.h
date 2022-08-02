@@ -41,9 +41,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWLoadingScreenView> LoadingScreenViewWidgetClass;
 	UPROPERTY()
-		class UOPAG_UWModuleCompareView* ModuleCompareViewWidget;
+		class UOPAG_UWModuleView* ModuleViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UOPAG_UWModuleCompareView> ModuleCompareViewWidgetClass;
+		TSubclassOf<UOPAG_UWModuleView> ModuleViewWidgetClass;
+	
 
 public:
 	virtual void DrawHUD() override;
@@ -59,7 +60,6 @@ public:
 	UFUNCTION()
 	void HideLoadingScreenView();
 	UFUNCTION()
-	void ShowModuleCompareView(const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule,
-			const FString CurrentModuleName, const EModuleRarity CurrentModuleRarity, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
+	void ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
 	
 };

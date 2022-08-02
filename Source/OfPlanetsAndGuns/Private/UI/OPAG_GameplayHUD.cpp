@@ -7,7 +7,7 @@
 #include "UI/OPAG_UWPlayerStatsView.h"
 #include "UI/OPAG_UWPauseView.h"
 #include "UI/OPAG_UWLoadingScreenView.h"
-#include "UI/OPAG_UWModuleCompareView.h"
+#include "UI/OPAG_UWModuleView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -74,11 +74,12 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		PauseViewWidget = CreateWidget<UOPAG_UWPauseView>(GetWorld(), PauseViewWidgetClass);
 	}
-
-	if (ModuleCompareViewWidgetClass)
+	
+	if (ModuleViewWidgetClass)
 	{
-		ModuleCompareViewWidget = CreateWidget<UOPAG_UWModuleCompareView>(GetWorld(), ModuleCompareViewWidgetClass);
+		ModuleViewWidget = CreateWidget<UOPAG_UWModuleView>(GetWorld(), ModuleViewWidgetClass);
 	}
+	
 }
 
 void AOPAG_GameplayHUD::ShowPauseView() {
@@ -132,11 +133,12 @@ void AOPAG_GameplayHUD::HideLoadingScreenView()
 	}
 }
 
-void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule,
-	const FString CurrentModuleName, const EModuleRarity CurrentModuleRarity, const FString OtherModuleName, const EModuleRarity OtherModuleRarity)
+void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, 
+	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity)
 {
-	if (ModuleCompareViewWidget) {
-		ModuleCompareViewWidget->AddToViewport(2);
-		ModuleCompareViewWidget->UpdateModulesValues(CurrentModule, OtherModule, CurrentModuleName, CurrentModuleRarity, OtherModuleName, OtherModuleRarity);
+	if (ModuleViewWidget) {
+		ModuleViewWidget->AddToViewport(3);
+		ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity);
 	}
+	
 }

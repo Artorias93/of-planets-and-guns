@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "OPAG_ModuleViewUW.generated.h"
+#include "OPAG_UWModuleView.generated.h"
 
 class UImage;
 class UTextBlock;
@@ -12,7 +12,7 @@ class UTextBlock;
  * 
  */
 UCLASS()
-class OFPLANETSANDGUNS_API UOPAG_ModuleViewUW : public UUserWidget
+class OFPLANETSANDGUNS_API UOPAG_UWModuleView : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -22,6 +22,7 @@ class OFPLANETSANDGUNS_API UOPAG_ModuleViewUW : public UUserWidget
 		UTextBlock* ModuleName;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ModuleRarity;
+
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* DamageText;
 	UPROPERTY(meta = (BindWidget))
@@ -48,9 +49,26 @@ class OFPLANETSANDGUNS_API UOPAG_ModuleViewUW : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ClipSizeAmount;
 
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* DamageDelta;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* FireRateDelta;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* AccuracyDelta;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* RecoilDelta;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* ReloadingDelta;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* ClipSizeDelta;
+
 public:
 	UFUNCTION()
-		void UpdateModuleValues(const FOPAG_GunStats& Stats, const FString Name, const EModuleRarity Rarity);
+		void UpdateModuleValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& CurrentModuleStats, 
+			const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
 
 	void NativeConstruct();
+
+	void UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float BaseAmount, float OldValue, float NewValue);
+
 };
