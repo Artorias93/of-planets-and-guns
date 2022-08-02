@@ -1,8 +1,8 @@
 #include "Characters/Enemies/RangedEnemy/OPAG_RangedEnemy.h"
 #include <Kismet/KismetMathLibrary.h>
 //My Classes
+#include "Characters/Enemies/OPAG_AICBase.h"
 #include "Weapons/Guns/OPAG_GunBase.h"
-#include "Characters/Enemies/RangedEnemy/OPAG_AICRangedEnemy.h"
 #include "Characters/Player/OPAG_Player.h"
 
 AOPAG_RangedEnemy::AOPAG_RangedEnemy()
@@ -59,7 +59,7 @@ void AOPAG_RangedEnemy::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	
-	if (const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(GetController()))
+	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
 		if(const AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 		{

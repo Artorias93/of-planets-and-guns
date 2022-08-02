@@ -18,7 +18,7 @@ public:
 
 	AOPAG_AICBase();
 
-private:
+protected:
 
 	virtual void OnPossess(APawn* ControlledPawn) override;
 
@@ -27,6 +27,8 @@ private:
 
 	UFUNCTION()
 	void LoseTarget();
+
+private:
 
 	/////////////////////////////
 	//Variables
@@ -52,13 +54,13 @@ protected:
 	UPROPERTY(transient)
 	UBlackboardComponent* BlackboardComponent;
 
-	UPROPERTY(transient)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UAIPerceptionComponent* PerceptionComp;
 
-	UPROPERTY(transient)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UAISenseConfig_Sight* PerceptionSightConfig;
 
-	UPROPERTY(transient)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UAISenseConfig_Damage* PerceptionDamageConfig;	
 	
 	FTimerHandle LoseSightTimerHandle;
