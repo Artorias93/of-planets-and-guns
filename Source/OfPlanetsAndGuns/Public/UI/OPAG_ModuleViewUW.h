@@ -50,8 +50,7 @@ class OFPLANETSANDGUNS_API UOPAG_ModuleViewUW : public UUserWidget
 
 public:
 	UFUNCTION()
-	void UpdateModuleValues(const FString _ModuleName, const FString _ModuleRarity,  float _Damage, float _FireRate,
-			float _Accuracy, float _Recoil, float _Reloading, int _ClipSize);
+		void UpdateModuleValues(const FOPAG_GunStats& Stats, const FString Name, const EModuleRarity Rarity);
 
 	void NativeConstruct();
 };

@@ -26,9 +26,9 @@ class OFPLANETSANDGUNS_API UOPAG_UWModuleCompareView : public UUserWidget
 		UOPAG_ModuleViewUW* OtherModuleWidget;
 
 public:
-	//UFUNCTION()
-	//void UpdateModulesValues(const FGunStats& CurrentModule, const FGunStats& OtherModule,
-			//const FString CurrentModuleName, const EModuleRarity CurrentModuleRarity, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
+	UFUNCTION()
+	void UpdateModulesValues(const FOPAG_GunStats& CurrentModule, const FOPAG_GunStats& OtherModule,
+			const FString CurrentModuleName, const EModuleRarity CurrentModuleRarity, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
 
 	void NativeConstruct();
 };

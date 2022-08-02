@@ -23,7 +23,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
 		EMS->LoadingProgress.AddDynamic(this, &AOPAG_GameplayHUD::UpdateLoadingScreenBar);
 		EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
-		//EMS->LookedAtModule.AddDynamic(this, &AOPAG_GameplayHUD::ShowModuleCompareView);
+		EMS->LookedAtModule.AddDynamic(this, &AOPAG_GameplayHUD::ShowModuleCompareView);
 	}
 }
 
@@ -136,5 +136,8 @@ void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats& CurrentModul
 {
 	if (ModuleCompareViewWidget) {
 		ModuleCompareViewWidget->AddToViewport(2);
+		//MCVW->DoStuff();
 	}
+
+	//Updatare la UI con i valori delle stats etc.
 }

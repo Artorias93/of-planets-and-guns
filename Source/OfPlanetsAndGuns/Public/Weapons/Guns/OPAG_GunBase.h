@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include <Engine/DataTable.h>
 #include "OPAG_GunStats.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_GunBase.generated.h"
 
 class USkeletalMeshComponent;
