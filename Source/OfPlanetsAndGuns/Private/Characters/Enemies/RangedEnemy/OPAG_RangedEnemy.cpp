@@ -87,7 +87,7 @@ void AOPAG_RangedEnemy::StartShooting()
 {
 	GetWorld()->GetTimerManager().ClearTimer(ShotTimerHandle);
 	
-	EquippedWeapon->Shoot(StartLocation, Direction);
+	EquippedWeapon->Shoot(StartLocation, Direction, this);
 
 	UE_LOG(LogTemp, Warning, TEXT("I'm shooting dude"));
 }

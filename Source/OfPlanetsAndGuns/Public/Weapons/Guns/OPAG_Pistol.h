@@ -1,0 +1,27 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Weapons/Guns/OPAG_GunBase.h"
+#include "OPAG_Pistol.generated.h"
+
+class UKismetSystemLibrary;
+class AOPAG_CharacterBase;
+
+UCLASS()
+class OFPLANETSANDGUNS_API AOPAG_Pistol : public AOPAG_GunBase
+{
+	GENERATED_BODY()
+	
+public:
+	AOPAG_Pistol();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	virtual void Tick(float DeltaTime) override;
+
+private:
+	// Shooting behavior
+	virtual void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter) override;
+};

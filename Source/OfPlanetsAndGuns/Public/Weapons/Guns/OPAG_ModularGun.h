@@ -1,0 +1,103 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Weapons/Guns/OPAG_GunBase.h"
+#include "OPAG_ModularGun.generated.h"
+
+class AOPAG_ModuleBase;
+enum class EModuleTypes : uint8;
+enum class EModuleRarity : uint8;
+
+class AOPAG_BarrelBase;
+class AOPAG_AccessoryBase;
+class AOPAG_SightBase;
+
+class AOPAG_CharacterBase;
+class AOPAG_Grenade;
+
+class UOPAG_EventManagerSubsystem;
+
+class UKismetSystemLibrary;
+class UDataTable;
+
+UCLASS()
+class OFPLANETSANDGUNS_API AOPAG_ModularGun : public AOPAG_GunBase
+{
+	GENERATED_BODY()
+	
+public:
+	AOPAG_ModularGun();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* Barrel;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* Stock;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* Grip;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* Magazine;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* Sight;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UChildActorComponent* Accessory;
+
+public:
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+    UDataTable* AmmoReloadingMultipliersTable;
+
+private:
+	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
+
+private:
+	TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
+	TSubclassOf<AOPAG_ModuleBase> StandardStock;
+	TSubclassOf<AOPAG_ModuleBase> StandardGrip;
+	TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	virtual void Tick(float DeltaTime) override;
+
+	// Reload system
+	void Reload();
+
+	// Increment ammo system
+	void IncrementAmmo();
+
+	// Module
+	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FGunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
+
+	// Camera behavior
+	UCameraComponent* GetSightCamera();
+protected:
+	// Shoot behavior
+	void ShootThrowable(const FRotator SpawnRotation);
+	void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
+
+	// Shoot utility
+	virtual TArray<AActor*> CheckWhatActorsIgnoreLinetrace() override;
+
+	// Utility for link modules and sockets
+	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const;
+	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
+	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
+	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
+
+	// Create and Attach module behavior
+	void CreateAndAttachAllModules();
+	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
+	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes);
+	void UpdateStats();
+
+	// Ammo behavior
+	void UpdateAmmo();
+	void WaitReloadingTimer();
+	void PopulateAmmoTable();
+};

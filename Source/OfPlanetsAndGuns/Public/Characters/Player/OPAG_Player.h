@@ -10,7 +10,6 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Player.generated.h"
 
-
 class AOPAG_AccessoryBase;
 class UOPAG_AttributeSetBase;
 class UKismetMathLibrary;
@@ -20,12 +19,12 @@ class AOPAG_ModuleBase;
 class USpringArmComponent;
 class UCameraComponent;
 class UChildActorComponent;
-class UEnhancedInputComponent;
 class UInputAction;
 class AOPAG_GunBase;
 class UDataTable;
 class UKismetSystemLibrary;
 class UAbilitySystemComponent;
+class AOPAG_ModularGun;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
@@ -52,7 +51,7 @@ public:
 
 public:
 	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
-	AOPAG_GunBase* PrimaryGun;
+	AOPAG_ModularGun* PrimaryGun;
 
 	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
 	AOPAG_GunBase* CurrentGun;
@@ -177,6 +176,7 @@ private:
 
 	// Guns behavior 
 	void AttachDefaultGuns();
+	const bool IsPrimaryGun() const;
 
 	//Camera behavior
 	void MakingAimCameraRotate();
@@ -240,6 +240,6 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
-
 	void HealthChanged(const FOnAttributeChangeData& Data);
+
 };

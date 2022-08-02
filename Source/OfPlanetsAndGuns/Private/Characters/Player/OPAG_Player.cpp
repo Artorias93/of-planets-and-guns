@@ -19,6 +19,7 @@
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Items/OPAG_Drop.h"
 #include "Components/CapsuleComponent.h"
+#include "Weapons/Guns/OPAG_ModularGun.h"
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -100,6 +101,12 @@ void AOPAG_Player::Tick(float DeltaTime)
 	InteractableObject = CheckLookAtInteractableItems();
 }
 
+void AOPAG_Player::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+}
+
 void AOPAG_Player::BroadEvents()
 {
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
@@ -139,7 +146,7 @@ void AOPAG_Player::InitDefaultValues()
 	if (PrimaryGunComponent->GetChildActor())
 	{
 		CurrentGun = Cast<AOPAG_GunBase>(PrimaryGunComponent->GetChildActor());
-		PrimaryGun = CurrentGun;
+		PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());;
 	}
 	if (Camera)
 	{
@@ -214,44 +221,6 @@ const FVector AOPAG_Player::CalculateThrowForce() const
 }
 #pragma endregion MathematicUtility
 
-#pragma region EnhanchedInput
-void AOPAG_Player::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	/*UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(PlayerInputComponent);
-	check(EIC);
-
-	// All binding events for player's ability
-	EIC->BindAction(InputActions.SwapGun, ETriggerEvent::Started, this, &AOPAG_Player::SwapGuns);
-	EIC->BindAction(InputActions.ReloadGun, ETriggerEvent::Started, this, &AOPAG_Player::ReloadGun);
-	EIC->BindAction(InputActions.Dash, ETriggerEvent::Triggered, this, &AOPAG_Player::ActiveDash);
-	EIC->BindAction(InputActions.GunAbility, ETriggerEvent::Triggered, this, &AOPAG_Player::ActiveGunAbility);
-
-	// All binding events for player's movements
-	EIC->BindAction(InputActions.Move, ETriggerEvent::Triggered, this, &AOPAG_Player::MoveForward);
-	EIC->BindAction(InputActions.Move, ETriggerEvent::Triggered, this, &AOPAG_Player::MoveRight);
-	EIC->BindAction(InputActions.CameraMove, ETriggerEvent::Triggered, this, &AOPAG_Player::Lookup);
-	EIC->BindAction(InputActions.CameraMove, ETriggerEvent::Triggered, this, &AOPAG_Player::Turn);
-	EIC->BindAction(InputActions.Jump, ETriggerEvent::Triggered, this, &AOPAG_Player::Jumping);
-	EIC->BindAction(InputActions.Jump, ETriggerEvent::Canceled, this, &AOPAG_Player::StopJumping);
-
-	// All binding events for shoot
-	EIC->BindAction(InputActions.Shoot, ETriggerEvent::Started, this, &AOPAG_Player::Shoot);
-	EIC->BindAction(InputActions.Shoot, ETriggerEvent::Triggered, this, &AOPAG_Player::Shoot);
-
-	// Binding event for interact with objects
-	EIC->BindAction(InputActions.Interact, ETriggerEvent::Started, this, &AOPAG_Player::InteractWithItem);
-
-	// Binding event for interact with camera ads
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Started, this, &AOPAG_Player::SwitchToADSCamera);
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Completed, this, &AOPAG_Player::ResetFPSCamera);
-
-	// binding event for health 
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Triggered, this, &AOPAG_Player::Health);*/
-}
-#pragma endregion EnhanchedInput
-
 #pragma region Ability
 void AOPAG_Player::InitializeAbilities()
 {
@@ -291,9 +260,10 @@ void AOPAG_Player::ActiveDash()
 
 void AOPAG_Player::ActiveGunAbility()
 {
-	if (AbilitySystemComp && CurrentGun == PrimaryGun && CurrentGun->Accessory->GetChildActor())
+	const bool bIsPrimaryGun = IsPrimaryGun();
+	if (AbilitySystemComp && bIsPrimaryGun && PrimaryGun->Accessory->GetChildActor())
 	{
-		AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(CurrentGun->Accessory->GetChildActor());
+		AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(PrimaryGun->Accessory->GetChildActor());
 		if (Module->Ability)
 		{
 			AbilitySystemComp->TryActivateAbilityByClass(Module->Ability, true);
@@ -322,19 +292,19 @@ void AOPAG_Player::SwapGuns()
 {
 	if (PrimaryGunComponent->GetChildActor() && SecondaryGunComponent->GetChildActor())
 	{
-		AOPAG_GunBase* PrimaryGunPtr = Cast<AOPAG_GunBase>(PrimaryGunComponent->GetChildActor());
 		AOPAG_GunBase* SecondaryGun = Cast<AOPAG_GunBase>(SecondaryGunComponent->GetChildActor());
-		if (CurrentGun == PrimaryGunPtr)
+		const bool bIsPrimaryGun = IsPrimaryGun();
+		if (bIsPrimaryGun)
 		{
-			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
-			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
+			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
+			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
 			CurrentGun = SecondaryGun;
 		}
 		else
 		{
-			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
-			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
-			CurrentGun = PrimaryGunPtr;
+			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
+			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
+			CurrentGun = PrimaryGun;
 		}
 
 		EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
@@ -345,9 +315,10 @@ void AOPAG_Player::SwapGuns()
 void AOPAG_Player::ReloadGun()
 {
 	const bool CheckIsReloading = CurrentGun->bIsReloading;
-	if (!CheckIsReloading)
+	const bool bIsPrimaryGun = IsPrimaryGun();
+	if (!CheckIsReloading && bIsPrimaryGun)
 	{
-		CurrentGun->Reload();
+		PrimaryGun->Reload();
 	}
 }
 
@@ -357,6 +328,12 @@ void AOPAG_Player::IncrementPrimaryGunAmmo()
 	{
 		PrimaryGun->IncrementAmmo();
 	}
+}
+
+const bool AOPAG_Player::IsPrimaryGun() const
+{
+	const bool bResult = (CurrentGun == PrimaryGun) ? true : false;
+	return bResult;
 }
 #pragma endregion Guns
 
@@ -370,7 +347,7 @@ void AOPAG_Player::Shoot()
 		FVector StartLocation;
 		FVector Direction;
 		GetShootingDirection(StartLocation, Direction);
-		CurrentGun->Shoot(StartLocation, Direction);
+		CurrentGun->Shoot(StartLocation, Direction, this);
 		Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 		RecoilTimeline->PlayFromStart();
 
@@ -454,10 +431,11 @@ void AOPAG_Player::SwitchToADSCamera()
 	// Set ADS and initialize new camera view
 	AActor* NewViewTarget = nullptr;
 	bIsInADS = true;
-	if (CurrentGun->Sight->GetChildActor())
+	const bool bIsPrimaryGun = IsPrimaryGun();
+	if (bIsPrimaryGun && PrimaryGun->Sight->GetChildActor())
 	{
-		NewViewTarget = CurrentGun->Sight->GetChildActor();
-		CurrentCamera = CurrentGun->GetSightCamera();
+		NewViewTarget = PrimaryGun->Sight->GetChildActor();
+		CurrentCamera = PrimaryGun->GetSightCamera();
 	}
 	else
 	{
@@ -656,8 +634,6 @@ void AOPAG_Player::RecoilTimelineProgress(float Value)
 	const float GunRecoilInSeconds = CurrentGun->CalculateRateInSeconds(CurrentGun->Stats.RecoilRate);
 	const float RecoilPitch = GunRecoilInSeconds * Value;
 	AddControllerPitchInput(RecoilPitch);
-
-	UE_LOG(LogTemp, Warning, TEXT("%f"), RecoilPitch);
 }
 
 void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -667,7 +643,6 @@ void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 		InventorySystemComp->AnalyzeItem(object);
 	}
 }
-
 #pragma endregion Timeline
 
 #pragma region Health
