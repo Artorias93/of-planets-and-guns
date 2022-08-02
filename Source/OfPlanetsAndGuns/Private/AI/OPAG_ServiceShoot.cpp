@@ -2,7 +2,7 @@
 #include <Kismet/KismetSystemLibrary.h>
 #include "GameFramework/Actor.h"
 //My Classes
-#include "Characters/Enemies/RangedEnemy/OPAG_AICRangedEnemy.h"
+#include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Enemies/RangedEnemy/OPAG_RangedEnemy.h"
 #include "Characters/Player/OPAG_Player.h"
 
@@ -22,7 +22,7 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 
 	if(!bIsAiming)
 	{
-		if (const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
+		if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 		{
 			if (const AOPAG_Player* const FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
@@ -50,7 +50,7 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 //Executed on service activation
 void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
-	if(const AOPAG_AICRangedEnemy* const AIController = Cast<AOPAG_AICRangedEnemy>(OwnerBTComponent.GetAIOwner()))
+	if(const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
 		if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
 		{
