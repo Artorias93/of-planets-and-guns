@@ -55,6 +55,8 @@ public:
 
 private:
 
+	void LoadEnemyLevelData();
+
 	float GaussianProbabilityModifier(float Level) const;
 
 	void GetMappedEnemies(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyProbabilityMap);
@@ -66,6 +68,8 @@ private:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	virtual void InitializeComponent() override;
 
 public:	
 	// Called every frame

@@ -19,6 +19,9 @@ AOPAG_RoomStreamingVolume::AOPAG_RoomStreamingVolume()
 	Volume->SetWorldScale3D(FVector::OneVector * 20.f);
 	Volume->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_RoomStreamingVolume::OnOverlapBegin);
 	Volume->OnComponentEndOverlap.AddDynamic(this, &AOPAG_RoomStreamingVolume::OnOverlapEnd);
+	Volume->SetCanEverAffectNavigation(false);
+
+	bGenerateOverlapEventsDuringLevelStreaming = true;
 }
 
 // Called when the game starts or when spawned

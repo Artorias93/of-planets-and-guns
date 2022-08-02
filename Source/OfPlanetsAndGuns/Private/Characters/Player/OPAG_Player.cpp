@@ -548,7 +548,7 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 		const bool bActorImplementsInterface = OutHits[0].GetActor()->GetClass()->
 		ImplementsInterface(UOPAG_InteractableInterface::StaticClass());
 		if (bActorImplementsInterface)
-		{	
+		{
 			return OutHits[0].GetActor();
 		}
 	}
