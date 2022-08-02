@@ -21,6 +21,7 @@
 #include "Items/OPAG_Drop.h"
 #include "Components/CapsuleComponent.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
+#include "Characters/Player/OPAG_PlayerState.h"
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -86,8 +87,8 @@ void AOPAG_Player::BeginPlay()
 	InitRecoilTimeline();
 	AttachDefaultGuns();
 
-	BroadEvents();
 	BindEvents();
+	BroadcastEvents();
 }
 
 void AOPAG_Player::Tick(float DeltaTime)
@@ -110,15 +111,21 @@ void AOPAG_Player::SetupPlayerInputComponent(class UInputComponent* PlayerInputC
 
 }
 
-void AOPAG_Player::BroadEvents()
+void AOPAG_Player::BroadcastEvents()
 {
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 	EMS->DashAmountChanged.Broadcast(DashCount);
+	EMS->RequestPlayerState.Broadcast();
 }
 
 void AOPAG_Player::BindEvents() 
 {
+	EMS->RequestSavePlayerState.AddDynamic(this, &AOPAG_Player::SavePlayerState);
+	EMS->ApplyPlayerState.AddDynamic(this, &AOPAG_Player::ApplyPlayerState);
+
+	
+
 	// Enhanced
 	EMS->MoveForward.AddDynamic(this, &AOPAG_Player::MoveForward);
 	EMS->MoveRight.AddDynamic(this, &AOPAG_Player::MoveRight);
@@ -263,7 +270,7 @@ void AOPAG_Player::ActiveDash()
 
 void AOPAG_Player::ActiveGunAbility()
 {
-	const bool bIsPrimaryGun = IsPrimaryGun();
+	const bool bIsPrimaryGun = IsPrimaryGunActive();
 	if (AbilitySystemComp && bIsPrimaryGun && PrimaryGun->Accessory->GetChildActor())
 	{
 		AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(PrimaryGun->Accessory->GetChildActor());
@@ -296,7 +303,7 @@ void AOPAG_Player::SwapGuns()
 	if (PrimaryGunComponent->GetChildActor() && SecondaryGunComponent->GetChildActor())
 	{
 		AOPAG_GunBase* SecondaryGun = Cast<AOPAG_GunBase>(SecondaryGunComponent->GetChildActor());
-		const bool bIsPrimaryGun = IsPrimaryGun();
+		const bool bIsPrimaryGun = IsPrimaryGunActive();
 		if (bIsPrimaryGun)
 		{
 			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
@@ -318,7 +325,7 @@ void AOPAG_Player::SwapGuns()
 void AOPAG_Player::ReloadGun()
 {
 	const bool CheckIsReloading = CurrentGun->bIsReloading;
-	const bool bIsPrimaryGun = IsPrimaryGun();
+	const bool bIsPrimaryGun = IsPrimaryGunActive();
 	if (!CheckIsReloading && bIsPrimaryGun)
 	{
 		PrimaryGun->Reload();
@@ -334,10 +341,9 @@ void AOPAG_Player::IncrementPrimaryGunAmmo()
 	}
 }
 
-const bool AOPAG_Player::IsPrimaryGun() const
+const bool AOPAG_Player::IsPrimaryGunActive() const
 {
-	const bool bResult = (CurrentGun == PrimaryGun) ? true : false;
-	return bResult;
+	return CurrentGun == PrimaryGun;
 }
 #pragma endregion Guns
 
@@ -435,7 +441,7 @@ void AOPAG_Player::SwitchToADSCamera()
 	// Set ADS and initialize new camera view
 	AActor* NewViewTarget = nullptr;
 	bIsInADS = true;
-	const bool bIsPrimaryGun = IsPrimaryGun();
+	const bool bIsPrimaryGun = IsPrimaryGunActive();
 	if (bIsPrimaryGun && PrimaryGun->Sight->GetChildActor())
 	{
 		NewViewTarget = PrimaryGun->Sight->GetChildActor();
@@ -656,6 +662,59 @@ void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 		InventorySystemComp->AnalyzeItem(object);
 	}
 }
+
+void AOPAG_Player::SavePlayerState()
+{
+	FOPAG_PlayerState NewState;
+
+
+	NewState.Health = GetHealth();
+	NewState.DashCount = DashCount;
+	NewState.GoldAmount = InventorySystemComp->GoldAmount;
+	NewState.BoltsAmount = InventorySystemComp->BoltsAmount;
+	NewState.PotionsAmount = InventorySystemComp->PotionsAmount;
+	NewState.bIsPrimaryActive = IsPrimaryGunActive();
+
+
+	PrimaryGun->GetCurrentState(NewState.PrimaryGun);
+
+	EMS->SavePlayerState.Broadcast(NewState);
+}
+
+void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
+{
+	if (StateToApply.Health <= 0.f) return;
+
+	SetHealth(StateToApply.Health);
+	DashCount = StateToApply.DashCount;
+	InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
+	InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
+	InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
+	EMS->DashAmountChanged.Broadcast(DashCount);
+
+	if (StateToApply.PrimaryGun.GunClass)
+	{
+		PrimaryGunComponent->SetChildActorClass(StateToApply.PrimaryGun.GunClass);
+		if (PrimaryGunComponent->GetChildActor())
+		{
+			SwapGuns();
+
+			PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());;
+			PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
+			PrimaryGun->AmmoCurrent = StateToApply.PrimaryGun.AmmoCurrent;
+			PrimaryGun->AmmoMax = StateToApply.PrimaryGun.AmmoMax;
+			AttachDefaultGuns();
+
+			if (StateToApply.bIsPrimaryActive) SwapGuns();
+
+
+			EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
+			EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
+		}
+	}
+
+}
+
 #pragma endregion Timeline
 
 #pragma region Health

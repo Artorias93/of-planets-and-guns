@@ -6,6 +6,7 @@
 #include "InputActionValue.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
+#include "Characters/Player/OPAG_PlayerState.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
 class AOPAG_RoomStreamingVolume;
@@ -27,6 +28,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLeftRoomStreamingVolume);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLoadingProgress, float, Percent);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestSavePlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestPlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSavePlayerState, FOPAG_PlayerState, PlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FApplyPlayerState, const FOPAG_PlayerState&, PlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
@@ -92,6 +97,14 @@ public:
 		FLoadingProgress LoadingProgress;
 
 	//Player stuff
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FRequestSavePlayerState RequestSavePlayerState;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FRequestPlayerState RequestPlayerState;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FSavePlayerState SavePlayerState;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FApplyPlayerState ApplyPlayerState;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FHealthChanged HealthChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)

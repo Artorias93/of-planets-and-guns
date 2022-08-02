@@ -62,7 +62,13 @@ void AOPAG_ModularGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CreateAndAttachAllModules();
+	FOPAG_GunModules StandardModules;
+	StandardModules.Barrel = StandardBarrel;
+	StandardModules.Stock = StandardStock;
+	StandardModules.Grip = StandardGrip;
+	StandardModules.Magazine = StandardMagazine;
+
+	CreateAndAttachAllModules(StandardModules);
 	PopulateAmmoTable();
 }
 
@@ -166,6 +172,20 @@ UCameraComponent* AOPAG_ModularGun::GetSightCamera()
 	}
 	return nullptr;
 }
+
+void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState)
+{
+	GunState.GunClass = GetClass();
+
+	GunState.AttachedModules.Barrel = Barrel->GetChildActorClass();
+	GunState.AttachedModules.Stock = Stock->GetChildActorClass();
+	GunState.AttachedModules.Grip = Grip->GetChildActorClass();
+	GunState.AttachedModules.Sight = Sight->GetChildActorClass();
+	GunState.AttachedModules.Accessory = Accessory->GetChildActorClass();
+
+	GunState.AmmoCurrent = AmmoCurrent;
+	GunState.AmmoMax = AmmoMax;
+}
 #pragma endregion GET
 
 #pragma region Shoot Behavior
@@ -235,12 +255,14 @@ TArray<AActor*> AOPAG_ModularGun::CheckWhatActorsIgnoreLinetrace()
 #pragma endregion Shoot Utility
 
 #pragma region Create and Attach Modules
-void AOPAG_ModularGun::CreateAndAttachAllModules()
+void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules)
 {
-	CreateModule(Barrel, StandardBarrel);
-	CreateModule(Stock, StandardStock);
-	CreateModule(Grip, StandardGrip);
-	CreateModule(Magazine, StandardMagazine);
+	if (Modules.Barrel) CreateModule(Barrel, Modules.Barrel);
+	if (Modules.Stock) CreateModule(Stock, Modules.Stock);
+	if (Modules.Grip) CreateModule(Grip, Modules.Grip);
+	if (Modules.Magazine) CreateModule(Magazine, Modules.Magazine);
+	if (Modules.Sight) CreateModule(Sight, Modules.Sight);
+	if (Modules.Accessory) CreateModule(Accessory, Modules.Accessory);
 
 	// Update Stats
 	UpdateStats();

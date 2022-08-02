@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/Player/OPAG_PlayerState.h"
 #include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
 #include "StageManager/OPAG_StageGeneration.h"
@@ -18,11 +19,14 @@ class OFPLANETSANDGUNS_API UOPAG_GameInstance : public UGameInstance
 	GENERATED_BODY()
 
 	float StageDifficulty;
+	EStageType NextStage;
 	TArray<FOPAG_StageGeneration*> StageGens;
 	TArray<FOPAG_StageGeneration*> BossStages;
 	TArray<FOPAG_StageGeneration*> SafeStages;
 	int32 CurrentStage;
 	uint8 bNextStageIsSafe : 1;
+
+	FOPAG_PlayerState PlayerState;
 
 public:
 
@@ -46,7 +50,9 @@ public:
 		void StartStage(const EStageType StageType);
 
 	UFUNCTION(BlueprintCallable)
-		void SavePlayerState();
+		void SavePlayerState(FOPAG_PlayerState NewPlayerState);
+	UFUNCTION(BlueprintCallable)
+		void SendPlayerState();
 
 	UFUNCTION()
 		void OnStageManagerReady();

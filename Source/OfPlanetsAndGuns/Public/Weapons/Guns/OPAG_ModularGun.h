@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OPAG_GunState.h"
 #include "Weapons/Guns/OPAG_GunBase.h"
 #include "OPAG_ModularGun.generated.h"
 
@@ -79,10 +80,15 @@ public:
 	void IncrementAmmo();
 
 	// Module
+	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules);
 	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
 
 	// Camera behavior
 	UCameraComponent* GetSightCamera();
+
+	void GetCurrentState(FOPAG_GunState& GunState);
+
+
 protected:
 	// Shoot behavior
 	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
@@ -98,7 +104,6 @@ protected:
 	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
 	// Create and Attach module behavior
-	void CreateAndAttachAllModules();
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
 	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes);
 	void UpdateStats();
