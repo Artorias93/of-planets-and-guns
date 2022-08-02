@@ -3,6 +3,9 @@
 #include "UObject/ConstructorHelpers.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include <Engine/DataTable.h>
+#include "OPAG_GunStats.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_GunBase.generated.h"
 
 class USkeletalMeshComponent;
@@ -20,44 +23,12 @@ class AOPAG_SightBase;
 class AOPAG_CharacterBase;
 class AOPAG_Grenade;
 
+class UOPAG_EventManagerSubsystem;
+
 class UKismetSystemLibrary;
+class UDataTable;
 
-UENUM(BlueprintType, meta = (Bitflags))
-enum class EFireTypes : uint8
-{
-	FullyAutomatic = 0x00,
-	SingleShot = 0x01,
-	Burst3 = 0x02,
-	Shotgun = 0x03,
-};
-ENUM_CLASS_FLAGS(EFireTypes);
 
-USTRUCT(BlueprintType)
-struct FGunStats
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Damage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float FireRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Accuracy;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float RecoilRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ReloadingTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int ClipSize;
-
-	FGunStats() : Damage(0), FireRate(0), Accuracy(0), RecoilRate(0), ReloadingTime(0), ClipSize(0) {}
-};
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_GunBase : public AActor
@@ -73,33 +44,15 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* ADSCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Barrel;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Stock;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Grip;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Magazine;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Sight;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Accessory;
-
 public:
-	UPROPERTY(Category = "Gun", VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "Gun", EditDefaultsOnly, BlueprintReadWrite)
 	FName Name;
 
 	UPROPERTY(Category = "Gun", EditDefaultsOnly, BlueprintReadWrite)
-	EFireTypes Type;
+	EFireTypes FireType;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
-	FGunStats Stats;
+	FOPAG_GunStats Stats;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	int AmmoCurrent = 0;
@@ -131,13 +84,10 @@ public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
-private:
-	TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
-	TSubclassOf<AOPAG_ModuleBase> StandardStock;
-	TSubclassOf<AOPAG_ModuleBase> StandardGrip;
-	TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
+protected:
+	UOPAG_EventManagerSubsystem* EMS;
 
-private:
+protected:
 	FTimerHandle ResetShootHandle;
 	FTimerHandle ReloadHandle;
 
@@ -151,28 +101,13 @@ public:
 	const float CalculateRateInSeconds(const float FireRate);
 
 	// Main system for shooting
-	void Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
-
-	// Reload system
-	void Reload();
+	virtual void Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
 
 	// Camera behavior
-	UCameraComponent* GetSightCamera();
 	UCameraComponent* GetADSCamera();
-
-	// Module
-	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FGunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
-private:
-	// Utility for link modules and sockets
-	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const; 
-	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
-	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
-	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
-
+protected:
 	// Main system for shooting
-	void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
-	void ShootThrowable(const FRotator SpawnRotation);
-	void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
+	virtual void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
 	void ResetShootTimer();
 
 	// Subsystem for shooting
@@ -181,14 +116,5 @@ private:
 	const FVector2D CalculateRandPointInCircle();
 	const FVector ApplyNoise(const FVector Direction);
 	const FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction);
-	TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
-	
-	// Ammo behavior
-	void UpdateAmmo();
-	void WaitReloadingTimer();
-
-	// Create and Attach module behavior
-	void CreateAndAttachAllModules();
-	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
-	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FGunStats NewModuleStats, const int NewModuleEquippableFireTypes);
+	virtual TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
 };

@@ -10,7 +10,6 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Player.generated.h"
 
-
 class AOPAG_AccessoryBase;
 class UOPAG_AttributeSetBase;
 class UKismetMathLibrary;
@@ -20,41 +19,12 @@ class AOPAG_ModuleBase;
 class USpringArmComponent;
 class UCameraComponent;
 class UChildActorComponent;
-class UEnhancedInputComponent;
 class UInputAction;
 class AOPAG_GunBase;
 class UDataTable;
 class UKismetSystemLibrary;
 class UAbilitySystemComponent;
-
-USTRUCT(BlueprintType)
-struct FInputActions
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly) UInputAction* Move;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* CameraMove;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Jump;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Shoot;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* SwapGun;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* ReloadGun;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Interact;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* ADS;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Health;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Dash;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* GunAbility;
-};
+class AOPAG_ModularGun;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
@@ -63,6 +33,9 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 	
 public:
 	AOPAG_Player();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
+	class UOPAG_InventorySystemComponent* InventorySystemComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
@@ -77,14 +50,8 @@ public:
 	UChildActorComponent* SecondaryGunComponent;
 
 public:
-	UPROPERTY(Category = "Enhanced Input", EditDefaultsOnly, BlueprintReadWrite)
-	FInputActions InputActions;
-
-	UPROPERTY(Category = "Enhanced Input", EditDefaultsOnly, BlueprintReadWrite)
-	UInputMappingContext* InputMappingContext;
-
 	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
-	AOPAG_GunBase* PrimarytGun;
+	AOPAG_ModularGun* PrimaryGun;
 
 	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
 	AOPAG_GunBase* CurrentGun;
@@ -194,6 +161,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	// Events system
+	void BroadEvents();
+	void BindEvents();
+
 	// Init standard values
 	void InitDefaultValues();
 	void InitADSTimeline();
@@ -208,8 +179,7 @@ private:
 
 	// Guns behavior 
 	void AttachDefaultGuns();
-	void SwapGuns();
-	void ReloadGun();
+	const bool IsPrimaryGun() const;
 
 	//Camera behavior
 	void MakingAimCameraRotate();
@@ -237,21 +207,27 @@ public:
 
 	UFUNCTION() void Turn(const FInputActionValue& Value);
 
-	UFUNCTION() void Jumping(const FInputActionValue& Value);
+	UFUNCTION() void Jumping();
 
-	UFUNCTION() void Shoot(const FInputActionValue& Value);
+	UFUNCTION() void Shoot();
 
-	UFUNCTION() void InteractWithItem(const FInputActionValue& Value);
+	UFUNCTION() void SwapGuns();
 
-	UFUNCTION() void SwitchToADSCamera(const FInputActionValue& Value);
+	UFUNCTION() void ReloadGun();
 
-	UFUNCTION() void ResetFPSCamera(const FInputActionValue& Value);
+	UFUNCTION() void InteractWithItem();
 
-	UFUNCTION() void Health(const FInputActionValue& Value);
+	UFUNCTION() void SwitchToADSCamera();
 
-	UFUNCTION() void ActiveDash(const FInputActionValue& Value);
+	UFUNCTION() void ResetFPSCamera();
 
-	UFUNCTION() void ActiveGunAbility(const FInputActionValue& Value);
+	UFUNCTION() void Health();
+
+	UFUNCTION() void ActiveDash();
+
+	UFUNCTION() void ActiveGunAbility();
+
+	UFUNCTION() void IncrementPrimaryGunAmmo();
 
 public:
 	UFUNCTION() void ADSTimelineProgress(float Value);
@@ -261,7 +237,12 @@ public:
 	UFUNCTION() void RecoilTimelineProgress(float Value);
 
 public:
-	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
+			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+public:
+	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
 	void HealthChanged(const FOnAttributeChangeData& Data);
+
 };

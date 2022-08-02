@@ -7,6 +7,7 @@
 #include "UI/OPAG_UWPlayerStatsView.h"
 #include "UI/OPAG_UWPauseView.h"
 #include "UI/OPAG_UWLoadingScreenView.h"
+#include "UI/OPAG_UWModuleCompareView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 
@@ -22,6 +23,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
 		EMS->LoadingProgress.AddDynamic(this, &AOPAG_GameplayHUD::UpdateLoadingScreenBar);
 		EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
+		EMS->LookedAtModule.AddDynamic(this, &AOPAG_GameplayHUD::ShowModuleCompareView);
 	}
 }
 
@@ -70,6 +72,11 @@ void AOPAG_GameplayHUD::BeginPlay()
 	if (PauseViewWidgetClass)
 	{
 		PauseViewWidget = CreateWidget<UOPAG_UWPauseView>(GetWorld(), PauseViewWidgetClass);
+	}
+
+	if (ModuleCompareViewWidgetClass)
+	{
+		ModuleCompareViewWidget = CreateWidget<UOPAG_UWModuleCompareView>(GetWorld(), ModuleCompareViewWidgetClass);
 	}
 }
 
@@ -122,4 +129,15 @@ void AOPAG_GameplayHUD::HideLoadingScreenView()
 	if (LoadingScreenViewWidget) {
 		LoadingScreenViewWidget->RemoveFromViewport();
 	}
+}
+
+void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats& CurrentModule, const FOPAG_GunStats& OtherModule,
+	const FString CurrentModuleName, const EModuleRarity CurrentModuleRarity, const FString OtherModuleName, const EModuleRarity OtherModuleRarity)
+{
+	if (ModuleCompareViewWidget) {
+		ModuleCompareViewWidget->AddToViewport(2);
+		//MCVW->DoStuff();
+	}
+
+	//Updatare la UI con i valori delle stats etc.
 }

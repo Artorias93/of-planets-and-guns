@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Weapons/Guns/OPAG_GunStats.h"
 #include "OPAG_GameplayHUD.generated.h"
 
 /**
  * 
  */
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_GameplayHUD : public AHUD
 {
@@ -39,6 +41,10 @@ private:
 		class UOPAG_UWLoadingScreenView* LoadingScreenViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWLoadingScreenView> LoadingScreenViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWModuleCompareView* ModuleCompareViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWModuleCompareView> ModuleCompareViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
@@ -53,4 +59,8 @@ public:
 	void ShowLoadingScreenView();
 	UFUNCTION()
 	void HideLoadingScreenView();
+	UFUNCTION()
+	void ShowModuleCompareView(const FOPAG_GunStats& CurrentModule, const FOPAG_GunStats& OtherModule,
+			const FString CurrentModuleName, const EModuleRarity CurrentModuleRarity, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
+	
 };
