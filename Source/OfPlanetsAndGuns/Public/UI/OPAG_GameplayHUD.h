@@ -59,7 +59,7 @@ public:
 	UFUNCTION()
 	void HideLoadingScreenView();
 	UFUNCTION()
-	void ShowModuleCompareView(const FOPAG_GunStats& CurrentModule, const FOPAG_GunStats& OtherModule,
+	void ShowModuleCompareView(const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule,
 			const FString CurrentModuleName, const EModuleRarity CurrentModuleRarity, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
 	
 };

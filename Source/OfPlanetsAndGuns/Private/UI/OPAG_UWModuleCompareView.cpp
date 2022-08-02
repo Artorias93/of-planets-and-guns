@@ -9,7 +9,7 @@
 
 void UOPAG_UWModuleCompareView::NativeConstruct()
 {
-
+	Super::NativeConstruct();
 }
 
 void UOPAG_UWModuleCompareView::UpdateModulesValues(const FOPAG_GunStats& CurrentModule, const FOPAG_GunStats& OtherModule,

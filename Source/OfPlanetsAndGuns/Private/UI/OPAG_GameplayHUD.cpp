@@ -132,7 +132,7 @@ void AOPAG_GameplayHUD::HideLoadingScreenView()
 	}
 }
 
-void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats& CurrentModule, const FOPAG_GunStats& OtherModule,
+void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule,
 	const FString CurrentModuleName, const EModuleRarity CurrentModuleRarity, const FString OtherModuleName, const EModuleRarity OtherModuleRarity)
 {
 	if (ModuleCompareViewWidget) {

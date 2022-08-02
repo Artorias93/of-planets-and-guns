@@ -8,7 +8,7 @@
 
 void UOPAG_ModuleViewUW::NativeConstruct()
 {
-
+	Super::NativeConstruct();
 }
 
 void UOPAG_ModuleViewUW::UpdateModuleValues(const FOPAG_GunStats& Stats, const FString Name, const EModuleRarity Rarity)
