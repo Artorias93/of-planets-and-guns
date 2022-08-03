@@ -70,5 +70,4 @@ public:
 	void NativeConstruct();
 
 	void UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float BaseAmount, float OldValue, float NewValue);
-
 };

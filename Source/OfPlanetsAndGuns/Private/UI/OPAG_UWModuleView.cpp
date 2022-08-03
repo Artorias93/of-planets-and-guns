@@ -5,7 +5,6 @@
 #include "Weapons/Guns/OPAG_GunBase.h"
 #include "Components/TextBlock.h"
 
-
 void UOPAG_UWModuleView::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -16,16 +15,6 @@ void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& GunStats, cons
 {
 	ModuleName->SetText(FText::FromString(OtherModuleName));
 	ModuleRarity->SetText(FText::FromString("No Method - Do it"));
-	/*
-
-	DamageAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.Damage)));
-	//DoStuff(DamageAmount, GunStats.Damage, CurrentStats.Damage, Stats.Damage);
-	FireRateAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.FireRate)));
-	AccuracyAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.Accuracy)));
-	RecoilAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.RecoilRate)));
-	ReloadingAmount->SetText(FText::FromString(FString::SanitizeFloat(Stats.ReloadingTime)));
-	ClipSizeAmount->SetText(FText::FromString(FString::FromInt(Stats.ClipSize)));
-	*/
 
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, CurrentModuleStats.Damage, OtherModuleStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);

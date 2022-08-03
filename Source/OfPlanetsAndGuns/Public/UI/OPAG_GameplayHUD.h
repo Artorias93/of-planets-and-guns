@@ -53,13 +53,16 @@ public:
 	void ShowPauseView();
 	UFUNCTION()
 	void HidePauseView();
+
 	UFUNCTION()
 	void UpdateLoadingScreenBar(float Percentage);
 	UFUNCTION()
 	void ShowLoadingScreenView();
 	UFUNCTION()
 	void HideLoadingScreenView();
+
 	UFUNCTION()
 	void ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
-	
+	UFUNCTION()
+	void HideModuleCompareView();
 };

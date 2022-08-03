@@ -36,6 +36,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FLookedAtModule, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, CurrentModule, const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
@@ -108,6 +109,8 @@ public:
 		FAmmoPickedUp AmmoPickedUp;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
 		FLookedAtModule LookedAtModule;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FUnlookedAtModule UnlookedAtModule;
 	
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
