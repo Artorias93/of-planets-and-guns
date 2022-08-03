@@ -14,6 +14,7 @@
 class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomManager;
 class AOPAG_Enemy;
+class AOPAG_ZiplineSupport;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageManagerReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneration, StageGenData);
@@ -41,6 +42,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FZiplineActivated, const AOPAG_ZiplineSupport* const, ZiplineSupport);
+
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
@@ -100,4 +103,8 @@ public:
 		FStartRun StartRun;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FQuitGame QuitGame;
+
+	//interactable stuff
+	//UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Interactable)
+		//FZiplineActivated ZiplineActivated;
 };

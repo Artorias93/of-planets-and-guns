@@ -4,15 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "../Interactables/OPAG_InteractableInterface.h"
 #include "OPAG_ZiplineSupport.h"
-#include "../../../../../../../../../../Program Files/Epic Games/UE_4.27/Engine/Plugins/Runtime/CableComponent/Source/CableComponent/Classes/CableComponent.h"
-#include "../Characters/Player/OPAG_Player.h"
+#include "CableComponent.h"
+#include "Characters/Player/OPAG_Player.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "OPAG_Zipline.generated.h"
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_Zipline : public AActor, public IOPAG_InteractableInterface
+class OFPLANETSANDGUNS_API AOPAG_Zipline : public AActor , public IOPAG_InteractableInterface
 {
 	GENERATED_BODY()
 	
@@ -23,11 +22,35 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Zipline")
 		USceneComponent* Root;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Zipline | Supports")
-		AOPAG_ZiplineSupport *  PointA;
+	UPROPERTY(EditAnyWhere, BLueprintReadWrite, Category = "ZiplineSupport | Point A")
+		USceneComponent* PointA;
 
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Zipline | Supports")
-		AOPAG_ZiplineSupport* PointB;
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "ZiplineSupport | Point A")
+		UStaticMeshComponent* SupportMeshA;
+
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "ZiplineSupport | Point A")
+		UBoxComponent* InteractableAreaA;
+
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "ZiplineSupport | Point A")
+		USceneComponent* CableAttachPointA;
+
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "ZiplineSupport | Point A")
+		USceneComponent* PlayerAttachPointA;
+
+	UPROPERTY(EditAnyWhere, BLueprintReadWrite, Category = "ZiplineSupport | Point B")
+		USceneComponent* PointB;
+
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "ZiplineSupport | Point B")
+		UStaticMeshComponent* SupportMeshB;
+
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "ZiplineSupport | Point B")
+		UBoxComponent* InteractableAreaB;
+
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "ZiplineSupport | Point B")
+		USceneComponent* CableAttachPointB;
+
+	UPROPERTY(EditDefaultsOnly, BLueprintReadWrite, Category = "ZiplineSupport | Point B")
+		USceneComponent* PlayerAttachPointB;
 	
 	UPROPERTY(BlueprintReadOnly , Category = "Zipline")
 		UCableComponent* Cable;
@@ -39,7 +62,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void Interact();
 	virtual void Interact_Implementation() override;
@@ -50,16 +73,16 @@ public:
 
 private: 
 	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline" , meta = (AllowPrivateAccess = "true"))
-		uint8 bCanPlayerInteract : 1;
+		USceneComponent* StartingPoint;
 
-	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline | Supports" , meta = (AllowPrivateAccess = "true"))
-		AOPAG_ZiplineSupport* StartingPoint;
+	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline", meta = (AllowPrivateAccess = "true"))
+		USceneComponent* EndingPoint;
 
-	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline | Supports", meta = (AllowPrivateAccess = "true"))
-		AOPAG_ZiplineSupport* EndingPoint;
-
-	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline | Supports" , meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline" , meta = (AllowPrivateAccess = "true"))
 		AOPAG_Player* PlayerRef;
+
+	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline", meta = (AllowPrivateAccess = "true"))
+		uint8 bCanPlayerInteract : 1;
 
 	UFUNCTION(BlueprintCallable)
 		void SetUpZipline();
@@ -75,5 +98,5 @@ private:
 
 	UFUNCTION()
 		void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
+	
 };

@@ -2,6 +2,8 @@
 
 
 #include "Environment/OPAG_ZiplineSupport.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
 
 // Sets default values
 AOPAG_ZiplineSupport::AOPAG_ZiplineSupport()
@@ -34,4 +36,5 @@ void AOPAG_ZiplineSupport::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
 

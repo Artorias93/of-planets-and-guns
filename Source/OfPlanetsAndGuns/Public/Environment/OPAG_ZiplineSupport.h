@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
+#include "Interactables/OPAG_InteractableInterface.h"
 #include "OPAG_ZiplineSupport.generated.h"
 
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_ZiplineSupport : public AActor
+class OFPLANETSANDGUNS_API AOPAG_ZiplineSupport : public AActor , public IOPAG_InteractableInterface
 {
 	GENERATED_BODY()
 
@@ -39,5 +40,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 
 };
