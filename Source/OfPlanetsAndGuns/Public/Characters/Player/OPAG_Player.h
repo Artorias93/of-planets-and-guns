@@ -215,7 +215,7 @@ public:
 
 	UFUNCTION() void ResetFPSCamera();
 
-	UFUNCTION() void Health();
+	UFUNCTION() void UsePotion();
 
 	UFUNCTION() void ActiveDash();
 

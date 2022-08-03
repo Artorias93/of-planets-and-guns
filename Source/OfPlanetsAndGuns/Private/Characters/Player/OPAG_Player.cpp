@@ -139,7 +139,7 @@ void AOPAG_Player::BindEvents()
 	EMS->InteractWithItem.AddDynamic(this, &AOPAG_Player::InteractWithItem);
 	EMS->SwitchToADSCamera.AddDynamic(this, &AOPAG_Player::SwitchToADSCamera);
 	EMS->ResetFPSCamera.AddDynamic(this, &AOPAG_Player::ResetFPSCamera);
-	EMS->Health.AddDynamic(this, &AOPAG_Player::Health);
+	EMS->UsePotion.AddDynamic(this, &AOPAG_Player::UsePotion);
 	EMS->ActiveDash.AddDynamic(this, &AOPAG_Player::ActiveDash);
 	EMS->ActiveGunAbility.AddDynamic(this, &AOPAG_Player::ActiveGunAbility);
 
@@ -386,19 +386,19 @@ void AOPAG_Player::GetShootingDirection(FVector& OutStartLocation, FVector& OutD
 #pragma region Movement Input
 void AOPAG_Player::MoveForward(const FInputActionValue& Value)
 {
-	const float MoveForwardScale = Value[1];
-	if (MoveForwardScale != 0.0f)
+	AxisY = Value[1];
+	if (AxisY != 0.0f)
 	{
-		AddMovementInput(GetActorForwardVector(), MoveForwardScale);
+		AddMovementInput(GetActorForwardVector(), AxisY);
 	}
 }
 
 void AOPAG_Player::MoveRight(const FInputActionValue& Value)
 {
-	const float MoveRightScale = Value[0];
-	if (MoveRightScale != 0.0f)
+	AxisX = Value[0];
+	if (AxisX != 0.0f)
 	{
-		AddMovementInput(GetActorRightVector(), MoveRightScale);
+		AddMovementInput(GetActorRightVector(), AxisX);
 	}
 }
 
@@ -604,13 +604,14 @@ void AOPAG_Player::ThrowScrap(UPrimitiveComponent* Target)
 #pragma endregion LookAtInteractable
 
 #pragma region Others Input
-void AOPAG_Player::Health()
+void AOPAG_Player::UsePotion()
 {
 	if (PotionCount > 0 && AbilitySystemComp)
 	{
 		const bool bSuccess = AbilitySystemComp->TryActivateAbilityByClass(HealthPotion, true);
 		if (bSuccess)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("%f"), GetHealth());
 			PotionCount--;
 		}
 	}

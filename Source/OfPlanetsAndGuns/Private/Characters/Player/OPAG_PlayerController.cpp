@@ -57,7 +57,7 @@ void AOPAG_PlayerController::SetupInputComponent()
 	EIC->BindAction(InputActions.ADS, ETriggerEvent::Completed, this, &AOPAG_PlayerController::ResetFPSCamera);
 
 	// binding event for health 
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Health);
+	EIC->BindAction(InputActions.UsePotion, ETriggerEvent::Started, this, &AOPAG_PlayerController::UsePotion);
 }
 
 void AOPAG_PlayerController::MoveForward(const FInputActionValue& Value)
@@ -120,9 +120,9 @@ void AOPAG_PlayerController::ResetFPSCamera()
 	EMS->ResetFPSCamera.Broadcast();
 }
 
-void AOPAG_PlayerController::Health()
+void AOPAG_PlayerController::UsePotion()
 {
-	EMS->Health.Broadcast();
+	EMS->UsePotion.Broadcast();
 }
 
 void AOPAG_PlayerController::ActiveDash()

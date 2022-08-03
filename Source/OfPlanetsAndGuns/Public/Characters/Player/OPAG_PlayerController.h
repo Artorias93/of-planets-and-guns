@@ -31,7 +31,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly) UInputAction* ADS;
 
-	UPROPERTY(EditDefaultsOnly) UInputAction* Health;
+	UPROPERTY(EditDefaultsOnly) UInputAction* UsePotion;
 
 	UPROPERTY(EditDefaultsOnly) UInputAction* Dash;
 
@@ -84,7 +84,7 @@ public:
 
 	UFUNCTION() void ResetFPSCamera();
 
-	UFUNCTION() void Health();
+	UFUNCTION() void UsePotion();
 
 	UFUNCTION() void ActiveDash();
 

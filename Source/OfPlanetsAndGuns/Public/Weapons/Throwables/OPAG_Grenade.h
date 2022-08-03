@@ -38,6 +38,9 @@ public:
 	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadOnly)
 		float Damage = 0;
 
+	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadOnly)
+		FVector ImpactPoint = FVector::ZeroVector;
+
 protected:
 	virtual void BeginPlay() override;
 

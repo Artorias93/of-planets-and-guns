@@ -62,7 +62,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractWithItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwitchToADSCamera);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetFPSCamera);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUsePotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
 
@@ -180,7 +180,7 @@ public:
 		FResetFPSCamera ResetFPSCamera;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
-		FHealth Health;
+		FUsePotion UsePotion;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FActiveDash ActiveDash;
