@@ -6,24 +6,17 @@
 
 UOPAG_HealthPotionEffect::UOPAG_HealthPotionEffect()
 {
-	DurationPolicy = EGameplayEffectDurationType::Instant;
-	FScalableFloat HealthScalableFloat;
-	HealthScalableFloat.SetValue(.25f);
-	FGameplayEffectModifierMagnitude HealthMagnitude(HealthScalableFloat);
+	DurationPolicy = EGameplayEffectDurationType::HasDuration;
+
+	FGameplayEffectModifierMagnitude HealthMagnitude(FScalableFloat(.25f));
 	DurationMagnitude = HealthMagnitude;
+
 	FGameplayModifierInfo ModifierInfo;
-	ModifierInfo.Attribute = UOPAG_AttributeSetBase::GetHealthAttribute();
+	ModifierInfo.Attribute.SetUProperty(UOPAG_AttributeSetBase::GetHealthAttribute().GetUProperty());
 	ModifierInfo.ModifierOp = EGameplayModOp::Additive;
-
-	FScalableFloat ModifierScalableFloat;
-	ModifierScalableFloat.SetValue(50.f);
-	ModifierInfo.Magnitude = ModifierScalableFloat;
-
+	ModifierInfo.ModifierMagnitude = FScalableFloat(5.f);
 	Modifiers.Add(ModifierInfo);
 
-	FScalableFloat PeriodScalableFloat;
-	PeriodScalableFloat.SetValue(.025f);
-	Period = PeriodScalableFloat;
+	Period = FScalableFloat(.025f);
 	bExecutePeriodicEffectOnApplication = false;
-	
 }

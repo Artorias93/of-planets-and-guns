@@ -15,7 +15,7 @@ class OFPLANETSANDGUNS_API UOPAG_HealthPotion : public UOPAG_GameplayAbilityBase
 	GENERATED_BODY()
 public: 
 	UOPAG_HealthPotion(const FObjectInitializer& ObjectInitializer);
+
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 };

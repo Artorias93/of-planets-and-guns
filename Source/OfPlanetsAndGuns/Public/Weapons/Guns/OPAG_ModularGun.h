@@ -88,10 +88,11 @@ public:
 
 	void GetCurrentState(FOPAG_GunState& GunState);
 
+	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
+
 
 protected:
 	// Shoot behavior
-	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
 	UFUNCTION(BlueprintCallable) void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
 
 	// Shoot utility

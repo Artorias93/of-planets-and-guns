@@ -2,6 +2,7 @@
 #include "Weapons/Modules/OPAG_BarrelBase.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Camera/CameraComponent.h"
+#include "Weapons/Guns/OPAG_ModularGun.h"
 
 UOPAG_LaunchGranade::UOPAG_LaunchGranade(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
@@ -16,11 +17,6 @@ void UOPAG_LaunchGranade::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	if (Player)
 	{
 		const FRotator CameraRotation = Player->CurrentCamera->GetComponentRotation();
-		//Player->PrimarytGun->ShootThrowable(CameraRotation);
+		Player->PrimaryGun->ShootThrowable(CameraRotation);
 	}
-}
-
-void UOPAG_LaunchGranade::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-
 }

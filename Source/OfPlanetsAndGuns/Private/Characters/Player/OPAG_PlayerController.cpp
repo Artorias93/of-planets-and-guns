@@ -31,33 +31,44 @@ void AOPAG_PlayerController::SetupInputComponent()
 	UEnhancedInputComponent* EIC = Cast<UEnhancedInputComponent>(InputComponent);
 	check(EIC);
 
+	PopulateArrayWithTable();
+
 	// All binding events for player's ability
-	EIC->BindAction(InputActions.SwapGun, ETriggerEvent::Started, this, &AOPAG_PlayerController::SwapGuns);
-	EIC->BindAction(InputActions.ReloadGun, ETriggerEvent::Started, this, &AOPAG_PlayerController::ReloadGun);
-	EIC->BindAction(InputActions.Dash, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::ActiveDash);
-	EIC->BindAction(InputActions.GunAbility, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::ActiveGunAbility);
+	EIC->BindAction(InputActions[7]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::SwapGuns);
+	EIC->BindAction(InputActions[8]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::ReloadGun);
+	EIC->BindAction(InputActions[9]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::ActiveDash);
+	EIC->BindAction(InputActions[10]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::ActiveGunAbility);
 
 	// All binding events for player's movements
-	EIC->BindAction(InputActions.Move, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::MoveForward);
-	EIC->BindAction(InputActions.Move, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::MoveRight);
-	EIC->BindAction(InputActions.CameraMove, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Lookup);
-	EIC->BindAction(InputActions.CameraMove, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Turn);
-	EIC->BindAction(InputActions.Jump, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Jumping);
-	EIC->BindAction(InputActions.Jump, ETriggerEvent::Canceled, this, &AOPAG_PlayerController::StopJumping);
+	EIC->BindAction(InputActions[0]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::MoveForward);
+	EIC->BindAction(InputActions[0]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::MoveRight);
+	EIC->BindAction(InputActions[1]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Lookup);
+	EIC->BindAction(InputActions[1]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Turn);
+	EIC->BindAction(InputActions[2]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Jumping);
+	EIC->BindAction(InputActions[2]->InputAction, ETriggerEvent::Canceled, this, &AOPAG_PlayerController::StopJumping);
 
 	// All binding events for shoot
-	EIC->BindAction(InputActions.Shoot, ETriggerEvent::Started, this, &AOPAG_PlayerController::Shoot);
-	EIC->BindAction(InputActions.Shoot, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Shoot);
+	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::Shoot);
+	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Shoot);
 
 	// Binding event for interact with objects
-	EIC->BindAction(InputActions.Interact, ETriggerEvent::Started, this, &AOPAG_PlayerController::InteractWithItem);
+	EIC->BindAction(InputActions[4]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::InteractWithItem);
 
 	// Binding event for interact with camera ads
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Started, this, &AOPAG_PlayerController::SwitchToADSCamera);
-	EIC->BindAction(InputActions.ADS, ETriggerEvent::Completed, this, &AOPAG_PlayerController::ResetFPSCamera);
+	EIC->BindAction(InputActions[5]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::SwitchToADSCamera);
+	EIC->BindAction(InputActions[5]->InputAction, ETriggerEvent::Completed, this, &AOPAG_PlayerController::ResetFPSCamera);
 
 	// binding event for health 
-	EIC->BindAction(InputActions.UsePotion, ETriggerEvent::Started, this, &AOPAG_PlayerController::UsePotion);
+	EIC->BindAction(InputActions[6]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::UsePotion);
+}
+
+void AOPAG_PlayerController::PopulateArrayWithTable()
+{
+	const FString Context;
+	if (InputDataTable)
+	{
+		InputDataTable->GetAllRows(Context, InputActions);
+	}
 }
 
 void AOPAG_PlayerController::MoveForward(const FInputActionValue& Value)

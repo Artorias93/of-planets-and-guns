@@ -70,6 +70,8 @@ void AOPAG_ModularGun::BeginPlay()
 
 	CreateAndAttachAllModules(StandardModules);
 	PopulateAmmoTable();
+
+	AmmoCurrent = Stats.ClipSize;
 }
 
 void AOPAG_ModularGun::Tick(float DeltaTime)
@@ -197,7 +199,7 @@ void AOPAG_ModularGun::ShootThrowable(const FRotator SpawnRotation)
 		UChildActorComponent* Muzzle = Module->MuzzleComponent;
 		if (Muzzle)
 		{
-			const FVector SpawnLocation = Muzzle->GetComponentLocation();
+			const FVector SpawnLocation = Muzzle->GetComponentLocation() + Muzzle->GetForwardVector()*20;
 			SpawnThrowable(SpawnLocation, SpawnRotation);
 		}
 	}
@@ -423,7 +425,7 @@ void AOPAG_ModularGun::WaitReloadingTimer()
 	const int BulletDifference = Stats.ClipSize - AmmoCurrent;
 	if (BulletDifference < AmmoMax)
 	{
-		AmmoCurrent = Stats.ClipSize;
+		AmmoCurrent += BulletDifference;
 		AmmoMax -= BulletDifference;
 
 		if (Player) {

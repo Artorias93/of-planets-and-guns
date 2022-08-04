@@ -326,7 +326,7 @@ void AOPAG_Player::ReloadGun()
 {
 	const bool CheckIsReloading = CurrentGun->bIsReloading;
 	const bool bIsPrimaryGun = IsPrimaryGunActive();
-	if (!CheckIsReloading && bIsPrimaryGun)
+	if (bIsPrimaryGun && !CheckIsReloading && PrimaryGun->AmmoCurrent < PrimaryGun->Stats.ClipSize)
 	{
 		PrimaryGun->Reload();
 		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
