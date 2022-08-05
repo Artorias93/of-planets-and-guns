@@ -11,5 +11,4 @@ class OFPLANETSANDGUNS_API AOPAG_FullyAutomatic : public AOPAG_ModularGun
 	
 public:
 	AOPAG_FullyAutomatic();
-
 };

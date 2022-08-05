@@ -17,6 +17,9 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->RoomCleared.AddDynamic(this, &UOPAG_GameInstance::OnRoomCleared);
 	EMS->PauseGame.AddDynamic(this, &UOPAG_GameInstance::OnPauseGame);
 	EMS->ResumeGame.AddDynamic(this, &UOPAG_GameInstance::OnResumeGame);
+
+	EMS->RequestPlayerState.AddDynamic(this, &UOPAG_GameInstance::SendPlayerState);
+	EMS->SavePlayerState.AddDynamic(this, &UOPAG_GameInstance::SavePlayerState);
 }
 
 void UOPAG_GameInstance::LoadGenerationTable()
@@ -75,9 +78,16 @@ void UOPAG_GameInstance::StartStage(const EStageType StageType)
 	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), PlanetPersistentLevel);
 }
 
-void UOPAG_GameInstance::SavePlayerState()
+void UOPAG_GameInstance::SavePlayerState(FOPAG_PlayerState NewPlayerState)
 {
-	//TODO: add player state
+	PlayerState = NewPlayerState;
+	StartStage(NextStage);
+}
+
+void UOPAG_GameInstance::SendPlayerState()
+{
+	if (PlayerState.Health > 0.f)
+		GetEventManager()->ApplyPlayerState.Broadcast(PlayerState);
 }
 
 void UOPAG_GameInstance::OnStageManagerReady()
@@ -105,6 +115,7 @@ void UOPAG_GameInstance::OnStageLoaded()
 
 void UOPAG_GameInstance::OnStageCleared(const EStageType NextStageType)
 {
+	NextStage = NextStageType;
 	switch (NextStageType) { case EStageType::Stage: 
 		CurrentStage++;
 		break;
@@ -115,8 +126,7 @@ void UOPAG_GameInstance::OnStageCleared(const EStageType NextStageType)
 	default: ;
 	}
 
-
-	StartStage(NextStageType);
+	GetEventManager()->RequestSavePlayerState.Broadcast();
 }
 
 void UOPAG_GameInstance::OnRoomEntered()
