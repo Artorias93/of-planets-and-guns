@@ -4,6 +4,7 @@
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Enemies/RangedEnemy/OPAG_RangedEnemy.h"
+#include "Characters/Enemies/NormalTurret/OPAG_NormalTurret.h"
 #include "Characters/Player/OPAG_Player.h"
 
 UOPAG_ServiceShoot::UOPAG_ServiceShoot(FObjectInitializer const& ObjectInitializer) : Super(ObjectInitializer)
@@ -26,7 +27,7 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 		{
 			if (const AOPAG_Player* const FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
-				if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
+				if(AOPAG_Enemy* const RangedEnemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 				{
 					//Constructing what's needed for the SphereTrace
 					TArray<AActor*> ActorsToIgnore;
