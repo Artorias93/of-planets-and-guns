@@ -46,3 +46,27 @@ struct FOPAG_StageGeneration : public FTableRowBase
 };
 
 
+USTRUCT(BlueprintType)
+struct FOPAG_PlanetData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Planet)
+		int32 PlanetID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Difficulty)
+		float PlanetDLStart;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Difficulty)
+		float PlanetDLTarget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Difficulty)
+		float SSIncrement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Planet)
+		TSoftObjectPtr<UWorld> PlanetPersistentLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Planet)
+		UDataTable* StageGenerationTable;
+
+};

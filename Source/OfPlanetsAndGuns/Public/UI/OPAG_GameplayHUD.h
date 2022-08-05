@@ -59,7 +59,7 @@ public:
 	UFUNCTION()
 	void ShowLoadingScreenView();
 	UFUNCTION()
-	void HideLoadingScreenView();
+	void HideLoadingScreenView(int32 RoomCount);
 
 	UFUNCTION()
 	void ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);

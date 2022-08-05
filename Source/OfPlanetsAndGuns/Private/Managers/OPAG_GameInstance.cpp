@@ -22,10 +22,19 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->SavePlayerState.AddDynamic(this, &UOPAG_GameInstance::SavePlayerState);
 }
 
+void UOPAG_GameInstance::LoadPlanetTable()
+{
+	FString context;
+	PlanetTable->GetAllRows<FOPAG_PlanetData>(context, Planets);
+}
+
 void UOPAG_GameInstance::LoadGenerationTable()
 {
 	FString context;
-	StageGenerationTable->GetAllRows<FOPAG_StageGeneration>(context, StageGens);
+	StageGens.Empty();
+	SafeStages.Empty();
+	BossStages.Empty();
+	CurrentPlanet->StageGenerationTable->GetAllRows<FOPAG_StageGeneration>(context, StageGens);
 
 	SplitStageGens();
 
@@ -64,18 +73,21 @@ void UOPAG_GameInstance::Init()
 {
 	Super::Init();
 
-	StageDifficulty = 1.f;
+	CurrentDifficulty = 1.f;
 	CurrentStage = 0;
 	bNextStageIsSafe = false;
 
 	BindEvents();
 
+	LoadPlanetTable();
+	CurrentPlanet = Planets[0];
 	LoadGenerationTable();
+
 }
 
 void UOPAG_GameInstance::StartStage(const EStageType StageType)
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), PlanetPersistentLevel);
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), CurrentPlanet->PlanetPersistentLevel);
 }
 
 void UOPAG_GameInstance::SavePlayerState(FOPAG_PlayerState NewPlayerState)
@@ -108,9 +120,16 @@ void UOPAG_GameInstance::OnStageManagerReady()
 	}
 }
 
-void UOPAG_GameInstance::OnStageLoaded()
+void UOPAG_GameInstance::OnStageLoaded(int32 RoomCount)
 {
-	UE_LOG(LogTemp, Warning, TEXT("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ"));
+	UE_LOG(LogTemp, Warning, TEXT("Stage Finished Loading"));
+	//ignore the starting room
+	CurrentStageRoomCount = RoomCount-1;
+
+	StageDLStart = CurrentPlanet->PlanetDLStart + CurrentPlanet->SSIncrement * CurrentStage;
+	CurrentDifficulty = StageDLStart;
+	UE_LOG(LogTemp, Warning, TEXT("New Difficulty: %f"), CurrentDifficulty);
+
 }
 
 void UOPAG_GameInstance::OnStageCleared(const EStageType NextStageType)
@@ -131,7 +150,11 @@ void UOPAG_GameInstance::OnStageCleared(const EStageType NextStageType)
 
 void UOPAG_GameInstance::OnRoomEntered()
 {
-	StageDifficulty += 0.2f;
+	CurrentDifficulty += (CurrentPlanet->PlanetDLTarget - StageDLStart) / CurrentStageRoomCount;
+	if (CurrentDifficulty > CurrentPlanet->PlanetDLTarget)
+		CurrentDifficulty = CurrentPlanet->PlanetDLTarget;
+	UE_LOG(LogTemp, Warning, TEXT("New Difficulty: %f"), CurrentDifficulty);
+	GetEventManager()->StageDifficultyUpdated.Broadcast();
 }
 
 void UOPAG_GameInstance::OnRoomCleared()
@@ -155,5 +178,5 @@ UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager() const
 
 float UOPAG_GameInstance::GetStageDifficulty()
 {
-	return StageDifficulty;
+	return CurrentDifficulty;
 }

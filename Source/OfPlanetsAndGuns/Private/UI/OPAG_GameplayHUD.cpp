@@ -127,7 +127,7 @@ void AOPAG_GameplayHUD::ShowLoadingScreenView()
 	
 }
 
-void AOPAG_GameplayHUD::HideLoadingScreenView()
+void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 {
 	if (LoadingScreenViewWidget) {
 		LoadingScreenViewWidget->RemoveFromViewport();

@@ -35,6 +35,8 @@ void AOPAG_StageManager::StartStageGeneration(const FOPAG_StageGeneration GenDat
 	SafeRoom = -1;
 	TotalWeight = 0;
 
+	RoomCounter = 0;
+
 	//loop until the weight has reached the target
 	if (BaseGenerationData.StageType == EStageType::Stage)
 	{
@@ -132,6 +134,7 @@ void AOPAG_StageManager::FindRoomToSpawn(const int32 Previous, uint8& PreviousRo
 	PathingItem->CurrentRoom = RandomRoom;
 	PathingItem->PrevRoomID = Previous;
 	StagePathing.Add(RandomRoom->ID, PathingItem);
+	RoomCounter++;
 
 	if (bIsNotFirst)
 	{
@@ -384,7 +387,7 @@ void AOPAG_StageManager::FinishedLoadingStage() const
 	const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
 	if (GI)
 	{
-		GI->GetEventManager()->StageLoaded.Broadcast();
+		GI->GetEventManager()->StageLoaded.Broadcast(RoomCounter);
 	}
 }
 

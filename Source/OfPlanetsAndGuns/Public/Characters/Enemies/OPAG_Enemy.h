@@ -21,6 +21,8 @@ public:
 	AOPAG_Enemy();
 
 	void UpdateSpeed(float const NewSpeed) const;
+
+	void UpdateAcceleration(float const NewAcceleration) const;
 	
 	virtual void ReceiveDamage(float DamageAmount) override;
 
