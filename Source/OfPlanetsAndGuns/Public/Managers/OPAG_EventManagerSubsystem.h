@@ -47,6 +47,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPotionsChanged, int, CurrentValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
 
@@ -121,6 +122,8 @@ public:
 		FGoldChanged GoldChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FBoltsChanged BoltsChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FPotionsChanged PotionsChanged;
 
 	//Gun stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)

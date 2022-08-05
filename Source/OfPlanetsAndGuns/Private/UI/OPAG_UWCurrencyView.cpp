@@ -18,6 +18,7 @@ void UOPAG_UWCurrencyView::BindEvents()
 	if (EMS) {
 		EMS->GoldChanged.AddDynamic(this, &UOPAG_UWCurrencyView::UpdateGoldValue);
 		EMS->BoltsChanged.AddDynamic(this, &UOPAG_UWCurrencyView::UpdateBoltsValue);
+		EMS->PotionsChanged.AddDynamic(this, &UOPAG_UWCurrencyView::UpdatePotionsValue);
 	}
 }
 
@@ -32,5 +33,12 @@ void UOPAG_UWCurrencyView::UpdateGoldValue(const int Value)
 {
 	if (GoldAmountText && Value >= 0) {
 		GoldAmountText->SetText(FText::FromString(FString::FromInt(Value)));
+	}
+}
+
+void UOPAG_UWCurrencyView::UpdatePotionsValue(const int Value)
+{
+	if (PotionsAmountText && Value >= 0) {
+		PotionsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
 	}
 }

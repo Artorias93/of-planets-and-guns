@@ -23,7 +23,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-
 	UPROPERTY(Category = "Inventory Stuff", EditAnywhere, BlueprintReadWrite)
 		int PotionsAmount = 0;
 	UPROPERTY(Category = "Inventory Stuff", EditAnywhere, BlueprintReadWrite)

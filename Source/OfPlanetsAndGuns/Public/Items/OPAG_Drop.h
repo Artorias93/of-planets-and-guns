@@ -13,7 +13,8 @@ UENUM(BlueprintType)
 enum class EDropType : uint8 {
 	Ammo,
 	Gold,
-	Bolts
+	Bolts,
+	Potion
 };
 
 UCLASS()

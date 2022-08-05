@@ -502,9 +502,6 @@ void AOPAG_Player::InteractWithItem()
 		else
 		{
 			IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
-			// TODO: Potion check
-			//PotionCount++;
-			//InteractableObject->Destroy();
 		}
 	}
 }
@@ -639,13 +636,13 @@ void AOPAG_Player::ThrowScrap(UPrimitiveComponent* Target)
 #pragma region Others Input
 void AOPAG_Player::UsePotion()
 {
-	if (PotionCount > 0 && AbilitySystemComp)
+	if (InventorySystemComp->PotionsAmount > 0 && AbilitySystemComp)
 	{
 		const bool bSuccess = AbilitySystemComp->TryActivateAbilityByClass(HealthPotion, true);
 		if (bSuccess)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%f"), GetHealth());
-			PotionCount--;
+			InventorySystemComp->PotionsAmount--;
+			EMS->PotionsChanged.Broadcast(InventorySystemComp->PotionsAmount);
 		}
 	}
 }

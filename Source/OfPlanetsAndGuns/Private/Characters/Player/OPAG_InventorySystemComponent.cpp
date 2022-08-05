@@ -49,6 +49,16 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			Target->Destroy();
 			break;
 
+		case EDropType::Potion:
+			if (PotionsAmount < 4) {
+				PotionsAmount++;
+				if (Owner && Owner->EMS) {
+					Owner->EMS->PotionsChanged.Broadcast(PotionsAmount);
+				}
+				Target->Destroy();
+			}
+			break;
+
 		default:
 			break;
 		}
