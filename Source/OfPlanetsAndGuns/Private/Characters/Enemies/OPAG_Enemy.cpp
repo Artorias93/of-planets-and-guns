@@ -33,6 +33,11 @@ void AOPAG_Enemy::UpdateSpeed(float const NewSpeed) const
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
+void AOPAG_Enemy::UpdateAcceleration(float const NewAcceleration) const
+{
+	GetCharacterMovement()->MaxAcceleration = NewAcceleration;
+}
+
 void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
 {
 	Super::ReceiveDamage(DamageAmount);
