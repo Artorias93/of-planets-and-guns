@@ -33,12 +33,22 @@ void AOPAG_StageManager::StartStageGeneration(const FOPAG_StageGeneration GenDat
 	StartingRoom = -1;
 	FinalRoom = -1;
 	SafeRoom = -1;
+	TotalWeight = 0;
 
 	//loop until the weight has reached the target
-	while (BaseGenerationData.TargetWeight > TotalWeight)
+	if (BaseGenerationData.StageType == EStageType::Stage)
 	{
-		FindRoomToSpawn(RoomsToAppend.Num() > 0 ? RoomsToAppend[0] : -1, PreviousRoomTurn);
+		while (BaseGenerationData.TargetWeight > TotalWeight)
+		{
+			FindRoomToSpawn(RoomsToAppend.Num() > 0 ? RoomsToAppend[0] : -1, PreviousRoomTurn);
+		}
 	}
+	else
+	{
+		TotalWeight = BaseGenerationData.TargetWeight;
+		FindRoomToSpawn(-1, PreviousRoomTurn);
+	}
+
 	LoadingProgress->Broadcast(LoadingProgress_Pathing);
 
 	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, FString::Printf(
@@ -67,6 +77,8 @@ void AOPAG_StageManager::LoadDataTables()
 
 void AOPAG_StageManager::AddMoreRoomsFromListToHitWeightRequirements()
 {
+	if (BaseGenerationData.StageType != EStageType::Stage) return;
+
 	int32 CurrentWeight = 0;
 	for (const FOPAG_RoomOffset* Room : Rooms)
 	{
@@ -81,8 +93,10 @@ void AOPAG_StageManager::AddMoreRoomsFromListToHitWeightRequirements()
 		TEXT("Not Enough rooms in Data table. Missing weight of %i to reach target weight"),
 		BaseGenerationData.TargetWeight - CurrentWeight), EMessageSeverity::Error);
 
+	TArray<FOPAG_RoomOffset*> NonStartRooms;
 	TArray<FOPAG_RoomOffset*> StraightRooms;
-	FilterRoomsByExitType(Rooms, StraightRooms, 
+	FilterStartingRooms(Rooms, NonStartRooms, false);
+	FilterRoomsByExitType(NonStartRooms, StraightRooms,
 		static_cast<uint8>(ERoomExits::Left | ERoomExits::Right));
 
 	//add new rooms until target + 3 (so we always have just a little bit more than needed)
@@ -150,34 +164,32 @@ void AOPAG_StageManager::FindRoomToSpawn(const int32 Previous, uint8& PreviousRo
 
 	if (StartingRoom == -1) StartingRoom = RandomRoom->ID;
 
-	if (RandomRoom->ID < SpecialRoomID) //again.. temp check
+
 	if (RandomRoom->ID != FinalRoom && RandomRoom->RoomOffset.ExitCount > 0)
 	{
-		AddRandomBridge(PathingItem);
-		if (RandomRoom->RoomOffset.ExitCount > 1)
+		if (RandomRoom->ID < SpecialRoomID)
 		{
-			//Not deleting any endbridges from this array. this means that this will be true only at the first entry.
-			if (SpecialRoomBridges.Num() == 0)
+			AddRandomBridge(PathingItem);
+			if (RandomRoom->RoomOffset.ExitCount > 1)
 			{
-				SpecialRoomBridges.Add(AddRandomBridge(PathingItem, true));
-			}
-			else
-			{
-				if (SafeRoom < 0) //can add more check for some rng
+				//Not deleting any endbridges from this array. this means that this will be true only at the first entry.
+				if (SpecialRoomBridges.Num() == 0)
 				{
-					SafeRoom = RandomRoom->ID;
+					SpecialRoomBridges.Add(AddRandomBridge(PathingItem, true));
 				}
 			}
 		}
+		else if (SafeRoom < 0) //can add more check for some rng
+		{
+			SafeRoom = RandomRoom->ID;
+		}
 	}
-
-
 }
 
 void AOPAG_StageManager::FilterRoomsByExitType(const TArray<FOPAG_RoomOffset*>& RoomList,
-	TArray<FOPAG_RoomOffset*>& FilteredRooms, const uint8 LastRoomTurn)
+	TArray<FOPAG_RoomOffset*>& FilteredRooms, const uint8 LastRoomTurn) const
 {
-	for (FOPAG_RoomOffset* Room : Rooms)
+	for (FOPAG_RoomOffset* Room : RoomList)
 	{
 		//bitwise & to find rooms that don't have the same turn (example both having left exit)
 		if ((Room->ExitSides & LastRoomTurn) == 0)
@@ -188,11 +200,11 @@ void AOPAG_StageManager::FilterRoomsByExitType(const TArray<FOPAG_RoomOffset*>& 
 }
 
 void AOPAG_StageManager::FilterRoomsByRemainingWeight(const TArray<FOPAG_RoomOffset*>& RoomList,
-	TArray<FOPAG_RoomOffset*>& FilteredRooms)
+	TArray<FOPAG_RoomOffset*>& FilteredRooms) const
 {
-	for (FOPAG_RoomOffset* Room : Rooms)
+	for (FOPAG_RoomOffset* Room : RoomList)
 	{
-		if (Room->Weight <= TotalWeight - BaseGenerationData.TargetWeight)
+		if (Room->Weight <= BaseGenerationData.TargetWeight - TotalWeight)
 		{
 			FilteredRooms.Add(Room);
 		}
@@ -200,12 +212,25 @@ void AOPAG_StageManager::FilterRoomsByRemainingWeight(const TArray<FOPAG_RoomOff
 }
 
 void AOPAG_StageManager::FilterDoubleExitRooms(const TArray<FOPAG_RoomOffset*>& RoomList,
-	TArray<FOPAG_RoomOffset*>& FilteredRooms, const bool bHasDoubleExits)
+	TArray<FOPAG_RoomOffset*>& FilteredRooms, const bool bHasDoubleExits) const
 {
-	for (FOPAG_RoomOffset* Room : Rooms)
+	for (FOPAG_RoomOffset* Room : RoomList)
 	{
 		if ((Room->ExitCount > 1 && bHasDoubleExits) ||
 			(Room->ExitCount <= 1 && !bHasDoubleExits))
+		{
+			FilteredRooms.Add(Room);
+		}
+	}
+}
+
+void AOPAG_StageManager::FilterStartingRooms(const TArray<FOPAG_RoomOffset*>& RoomList,
+	TArray<FOPAG_RoomOffset*>& FilteredRooms, const bool bIsStartingRoom) const
+{
+	for (FOPAG_RoomOffset* Room : RoomList)
+	{
+		if ((Room->bIsStartingRoom && bIsStartingRoom) ||
+			(!Room->bIsStartingRoom && !bIsStartingRoom))
 		{
 			FilteredRooms.Add(Room);
 		}
@@ -217,7 +242,37 @@ FOPAG_RoomOffset* AOPAG_StageManager::GetRandomRoom(bool bIsNotFirst, const uint
 	TArray<FOPAG_RoomOffset*> InputRooms = Rooms;
 	TArray<FOPAG_RoomOffset*> FilteredRooms;
 
-	FilterDoubleExitRooms(Rooms, FilteredRooms, IsRoomDouble());
+	if (!bIsNotFirst)
+	{
+		FilterStartingRooms(Rooms, FilteredRooms, true);
+		if (FilteredRooms.Num() == 0)
+		{
+			UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this,
+				FString::Printf(TEXT("%i - StartingRoom filter was empty!"), StagePathing.Num()),
+				EMessageSeverity::Error);
+		}
+		else
+		{
+			InputRooms = FilteredRooms;
+			FilteredRooms.Empty();
+
+			//also get rid of starting rooms for future room filters
+			FilterStartingRooms(Rooms, FilteredRooms, false);
+			if (FilteredRooms.Num() == 0)
+			{
+				UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this,
+					FString::Printf(TEXT("%i - All rooms are starting rooms!"), StagePathing.Num()),
+					EMessageSeverity::Error);
+			}
+			else
+			{
+				Rooms = FilteredRooms;
+			}
+		}
+		FilteredRooms.Empty();
+	}
+
+	FilterDoubleExitRooms(InputRooms, FilteredRooms, bIsNotFirst && IsRoomDouble());
 	if (FilteredRooms.Num() == 0)
 	{
 		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
@@ -474,7 +529,7 @@ void AOPAG_StageManager::AssignVolumes()
 
 	TArray<uint32> VolumeKeys;
 	RoomStreamingVolumes.GetKeys(VolumeKeys);
-	for (auto Key : VolumeKeys)
+	for (const auto Key : VolumeKeys)
 	{
 
 		AddLevelsToVolume(RoomStreamingVolumes[Key], Key);

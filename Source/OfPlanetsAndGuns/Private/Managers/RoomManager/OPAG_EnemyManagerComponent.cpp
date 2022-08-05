@@ -23,6 +23,13 @@ UOPAG_EnemyManagerComponent::UOPAG_EnemyManagerComponent()
 }
 
 
+void UOPAG_EnemyManagerComponent::LoadEnemyLevelData()
+{
+	const FString Context;
+	if (EnemyTypes && BaseEnemyLevels.Num() == 0) EnemyTypes->GetAllRows(Context, BaseEnemyLevels);
+
+}
+
 float UOPAG_EnemyManagerComponent::GaussianProbabilityModifier(const float Level) const
 {
 	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
@@ -32,7 +39,7 @@ float UOPAG_EnemyManagerComponent::GaussianProbabilityModifier(const float Level
 	return FMath::Exp(FMath::Pow(ModifiedLevel, 2.f) * -0.5f);
 }
 
-int32 UOPAG_EnemyManagerComponent::GetSpawnerCount()
+int32 UOPAG_EnemyManagerComponent::GetSpawnerCount() const
 {
 	int32 SpawnCount = 0;
 	for (const TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)
@@ -47,6 +54,7 @@ void UOPAG_EnemyManagerComponent::GetMappedEnemies(TMap<TSoftClassPtr<AOPAG_Enem
 	float OverallProbability = 0;
 	TArray<TSoftClassPtr<AOPAG_Enemy>> Keys;
 
+	LoadEnemyLevelData();
 	for (const FOPAG_EnemyLevel* BaseEnemyLevel : BaseEnemyLevels)
 	{
 		float Probability = GaussianProbabilityModifier(BaseEnemyLevel->Level);
@@ -87,9 +95,6 @@ void UOPAG_EnemyManagerComponent::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 void UOPAG_EnemyManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	const FString Context;
-	if (EnemyTypes) EnemyTypes->GetAllRows(Context, BaseEnemyLevels);
-
 
 	const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
 		UGameplayStatics::GetGameInstance(GetWorld()));
@@ -98,6 +103,12 @@ void UOPAG_EnemyManagerComponent::BeginPlay()
 		GI->GetEventManager()->EnemyKilled.AddDynamic(this, 
 			&UOPAG_EnemyManagerComponent::OnEnemyDeath);
 	}
+}
+
+void UOPAG_EnemyManagerComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+	LoadEnemyLevelData();
 }
 
 

@@ -96,7 +96,8 @@ void AOPAG_RoomManager::UpdateData()
 			Row.Weight = Weight;
 			Row.ExitCount = Exits.Num();
 			Row.ExitSides = ExitSides;
-			Row.Offset = Entrance->RoomOffset;
+			Row.bIsStartingRoom = bIsStartingRoom;
+			Row.Offset = Entrance != nullptr ? Entrance->RoomOffset : FTransform::Identity;
 
 			DataTable->AddRow(FName(Name), Row);
 
@@ -130,9 +131,19 @@ void AOPAG_RoomManager::CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const
 	}
 }
 
-void AOPAG_RoomManager::EnterRoom() const
+void AOPAG_RoomManager::EnterRoom()
 {
-	if (bIsRoomCleared) return;
+	if (bIsRoomCleared)
+	{
+		DoorManager->OpenDoors();
+		return;
+	}
+
+	if (EnemyManager->GetSpawnerCount() == 0)
+	{
+		RoomCleared();
+		return;
+	}
 
 	EnemyManager->SpawnWave();
 	DoorManager->CloseDoors();

@@ -5,6 +5,7 @@
 #include <GameplayTagsManager.h>
 #include <GameplayTagContainer.h>
 //My Classes
+#include "Abilities/OPAG_BasicShot.h"
 #include "Characters/OPAG_AttributeSetBase.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
@@ -16,12 +17,7 @@ AOPAG_CharacterBase::AOPAG_CharacterBase()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");
-
-	static ConstructorHelpers::FClassFinder<UGameplayAbility> BasicShotClass(TEXT("/Game/OfPlanetsAndGuns/Core/Abilities/GA_BasicShot"));
-	if (BasicShotClass.Succeeded())
-	{
-		BasicShot = BasicShotClass.Class;
-	}
+	BasicShot = UOPAG_BasicShot::StaticClass();
 }
 
 //Binds functionality to input
@@ -127,14 +123,3 @@ void AOPAG_CharacterBase::Death()
 	//Overridden by children
 }
 
-const float AOPAG_CharacterBase::GetAxisX() const
-{
-	const float X = GetInputAxisValue("MoveForward");
-	return X;
-}
-
-const float AOPAG_CharacterBase::GetAxisY() const
-{
-	const float Y = GetInputAxisValue("MoveRight");
-	return Y;
-}

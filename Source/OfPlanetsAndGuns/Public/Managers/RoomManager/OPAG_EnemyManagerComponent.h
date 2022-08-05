@@ -55,9 +55,9 @@ public:
 
 private:
 
-	float GaussianProbabilityModifier(float Level) const;
+	void LoadEnemyLevelData();
 
-	int32 GetSpawnerCount();
+	float GaussianProbabilityModifier(float Level) const;
 
 	void GetMappedEnemies(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyProbabilityMap);
 
@@ -69,6 +69,8 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	virtual void InitializeComponent() override;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* 
@@ -76,5 +78,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy Manager")
 		void SpawnWave();
-		
+
+	int32 GetSpawnerCount() const;
+
 };

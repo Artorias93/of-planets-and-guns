@@ -15,6 +15,8 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
+#include <Engine/StaticMeshActor.h>
+#include <Kismet/GameplayStatics.h>
 
 AOPAG_ModularGun::AOPAG_ModularGun()
 {
@@ -60,8 +62,16 @@ void AOPAG_ModularGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CreateAndAttachAllModules();
+	FOPAG_GunModules StandardModules;
+	StandardModules.Barrel = StandardBarrel;
+	StandardModules.Stock = StandardStock;
+	StandardModules.Grip = StandardGrip;
+	StandardModules.Magazine = StandardMagazine;
+
+	CreateAndAttachAllModules(StandardModules);
 	PopulateAmmoTable();
+
+	AmmoCurrent = Stats.ClipSize;
 }
 
 void AOPAG_ModularGun::Tick(float DeltaTime)
@@ -164,6 +174,20 @@ UCameraComponent* AOPAG_ModularGun::GetSightCamera()
 	}
 	return nullptr;
 }
+
+void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState)
+{
+	GunState.GunClass = GetClass();
+
+	GunState.AttachedModules.Barrel = Barrel->GetChildActorClass();
+	GunState.AttachedModules.Stock = Stock->GetChildActorClass();
+	GunState.AttachedModules.Grip = Grip->GetChildActorClass();
+	GunState.AttachedModules.Sight = Sight->GetChildActorClass();
+	GunState.AttachedModules.Accessory = Accessory->GetChildActorClass();
+
+	GunState.AmmoCurrent = AmmoCurrent;
+	GunState.AmmoMax = AmmoMax;
+}
 #pragma endregion GET
 
 #pragma region Shoot Behavior
@@ -175,7 +199,7 @@ void AOPAG_ModularGun::ShootThrowable(const FRotator SpawnRotation)
 		UChildActorComponent* Muzzle = Module->MuzzleComponent;
 		if (Muzzle)
 		{
-			const FVector SpawnLocation = Muzzle->GetComponentLocation();
+			const FVector SpawnLocation = Muzzle->GetComponentLocation() + Muzzle->GetForwardVector()*20;
 			SpawnThrowable(SpawnLocation, SpawnRotation);
 		}
 	}
@@ -190,6 +214,21 @@ void AOPAG_ModularGun::SpawnThrowable(const FVector SpawnLocation, const FRotato
 		const FActorSpawnParameters SpawnInfo;
 		GetWorld()->SpawnActor(GrenadeClass, &SpawnLocation, &SpawnRotation, SpawnInfo);
 	}
+}
+
+USceneComponent* AOPAG_ModularGun::GetMuzzle() const
+{
+	AOPAG_BarrelBase* Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
+	if (Module)
+	{
+		UChildActorComponent* Muzzle = Module->MuzzleComponent;
+		if (Muzzle)
+		{
+			AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(Muzzle->GetChildActor());
+			return StaticMeshActor->GetStaticMeshComponent();
+		}
+	}
+	return nullptr;
 }
 #pragma endregion Shoot Behavior
 
@@ -218,12 +257,14 @@ TArray<AActor*> AOPAG_ModularGun::CheckWhatActorsIgnoreLinetrace()
 #pragma endregion Shoot Utility
 
 #pragma region Create and Attach Modules
-void AOPAG_ModularGun::CreateAndAttachAllModules()
+void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules)
 {
-	CreateModule(Barrel, StandardBarrel);
-	CreateModule(Stock, StandardStock);
-	CreateModule(Grip, StandardGrip);
-	CreateModule(Magazine, StandardMagazine);
+	if (Modules.Barrel) CreateModule(Barrel, Modules.Barrel);
+	if (Modules.Stock) CreateModule(Stock, Modules.Stock);
+	if (Modules.Grip) CreateModule(Grip, Modules.Grip);
+	if (Modules.Magazine) CreateModule(Magazine, Modules.Magazine);
+	if (Modules.Sight) CreateModule(Sight, Modules.Sight);
+	if (Modules.Accessory) CreateModule(Accessory, Modules.Accessory);
 
 	// Update Stats
 	UpdateStats();
@@ -289,7 +330,7 @@ void AOPAG_ModularGun::UpdateStats()
 		Modules.Add(ModuleAccessory);
 	}
 
-	Stats = FOPAG_GunStats();
+	Stats = BaseStats;
 
 	// Update stats
 	for (int i = 0; i < Modules.Num(); i++)
@@ -356,6 +397,7 @@ void AOPAG_ModularGun::Reload()
 {
 	bIsReloading = true;
 	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_ModularGun::WaitReloadingTimer, Stats.ReloadingTime, false);
+	UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
 }
 
 void AOPAG_ModularGun::IncrementAmmo()
@@ -383,7 +425,7 @@ void AOPAG_ModularGun::WaitReloadingTimer()
 	const int BulletDifference = Stats.ClipSize - AmmoCurrent;
 	if (BulletDifference < AmmoMax)
 	{
-		AmmoCurrent = Stats.ClipSize;
+		AmmoCurrent += BulletDifference;
 		AmmoMax -= BulletDifference;
 
 		if (Player) {

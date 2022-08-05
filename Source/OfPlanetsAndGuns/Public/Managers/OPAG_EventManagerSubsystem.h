@@ -6,6 +6,7 @@
 #include "InputActionValue.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
+#include "Characters/Player/OPAG_PlayerState.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
 class AOPAG_RoomStreamingVolume;
@@ -17,6 +18,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneratio
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomSpawned, AOPAG_RoomManager* const, RoomManager);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageLoaded);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageCleared, const EStageType, NextStageType);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomEntered);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 
@@ -25,6 +28,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLeftRoomStreamingVolume);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FLoadingProgress, float, Percent);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestSavePlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestPlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSavePlayerState, FOPAG_PlayerState, PlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FApplyPlayerState, const FOPAG_PlayerState&, PlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
@@ -55,7 +62,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractWithItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwitchToADSCamera);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetFPSCamera);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUsePotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
 
@@ -73,6 +80,9 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
 		FStageLoaded StageLoaded;
 
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
+		FStageCleared StageCleared;
+
 	UPROPERTY(BlueprintAssignable, Category = RoomManager)
 		FRoomEntered RoomEntered;
 	UPROPERTY(BlueprintAssignable, Category = RoomManager)
@@ -87,6 +97,14 @@ public:
 		FLoadingProgress LoadingProgress;
 
 	//Player stuff
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FRequestSavePlayerState RequestSavePlayerState;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FRequestPlayerState RequestPlayerState;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FSavePlayerState SavePlayerState;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FApplyPlayerState ApplyPlayerState;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FHealthChanged HealthChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
@@ -164,7 +182,7 @@ public:
 		FResetFPSCamera ResetFPSCamera;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
-		FHealth Health;
+		FUsePotion UsePotion;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FActiveDash ActiveDash;

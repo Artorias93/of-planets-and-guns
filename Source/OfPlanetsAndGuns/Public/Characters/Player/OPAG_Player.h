@@ -7,23 +7,17 @@
 #include "GameplayEffectTypes.h"
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
+#include "OPAG_PlayerState.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "OPAG_Player.generated.h"
 
-class AOPAG_AccessoryBase;
 class UOPAG_AttributeSetBase;
-class UKismetMathLibrary;
 class UTimelineComponent;
 class UCurveFloat;
 class AOPAG_ModuleBase;
-class USpringArmComponent;
 class UCameraComponent;
 class UChildActorComponent;
-class UInputAction;
 class AOPAG_GunBase;
-class UDataTable;
-class UKismetSystemLibrary;
-class UAbilitySystemComponent;
 class AOPAG_ModularGun;
 
 UCLASS()
@@ -162,7 +156,7 @@ public:
 
 private:
 	// Events system
-	void BroadEvents();
+	void BroadcastEvents();
 	void BindEvents();
 
 	// Init standard values
@@ -179,7 +173,7 @@ private:
 
 	// Guns behavior 
 	void AttachDefaultGuns();
-	const bool IsPrimaryGun() const;
+	const bool IsPrimaryGunActive() const;
 
 	//Camera behavior
 	void MakingAimCameraRotate();
@@ -221,7 +215,7 @@ public:
 
 	UFUNCTION() void ResetFPSCamera();
 
-	UFUNCTION() void Health();
+	UFUNCTION() void UsePotion();
 
 	UFUNCTION() void ActiveDash();
 
@@ -240,6 +234,12 @@ public:
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
 			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void SavePlayerState();
+	UFUNCTION()
+		void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
+
 
 public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;

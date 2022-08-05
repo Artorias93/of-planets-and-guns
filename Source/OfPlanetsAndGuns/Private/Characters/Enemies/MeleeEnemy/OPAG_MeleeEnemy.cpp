@@ -1,7 +1,7 @@
 #include "Characters/Enemies/MeleeEnemy/OPAG_MeleeEnemy.h"
 #include <Components/BoxComponent.h>
 //My Classes
-#include "Characters/Enemies/MeleeEnemy/OPAG_AICMeleeEnemy.h"
+#include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Player/OPAG_Player.h"
 
 AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
@@ -59,7 +59,7 @@ void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 //The attack collision & damage is computed only when the animation montage's notify is reached
 void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload &NotifyPayload)
 {
-	if (const AOPAG_AICMeleeEnemy* const AIController = Cast<AOPAG_AICMeleeEnemy>(GetController()))
+	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
 		if (DamageCollisionBox->IsOverlappingActor(AIController->GetFocusActor()))
 		{

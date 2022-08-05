@@ -53,10 +53,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		int Weight;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
+		uint8 bIsStartingRoom : 1;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door Manager")
 		uint8 bIsRoomCleared : 1;
 
-	int AssignedRoomID;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Room Manager", AdvancedDisplay)
+		int AssignedRoomID;
 
 
 protected:
@@ -76,7 +80,7 @@ public:
 		void CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const;
 
 	UFUNCTION(BlueprintCallable, Category = "Door Manager")
-		void EnterRoom() const;
+		void EnterRoom();
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy Manager")
 		void RoomCleared();

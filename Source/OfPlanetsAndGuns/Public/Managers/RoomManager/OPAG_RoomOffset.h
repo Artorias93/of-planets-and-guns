@@ -34,9 +34,11 @@ struct OFPLANETSANDGUNS_API FOPAG_RoomOffset : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int32 ExitCount;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExits))
 		uint8 ExitSides;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		uint8 bIsStartingRoom : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FTransform Offset;

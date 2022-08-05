@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "OPAG_ModuleStats.h"
 #include "GameFramework/Actor.h"
+#include "Interactables/OPAG_InteractableInterface.h"
 #include "OPAG_ModuleBase.generated.h"
 
 class USphereComponent;
@@ -12,7 +13,7 @@ class UStaticMeshComponent;
 
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_ModuleBase : public AActor
+class OFPLANETSANDGUNS_API AOPAG_ModuleBase : public AActor, public IOPAG_InteractableInterface
 {
 	GENERATED_BODY()
 	
@@ -47,6 +48,14 @@ public:
 	virtual void OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
 	void SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
 	UPrimitiveComponent* GetSphereComponent() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void Interact();
+	virtual void Interact_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		bool CanInteract();
+	virtual bool CanInteract_Implementation() override;
 
 private:
 	void CheckIfPhysical();

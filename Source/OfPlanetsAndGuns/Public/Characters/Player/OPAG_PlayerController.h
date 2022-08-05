@@ -3,39 +3,28 @@
 #include "CoreMinimal.h"
 #include "InputMappingContext.h"
 #include "GameFramework/PlayerController.h"
+#include <Engine/DataTable.h>
 #include "OPAG_PlayerController.generated.h"
 
 class UOPAG_EventManagerSubsystem;
 class UEnhancedInputComponent;
 class UOPAG_GameInstance;
+class UDataTable;
 
 USTRUCT(BlueprintType)
-struct FInputActions
+struct OFPLANETSANDGUNS_API FOPAG_InputAction : public FTableRowBase
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly) UInputAction* Move;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
+		UInputAction* InputAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int InputActionIndex;
 
-	UPROPERTY(EditDefaultsOnly) UInputAction* CameraMove;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Jump;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Shoot;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* SwapGun;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* ReloadGun;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Interact;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* ADS;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Health;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* Dash;
-
-	UPROPERTY(EditDefaultsOnly) UInputAction* GunAbility;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FText DisplayName;
 };
 
 UCLASS()
@@ -47,17 +36,20 @@ public:
 	AOPAG_PlayerController();
 
 	UPROPERTY(Category = "Enhanced Input", EditDefaultsOnly, BlueprintReadWrite)
-		FInputActions InputActions;
+		UDataTable* InputDataTable;
 
 	UPROPERTY(Category = "Enhanced Input", EditDefaultsOnly, BlueprintReadWrite)
 		UInputMappingContext* InputMappingContext;
 
 private:
 	UOPAG_EventManagerSubsystem* EMS;
+	TArray<FOPAG_InputAction*> InputActions;
 
 private:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	void PopulateArrayWithTable();
+
 
 public:
 	UFUNCTION() void MoveForward(const FInputActionValue& Value);
@@ -84,7 +76,7 @@ public:
 
 	UFUNCTION() void ResetFPSCamera();
 
-	UFUNCTION() void Health();
+	UFUNCTION() void UsePotion();
 
 	UFUNCTION() void ActiveDash();
 

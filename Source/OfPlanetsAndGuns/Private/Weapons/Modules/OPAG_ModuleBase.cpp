@@ -53,6 +53,15 @@ UPrimitiveComponent* AOPAG_ModuleBase::GetSphereComponent() const
 	return Sphere;
 }
 
+void AOPAG_ModuleBase::Interact_Implementation()
+{
+}
+
+bool AOPAG_ModuleBase::CanInteract_Implementation()
+{
+	return true;
+}
+
 void AOPAG_ModuleBase::CheckIfPhysical()
 {
 	// Control if module has parent gun -> is attached

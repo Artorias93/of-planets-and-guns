@@ -83,14 +83,16 @@ private:
 	void StartStageGeneration(FOPAG_StageGeneration GenData);
 	void LoadDataTables();
 	void AddMoreRoomsFromListToHitWeightRequirements();
-	void FindRoomToSpawn(int32 Previous, uint8& PreviousRoomTurn);
+	void FindRoomToSpawn(const int32 Previous, uint8& PreviousRoomTurn);
 
 	void FilterRoomsByExitType(const TArray<FOPAG_RoomOffset*>& RoomList,
-		TArray<FOPAG_RoomOffset*>& FilteredRooms, uint8 LastRoomTurn);
+		TArray<FOPAG_RoomOffset*>& FilteredRooms, uint8 LastRoomTurn) const;
 	void FilterRoomsByRemainingWeight(const TArray<FOPAG_RoomOffset*>& RoomList, 
-		TArray<FOPAG_RoomOffset*>& FilteredRooms);
+		TArray<FOPAG_RoomOffset*>& FilteredRooms) const;
 	void FilterDoubleExitRooms(const TArray<FOPAG_RoomOffset*>& RoomList, 
-		TArray<FOPAG_RoomOffset*>& FilteredRooms, bool bHasDoubleExits);
+		TArray<FOPAG_RoomOffset*>& FilteredRooms, const bool bHasDoubleExits) const;
+	void FilterStartingRooms(const TArray<FOPAG_RoomOffset*>& RoomList,
+		TArray<FOPAG_RoomOffset*>& FilteredRooms, const bool bIsStartingRoom) const;
 
 	FOPAG_RoomOffset* GetRandomRoom(bool bIsNotFirst, const uint8& PreviousRoomTurn);
 	FOPAG_RoomOffset* GetRandomSpecialRoom(const uint8& PreviousRoomTurn);

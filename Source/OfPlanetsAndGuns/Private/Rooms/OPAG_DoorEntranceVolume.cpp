@@ -17,19 +17,16 @@ AOPAG_DoorEntranceVolume::AOPAG_DoorEntranceVolume()
 	Volume->BodyInstance.SetCollisionProfileName(TEXT("Volume"));
 	Volume->SetWorldScale3D(FVector::OneVector * 20.f);
 	Volume->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_DoorEntranceVolume::OnOverlapBegin);
+	Volume->SetCanEverAffectNavigation(false);
+
+	bGenerateOverlapEventsDuringLevelStreaming = true;
+
 }
 
 // Called when the game starts or when spawned
 void AOPAG_DoorEntranceVolume::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GetWorld()->GetFirstPlayerController()->GetPawn()->IsOverlappingActor(this))
-	{
-		if (RoomManager)
-		{
-			RoomManager->EnterRoom();
-		}
-	}
 }
 
 // Called every frame

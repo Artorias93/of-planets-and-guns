@@ -1,15 +1,19 @@
 #include "Weapons/Guns/OPAG_Pistol.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include <Kismet/GameplayStatics.h>
+#include <Engine/StaticMeshActor.h>
 
 AOPAG_Pistol::AOPAG_Pistol()
 {
-
+	MuzzleComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("MuzzleComponent"));
+	MuzzleComponent->SetupAttachment(RootComponent);
 }
 
 void AOPAG_Pistol::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void AOPAG_Pistol::Tick(float DeltaTime)
@@ -21,7 +25,6 @@ void AOPAG_Pistol::Tick(float DeltaTime)
 #pragma region Shooting Behavior
 void AOPAG_Pistol::ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
-	//TODO: Recoil Event
 	const FVector NoiseDirection = ApplyNoise(Direction);
 	const FVector EffectiveDirection = ApplyWeaponRange(StartShootLocation, NoiseDirection);
 
@@ -34,11 +37,27 @@ void AOPAG_Pistol::ShootLineTrace(FVector StartShootLocation, FVector Direction,
 	// If Actor is inheritance by character base, invoke take damage
 	if (bIsHit)
 	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitPartile, OutHit.Location, FRotator::ZeroRotator, true, EPSCPoolMethod::None, true);
+
 		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 		if (Character)
 		{
 			Character->ReceiveDamage(Stats.Damage);
 		}
 	}
+
+	// Spawn emitter
+	// const FVector MuzzleLocation = GetMuzzle()->GetActorLocation();
+	UGameplayStatics::SpawnEmitterAttached(MuzzlePartile, GetMuzzle(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None, true);
+}
+
+USceneComponent* AOPAG_Pistol::GetMuzzle() const
+{
+	if (MuzzleComponent->GetChildActor())
+	{
+		AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(MuzzleComponent->GetChildActor());
+		return StaticMeshActor->GetStaticMeshComponent();
+	}
+	return nullptr;
 }
 #pragma endregion Shooting Behavior

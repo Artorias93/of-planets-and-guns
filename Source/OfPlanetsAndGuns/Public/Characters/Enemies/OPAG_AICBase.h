@@ -18,7 +18,7 @@ public:
 
 	AOPAG_AICBase();
 
-private:
+protected:
 
 	virtual void OnPossess(APawn* ControlledPawn) override;
 
@@ -27,6 +27,8 @@ private:
 
 	UFUNCTION()
 	void LoseTarget();
+
+private:
 
 	/////////////////////////////
 	//Variables
@@ -37,28 +39,19 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float LoseSightTimer = 3.f;
 
-	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	float SightSenseRadius = 2500.f;
-
-	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	float LoseSightSenseRadius = 3000.f;
-
-	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	float SightPeripheralVisionDegrees = 120.f;
-
 	UPROPERTY(transient)
 	class UBehaviorTreeComponent* BehaviorTreeComponent;
 
 	UPROPERTY(transient)
 	UBlackboardComponent* BlackboardComponent;
 
-	UPROPERTY(transient)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UAIPerceptionComponent* PerceptionComp;
 
-	UPROPERTY(transient)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UAISenseConfig_Sight* PerceptionSightConfig;
 
-	UPROPERTY(transient)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UAISenseConfig_Damage* PerceptionDamageConfig;	
 	
 	FTimerHandle LoseSightTimerHandle;
