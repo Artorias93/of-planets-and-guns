@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,9 +5,6 @@
 #include "Logging/TokenizedMessage.h"
 #include "OPAG_UtilityFunctionLibrary.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UtilityFunctionLibrary : public UBlueprintFunctionLibrary
 {
@@ -37,5 +32,4 @@ public:
 			}
 		}
 	}
-
 };

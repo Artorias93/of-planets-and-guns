@@ -1,12 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
+
+#include "Engine/DataTable.h"
+#include "OPAG_LootChance.h"
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Engine/DataTable.h"
 #include "OPAG_LootManagerComponent.generated.h"
 
+class AOPAG_LootBox;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OFPLANETSANDGUNS_API UOPAG_LootManagerComponent : public UActorComponent
@@ -17,7 +18,15 @@ public:
 	UOPAG_LootManagerComponent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
-		UDataTable* DataTable;
+	UDataTable* LootTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
+	AOPAG_LootBox* LootBox;
+
+private:
+	TArray<FOPAG_LootChance*> Drops;
+	TArray<FOPAG_LootChance*> Modules;
+	TArray<FOPAG_LootChance*> Guns;
 
 protected:
 	virtual void BeginPlay() override;
@@ -25,5 +34,8 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void SpawnLoot(const float DifficultyValue) const;
+	void GenerateLoot(const float DifficultyValue);
+
+private:
+	void PopulateLootLists();
 };

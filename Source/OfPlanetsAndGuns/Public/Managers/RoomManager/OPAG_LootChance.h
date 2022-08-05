@@ -24,6 +24,6 @@ struct OFPLANETSANDGUNS_API FOPAG_LootChance : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		ELootType DropType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (UIMin = 0, UIMax = 100))
 		float LootChance;
 };

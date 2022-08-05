@@ -32,6 +32,11 @@ void AOPAG_LootBox::Tick(float DeltaTime)
 
 }
 
+void AOPAG_LootBox::SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList)
+{
+	Items = ItemsList;
+}
+
 void AOPAG_LootBox::Interact_Implementation()
 {
 
@@ -41,4 +46,3 @@ bool AOPAG_LootBox::CanInteract_Implementation()
 {
 	return bIsInteractable;
 }
-
