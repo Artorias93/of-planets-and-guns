@@ -7,18 +7,17 @@ AOPAG_LootBox::AOPAG_LootBox()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	Crate = CreateDefaultSubobject<UStaticMeshComponent>("Crate");
+	if (Crate)
+		RootComponent = Crate;
+
 	Lid = CreateDefaultSubobject<UStaticMeshComponent>("Lid");
 	if (Lid)
 		Lid->SetupAttachment(RootComponent);
 
-	Crate = CreateDefaultSubobject<UStaticMeshComponent>("Crate");
-	if (Crate)
-		Crate->SetupAttachment(RootComponent);
-
 	LootSpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint");
 	if (LootSpawnPoint)
 		LootSpawnPoint->SetupAttachment(RootComponent);
-
 }
 
 void AOPAG_LootBox::BeginPlay()
@@ -31,5 +30,15 @@ void AOPAG_LootBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AOPAG_LootBox::Interact_Implementation()
+{
+
+}
+
+bool AOPAG_LootBox::CanInteract_Implementation()
+{
+	return bIsInteractable;
 }
 

@@ -11,7 +11,9 @@ UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_InteractableInterface
 {
 	GENERATED_BODY()
-	
+
+		bool bIsInteractable = false;
+
 public:	
 	// Sets default values for this actor's properties
 	AOPAG_LootBox();
@@ -39,5 +41,5 @@ public:
 		bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
 	
-
+	
 };

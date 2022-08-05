@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interactables/OPAG_InteractableInterface.h"
 #include "GameFramework/Actor.h"
 #include "OPAG_Drop.generated.h"
 
@@ -18,7 +19,7 @@ enum class EDropType : uint8 {
 };
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_Drop : public AActor
+class OFPLANETSANDGUNS_API AOPAG_Drop : public AActor, public IOPAG_InteractableInterface
 {
 	GENERATED_BODY()
 	
