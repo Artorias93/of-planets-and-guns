@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Characters/Enemies/NormalTurret/OPAG_NormalTurret.h"
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Player/OPAG_Player.h"
@@ -12,7 +9,6 @@ AOPAG_NormalTurret::AOPAG_NormalTurret()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("Muzzle"));
-
 	if (Muzzle)
 	{
 		Muzzle->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "TurretMuzzleSocket");
@@ -49,7 +45,21 @@ void AOPAG_NormalTurret::Death()
 		true
 	);
 
+	//Breaks constraints on all the bones of the skeletal mesh and gives them an impulse in a random direction,
+	//simulating an explosion
+	GetMesh()->BreakConstraint(GetRandomImpulseVector(), FVector::ZeroVector, "SK_Prop_Turret_Base_Single_01");
+	GetMesh()->BreakConstraint(GetRandomImpulseVector(), FVector::ZeroVector, "SK_Prop_Turret_Gattling_Base_01");
+	GetMesh()->BreakConstraint(GetRandomImpulseVector(), FVector::ZeroVector, "SK_Prop_Turret_Gattling_Barrel_01");
+
 	Super::Death();
+}
+
+//Returns a random vector in a range (the bounds of the range can be set in editor)
+FVector AOPAG_NormalTurret::GetRandomImpulseVector() const
+{
+	return FVector(FMath::FRandRange(-900, 900),
+		FMath::FRandRange(-900, 900),
+		FMath::FRandRange(-900, 900));
 }
 
 FRotator AOPAG_NormalTurret::GetTurretHeadRotation() const
@@ -59,18 +69,13 @@ FRotator AOPAG_NormalTurret::GetTurretHeadRotation() const
 
 void AOPAG_NormalTurret::Tick(float DeltaSeconds)
 {
-	AOPAG_AICBase* AIController = Cast<AOPAG_AICBase>(GetController());
-
-	if (AIController)
+	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
-		AOPAG_Player* Player = Cast<AOPAG_Player>(AIController->GetFocusActor());
-
-		if (Player)
+		if (const AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 		{
-			// Since the Anim BP set the rotation in mode "ADD", then we need to subtract the whole actor rotation
-			FRotator NewRotator = UKismetMathLibrary::FindLookAtRotation(Muzzle->GetComponentLocation(), Player->GetActorLocation()) - GetActorRotation();
-			TurretHeadRotation = NewRotator;			
+			// Since the Anim BP sets the rotation in "ADD" mode, we need to subtract the whole actor rotation
+			TurretHeadRotation = UKismetMathLibrary::FindLookAtRotation(Muzzle->GetComponentLocation(),
+				Player->GetActorLocation()) - GetActorRotation();;	
 		}
 	}
 }
-

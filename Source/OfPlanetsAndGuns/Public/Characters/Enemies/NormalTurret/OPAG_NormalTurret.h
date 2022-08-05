@@ -18,6 +18,8 @@ class OFPLANETSANDGUNS_API AOPAG_NormalTurret : public AOPAG_Enemy
 
 public:
 
+	AOPAG_NormalTurret();
+
 	virtual void Attack() override;
 
 	UFUNCTION(CallInEditor, Category = "Normal Turret")
@@ -28,9 +30,13 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-protected:
+protected:	
 
-	AOPAG_NormalTurret();
+	FVector GetRandomImpulseVector() const;
+
+	//TODO: This breaks everything
+	// UPROPERTY(EditAnywhere, Category="Normal Turret")
+	// float ExplosionImpulseRandomRange = 900.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
 		USceneComponent* Muzzle;
