@@ -17,6 +17,7 @@ void UOPAG_LootManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	PopulateLootLists();
 }
 
 void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -88,8 +89,11 @@ void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 			}
 			if (!Item)
 			{
-				UOPAG_UtilityFunctionLibrary::ShuffleArray(EquippableModules);
-				Items.Add(EquippableModules[0]);
+				if (EquippableModules.Num() > 0)
+				{
+					UOPAG_UtilityFunctionLibrary::ShuffleArray(EquippableModules);
+					Items.Add(EquippableModules[0]);
+				}
 			}
 		}
 	}

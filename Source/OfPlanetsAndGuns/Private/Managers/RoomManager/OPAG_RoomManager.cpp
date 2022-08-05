@@ -15,6 +15,8 @@
 #include "Rooms/OPAG_Portal.h"
 #include "Rooms/OPAG_RoomAttachPoint.h"
 #include "Rooms/OPAG_RoomStreamingVolume.h"
+#include "Interactables/OPAG_LootBox.h"
+#include "Managers/RoomManager/OPAG_LootManagerComponent.h"
 
 
 // Sets default values
@@ -25,6 +27,7 @@ AOPAG_RoomManager::AOPAG_RoomManager()
 	
 	DoorManager = CreateDefaultSubobject<UOPAG_DoorManagerComponent>(TEXT("Door Manager"));
 	EnemyManager = CreateDefaultSubobject<UOPAG_EnemyManagerComponent>(TEXT("Enemy Manager"));
+	LootManager = CreateDefaultSubobject<UOPAG_LootManagerComponent>(TEXT("Loot Manager"));
 }
 
 
@@ -90,6 +93,11 @@ void AOPAG_RoomManager::UpdateData()
 		for (TActorIterator<AOPAG_RoomAttachPoint> It(World); It; ++It)
 		{
 			It->UpdateAttachPointData(this);
+		}
+
+		for (TActorIterator<AOPAG_LootBox> It(World); It; ++It)
+		{
+			LootManager->LootBox = *It;
 		}
 
 		if (DataTable != nullptr)
@@ -172,6 +180,9 @@ void AOPAG_RoomManager::OnStageDifficultyUpdated()
 {
 	if (!bIsAwaitingDifficultyUpdate) return;
 	bIsAwaitingDifficultyUpdate = false;
+
+	LootManager->GenerateLoot(0);
+
 	if (EnemyManager->GetSpawnerCount() == 0)
 	{
 		RoomCleared();
@@ -180,4 +191,3 @@ void AOPAG_RoomManager::OnStageDifficultyUpdated()
 
 	EnemyManager->SpawnWave();
 }
-

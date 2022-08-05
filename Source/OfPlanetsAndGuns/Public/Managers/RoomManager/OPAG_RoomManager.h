@@ -12,6 +12,8 @@ class UOPAG_EnemyManagerComponent;
 class UOPAG_DoorManagerComponent;
 class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomAttachPoint;
+class UOPAG_LootManagerComponent;
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_RoomManager : public AActor
 {
@@ -23,6 +25,9 @@ class OFPLANETSANDGUNS_API AOPAG_RoomManager : public AActor
 
 	UPROPERTY(Category = "Enemy Manager", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UOPAG_EnemyManagerComponent* EnemyManager;
+
+	UPROPERTY(Category = "Enemy Manager", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UOPAG_LootManagerComponent* LootManager;
 
 	uint8 bHasBroadcastedEntry : 1;
 	uint8 bIsAwaitingDifficultyUpdate : 1;
