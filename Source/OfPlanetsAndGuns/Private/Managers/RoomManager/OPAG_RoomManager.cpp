@@ -32,6 +32,8 @@ AOPAG_RoomManager::AOPAG_RoomManager()
 void AOPAG_RoomManager::BeginPlay()
 {
 	Super::BeginPlay();
+	bHasBroadcastedEntry = false;
+	bIsAwaitingDifficultyUpdate = false;
 }
 
 void AOPAG_RoomManager::PreInitializeComponents()
@@ -47,6 +49,7 @@ void AOPAG_RoomManager::PreInitializeComponents()
 			if (GI)
 			{
 				GI->GetEventManager()->RoomSpawned.Broadcast(this);
+				GI->GetEventManager()->StageDifficultyUpdated.AddDynamic(this, &AOPAG_RoomManager::OnStageDifficultyUpdated);
 				return;
 			}
 		}
@@ -133,25 +136,25 @@ void AOPAG_RoomManager::CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const
 
 void AOPAG_RoomManager::EnterRoom()
 {
+	if (!bHasBroadcastedEntry && !bIsStartingRoom)
+	{
+		bHasBroadcastedEntry = true;
+		bIsAwaitingDifficultyUpdate = true;
+		const UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
+		if (GI != nullptr)
+		{
+			GI->GetEventManager()->RoomEntered.Broadcast();
+		}
+	}
+
 	if (bIsRoomCleared)
 	{
 		DoorManager->OpenDoors();
 		return;
 	}
 
-	if (EnemyManager->GetSpawnerCount() == 0)
-	{
-		RoomCleared();
-		return;
-	}
 
-	EnemyManager->SpawnWave();
 	DoorManager->CloseDoors();
-	const UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
-	if (GI != nullptr)
-	{
-		GI->GetEventManager()->RoomEntered.Broadcast();
-	}
 }
 
 void AOPAG_RoomManager::RoomCleared()
@@ -163,5 +166,18 @@ void AOPAG_RoomManager::RoomCleared()
 	{
 		GI->GetEventManager()->RoomCleared.Broadcast();
 	}
+}
+
+void AOPAG_RoomManager::OnStageDifficultyUpdated()
+{
+	if (!bIsAwaitingDifficultyUpdate) return;
+	bIsAwaitingDifficultyUpdate = false;
+	if (EnemyManager->GetSpawnerCount() == 0)
+	{
+		RoomCleared();
+		return;
+	}
+
+	EnemyManager->SpawnWave();
 }
 

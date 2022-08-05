@@ -6,6 +6,7 @@
 #include "Characters/Player/OPAG_PlayerState.h"
 #include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
+#include "RoomManager/OPAG_RoomManager.h"
 #include "StageManager/OPAG_StageGeneration.h"
 #include "OPAG_GameInstance.generated.h"
 
@@ -18,26 +19,28 @@ class OFPLANETSANDGUNS_API UOPAG_GameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
-	float StageDifficulty;
+	float StageDLStart;
+	float CurrentDifficulty;
 	EStageType NextStage;
+	TArray<FOPAG_PlanetData*> Planets;
 	TArray<FOPAG_StageGeneration*> StageGens;
 	TArray<FOPAG_StageGeneration*> BossStages;
 	TArray<FOPAG_StageGeneration*> SafeStages;
+	FOPAG_PlanetData* CurrentPlanet;
 	int32 CurrentStage;
+	int32 CurrentStageRoomCount;
 	uint8 bNextStageIsSafe : 1;
 
 	FOPAG_PlayerState PlayerState;
 
 public:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stage Data")
-		UDataTable* StageGenerationTable;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Planet Data")
-		TSoftObjectPtr<UWorld> PlanetPersistentLevel;
+		UDataTable* PlanetTable;
 
 private:
 	void BindEvents();
+	void LoadPlanetTable();
 	void LoadGenerationTable();
 
 	void SplitStageGens();
@@ -57,7 +60,7 @@ public:
 	UFUNCTION()
 		void OnStageManagerReady();
 	UFUNCTION()
-		void OnStageLoaded();
+		void OnStageLoaded(int32 RoomCount);
 
 	UFUNCTION()
 		void OnStageCleared(const EStageType NextStageType);

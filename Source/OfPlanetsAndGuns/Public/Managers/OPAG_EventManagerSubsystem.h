@@ -16,7 +16,8 @@ class AOPAG_Enemy;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageManagerReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneration, StageGenData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomSpawned, AOPAG_RoomManager* const, RoomManager);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageLoaded);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageDifficultyUpdated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageLoaded, int32, RoomCount);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageCleared, const EStageType, NextStageType);
 
@@ -80,6 +81,9 @@ public:
 		FRoomSpawned RoomSpawned;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
 		FStageLoaded StageLoaded;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
+		FStageDifficultyUpdated StageDifficultyUpdated;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
 		FStageCleared StageCleared;

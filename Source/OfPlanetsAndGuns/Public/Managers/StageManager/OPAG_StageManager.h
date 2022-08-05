@@ -51,6 +51,8 @@ class OFPLANETSANDGUNS_API AOPAG_StageManager : public AActor
 	int32 FinalRoom;
 	int32 SafeRoom;
 
+	int32 RoomCounter;
+
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

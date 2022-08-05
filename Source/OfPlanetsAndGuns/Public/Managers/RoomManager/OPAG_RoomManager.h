@@ -24,6 +24,8 @@ class OFPLANETSANDGUNS_API AOPAG_RoomManager : public AActor
 	UPROPERTY(Category = "Enemy Manager", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UOPAG_EnemyManagerComponent* EnemyManager;
 
+	uint8 bHasBroadcastedEntry : 1;
+	uint8 bIsAwaitingDifficultyUpdate : 1;
 
 public:	
 	// Sets default values for this actor's properties
@@ -79,9 +81,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Room Manager")
 		void CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const;
 
+	UFUNCTION(Category = "Room Manager")
+		void OnStageDifficultyUpdated();
+
 	UFUNCTION(BlueprintCallable, Category = "Door Manager")
 		void EnterRoom();
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy Manager")
 		void RoomCleared();
+
 };
