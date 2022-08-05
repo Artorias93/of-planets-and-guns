@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Weapons/Guns/OPAG_GunStats.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_UWModuleView.generated.h"
 
 class UImage;
