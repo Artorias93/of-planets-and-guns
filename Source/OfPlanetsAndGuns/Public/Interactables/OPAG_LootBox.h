@@ -15,14 +15,14 @@ class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_Interacta
 public:	
 	// Sets default values for this actor's properties
 	AOPAG_LootBox();
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* Lid;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* Crate;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UStaticMeshComponent* SpawnPoint;
-
+		USceneComponent* LootSpawnPoint;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -30,7 +30,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void Interact();
 	virtual void Interact_Implementation() override;
@@ -38,5 +38,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
+	
 
 };

@@ -3,22 +3,30 @@
 
 #include "Interactables/OPAG_LootBox.h"
 
-// Sets default values
 AOPAG_LootBox::AOPAG_LootBox()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	Lid = CreateDefaultSubobject<UStaticMeshComponent>("Lid");
+	if (Lid)
+		Lid->SetupAttachment(RootComponent);
+
+	Crate = CreateDefaultSubobject<UStaticMeshComponent>("Crate");
+	if (Crate)
+		Crate->SetupAttachment(RootComponent);
+
+	LootSpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint");
+	if (LootSpawnPoint)
+		LootSpawnPoint->SetupAttachment(RootComponent);
 
 }
 
-// Called when the game starts or when spawned
 void AOPAG_LootBox::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void AOPAG_LootBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
