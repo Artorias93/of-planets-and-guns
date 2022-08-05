@@ -102,6 +102,8 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// Initialize the object seen by the player
 	InteractableObject = CheckLookAtInteractableItems();
 
+	UpdateModuleComparison();
+
 	//UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), GetHealth());
 }
 
@@ -593,6 +595,37 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 		}
 	}
 	return nullptr;
+}
+
+void AOPAG_Player::UpdateModuleComparison() {
+
+	if (InteractableObject == PreviousLookedAtModule)
+		return;
+
+	if (InteractableObject == nullptr) {
+		EMS->UnlookedAtModule.Broadcast();
+
+		PreviousLookedAtModule = InteractableObject;
+	}
+
+	else if (InteractableObject != nullptr) {
+		AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject);
+		if (Module) {
+
+			FOPAG_GunStats CurrentModuleStats;
+			AOPAG_ModuleBase* CurrentModule = PrimaryGun->GetModuleBySocketType(Module->Type);
+			
+			if (CurrentModule) {
+				CurrentModuleStats = CurrentModule->Stats;
+			}
+
+			EMS->LookedAtModule.Broadcast(PrimaryGun->Stats, CurrentModuleStats, Module->Stats,
+					Module->Name, Module->Rarity);
+
+			PreviousLookedAtModule = InteractableObject;
+		}
+	}
+
 }
 
 void AOPAG_Player::ThrowScrap(UPrimitiveComponent* Target)

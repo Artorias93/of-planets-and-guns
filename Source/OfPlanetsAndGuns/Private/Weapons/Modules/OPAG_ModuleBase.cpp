@@ -48,6 +48,14 @@ void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FOPAG_
 	EquippableFireTypes = NewEquippableFireTypes;
 }
 
+FString AOPAG_ModuleBase::GetRarityName(EModuleRarity ModuleRarity)
+{
+	FString RarityName;
+	UEnum::GetValueAsString(ModuleRarity, RarityName);
+	RarityName.RemoveAt(0, 15, true);
+	return RarityName;
+}
+
 UPrimitiveComponent* AOPAG_ModuleBase::GetSphereComponent() const
 {
 	return Sphere;

@@ -140,6 +140,7 @@ private:
 	bool bIsPreADS = false;
 	float GunPreADSRoll = 0;
 	AActor* InteractableObject = nullptr;
+	AActor* PreviousLookedAtModule = nullptr;
 
 private:
 	FOnTimelineFloat OnADSTimelineProgress;
@@ -187,6 +188,7 @@ private:
 	AActor* CheckLookAtInteractableItems();
 	const FVector CalculateModuleSpawnLocation() const;
 	void ThrowScrap(UPrimitiveComponent* Target);
+	void UpdateModuleComparison();
 
 	// Interact with items
 	void InteractWithModule(AOPAG_ModuleBase* Module);

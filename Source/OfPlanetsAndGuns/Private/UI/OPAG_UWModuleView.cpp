@@ -3,6 +3,8 @@
 
 #include "UI/OPAG_UWModuleView.h"
 #include "Weapons/Guns/OPAG_GunBase.h"
+#include "Kismet/KismetTextLibrary.h"
+#include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "Components/TextBlock.h"
 
 void UOPAG_UWModuleView::NativeConstruct()
@@ -14,7 +16,7 @@ void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& GunStats, cons
 	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity)
 {
 	ModuleName->SetText(FText::FromString(OtherModuleName));
-	ModuleRarity->SetText(FText::FromString("No Method - Do it"));
+	ModuleRarity->SetText(FText::FromString(AOPAG_ModuleBase::GetRarityName(OtherModuleRarity)));
 
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, CurrentModuleStats.Damage, OtherModuleStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);
@@ -46,9 +48,8 @@ void UOPAG_UWModuleView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* Stat
 		DeltaText->SetColorAndOpacity(FSlateColor(FLinearColor(FVector(1, 0, 0))));
 	}
 
-	StatAmount->SetText(FText::FromString(FString::SanitizeFloat(NewStat)));
-
-	DeltaString.Append(FString::SanitizeFloat(Delta));
-
+	StatAmount->SetText(UKismetTextLibrary::Conv_FloatToText(NewStat, ERoundingMode::FromZero, false, true, 1, 324, 2, 2));
+	
+	DeltaString.Append(FString::SanitizeFloat(Delta, 2));
 	DeltaText->SetText(FText::FromString(DeltaString));
 }

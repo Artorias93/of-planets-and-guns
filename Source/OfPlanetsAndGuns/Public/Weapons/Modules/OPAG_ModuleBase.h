@@ -20,6 +20,9 @@ class OFPLANETSANDGUNS_API AOPAG_ModuleBase : public AActor, public IOPAG_Intera
 public:	
 	AOPAG_ModuleBase();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FString Name;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* Sphere;
 
@@ -47,6 +50,9 @@ public:
 
 	virtual void OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
 	void SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
+
+	static FString GetRarityName(EModuleRarity ModuleRarity);
+
 	UPrimitiveComponent* GetSphereComponent() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)

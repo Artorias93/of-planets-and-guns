@@ -90,6 +90,8 @@ public:
 
 	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
 
+	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
+	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
 protected:
 	// Shoot behavior
@@ -100,9 +102,7 @@ protected:
 
 	// Utility for link modules and sockets
 	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const;
-	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
 	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
-	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
 	// Create and Attach module behavior
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
