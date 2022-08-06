@@ -173,6 +173,7 @@ void AOPAG_Player::InitDefaultValues()
 
 void AOPAG_Player::InitADSTimeline()
 {
+	checkf(ADSCurveFloat, TEXT("ADS curve float is required for the ADS to rotate properly."));
 	if (ADSCurveFloat)
 	{
 		ADSTimeline->SetLooping(false);
@@ -742,7 +743,7 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 		{
 			SwapGuns();
 
-			PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());;
+			PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
 			PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
 			PrimaryGun->AmmoCurrent = StateToApply.PrimaryGun.AmmoCurrent;
 			PrimaryGun->AmmoMax = StateToApply.PrimaryGun.AmmoMax;

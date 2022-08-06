@@ -389,9 +389,7 @@ void AOPAG_StageManager::FinishedLoadingStage() const
 	{
 		GI->GetEventManager()->StageLoaded.Broadcast(RoomCounter);
 		FTransform StartLocation = StagePathing[StartingRoom]->CurrentRoom->RoomOffset.Offset;
-		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, StartLocation.ToString(), EMessageSeverity::Warning);
 		StartLocation += StagePathing[StartingRoom]->CurrentRoom->LevelStreaming->LevelTransform;
-		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, StartLocation.ToString(), EMessageSeverity::Warning);
 		GI->GetEventManager()->PlacePlayerAtStart.Broadcast(StartLocation);
 	}
 }
