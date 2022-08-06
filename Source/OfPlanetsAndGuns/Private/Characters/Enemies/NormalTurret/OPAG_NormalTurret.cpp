@@ -8,6 +8,8 @@ AOPAG_NormalTurret::AOPAG_NormalTurret()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	//ExplosionImpulseRandomRange = 900.f;
+
 	Muzzle = CreateDefaultSubobject<USceneComponent>(TEXT("Muzzle"));
 	if (Muzzle)
 	{
