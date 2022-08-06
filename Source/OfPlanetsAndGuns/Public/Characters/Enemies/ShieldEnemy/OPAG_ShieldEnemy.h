@@ -35,6 +35,8 @@ private:
 	UFUNCTION()
 	void OnAttackEnd(UAnimMontage* Montage, bool bInterrupted);
 
+	FVector GetChargeEndPosition() const;
+
 	/////////////////////////////
 	//Variables
 	/////////////////////////////

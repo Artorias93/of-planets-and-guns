@@ -35,8 +35,8 @@ protected:
 	FVector GetRandomImpulseVector() const;
 
 	//TODO: This breaks everything
-	// UPROPERTY(EditAnywhere, Category="Normal Turret")
-	// float ExplosionImpulseRandomRange = 900.f;
+	UPROPERTY(EditAnywhere, Category="Normal Turret")
+	float ExplosionImpulseRandomRange = 900.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
 		USceneComponent* Muzzle;
