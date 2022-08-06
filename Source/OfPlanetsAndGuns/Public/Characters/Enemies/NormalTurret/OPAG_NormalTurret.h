@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
+#include <../../../FX/Niagara/Source/Niagara/Public/NiagaraComponent.h>
 #include "OPAG_NormalTurret.generated.h"
 
 class UParticleSystem;
@@ -28,15 +29,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Normal Turret")
 		FRotator GetTurretHeadRotation() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Normal Turret")
+		UNiagaraComponent* GetLaserBeam() const;
+
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
+
+	void StartShooting();
+	
+	void GetShootingDirection(FVector& Start, FVector& ShootDirection, float const ShootingAccuracyTolerance);
+
+	void ShootLineTrace(FVector StartShootLocation, FVector Direction);
+
+	TArray<AActor*> GetAllActorsToIgnore();
 
 protected:	
 
 	FVector GetRandomImpulseVector() const;
-
-	//TODO: This breaks everything
-	 UPROPERTY(EditAnywhere, Category="Normal Turret")
-		float ExplosionImpulseRandomRange = 900.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
 		USceneComponent* Muzzle;
@@ -54,5 +63,18 @@ protected:
 		USoundBase* ShootSound;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
-		FRotator TurretHeadRotation;	
+		FRotator TurretHeadRotation;
+
+	UPROPERTY(VisibleAnywhere)
+		UNiagaraComponent* LaserBeam;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
+
+	FTimerHandle ShotTimerHandle;
+
+	UPROPERTY()
+		FVector StartLocation = FVector::ZeroVector;
+	UPROPERTY()
+		FVector TurretShootDirection = FVector::ZeroVector;
 };
