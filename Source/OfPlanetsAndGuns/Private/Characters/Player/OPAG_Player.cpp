@@ -22,6 +22,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
 #include "Characters/Player/OPAG_PlayerState.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -89,6 +91,9 @@ void AOPAG_Player::BeginPlay()
 
 	BindEvents();
 	BroadcastEvents();
+
+	GetCharacterMovement()->DisableMovement();
+
 }
 
 void AOPAG_Player::Tick(float DeltaTime)
@@ -126,7 +131,7 @@ void AOPAG_Player::BindEvents()
 	EMS->RequestSavePlayerState.AddDynamic(this, &AOPAG_Player::SavePlayerState);
 	EMS->ApplyPlayerState.AddDynamic(this, &AOPAG_Player::ApplyPlayerState);
 
-	
+	EMS->PlacePlayerAtStart.AddDynamic(this, &AOPAG_Player::TeleportPlayerToStart);
 
 	// Enhanced
 	EMS->MoveForward.AddDynamic(this, &AOPAG_Player::MoveForward);
@@ -168,6 +173,7 @@ void AOPAG_Player::InitDefaultValues()
 
 void AOPAG_Player::InitADSTimeline()
 {
+	checkf(ADSCurveFloat, TEXT("ADS curve float is required for the ADS to rotate properly."));
 	if (ADSCurveFloat)
 	{
 		ADSTimeline->SetLooping(false);
@@ -200,6 +206,13 @@ void AOPAG_Player::InitRecoilTimeline()
 		OnRecoilTimelineProgress.BindUFunction(this, FName("RecoilTimelineProgress"));
 		RecoilTimeline->AddInterpFloat(RecoilCurveFloat, OnRecoilTimelineProgress);
 	}
+}
+
+void AOPAG_Player::TeleportPlayerToStart(FTransform StartLocation)
+{;
+	TeleportTo(StartLocation.GetLocation(), FRotator::ZeroRotator);
+	GetController()->SetControlRotation(StartLocation.Rotator());
+	GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Walking;
 }
 
 void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -730,7 +743,7 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 		{
 			SwapGuns();
 
-			PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());;
+			PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
 			PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
 			PrimaryGun->AmmoCurrent = StateToApply.PrimaryGun.AmmoCurrent;
 			PrimaryGun->AmmoMax = StateToApply.PrimaryGun.AmmoMax;

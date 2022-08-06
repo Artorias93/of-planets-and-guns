@@ -18,6 +18,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneratio
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomSpawned, AOPAG_RoomManager* const, RoomManager);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageDifficultyUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageLoaded, int32, RoomCount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlacePlayerAtStart, const FTransform, StartLocation);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageCleared, const EStageType, NextStageType);
 
@@ -81,6 +82,8 @@ public:
 		FRoomSpawned RoomSpawned;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
 		FStageLoaded StageLoaded;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
+		FPlacePlayerAtStart PlacePlayerAtStart;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = StageManager)
 		FStageDifficultyUpdated StageDifficultyUpdated;
