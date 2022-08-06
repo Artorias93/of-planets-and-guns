@@ -2,12 +2,14 @@
 
 #include "Engine/DataTable.h"
 #include "OPAG_LootChance.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "OPAG_LootManagerComponent.generated.h"
 
 class AOPAG_LootBox;
+class AOPAG_ModuleBase;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OFPLANETSANDGUNS_API UOPAG_LootManagerComponent : public UActorComponent
@@ -38,4 +40,5 @@ public:
 
 private:
 	void PopulateLootLists();
+	TSubclassOf<AActor> SelectRandomicModules(const int FireMask, const EModuleTypes ModuleType);
 };

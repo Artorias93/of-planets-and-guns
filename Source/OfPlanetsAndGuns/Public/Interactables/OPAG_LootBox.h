@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "GameFramework/Actor.h"
+#include "Weapons/Guns/OPAG_GunState.h"
 #include "OPAG_LootBox.generated.h"
 
 UCLASS()
@@ -12,7 +13,7 @@ class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_Interacta
 {
 	GENERATED_BODY()
 
-	bool bIsInteractable = false;
+	bool bIsInteractable = true;
 
 public:	
 	AOPAG_LootBox();
@@ -26,8 +27,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		USceneComponent* LootSpawnPoint;
 
+public:
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	float ExplosionForce = 100.f;
+
 private:
 	TArray<TSubclassOf<AActor>> Items;   
+	FOPAG_GunModules Modules;
+	FTimerHandle SpawnItemsHandle;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -37,6 +44,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList);
+	void SetModules(FOPAG_GunModules& ModulesStruct);
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void Interact();
@@ -45,4 +53,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
+
+	UFUNCTION() void SpawnItem();
 };

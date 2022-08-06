@@ -24,4 +24,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool CanInteract();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		void ApplyForce();
 };

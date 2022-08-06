@@ -54,6 +54,25 @@ void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 		Sum += Gun->LootChance;
 		if (RandomChance < Gun->LootChance)
 		{
+			// Init gun's fire type (util for pick random modules)
+			AOPAG_ModularGun* DefaultGun = Gun->DropClass->GetDefaultObject<AOPAG_ModularGun>();
+			const int FireMask = 1 << (int)DefaultGun->FireType;
+
+			// Select random modules to attach 
+			TSubclassOf<AActor> Barrel = SelectRandomicModules(FireMask, EModuleTypes::Barrel);
+			TSubclassOf<AActor> Stock = SelectRandomicModules(FireMask, EModuleTypes::Stock);
+			TSubclassOf<AActor> Grip = SelectRandomicModules(FireMask, EModuleTypes::Grip);
+			TSubclassOf<AActor> Magazine = SelectRandomicModules(FireMask, EModuleTypes::Magazine);
+
+			// Create struct and set this struct in the loot box
+			FOPAG_GunModules ModulesStruct;
+			ModulesStruct.Barrel = Barrel;
+			ModulesStruct.Stock = Stock;
+			ModulesStruct.Grip = Grip;
+			ModulesStruct.Magazine = Magazine;
+			LootBox->SetModules(ModulesStruct);
+
+
 			Item = Gun->DropClass;
 			Items.Add(Item);
 			break;
@@ -126,4 +145,47 @@ void UOPAG_LootManagerComponent::PopulateLootLists()
 				break;
 		}
 	}
+}
+
+TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomicModules(const int FireMask, const EModuleTypes ModuleType)
+{
+	TArray<TSubclassOf<AActor>> EquippableModules;
+	UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
+	float Sum = 0.f;
+	const float RandomChance = FMath::RandRange(0.f, 100.f);
+
+	for (FOPAG_LootChance* Lootable : Modules)
+	{
+		AOPAG_ModuleBase* DefaultModule = Lootable->DropClass->GetDefaultObject<AOPAG_ModuleBase>();
+		if (DefaultModule)
+		{
+			const int EquippableType = DefaultModule->EquippableFireTypes;
+			if (DefaultModule->Type == ModuleType && FireMask & EquippableType)
+			{
+				Sum += Lootable->LootChance;
+				if (RandomChance < Sum)
+				{
+					return Lootable->DropClass;
+				}
+				EquippableModules.Add(Lootable->DropClass);
+			}
+		}
+	}
+	if (EquippableModules.Num() > 0)
+	{
+		UOPAG_UtilityFunctionLibrary::ShuffleArray(EquippableModules);
+		for (TSubclassOf<AActor> Equippable : EquippableModules)
+		{
+			AOPAG_ModuleBase* DefaultModule = Equippable->GetDefaultObject<AOPAG_ModuleBase>();
+			if (DefaultModule)
+			{
+				const int EquippableType = DefaultModule->EquippableFireTypes;
+				if (DefaultModule->Type == ModuleType && FireMask & EquippableType)
+				{
+					return Equippable;
+				}
+			}
+		}
+	}
+	return nullptr;
 }

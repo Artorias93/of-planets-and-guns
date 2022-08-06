@@ -42,6 +42,9 @@ public:
 	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = "EFireTypes"))
 	int EquippableFireTypes;
 
+
+	void ApplyForce_Implementation() override;
+
 protected:
 	virtual void BeginPlay() override;
 

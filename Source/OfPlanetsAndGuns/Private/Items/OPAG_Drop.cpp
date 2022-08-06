@@ -19,6 +19,7 @@ AOPAG_Drop::AOPAG_Drop()
 	if (DropMesh) 
 	{
 		DropMesh->SetupAttachment(RootComponent);
+		DropMesh->SetCollisionProfileName("Drop");
 	}
 }
 
@@ -32,5 +33,12 @@ void AOPAG_Drop::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AOPAG_Drop::ApplyForce_Implementation()
+{
+	Sphere->SetSimulatePhysics(true);
+	const FVector Force = Sphere->GetUpVector() * 20000.f + Sphere->GetForwardVector() * 20000.f;
+	Sphere->AddForce(Force, NAME_None, true);
 }
 

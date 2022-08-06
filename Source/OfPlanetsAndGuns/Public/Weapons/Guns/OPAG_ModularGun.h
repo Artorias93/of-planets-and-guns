@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "OPAG_GunState.h"
 #include "Weapons/Guns/OPAG_GunBase.h"
+#include "Interactables/OPAG_InteractableInterface.h"
 #include "OPAG_ModularGun.generated.h"
 
 class AOPAG_ModuleBase;
@@ -22,10 +23,10 @@ class UKismetSystemLibrary;
 class UDataTable;
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_ModularGun : public AOPAG_GunBase
+class OFPLANETSANDGUNS_API AOPAG_ModularGun : public AOPAG_GunBase, public IOPAG_InteractableInterface
 {
 	GENERATED_BODY()
-	
+
 public:
 	AOPAG_ModularGun();
 
@@ -57,14 +58,21 @@ public:
 	UPROPERTY(Category = "Sound", EditDefaultsOnly, BlueprintReadWrite)
 	USoundBase* ReloadSound;
 
-private:
-	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
+public:
+	UPROPERTY(Category = StandardModules, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
+
+	UPROPERTY(Category = StandardModules, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AOPAG_ModuleBase> StandardStock;
+
+	UPROPERTY(Category = StandardModules, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AOPAG_ModuleBase> StandardGrip;
+
+	UPROPERTY(Category = StandardModules, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
 
 private:
-	TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
-	TSubclassOf<AOPAG_ModuleBase> StandardStock;
-	TSubclassOf<AOPAG_ModuleBase> StandardGrip;
-	TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
+	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
 
 protected:
 	virtual void BeginPlay() override;
@@ -72,6 +80,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	void ApplyForce_Implementation() override;
 
 	// Reload system
 	void Reload();

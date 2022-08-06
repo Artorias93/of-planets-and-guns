@@ -22,6 +22,13 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 	}
 }
 
+void AOPAG_ModuleBase::ApplyForce_Implementation()
+{
+	Sphere->SetSimulatePhysics(true);
+	const FVector Force = Sphere->GetUpVector() * 20000.f + Sphere->GetForwardVector() * 20000.f;
+	Sphere->AddForce(Force, NAME_None, true);
+}
+
 void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();

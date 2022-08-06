@@ -2,6 +2,9 @@
 
 
 #include "Interactables/OPAG_LootBox.h"
+#include "Weapons/Guns/OPAG_ModularGun.h"
+#include <Components/PrimitiveComponent.h>
+#include "Interactables/OPAG_InteractableInterface.h"
 
 AOPAG_LootBox::AOPAG_LootBox()
 {
@@ -37,12 +40,53 @@ void AOPAG_LootBox::SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList)
 	Items = ItemsList;
 }
 
+void AOPAG_LootBox::SetModules(FOPAG_GunModules& ModulesStruct)
+{
+	Modules = ModulesStruct;
+}
+
 void AOPAG_LootBox::Interact_Implementation()
 {
+	// Explosion behavior with half parabolic method
+	Lid->SetSimulatePhysics(true);
+	const FVector Force = Lid->GetUpVector() * ExplosionForce + Lid->GetForwardVector() * ExplosionForce;
+	Lid->AddForce(Force, NAME_None, true);
 
+	// Active Timer for spawn items
+	SpawnItem();
 }
 
 bool AOPAG_LootBox::CanInteract_Implementation()
 {
 	return bIsInteractable;
+}
+
+void AOPAG_LootBox::SpawnItem()
+{
+	if (Items.Num() == 0)
+	{
+		return;
+	}
+
+	// Spawn Item
+	const FVector SpawnLocation = RootComponent->GetComponentLocation();
+	const FRotator SpawnRotator = FRotator::ZeroRotator;
+	AActor* Item = GetWorld()->SpawnActor(Items[0], &SpawnLocation, &SpawnRotator);
+	Items.RemoveAt(0);
+
+	// If the item is gun, that gun is generate with random modules
+	if (AOPAG_ModularGun* GunModular = Cast<AOPAG_ModularGun>(Item))
+	{
+		GunModular->CreateAndAttachAllModules(Modules);
+	}
+
+	// Apply force for any items
+	IOPAG_InteractableInterface* TheInterface = Cast<IOPAG_InteractableInterface>(Item);
+	if (TheInterface)
+	{
+		TheInterface->ApplyForce_Implementation();
+	}
+
+	// Re-call this method for any items
+	GetWorld()->GetTimerManager().SetTimer(SpawnItemsHandle, this, &AOPAG_LootBox::SpawnItem, 1.2f, false);
 }

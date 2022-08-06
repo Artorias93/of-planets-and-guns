@@ -28,34 +28,13 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	Magazine = CreateDefaultSubobject<UChildActorComponent>(TEXT("Magazine"));
 	Sight = CreateDefaultSubobject<UChildActorComponent>(TEXT("Sight"));
 	Accessory = CreateDefaultSubobject<UChildActorComponent>(TEXT("Accessory"));
+}
 
-	// Barrel Setting
-	static ConstructorHelpers::FClassFinder<AActor> BlueprintStandardBarrel(TEXT("/Game/OfPlanetsAndGuns/Weapons/Modules/SpecializedModules/Barrell/BP_StandardBarrell"));
-	if (BlueprintStandardBarrel.Succeeded())
-	{
-		StandardBarrel = BlueprintStandardBarrel.Class;
-	}
-
-	// Stock Setting
-	static ConstructorHelpers::FClassFinder<AActor> BlueprintStandardStock(TEXT("/Game/OfPlanetsAndGuns/Weapons/Modules/SpecializedModules/Stock/BP_StandardStock"));
-	if (BlueprintStandardStock.Succeeded())
-	{
-		StandardStock = BlueprintStandardStock.Class;
-	}
-
-	// Grip Setting
-	static ConstructorHelpers::FClassFinder<AActor> BlueprintStandardGrip(TEXT("/Game/OfPlanetsAndGuns/Weapons/Modules/SpecializedModules/Grip/BP_StandardGrip"));
-	if (BlueprintStandardGrip.Succeeded())
-	{
-		StandardGrip = BlueprintStandardGrip.Class;
-	}
-
-	// Magazine Setting
-	static ConstructorHelpers::FClassFinder<AActor> BlueprintStandardMagazine(TEXT("/Game/OfPlanetsAndGuns/Weapons/Modules/SpecializedModules/Magazine/BP_StandardMagazine"));
-	if (BlueprintStandardMagazine.Succeeded())
-	{
-		StandardMagazine = BlueprintStandardMagazine.Class;
-	}
+void AOPAG_ModularGun::ApplyForce_Implementation()
+{
+	Receiver->SetSimulatePhysics(true);
+	const FVector Force = Receiver->GetUpVector() * 20000.f + Receiver->GetForwardVector() * 20000.f;
+	Receiver->AddForce(Force, NAME_None, true);
 }
 
 void AOPAG_ModularGun::BeginPlay()
