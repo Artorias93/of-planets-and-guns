@@ -3,6 +3,7 @@
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 {
