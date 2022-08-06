@@ -166,6 +166,9 @@ private:
 	void InitDashTimeline();
 	void InitRecoilTimeline();
 
+	UFUNCTION()
+	void TeleportPlayerToStart(FTransform StartLocation);
+
 	// Mathematics utility
 	const FVector CalculateThrowForce() const;
 	

@@ -388,6 +388,11 @@ void AOPAG_StageManager::FinishedLoadingStage() const
 	if (GI)
 	{
 		GI->GetEventManager()->StageLoaded.Broadcast(RoomCounter);
+		FTransform StartLocation = StagePathing[StartingRoom]->CurrentRoom->RoomOffset.Offset;
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, StartLocation.ToString(), EMessageSeverity::Warning);
+		StartLocation += StagePathing[StartingRoom]->CurrentRoom->LevelStreaming->LevelTransform;
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, StartLocation.ToString(), EMessageSeverity::Warning);
+		GI->GetEventManager()->PlacePlayerAtStart.Broadcast(StartLocation);
 	}
 }
 
@@ -588,7 +593,6 @@ void AOPAG_StageManager::PostGenerationActions()
 	AssignClosedExits();
 	UnloadLevels();
 	LoadingProgress->Broadcast(LoadingProgress_Full);
-	//ReplacePawn();
 	GetWorldTimerManager().SetTimerForNextTick(FTimerDelegate::CreateLambda([this]()
 	{
 		FinishedLoadingStage();
@@ -604,17 +608,6 @@ void AOPAG_StageManager::AssignClosedExits()
 
 		RoomManager->CloseExits(Pathing->CurrentRoom->ID == FinalRoom, Pathing->CurrentRoom->ID == SafeRoom);
 	}
-}
-
-void AOPAG_StageManager::ReplacePawn() const
-{
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	AActor* PawnToDestroy = PlayerController->GetPawnOrSpectator();
-	const FActorSpawnParameters SpawnInfo;
-	APawn* PawnToPossess = GetWorld()->SpawnActor<APawn>(
-		Pawn.Get(), PawnToDestroy->GetActorTransform(), SpawnInfo);
-	PawnToDestroy->Destroy();
-	PlayerController->Possess(PawnToPossess);
 }
 
 void AOPAG_StageManager::UnloadLevels()

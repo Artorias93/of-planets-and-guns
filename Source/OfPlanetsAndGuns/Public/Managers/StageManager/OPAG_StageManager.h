@@ -66,8 +66,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay)
 		bool bDisableLevelUnloading;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSoftClassPtr<APawn> Pawn;
 	// Sets default values for this actor's properties
 	AOPAG_StageManager();
 
@@ -126,7 +124,6 @@ private:
 	void PostGenerationActions();
 
 	void AssignClosedExits();
-	void ReplacePawn() const;
 	UFUNCTION()
 	void LoadLevels(AOPAG_RoomStreamingVolume* const Volume);
 	UFUNCTION()
