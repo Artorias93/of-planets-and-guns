@@ -5,14 +5,13 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 
+
 // Sets default values
 AOPAG_Zipline::AOPAG_Zipline()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	StartingPoint = nullptr;
-	EndingPoint = nullptr;
 	PlayerRef = nullptr;
 	bCanPlayerInteract = false;
 
@@ -68,13 +67,13 @@ void AOPAG_Zipline::Interact_Implementation()
 	//if (StartingPoint == nullptr || EndingPoint == nullptr || PlayerRef == nullptr) return;
 	UE_LOG(LogTemp, Warning, TEXT("INTERACT"));
 
-	float deltaDistance = FVector::Distance(StartingPoint->GetComponentLocation(), EndingPoint->GetComponentLocation());
+	float deltaDistance = FVector::Distance(StartingPoint, EndingPoint);
 	float deltaTime = deltaDistance / 1000;
 	FLatentActionInfo LatentInfo;
 	LatentInfo.CallbackTarget = this;
 
-	UKismetSystemLibrary::MoveComponentTo(PlayerRef->GetRootComponent(), StartingPoint->GetComponentLocation(), PlayerRef->GetRootComponent()->GetRelativeRotation(), false, false, 0.3, false, EMoveComponentAction::Type::Move, LatentInfo);
-	UKismetSystemLibrary::MoveComponentTo(PlayerRef->GetRootComponent(), EndingPoint->GetComponentLocation(), PlayerRef->GetRootComponent()->GetRelativeRotation(), false, true, deltaTime , false, EMoveComponentAction::Type::Move , LatentInfo);
+	UKismetSystemLibrary::MoveComponentTo(PlayerRef->GetRootComponent(), StartingPoint, PlayerRef->GetRootComponent()->GetRelativeRotation(), false, false, 0.3, false, EMoveComponentAction::Type::Move, LatentInfo);
+	UKismetSystemLibrary::MoveComponentTo(PlayerRef->GetRootComponent(), EndingPoint, PlayerRef->GetRootComponent()->GetRelativeRotation(), false, true, deltaTime , false, EMoveComponentAction::Type::Move , LatentInfo);
 	
 }
 
@@ -84,52 +83,42 @@ bool AOPAG_Zipline::CanInteract_Implementation() {
 
 
 void AOPAG_Zipline::SetUpZipline() {
-
 	Cable->AttachToComponent(CableAttachPointA, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	Cable->SetAttachEndToComponent(CableAttachPointB);
 	InteractableAreaA->BodyInstance.SetCollisionProfileName(TEXT("Volume"));
 	InteractableAreaB->BodyInstance.SetCollisionProfileName(TEXT("Volume"));
 	InteractableAreaA->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapPointABegin);
 	InteractableAreaB->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapPointBBegin);
-	InteractableAreaA->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapEnd);
-	InteractableAreaB->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapEnd);
-}
-
-
-void AOPAG_Zipline::OverlapReset() {
-	StartingPoint = nullptr;
-	EndingPoint = nullptr;
-	PlayerRef = nullptr;
-	bCanPlayerInteract = false;
+	InteractableAreaA->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapReset);
+	InteractableAreaB->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapReset);
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_Player::StaticClass(), FoundActors);
+	PlayerRef = (AOPAG_Player*)FoundActors[0];
 }
 
 void AOPAG_Zipline::OverlapPointABegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn()){
-		UE_LOG(LogTemp, Warning, TEXT("Collision A Begin Step 1"));
-		if (StartingPoint == nullptr && PlayerRef == nullptr && EndingPoint == nullptr) {
-			StartingPoint = PlayerAttachPointA;
-			EndingPoint = PlayerAttachPointB;
-			PlayerRef = (AOPAG_Player*)OtherActor;
-			bCanPlayerInteract = true;
-			UE_LOG(LogTemp, Warning, TEXT("Collision A Begin Step 2"));
-		}
+		StartingPoint = PlayerAttachPointA->GetComponentLocation();
+		EndingPoint = PlayerAttachPointB->GetComponentLocation();
+		//PlayerRef = (AOPAG_Player*)OtherActor;
+		bCanPlayerInteract = true;
+		UE_LOG(LogTemp, Warning, TEXT("Collision A Begin Step 2"));
+
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Collision A Begin"));
 }
 
 void AOPAG_Zipline::OverlapPointBBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn()) {
-		if (StartingPoint == nullptr && PlayerRef == nullptr) {
-			StartingPoint = PlayerAttachPointB;
-			EndingPoint = PlayerAttachPointA;
-			PlayerRef = (AOPAG_Player*)OtherActor;
-			bCanPlayerInteract = true;
-		}
+		StartingPoint = PlayerAttachPointB->GetComponentLocation();
+		EndingPoint = PlayerAttachPointA->GetComponentLocation();
+		//PlayerRef = (AOPAG_Player*)OtherActor;
+		bCanPlayerInteract = true;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Collision B Begin"));
 }
 
 
-void AOPAG_Zipline::OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	OverlapReset();
+void AOPAG_Zipline::OverlapReset(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
+	bCanPlayerInteract = false;
 }

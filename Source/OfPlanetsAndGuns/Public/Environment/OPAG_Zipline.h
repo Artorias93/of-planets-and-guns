@@ -8,6 +8,7 @@
 #include "CableComponent.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 #include "OPAG_Zipline.generated.h"
 
 UCLASS()
@@ -73,10 +74,10 @@ public:
 
 private: 
 	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline" , meta = (AllowPrivateAccess = "true"))
-		USceneComponent* StartingPoint;
+		FVector StartingPoint;
 
 	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline", meta = (AllowPrivateAccess = "true"))
-		USceneComponent* EndingPoint;
+		FVector EndingPoint;
 
 	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline" , meta = (AllowPrivateAccess = "true"))
 		AOPAG_Player* PlayerRef;
@@ -87,9 +88,6 @@ private:
 	UFUNCTION(BlueprintCallable)
 		void SetUpZipline();
 
-	UFUNCTION(BlueprintCallable)
-		void OverlapReset();
-
 	UFUNCTION()
 		void OverlapPointABegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
@@ -97,6 +95,6 @@ private:
 		void OverlapPointBBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void OverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+		void OverlapReset(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 };
