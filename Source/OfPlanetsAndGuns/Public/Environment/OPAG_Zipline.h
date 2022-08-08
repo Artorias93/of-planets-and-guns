@@ -96,5 +96,5 @@ private:
 
 	UFUNCTION()
 		void OverlapReset(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	
+
 };

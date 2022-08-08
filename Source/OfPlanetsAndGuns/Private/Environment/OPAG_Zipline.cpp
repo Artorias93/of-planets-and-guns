@@ -91,9 +91,8 @@ void AOPAG_Zipline::SetUpZipline() {
 	InteractableAreaB->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapPointBBegin);
 	InteractableAreaA->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapReset);
 	InteractableAreaB->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapReset);
-	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_Player::StaticClass(), FoundActors);
-	PlayerRef = (AOPAG_Player*)FoundActors[0];
+
+	PlayerRef = Cast<AOPAG_Player>(GetWorld()->GetFirstPlayerController()->GetPawn());
 }
 
 void AOPAG_Zipline::OverlapPointABegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -102,10 +101,9 @@ void AOPAG_Zipline::OverlapPointABegin(UPrimitiveComponent* OverlappedComponent,
 		EndingPoint = PlayerAttachPointB->GetComponentLocation();
 		//PlayerRef = (AOPAG_Player*)OtherActor;
 		bCanPlayerInteract = true;
-		UE_LOG(LogTemp, Warning, TEXT("Collision A Begin Step 2"));
-
+		UE_LOG(LogTemp, Warning, TEXT("Collision A Begin"));
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Collision A Begin"));
+
 }
 
 void AOPAG_Zipline::OverlapPointBBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -114,11 +112,14 @@ void AOPAG_Zipline::OverlapPointBBegin(UPrimitiveComponent* OverlappedComponent,
 		EndingPoint = PlayerAttachPointA->GetComponentLocation();
 		//PlayerRef = (AOPAG_Player*)OtherActor;
 		bCanPlayerInteract = true;
+		UE_LOG(LogTemp, Warning, TEXT("Collision B Begin"));
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Collision B Begin"));
 }
 
 
 void AOPAG_Zipline::OverlapReset(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	bCanPlayerInteract = false;
+	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn()) {
+		bCanPlayerInteract = false;
+	}
 }
+

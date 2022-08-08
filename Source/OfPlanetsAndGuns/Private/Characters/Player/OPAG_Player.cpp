@@ -541,15 +541,19 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 	// Calculate Tracing
 	TArray<FHitResult> OutHits;
 	TArray<AActor*> ActorsToIgnore;
-	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), CameraStartLocation, CameraDirection, LookUpCapsuleRadius, 0, InteractableTypesQuery, 
-		false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+	this->GetAllChildActors(ActorsToIgnore);
+	ActorsToIgnore.Add(this);
+	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), Camera->GetComponentLocation(), CameraDirection, LookUpCapsuleRadius, 0, InteractableTypesQuery,
+		false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, OutHits, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 	if (bHasHit && OutHits.Num() > 0)
 	{
-		const bool bActorImplementsInterface = OutHits[0].GetActor()->GetClass()->
-		ImplementsInterface(UOPAG_InteractableInterface::StaticClass());
-		if (bActorImplementsInterface)
-		{	
-			return OutHits[0].GetActor();
+		for (int i = 0; i < OutHits.Num(); ++i) {
+			const bool bActorImplementsInterface = OutHits[i].GetActor()->GetClass()->
+			ImplementsInterface(UOPAG_InteractableInterface::StaticClass());
+			if (bActorImplementsInterface)
+			{	
+				return OutHits[i].GetActor();
+			}
 		}
 	}
 	return nullptr;
