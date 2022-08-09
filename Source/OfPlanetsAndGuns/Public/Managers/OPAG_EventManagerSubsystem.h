@@ -46,6 +46,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValu
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FLookedAtModule, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, CurrentModule, const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FLookedAtGun, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, OtherGunStats, const FString, OtherGunName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
@@ -139,7 +141,11 @@ public:
 		FLookedAtModule LookedAtModule;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
 		FUnlookedAtModule UnlookedAtModule;
-	
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FLookedAtGun LookedAtGun;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FUnlookedAtGun UnlookedAtGun;
+
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
 		FEnemyKilled EnemyKilled;

@@ -8,6 +8,7 @@
 #include "UI/OPAG_UWPauseView.h"
 #include "UI/OPAG_UWLoadingScreenView.h"
 #include "UI/OPAG_UWModuleView.h"
+#include "UI/OPAG_UWGunCompareView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -26,6 +27,8 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
 		EMS->LookedAtModule.AddDynamic(this, &AOPAG_GameplayHUD::ShowModuleCompareView);
 		EMS->UnlookedAtModule.AddDynamic(this, &AOPAG_GameplayHUD::HideModuleCompareView);
+		EMS->LookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::ShowGunCompareView);
+		EMS->UnlookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::HideGunCompareView);
 	}
 }
 
@@ -80,7 +83,11 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		ModuleViewWidget = CreateWidget<UOPAG_UWModuleView>(GetWorld(), ModuleViewWidgetClass);
 	}
-	
+
+	if (GunCompareViewWidgetClass)
+	{
+		GunCompareViewWidget = CreateWidget<UOPAG_UWGunCompareView>(GetWorld(), GunCompareViewWidgetClass);
+	}
 }
 
 void AOPAG_GameplayHUD::ShowPauseView() {
@@ -147,5 +154,20 @@ void AOPAG_GameplayHUD::HideModuleCompareView()
 {
 	if (ModuleViewWidget) {
 		ModuleViewWidget->RemoveFromViewport();
+	}
+}
+
+void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName)
+{
+	if (GunCompareViewWidget) {
+		GunCompareViewWidget->AddToViewport(3);
+		GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName);
+	}
+}
+
+void AOPAG_GameplayHUD::HideGunCompareView()
+{
+	if (GunCompareViewWidget) {
+		GunCompareViewWidget->RemoveFromViewport();
 	}
 }

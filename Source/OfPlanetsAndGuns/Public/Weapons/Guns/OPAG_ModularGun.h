@@ -102,6 +102,10 @@ public:
 	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
 	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
+	virtual void Interact_Implementation() override;
+
+	virtual bool CanInteract_Implementation() override;
+
 protected:
 	// Shoot behavior
 	UFUNCTION(BlueprintCallable) void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);

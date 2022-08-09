@@ -37,6 +37,20 @@ void AOPAG_ModularGun::ApplyForce_Implementation()
 	Receiver->AddForce(Force, NAME_None, true);
 }
 
+void AOPAG_ModularGun::Interact_Implementation()
+{
+}
+
+bool AOPAG_ModularGun::CanInteract_Implementation()
+{
+	if (GetParentActor() == nullptr)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void AOPAG_ModularGun::BeginPlay()
 {
 	Super::BeginPlay();

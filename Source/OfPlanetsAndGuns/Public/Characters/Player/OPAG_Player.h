@@ -191,7 +191,7 @@ private:
 	AActor* CheckLookAtInteractableItems();
 	const FVector CalculateModuleSpawnLocation() const;
 	void ThrowScrap(UPrimitiveComponent* Target);
-	void UpdateModuleComparison();
+	void UpdateComparison();
 
 	// Interact with items
 	void InteractWithModule(AOPAG_ModuleBase* Module);

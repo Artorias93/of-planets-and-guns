@@ -20,13 +20,14 @@ void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& GunStats, cons
 
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, CurrentModuleStats.Damage, OtherModuleStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);
-	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, GunStats.Accuracy, CurrentModuleStats.Accuracy, OtherModuleStats.Accuracy);
+	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, GunStats.Accuracy, CurrentModuleStats.Accuracy, OtherModuleStats.Accuracy, true);
 	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, GunStats.RecoilRate, CurrentModuleStats.RecoilRate, OtherModuleStats.RecoilRate);
-	UpdateSingleStat(ReloadingText, ReloadingAmount, ReloadingDelta, GunStats.ReloadingTime, CurrentModuleStats.ReloadingTime, OtherModuleStats.ReloadingTime);
+	UpdateSingleStat(ReloadingText, ReloadingAmount, ReloadingDelta, GunStats.ReloadingTime, CurrentModuleStats.ReloadingTime, OtherModuleStats.ReloadingTime, true);
 	UpdateSingleStat(ClipSizeText, ClipSizeAmount, ClipSizeDelta, GunStats.ClipSize, CurrentModuleStats.ClipSize, OtherModuleStats.ClipSize);
 }
 
-void UOPAG_UWModuleView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float BaseAmount, float OldValue, float NewValue) {
+void UOPAG_UWModuleView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float BaseAmount, float OldValue, 
+	float NewValue, bool bIsInverted) {
 	float NewStat = BaseAmount + NewValue;
 	float OldStat = BaseAmount + OldValue;
 	float Delta = NewStat - OldStat;
@@ -34,22 +35,31 @@ void UOPAG_UWModuleView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* Stat
 	FString DeltaString;
 
 	if (NewStat > OldStat) {
-		StatText->SetColorAndOpacity(FSlateColor(FLinearColor(FVector(0,1,0))));
-		DeltaText->SetColorAndOpacity(FSlateColor(FLinearColor(FVector(0,1,0))));
+		if (bIsInverted)
+			UpdateTextColor(StatText, DeltaText, RedColor);
+		else
+			UpdateTextColor(StatText, DeltaText, GreenColor);
 
 		DeltaString.AppendChar('+');
 	}
 	else if (NewStat == OldStat) {
-		StatText->SetColorAndOpacity(FSlateColor(FLinearColor(FVector(1, 1, 1))));
-		DeltaText->SetColorAndOpacity(FSlateColor(FLinearColor(FVector(1, 1, 1))));
+		UpdateTextColor(StatText, DeltaText, WhiteColor);
 	}
 	else if (NewStat < OldStat) {
-		StatText->SetColorAndOpacity(FSlateColor(FLinearColor(FVector(1, 0, 0))));
-		DeltaText->SetColorAndOpacity(FSlateColor(FLinearColor(FVector(1, 0, 0))));
+		if (bIsInverted)
+			UpdateTextColor(StatText, DeltaText, GreenColor);
+		else
+			UpdateTextColor(StatText, DeltaText, RedColor);
 	}
 
 	StatAmount->SetText(UKismetTextLibrary::Conv_FloatToText(NewStat, ERoundingMode::FromZero, false, true, 1, 324, 2, 2));
 	
 	DeltaString.Append(FString::SanitizeFloat(Delta, 2));
 	DeltaText->SetText(FText::FromString(DeltaString));
+}
+
+void UOPAG_UWModuleView::UpdateTextColor(UTextBlock* StatText, UTextBlock* DeltaText, FLinearColor Color)
+{
+	StatText->SetColorAndOpacity(Color);
+	DeltaText->SetColorAndOpacity(Color);
 }

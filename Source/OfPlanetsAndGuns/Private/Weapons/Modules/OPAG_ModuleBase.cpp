@@ -90,4 +90,7 @@ void AOPAG_ModuleBase::CheckIfPhysical()
 	{
 		Sphere->SetSimulatePhysics(true);
 	}
+	else {
+		Sphere->SetCollisionProfileName("NoCollision");
+	}
 }

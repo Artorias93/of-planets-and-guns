@@ -63,6 +63,13 @@ class OFPLANETSANDGUNS_API UOPAG_UWModuleView : public UUserWidget
 		UTextBlock* ReloadingDelta;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ClipSizeDelta;
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		FLinearColor RedColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		FLinearColor GreenColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+		FLinearColor WhiteColor;
 
 public:
 	UFUNCTION()
@@ -71,5 +78,8 @@ public:
 
 	void NativeConstruct();
 
-	void UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float BaseAmount, float OldValue, float NewValue);
+	void UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float BaseAmount, float OldValue, 
+		float NewValue, bool bIsInverted = false);
+
+	void UpdateTextColor(UTextBlock* StatText, UTextBlock* DeltaText, FLinearColor Color);
 };

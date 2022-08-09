@@ -44,6 +44,10 @@ private:
 		class UOPAG_UWModuleView* ModuleViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWModuleView> ModuleViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWGunCompareView* GunCompareViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWGunCompareView> GunCompareViewWidgetClass;
 	
 
 public:
@@ -65,4 +69,9 @@ public:
 	void ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
 	UFUNCTION()
 	void HideModuleCompareView();
+
+	UFUNCTION()
+	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName);
+	UFUNCTION()
+	void HideGunCompareView();
 };
