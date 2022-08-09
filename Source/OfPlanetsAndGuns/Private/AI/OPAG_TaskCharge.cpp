@@ -39,7 +39,13 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE NOT FOUND"));
 					
 					AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
-					
+
+
+
+					AIController->MoveToLocation(ChargePoint, 100.f, false, false,
+						false, false, nullptr, false);
+
+
 					return EBTNodeResult::Succeeded;
 				}
 
