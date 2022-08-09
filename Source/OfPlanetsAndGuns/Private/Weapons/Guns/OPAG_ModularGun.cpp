@@ -175,7 +175,7 @@ void AOPAG_ModularGun::ShootThrowable(const FRotator SpawnRotation)
 	AOPAG_BarrelBase* Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
 	if (Module)
 	{
-		UChildActorComponent* Muzzle = Module->MuzzleComponent;
+		USceneComponent* Muzzle = Module->MuzzleComponent;
 		if (Muzzle)
 		{
 			const FVector SpawnLocation = Muzzle->GetComponentLocation() + Muzzle->GetForwardVector()*20;
@@ -200,12 +200,8 @@ USceneComponent* AOPAG_ModularGun::GetMuzzle() const
 	AOPAG_BarrelBase* Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
 	if (Module)
 	{
-		UChildActorComponent* Muzzle = Module->MuzzleComponent;
-		if (Muzzle)
-		{
-			AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(Muzzle->GetChildActor());
-			return StaticMeshActor->GetStaticMeshComponent();
-		}
+		if (Module->MuzzleComponent)
+			return Module->MuzzleComponent;
 	}
 	return nullptr;
 }

@@ -620,7 +620,7 @@ void AOPAG_Player::UpdateModuleComparison() {
 
 	else if (InteractableObject != nullptr) {
 		AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject);
-		if (Module) {
+		if (Module && IOPAG_InteractableInterface::Execute_CanInteract(Module)) {
 
 			FOPAG_GunStats CurrentModuleStats;
 			AOPAG_ModuleBase* CurrentModule = PrimaryGun->GetModuleBySocketType(Module->Type);

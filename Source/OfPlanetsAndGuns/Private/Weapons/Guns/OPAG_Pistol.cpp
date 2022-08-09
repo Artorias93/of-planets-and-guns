@@ -6,7 +6,7 @@
 
 AOPAG_Pistol::AOPAG_Pistol()
 {
-	MuzzleComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("MuzzleComponent"));
+	MuzzleComponent = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleComponent"));
 	MuzzleComponent->SetupAttachment(RootComponent);
 }
 
@@ -53,11 +53,9 @@ void AOPAG_Pistol::ShootLineTrace(FVector StartShootLocation, FVector Direction,
 
 USceneComponent* AOPAG_Pistol::GetMuzzle() const
 {
-	if (MuzzleComponent->GetChildActor())
-	{
-		AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(MuzzleComponent->GetChildActor());
-		return StaticMeshActor->GetStaticMeshComponent();
-	}
+	if(MuzzleComponent)
+		return MuzzleComponent;
+
 	return nullptr;
 }
 #pragma endregion Shooting Behavior

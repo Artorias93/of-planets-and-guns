@@ -74,7 +74,13 @@ void AOPAG_ModuleBase::Interact_Implementation()
 
 bool AOPAG_ModuleBase::CanInteract_Implementation()
 {
-	return true;
+	if (GetParentActor() == nullptr)
+	{
+		//UE_LOG(LogTemp, Error, "AA");
+		return true;
+	}
+
+	return false;
 }
 
 void AOPAG_ModuleBase::CheckIfPhysical()

@@ -15,7 +15,7 @@ public:
 	AOPAG_BarrelBase();
 
 	UPROPERTY(Category = "Module", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* MuzzleComponent;
+	USceneComponent* MuzzleComponent;
 
 protected:
 	virtual void BeginPlay() override;

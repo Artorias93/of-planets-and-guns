@@ -3,7 +3,7 @@
 
 AOPAG_BarrelBase::AOPAG_BarrelBase() : Super::AOPAG_ModuleBase()
 {
-	MuzzleComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("MuzzleComponent"));
+	MuzzleComponent = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleComponent"));
 	MuzzleComponent->SetRelativeRotation(FRotator(0, 90.f, 0));
 	MuzzleComponent->SetupAttachment(RootComponent);
 

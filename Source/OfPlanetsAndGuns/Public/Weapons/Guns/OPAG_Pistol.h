@@ -16,7 +16,7 @@ public:
 	AOPAG_Pistol();
 
 	UPROPERTY(Category = "Pistol", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* MuzzleComponent;
+		USceneComponent* MuzzleComponent;
 
 protected:
 	virtual void BeginPlay() override;
