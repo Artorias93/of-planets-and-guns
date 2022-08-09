@@ -1,15 +1,15 @@
-
 #include "Abilities/OPAG_ShieldAbility.h"
 #include <UObject/ConstructorHelpers.h>
 #include "Characters/Player/OPAG_Player.h"
+#include "Abilities/OPAG_ShieldAbilityCooldown.h"
 
 
 UOPAG_ShieldAbility::UOPAG_ShieldAbility(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::LocalPredicted;
-	//CooldownGameplayEffectClass = UOPAG_ShieldAbilityCooldown::StaticClass();
-	const FGameplayTag PotionTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.items.potion"));
-	AbilityTags.AddTag(PotionTag);
+	CooldownGameplayEffectClass = UOPAG_ShieldAbilityCooldown::StaticClass();
+	const FGameplayTag ShieldTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.shield"));
+	AbilityTags.AddTag(ShieldTag);
 
 	static ConstructorHelpers::FClassFinder<AActor> ShieldFinder(TEXT("/Game/FXVarietyPack/Blueprints/BP_ky_healAura"));
 	if (ShieldFinder.Succeeded())
