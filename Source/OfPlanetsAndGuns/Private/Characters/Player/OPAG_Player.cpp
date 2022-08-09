@@ -86,6 +86,7 @@ void AOPAG_Player::BeginPlay()
 	InitializeAbilities();
 	InitDefaultValues();
 	InitADSTimeline();
+	InitDashTimeline();
 	InitRecoilTimeline();
 	AttachDefaultGuns();
 
@@ -186,14 +187,11 @@ void AOPAG_Player::InitADSTimeline()
 
 void AOPAG_Player::InitDashTimeline()
 {
-	if (ADSCurveFloat)
-	{
-		DashTimeline->SetLooping(false);
-		DashTimeline->SetTimelineLength(0);
-
-		OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
-		DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
-	}
+	DashTimeline->SetLooping(false);
+	DashTimeline->SetTimelineLength(5.f);
+	DashTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+	OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
+	DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
 }
 
 void AOPAG_Player::InitRecoilTimeline()
@@ -693,6 +691,8 @@ void AOPAG_Player::DashTimelineFinished()
 {
 	DashTimeline->SetTimelineLength(DashRestoreTime);
 	DashCount++;
+	EMS->DashAmountChanged.Broadcast(DashCount);
+
 	if (DashCount < DashMaxCount)
 	{
 		DashTimeline->PlayFromStart();
