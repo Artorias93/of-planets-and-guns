@@ -2,7 +2,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Characters/Enemies/OPAG_AICBase.h"
-#include "Characters/Enemies/OPAG_Enemy.h"
+#include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -15,11 +15,11 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 {
 	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		if (const AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
+		if (AOPAG_ShieldEnemy* const ShieldEnemy = Cast<AOPAG_ShieldEnemy>(AIController->GetPawn()))
 		{
 			if(const AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
-			{				
-				const FVector EnemyPos = Enemy->GetActorLocation();			
+			{	
+				const FVector EnemyPos = ShieldEnemy->GetActorLocation();	
 				const FVector PlayerPos = Player->GetActorLocation();
 
 				FVector OutDir;
@@ -37,14 +37,14 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 				{
 					if(GEngine)
 						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE NOT FOUND"));
-					
-					AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
 
+					//TODO: Remove if everything is inside the charge BTTask
+					//AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
 
-
+					ShieldEnemy->SetIsCharging(true);
 					AIController->MoveToLocation(ChargePoint, 100.f, false, false,
 						false, false, nullptr, false);
-
+					ShieldEnemy->SetIsCharging(false);
 
 					return EBTNodeResult::Succeeded;
 				}
