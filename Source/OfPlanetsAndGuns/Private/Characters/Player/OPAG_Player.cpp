@@ -86,6 +86,7 @@ void AOPAG_Player::BeginPlay()
 	InitializeAbilities();
 	InitDefaultValues();
 	InitADSTimeline();
+	InitDashTimeline();
 	InitRecoilTimeline();
 	AttachDefaultGuns();
 
@@ -108,6 +109,11 @@ void AOPAG_Player::Tick(float DeltaTime)
 	InteractableObject = CheckLookAtInteractableItems();
 
 	UpdateComparison();
+
+	if (Shield != nullptr)
+	{
+		Shield->SetActorLocation(GetActorLocation());
+	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), GetHealth());
 }
@@ -186,14 +192,11 @@ void AOPAG_Player::InitADSTimeline()
 
 void AOPAG_Player::InitDashTimeline()
 {
-	if (ADSCurveFloat)
-	{
-		DashTimeline->SetLooping(false);
-		DashTimeline->SetTimelineLength(0);
-
-		OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
-		DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
-	}
+	DashTimeline->SetLooping(false);
+	DashTimeline->SetTimelineLength(5.f);
+	DashTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+	OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
+	DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
 }
 
 void AOPAG_Player::InitRecoilTimeline()
@@ -261,6 +264,9 @@ void AOPAG_Player::InitializeAbilities()
 
 	// This ability allow you to cure the player
 	InitializeAbility(HealthPotion, 0);
+
+	// This ability allow you to shield the player
+	InitializeAbility(ShieldAbility, 0);
 }
 
 void AOPAG_Player::ActiveDash()
@@ -593,15 +599,19 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 	// Calculate Tracing
 	TArray<FHitResult> OutHits;
 	TArray<AActor*> ActorsToIgnore;
-	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), CameraStartLocation, CameraDirection, LookUpCapsuleRadius, 0, InteractableTypesQuery, 
+	this->GetAllChildActors(ActorsToIgnore);
+	ActorsToIgnore.Add(this);
+	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), Camera->GetComponentLocation(), CameraDirection, LookUpCapsuleRadius, 0, InteractableTypesQuery,
 		false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 	if (bHasHit && OutHits.Num() > 0)
 	{
-		const bool bActorImplementsInterface = OutHits[0].GetActor()->GetClass()->
-		ImplementsInterface(UOPAG_InteractableInterface::StaticClass());
-		if (bActorImplementsInterface)
-		{
-			return OutHits[0].GetActor();
+		for (int i = 0; i < OutHits.Num(); ++i) {
+			const bool bActorImplementsInterface = OutHits[i].GetActor()->GetClass()->
+			ImplementsInterface(UOPAG_InteractableInterface::StaticClass());
+			if (bActorImplementsInterface)
+			{	
+				return OutHits[i].GetActor();
+			}
 		}
 	}
 	return nullptr;
@@ -693,6 +703,8 @@ void AOPAG_Player::DashTimelineFinished()
 {
 	DashTimeline->SetTimelineLength(DashRestoreTime);
 	DashCount++;
+	EMS->DashAmountChanged.Broadcast(DashCount);
+
 	if (DashCount < DashMaxCount)
 	{
 		DashTimeline->PlayFromStart();
@@ -782,4 +794,10 @@ void AOPAG_Player::HealthChanged(const FOnAttributeChangeData& Data)
 
 	EMS->HealthChanged.Broadcast(Data.NewValue, GetHealthMax());
 }
+
+void AOPAG_Player::SetShield(AActor* NewShield)
+{
+	Shield = NewShield;
+}
+
 #pragma endregion

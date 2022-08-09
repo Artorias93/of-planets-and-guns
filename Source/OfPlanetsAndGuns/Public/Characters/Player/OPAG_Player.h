@@ -126,6 +126,9 @@ public:
 	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UGameplayAbility> Dash;
 
+	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<UGameplayAbility> ShieldAbility;
+
 public:
 	UPROPERTY(Category = "Debug", EditDefaultsOnly, BlueprintReadWrite)
 	int CurrentHealth = 0;
@@ -141,6 +144,7 @@ private:
 	float GunPreADSRoll = 0;
 	AActor* InteractableObject = nullptr;
 	AActor* PreviousLookedAtModule = nullptr;
+	AActor* Shield = nullptr;
 
 private:
 	FOnTimelineFloat OnADSTimelineProgress;
@@ -245,9 +249,9 @@ public:
 	UFUNCTION()
 		void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
 
-
 public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
 	void HealthChanged(const FOnAttributeChangeData& Data);
+	void SetShield(AActor* NewShield);
 
 };
