@@ -1,5 +1,4 @@
 #include "Characters/OPAG_AttributeSetBase.h"
-#include "GameplayEffect.h"
 #include "GameplayEffectExtension.h"
 
 UOPAG_AttributeSetBase::UOPAG_AttributeSetBase() {}

@@ -25,15 +25,16 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UPROPERTY()
 	class UOPAG_EventManagerSubsystem* EMS;
 	
 	virtual void ReceiveDamage(const float Damage);
 	virtual void ReceiveDamage(AActor* Throwable);
 
 	// Ability system
-	const float GetHealth() const;
+	float GetHealth() const;
 	void SetHealth(const float Health);
-	const float GetHealthMax() const;
+	float GetHealthMax() const;
 	void SetHealthMax(const float HealthMax);
 
 	// Shoot system

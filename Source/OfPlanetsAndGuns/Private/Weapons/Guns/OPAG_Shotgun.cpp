@@ -2,6 +2,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include <Kismet/GameplayStatics.h>
+#include "Characters/Enemies/OPAG_Enemy.h"
 
 AOPAG_Shotgun::AOPAG_Shotgun()
 {
@@ -21,7 +22,7 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 		const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
 			ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
-		// If Actor is inheritance by character base, invoke take damage
+		// If Actor is inherited by character base, invoke take damage
 		if (bIsHit)
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitPartile, OutHit.Location, FRotator::ZeroRotator, true, EPSCPoolMethod::None, true);
@@ -29,8 +30,20 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 			AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 			if (Character)
 			{
-				const float Damage = Stats.Damage / ConsecutiveProjectile;
-				Character->ReceiveDamage(Damage);
+				//Checks for friendly fire
+				//If both the shooter and the target are enemies, damage is not applied
+				const AOPAG_Enemy* const EnemyShooter = Cast<AOPAG_Enemy>(ShooterCharacter);
+				const AOPAG_Enemy* const EnemyShot = Cast<AOPAG_Enemy>(Character);
+				if(!(EnemyShooter && EnemyShot))
+				{
+					//Check for shield enemy
+					//If the hit component is the shield, damage is not applied
+					if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
+					{
+						const float Damage = Stats.Damage / ConsecutiveProjectile;
+						Character->ReceiveDamage(Damage);
+					}
+				}
 			}
 		}
 	}

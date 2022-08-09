@@ -10,6 +10,9 @@
  * 
  */
 
+enum class EModuleRarity : uint8;
+struct FOPAG_GunStats;
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_GameplayHUD : public AHUD
 {
@@ -62,7 +65,8 @@ public:
 	void HideLoadingScreenView();
 
 	UFUNCTION()
-	void ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
+	void ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule,
+		const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
 	UFUNCTION()
 	void HideModuleCompareView();
 };

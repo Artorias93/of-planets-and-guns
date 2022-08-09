@@ -81,17 +81,17 @@ public:
 
 	// Module
 	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules);
-	const bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
+	bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
 
 	// Camera behavior
-	UCameraComponent* GetSightCamera();
+	UCameraComponent* GetSightCamera() const;
 
-	void GetCurrentState(FOPAG_GunState& GunState);
+	void GetCurrentState(FOPAG_GunState& GunState) const;
 
 	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
 
 	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
-	const FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
+	FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
 protected:
 	// Shoot behavior
@@ -101,12 +101,13 @@ protected:
 	virtual TArray<AActor*> CheckWhatActorsIgnoreLinetrace() override;
 
 	// Utility for link modules and sockets
-	AOPAG_ModuleBase* GetModule(UChildActorComponent* ChildeComponent) const;
+	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;
 	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
 
 	// Create and Attach module behavior
-	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module);
-	const bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes);
+	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const;
+	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule,
+		const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
 	void UpdateStats();
 
 	// Ammo behavior

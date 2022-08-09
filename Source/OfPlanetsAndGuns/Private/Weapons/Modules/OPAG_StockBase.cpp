@@ -1,6 +1,6 @@
 #include "Weapons/Modules/OPAG_StockBase.h"
 
-AOPAG_StockBase::AOPAG_StockBase() : Super::AOPAG_ModuleBase()
+AOPAG_StockBase::AOPAG_StockBase()
 {
 	// Initialize Parameters
 	Rarity = EModuleRarity::Common;

@@ -1,6 +1,6 @@
 #include "Weapons/Modules/OPAG_MagazineBase.h"
 
-AOPAG_MagazineBase::AOPAG_MagazineBase() : Super::AOPAG_ModuleBase()
+AOPAG_MagazineBase::AOPAG_MagazineBase()
 {
 	// Initialize Parameters
 	Rarity = EModuleRarity::Common;

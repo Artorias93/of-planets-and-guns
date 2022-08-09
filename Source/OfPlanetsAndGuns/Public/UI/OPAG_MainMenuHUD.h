@@ -16,8 +16,6 @@ class OFPLANETSANDGUNS_API AOPAG_MainMenuHUD : public AHUD
 
 	void BindEvents();
 	
-	virtual void BeginPlay() override;
-
 private:
 	UPROPERTY()
 		class UOPAG_UWMainMenuView* MainMenuViewWidget;
@@ -27,6 +25,9 @@ private:
 		class UOPAG_UWHubView* HubViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWHubView> HubViewWidgetClass;
+
+protected:
+	virtual void BeginPlay() override;
 
 public:
 	virtual void DrawHUD() override;

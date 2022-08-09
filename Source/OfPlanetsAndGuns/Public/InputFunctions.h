@@ -8,6 +8,7 @@
 #include "EnhancedActionKeyMapping.h"
 #include "InputFunctions.generated.h"
 
+class ACharacterBase;
 /**
  * 
  */

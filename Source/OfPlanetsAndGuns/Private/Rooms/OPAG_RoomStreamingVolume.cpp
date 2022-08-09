@@ -28,7 +28,7 @@ AOPAG_RoomStreamingVolume::AOPAG_RoomStreamingVolume()
 void AOPAG_RoomStreamingVolume::BeginPlay()
 {
 	Super::BeginPlay();
-	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
+	const UOPAG_GameInstance* const GI = Cast<UOPAG_GameInstance>(GetGameInstance());
 	if (GI)
 	{
 		EventManager = GI->GetEventManager();

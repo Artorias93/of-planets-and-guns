@@ -64,5 +64,5 @@ public:
 	virtual bool CanInteract_Implementation() override;
 
 private:
-	void CheckIfPhysical();
+	void CheckIfPhysical() const;
 };

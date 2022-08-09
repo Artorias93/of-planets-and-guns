@@ -4,6 +4,7 @@
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 UOPAG_TaskCharge::UOPAG_TaskCharge(FObjectInitializer const& ObjectInitializer)
 {
@@ -25,12 +26,25 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 				float OutLength;			
 				(PlayerPos - EnemyPos).ToDirectionAndLength(OutDir, OutLength);
 
-				const FVector ChargePoint = EnemyPos + OutDir * (OutLength + ChargeDistance);
+				const FVector ChargePoint = EnemyPos + OutDir * (OutLength + ChargeDistanceBehindPlayer);
 				
-				AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName,
-					ChargePoint);
+				FHitResult Hit;
+				const TArray<AActor*> ActorsToIgnore;
 
-				return EBTNodeResult::Succeeded;
+				if(!UKismetSystemLibrary::BoxTraceSingle(GetWorld(), EnemyPos, ChargePoint,
+					BoxTraceHalfSize, FRotator::ZeroRotator, TraceTypeQuery1,
+					false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true))
+				{
+					if(GEngine)
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE NOT FOUND"));
+					
+					AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
+					
+					return EBTNodeResult::Succeeded;
+				}
+
+				if(GEngine)
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE FOUND"));
 			}			
 		}
 	}

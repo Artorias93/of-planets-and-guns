@@ -70,7 +70,7 @@ bool AOPAG_ModuleBase::CanInteract_Implementation()
 	return true;
 }
 
-void AOPAG_ModuleBase::CheckIfPhysical()
+void AOPAG_ModuleBase::CheckIfPhysical() const
 {
 	// Control if module has parent gun -> is attached
 	if (GetParentActor() == nullptr)

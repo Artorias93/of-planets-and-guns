@@ -1,7 +1,7 @@
 #include "Weapons/Modules/OPAG_BarrelBase.h"
 #include "Components/ChildActorComponent.h"
 
-AOPAG_BarrelBase::AOPAG_BarrelBase() : Super::AOPAG_ModuleBase()
+AOPAG_BarrelBase::AOPAG_BarrelBase()
 {
 	MuzzleComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("MuzzleComponent"));
 	MuzzleComponent->SetRelativeRotation(FRotator(0, 90.f, 0));

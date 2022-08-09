@@ -82,18 +82,18 @@ void AOPAG_ModularGun::Tick(float DeltaTime)
 
 void AOPAG_ModularGun::PopulateAmmoTable()
 {
-	const FString Context;
 	if (AmmoReloadingMultipliersTable)
 	{
+		const FString Context;
 		AmmoReloadingMultipliersTable->GetAllRows(Context, AmmoReloadingMultipliers);
 	}
 }
 
 #pragma region GET
 // Return module by child actor of socket
-AOPAG_ModuleBase* AOPAG_ModularGun::GetModule(UChildActorComponent* ChildeComponent) const
+AOPAG_ModuleBase* AOPAG_ModularGun::GetModule(const UChildActorComponent* const ChildComponent) const
 {
-	AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(ChildeComponent->GetChildActor());
+	AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(ChildComponent->GetChildActor());
 	return Module;
 }
 
@@ -156,7 +156,7 @@ UChildActorComponent* AOPAG_ModularGun::GetSocketByModuleType(const EModuleTypes
 
 // Return socket's name by module type
 // Remove the first 14 chars because getvalues return EModuleTypes::X
-const FName AOPAG_ModularGun::GetSocketNameByModuleType(const EModuleTypes ModuleType) const
+FName AOPAG_ModularGun::GetSocketNameByModuleType(const EModuleTypes ModuleType) const
 {
 	FString SocketName;
 	UEnum::GetValueAsString(ModuleType, SocketName);
@@ -165,17 +165,17 @@ const FName AOPAG_ModularGun::GetSocketNameByModuleType(const EModuleTypes Modul
 }
 
 
-UCameraComponent* AOPAG_ModularGun::GetSightCamera()
+UCameraComponent* AOPAG_ModularGun::GetSightCamera() const
 {
 	if (Sight->GetChildActor())
 	{
-		AOPAG_SightBase* Module = Cast<AOPAG_SightBase>(Sight->GetChildActor());
+		const AOPAG_SightBase* const Module = Cast<AOPAG_SightBase>(Sight->GetChildActor());
 		return Module->GetCamera();
 	}
 	return nullptr;
 }
 
-void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState)
+void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState) const
 {
 	GunState.GunClass = GetClass();
 
@@ -193,10 +193,10 @@ void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState)
 #pragma region Shoot Behavior
 void AOPAG_ModularGun::ShootThrowable(const FRotator SpawnRotation)
 {
-	AOPAG_BarrelBase* Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
+	const AOPAG_BarrelBase* const Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
 	if (Module)
 	{
-		UChildActorComponent* Muzzle = Module->MuzzleComponent;
+		const UChildActorComponent* const Muzzle = Module->MuzzleComponent;
 		if (Muzzle)
 		{
 			const FVector SpawnLocation = Muzzle->GetComponentLocation() + Muzzle->GetForwardVector()*20;
@@ -218,13 +218,13 @@ void AOPAG_ModularGun::SpawnThrowable(const FVector SpawnLocation, const FRotato
 
 USceneComponent* AOPAG_ModularGun::GetMuzzle() const
 {
-	AOPAG_BarrelBase* Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
+	const AOPAG_BarrelBase* const Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
 	if (Module)
 	{
-		UChildActorComponent* Muzzle = Module->MuzzleComponent;
+		const UChildActorComponent* const Muzzle = Module->MuzzleComponent;
 		if (Muzzle)
 		{
-			AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(Muzzle->GetChildActor());
+			const AStaticMeshActor* const StaticMeshActor = Cast<AStaticMeshActor>(Muzzle->GetChildActor());
 			return StaticMeshActor->GetStaticMeshComponent();
 		}
 	}
@@ -271,11 +271,11 @@ void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules
 }
 
 // Is important when generate the basic gun 
-void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module)
+void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const
 {
 	if (Module)
 	{
-		AOPAG_ModuleBase* Base = Module->GetDefaultObject<AOPAG_ModuleBase>();
+		const AOPAG_ModuleBase* const Base = Module->GetDefaultObject<AOPAG_ModuleBase>();
 		if (Base)
 		{
 			const EModuleRarity ModuleRarity = Base->Rarity;
@@ -289,7 +289,8 @@ void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSub
 
 // Set child create the object in scene and set the actor's child
 // After this is important set the specific params of module (when invoke set child... the module has the default params, not the values in scene)
-const bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes)
+bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule,
+	const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const
 {
 	ModuleSlot->SetChildActorClass(NewModule);
 
@@ -345,14 +346,14 @@ void AOPAG_ModularGun::UpdateStats()
 }
 
 // When player pick new module in scene, the event call this method 
-const bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes)
+bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes)
 {
 	if (NewModule)
 	{
 		// Initialize Base (CDO of NewModule for default params of class) and ModuleSlot (the module of main socket ex. Barrel)
-		AOPAG_ModuleBase* Base = NewModule->GetDefaultObject<AOPAG_ModuleBase>();
-		UChildActorComponent* ModuleSlot = GetSocketByModuleType(Base->Type);
-		AOPAG_ModuleBase* OldModule = GetModuleBySocketType(Base->Type);
+		const AOPAG_ModuleBase* const Base = NewModule->GetDefaultObject<AOPAG_ModuleBase>();
+		UChildActorComponent* const ModuleSlot = GetSocketByModuleType(Base->Type);
+		const AOPAG_ModuleBase* const OldModule = GetModuleBySocketType(Base->Type);
 
 		// Set current value of ModuleSlot -> is important when re-spawn the module in scene 
 		if (OldModule)
