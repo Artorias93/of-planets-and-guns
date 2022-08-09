@@ -1,7 +1,7 @@
 #include "Weapons/Modules/OPAG_SightBase.h"
 #include "Camera/CameraComponent.h"
 
-AOPAG_SightBase::AOPAG_SightBase() : Super::AOPAG_ModuleBase()
+AOPAG_SightBase::AOPAG_SightBase()
 {
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SightCamera"));
 	CameraComponent->SetRelativeLocation(FVector(-0.000095f, -18.851955f, 6.571584f));

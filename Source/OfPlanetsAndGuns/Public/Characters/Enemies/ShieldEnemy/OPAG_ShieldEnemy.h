@@ -19,12 +19,18 @@ public:
 	
 	virtual void Attack() override;
 
-	UFUNCTION(CallInEditor, Category = "OPAG AI")
 	virtual void Death() override;
 
-private:
+	UFUNCTION(BlueprintCallable)
+	bool GetIsCharging() const;
+	UFUNCTION(BlueprintCallable)
+	void SetIsCharging(const bool Value);
+
+protected:
 
 	virtual void BeginPlay() override;
+
+private:	
 
 	UFUNCTION()
 	void OnAttackBegin(UAnimMontage* Montage);
@@ -40,6 +46,8 @@ private:
 	/////////////////////////////
 
 	private:
+
+	bool bIsCharging;
 
 	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
 	UAnimMontage* ShieldAttackMontage;
@@ -57,7 +65,7 @@ private:
 	FVector DamageCollisionBoxExtent = FVector(95.f, 20.f, 90.f);
 
 	UPROPERTY(VisibleAnywhere)
-	class UBoxComponent* DamageCollisionBox;
+	UBoxComponent* DamageCollisionBox;
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* SwordMesh;
@@ -66,5 +74,5 @@ private:
 	UStaticMeshComponent* ShieldMesh;
 
 	UPROPERTY(EditAnywhere)
-	float ShieldWeaponDamage = 25.f;	
+	float ShieldWeaponDamage = 10.f;	
 };

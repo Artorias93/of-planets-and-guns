@@ -1,6 +1,6 @@
 #include "Weapons/Modules/OPAG_GripBase.h"
 
-AOPAG_GripBase::AOPAG_GripBase() : Super::AOPAG_ModuleBase()
+AOPAG_GripBase::AOPAG_GripBase()
 {
 	// Initialize Parameters
 	Rarity = EModuleRarity::Common;

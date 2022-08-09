@@ -6,11 +6,6 @@
 #include <Runtime/Engine/Classes/Kismet/GameplayStatics.h>
 
 
-
-
-
-
-
 UInputMappingContext* UInputFunctions::GetCurrentMappingContext(UPARAM(Ref) ACharacterBase* Character)
 {
 	if (Character == nullptr) return nullptr;

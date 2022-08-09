@@ -17,6 +17,8 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include <Kismet/GameplayStatics.h>
+
+#include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
@@ -52,18 +54,17 @@ void AOPAG_GunBase::BeginPlay()
 void AOPAG_GunBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 #pragma region GET
-UCameraComponent* AOPAG_GunBase::GetADSCamera()
+UCameraComponent* AOPAG_GunBase::GetADSCamera() const
 {
 	return ADSCamera;
 }
 #pragma endregion GET
 
 #pragma region Mathematic Utility
-const float AOPAG_GunBase::CalculateRateInSeconds(const float FireRate)
+float AOPAG_GunBase::CalculateRateInSeconds(const float FireRate)
 {
 	const float Seconds = 1 / (FireRate / 60);
 	return Seconds;
@@ -73,7 +74,7 @@ const float AOPAG_GunBase::CalculateRateInSeconds(const float FireRate)
 #pragma region Shooting Behavior
 // Main method to to call when a shooting event is triggered
 // Call line trace method and set fire rate of gun with timer manager
-void AOPAG_GunBase::Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
+void AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
 	bCanShoot = false;
 
@@ -84,7 +85,7 @@ void AOPAG_GunBase::Shoot(FVector StartShootLocation, FVector Direction, const A
 	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 }
 
-void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
+void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
 	//TODO: Recoil Event
 	const FVector NoiseDirection = ApplyNoise(Direction);
@@ -120,7 +121,14 @@ void AOPAG_GunBase::ShootLineTrace(FVector StartShootLocation, FVector Direction
 			const AOPAG_Enemy* const EnemyShooter = Cast<AOPAG_Enemy>(ShooterCharacter);
 			const AOPAG_Enemy* const EnemyShot = Cast<AOPAG_Enemy>(Character);
 			if(!(EnemyShooter && EnemyShot))
-				Character->ReceiveDamage(Stats.Damage);
+			{
+				//Check for shield enemy
+				//If the hit component is the shield, damage is not applied
+				if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
+				{
+					Character->ReceiveDamage(Stats.Damage);
+				}
+			}
 		}
 	}
 	
@@ -144,13 +152,13 @@ void AOPAG_GunBase::ResetShootTimer()
 #pragma endregion Shooting Behavior
 
 #pragma region Shooting Utility
-const float AOPAG_GunBase::CalculateSpread()
+float AOPAG_GunBase::CalculateSpread() const
 {
 	const float Spread = (SpreadMax * (ShootConeLenght - Stats.Accuracy)) / 100;
 	return Spread;
 }
 
-const float AOPAG_GunBase::CalculateSpreadRadius()
+float AOPAG_GunBase::CalculateSpreadRadius() const
 {
 	const float Spread = CalculateSpread();
 	const float SpreadRadius = FMath::Tan(Spread / 2) * ShootConeLenght;
@@ -167,18 +175,18 @@ const float AOPAG_GunBase::CalculateSpreadRadius()
 	return SpreadRadius;
 }
 
-const FVector2D AOPAG_GunBase::CalculateRandPointInCircle()
+FVector2D AOPAG_GunBase::CalculateRandPointInCircle() const
 {
 	const float SpreadRadius = CalculateSpreadRadius();
 	const float Angle = FMath::RandRange(0.f, 2 * PI);
-	const float DistancefromCenter = SpreadRadius * FMath::Sqrt(FMath::RandRange(0.f, 1.f));
-	const FVector2D Point(DistancefromCenter * FMath::Cos(Angle), DistancefromCenter * FMath::Sin(Angle));
+	const float DistanceFromCenter = SpreadRadius * FMath::Sqrt(FMath::RandRange(0.f, 1.f));
+	const FVector2D Point(DistanceFromCenter * FMath::Cos(Angle), DistanceFromCenter * FMath::Sin(Angle));
 	return Point;
 }
 
 // Apply noise is method for set the accuracy when player shoot with gun
 // Calculate direction of shoot thought the rotation and calculate randomizer point into the cross hair circle
-const FVector AOPAG_GunBase::ApplyNoise(const FVector Direction)
+FVector AOPAG_GunBase::ApplyNoise(const FVector Direction) const
 {
 	const FRotator Rotation = Direction.Rotation();
 	const FVector2D Point = CalculateRandPointInCircle();
@@ -187,8 +195,8 @@ const FVector AOPAG_GunBase::ApplyNoise(const FVector Direction)
 	return NewDirection;
 }
 
-// The method applicate the max distance of projectile 
-const FVector AOPAG_GunBase::ApplyWeaponRange(const FVector StartLocation, const FVector Direction)
+// The method applies the max distance of projectile 
+FVector AOPAG_GunBase::ApplyWeaponRange(const FVector StartLocation, const FVector Direction) const
 {
 	const FVector NewDirection = StartLocation + (Direction * ProjectileRange);
 	return NewDirection;

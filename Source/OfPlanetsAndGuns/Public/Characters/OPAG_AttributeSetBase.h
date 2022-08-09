@@ -24,7 +24,7 @@ public:
 
 	UOPAG_AttributeSetBase();
 
-	void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 	/////////////////////////////
 	//Variables

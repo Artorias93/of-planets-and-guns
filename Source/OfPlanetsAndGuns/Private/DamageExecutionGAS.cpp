@@ -2,7 +2,7 @@
 
 UDamageExecutionGAS::UDamageExecutionGAS(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	FDamageAttributes DamageStruct;
+	const FDamageAttributes DamageStruct;
 
 	RelevantAttributesToCapture.Add(DamageStruct.HealthDef);
 	InvalidScopedModifierAttributes.Add(DamageStruct.HealthDef);
@@ -12,12 +12,12 @@ UDamageExecutionGAS::UDamageExecutionGAS(const FObjectInitializer& ObjectInitial
 
 void UDamageExecutionGAS::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
-	FDamageAttributes DamageStruct;
+	const FDamageAttributes DamageStruct;
 
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 
-	UAbilitySystemComponent* Target = ExecutionParams.GetTargetAbilitySystemComponent();
-	UAbilitySystemComponent* Source = ExecutionParams.GetSourceAbilitySystemComponent();
+	const UAbilitySystemComponent* const Target = ExecutionParams.GetTargetAbilitySystemComponent();
+	const UAbilitySystemComponent* const Source = ExecutionParams.GetSourceAbilitySystemComponent();
 
 	AActor* TargetActor = Target ? Target->AvatarActor : nullptr;
 	AActor* SourceActor = Source ? Source->AvatarActor : nullptr;
@@ -36,7 +36,7 @@ void UDamageExecutionGAS::Execute_Implementation(const FGameplayEffectCustomExec
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStruct.DamageTakenAmountDef, EvaluationParameters, DamageTaken);
 
 	//Replace 1 with an optional attack multiplier
-	float EffectiveDamageTaken = 1 * DamageTaken;
+	const float EffectiveDamageTaken = 1 * DamageTaken;
 
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStruct.HealthProperty, EGameplayModOp::Additive, -EffectiveDamageTaken));
 }

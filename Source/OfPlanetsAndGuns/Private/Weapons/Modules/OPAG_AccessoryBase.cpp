@@ -1,5 +1,4 @@
 #include "Weapons/Modules/OPAG_AccessoryBase.h"
-#include "Abilities/GameplayAbility.h"
 #include "Weapons/Throwables/OPAG_Grenade.h"
 
 AOPAG_AccessoryBase::AOPAG_AccessoryBase()

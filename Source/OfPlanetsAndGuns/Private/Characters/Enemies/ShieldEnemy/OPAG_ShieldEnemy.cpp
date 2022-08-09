@@ -28,6 +28,8 @@ AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 	if (ShieldMesh)
 	{
 		ShieldMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "LeftHandSocket");
+		ShieldMesh->SetCanEverAffectNavigation(false);
+		ShieldMesh->ComponentTags.Add(FName("Shield"));
 	}
 }
 
@@ -44,6 +46,8 @@ void AOPAG_ShieldEnemy::BeginPlay()
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AOPAG_ShieldEnemy::OnAttackNotify);
 		AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_ShieldEnemy::OnAttackEnd);
 	}
+
+	bIsCharging = false;
 }
 
 void AOPAG_ShieldEnemy::Attack()
@@ -99,12 +103,22 @@ void AOPAG_ShieldEnemy::Death()
 	}
 	if(ShieldMesh)
 	{
-		SwordMesh->K2_DetachFromComponent(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld);
-		SwordMesh->SetSimulatePhysics(true);
+		ShieldMesh->K2_DetachFromComponent(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld);
+		ShieldMesh->SetSimulatePhysics(true);
 		//TODO: Check if this is correct, given that the shield usually has collision unlike the sword
-		SwordMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		ShieldMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	}
 
 	//Ragdoll stuff for the enemy mesh itself are done in the parent.
 	Super::Death();
+}
+
+bool AOPAG_ShieldEnemy::GetIsCharging() const
+{
+	return bIsCharging;
+}
+
+void AOPAG_ShieldEnemy::SetIsCharging(const bool Value)
+{
+	bIsCharging = Value;
 }

@@ -46,7 +46,7 @@ void AOPAG_CharacterBase::BeginPlay()
 	}
 }
 
-const float AOPAG_CharacterBase::GetHealth() const
+float AOPAG_CharacterBase::GetHealth() const
 {
 	if(AbilitySystemComp)
 	{
@@ -60,7 +60,7 @@ void AOPAG_CharacterBase::SetHealth(const float Health)
 	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetHealthAttribute(), Health);
 }
 
-const float AOPAG_CharacterBase::GetHealthMax() const
+float AOPAG_CharacterBase::GetHealthMax() const
 {
 	if (AbilitySystemComp)
 	{

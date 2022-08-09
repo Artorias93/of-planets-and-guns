@@ -25,6 +25,8 @@ private:
 
 	void DisableAimingSignals();
 
+	void TurretStartShooting();
+
 	/////////////////////////////
 	//Variables
 	/////////////////////////////

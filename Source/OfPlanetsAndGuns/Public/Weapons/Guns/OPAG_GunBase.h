@@ -84,6 +84,7 @@ public:
 	USoundBase* ShootSound;
 
 protected:
+	UPROPERTY()
 	UOPAG_EventManagerSubsystem* EMS;
 
 protected:
@@ -96,27 +97,27 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	// Mathematic Utility
-	const float CalculateRateInSeconds(const float FireRate);
+	// Maths Utility
+	static float CalculateRateInSeconds(const float FireRate);
 
 	// Main system for shooting
-	virtual void Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
+	virtual void Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
 
 	// Subsystem shooting
-	UFUNCTION(BlueprintCallable) const float CalculateSpreadRadius();
+	UFUNCTION(BlueprintCallable) float CalculateSpreadRadius() const;
 
 	// Camera behavior
-	UCameraComponent* GetADSCamera();
+	UCameraComponent* GetADSCamera() const;
 protected:
 	// Main system for shooting
-	virtual void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
+	virtual void ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
 	virtual USceneComponent* GetMuzzle() const;
 	void ResetShootTimer();
 
 	// Subsystem for shooting
-	const float CalculateSpread();
-	const FVector2D CalculateRandPointInCircle();
-	const FVector ApplyNoise(const FVector Direction);
-	const FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction);
+	float CalculateSpread() const;
+	FVector2D CalculateRandPointInCircle() const;
+	FVector ApplyNoise(const FVector Direction) const;
+	FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction) const;
 	virtual TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
 };

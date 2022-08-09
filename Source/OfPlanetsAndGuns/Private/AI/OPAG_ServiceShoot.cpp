@@ -4,6 +4,7 @@
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Enemies/RangedEnemy/OPAG_RangedEnemy.h"
+#include "Characters/Enemies/NormalTurret/OPAG_NormalTurret.h"
 #include "Characters/Player/OPAG_Player.h"
 
 UOPAG_ServiceShoot::UOPAG_ServiceShoot(FObjectInitializer const& ObjectInitializer) : Super(ObjectInitializer)
@@ -26,20 +27,20 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 		{
 			if (const AOPAG_Player* const FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
-				if(AOPAG_RangedEnemy* const RangedEnemy = Cast<AOPAG_RangedEnemy>(AIController->GetPawn()))
+				if(AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 				{
 					//Constructing what's needed for the SphereTrace
 					TArray<AActor*> ActorsToIgnore;
-					ActorsToIgnore.Add(RangedEnemy);
+					ActorsToIgnore.Add(Enemy);
 					FHitResult HitResult;
 					const bool TraceResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(),
-						RangedEnemy->GetActorLocation(), FocusActor->GetActorLocation(),
+						Enemy->GetActorLocation(), FocusActor->GetActorLocation(),
 						TraceTypeQuery2 /* = Camera*/, false, ActorsToIgnore,
 						EDrawDebugTrace::None, HitResult, true);
 
 					if (TraceResult)
 					{
-						RangedEnemy->Attack();
+						Enemy->Attack();
 					}
 				}
 			}
@@ -73,6 +74,19 @@ void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTCompone
 			}
 			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::DisableAimingSignals, StartShootingTimer, false);
 		}
+
+		if (AOPAG_NormalTurret* const Turret = Cast<AOPAG_NormalTurret>(AIController->GetPawn()))
+		{
+			bIsAiming = true;		
+
+			LaserBeam = Cast<UNiagaraComponent>(Turret->GetLaserBeam());
+			if (LaserBeam)
+			{
+				LaserBeam->SetVisibility(true);				
+			}			
+
+			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::TurretStartShooting, 5.f, false);
+		}
 	}
 }
 
@@ -80,5 +94,11 @@ void UOPAG_ServiceShoot::DisableAimingSignals()
 {
 	bIsAiming = false;
 	AimingLed->SetVisibility(false);
+	LaserBeam->SetVisibility(false);
+}
+
+void UOPAG_ServiceShoot::TurretStartShooting()
+{
+	bIsAiming = false;
 	LaserBeam->SetVisibility(false);
 }
