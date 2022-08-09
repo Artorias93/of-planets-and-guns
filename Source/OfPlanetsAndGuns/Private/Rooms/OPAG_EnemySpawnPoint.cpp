@@ -58,8 +58,12 @@ TArray<TSoftObjectPtr<AOPAG_Enemy>> AOPAG_EnemySpawnPoint::SpawnEnemies(
 	const TSoftClassPtr<AOPAG_Enemy> EnemyToSpawn = GetRandomEnemy(EnemyMap);
 	const FActorSpawnParameters SpawnInfo;
 	TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnedEnemies;
-	SpawnedEnemies.Add(GetWorld()->SpawnActor<AOPAG_Enemy>(EnemyToSpawn.Get(), GetActorLocation(),
-		FRotator::ZeroRotator, SpawnInfo));
+	TSoftObjectPtr<AOPAG_Enemy> Enemy = GetWorld()->SpawnActor<AOPAG_Enemy>(EnemyToSpawn.Get(), 
+		GetActorLocation(), FRotator::ZeroRotator, SpawnInfo);
+	if (Enemy.IsValid())
+	{
+		SpawnedEnemies.Add(Enemy);
+	}
 	return SpawnedEnemies;
 }
 

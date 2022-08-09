@@ -75,7 +75,6 @@ void UOPAG_EnemyManagerComponent::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 	if (EnemiesInRoom.Remove(Enemy) > 0)
 	{
 		EnemyDeathCount++;
-
 		if (EnemyDeathCount >= TotalEnemyAmount)
 		{
 			AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
@@ -143,19 +142,21 @@ void UOPAG_EnemyManagerComponent::SpawnWave()
 
 		TMap<TSoftClassPtr<AOPAG_Enemy>, float> EnemyProbabilityMap;
 		GetMappedEnemies(EnemyProbabilityMap);
-
-		for (const TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)
+		for (int i = 0; i < SpawnAttempts && EnemiesToSpawnNextWave > 0; ++i)
 		{
-			if (EnemiesToSpawnNextWave <= 0)
+			for (const TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)
 			{
-				break;
+				if (EnemiesToSpawnNextWave <= 0)
+				{
+					break;
+				}
+
+				TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnedEnemies =
+					Spawner->SpawnEnemies(EnemyProbabilityMap, EnemiesToSpawnNextWave);
+
+				EnemiesToSpawnNextWave -= SpawnedEnemies.Num();
+				EnemiesInRoom.Append(SpawnedEnemies);
 			}
-
-			TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnedEnemies = 
-				Spawner->SpawnEnemies(EnemyProbabilityMap, EnemiesToSpawnNextWave);
-
-			EnemiesToSpawnNextWave -= SpawnedEnemies.Num();
-			EnemiesInRoom.Append(SpawnedEnemies);
 		}
 	}
 }

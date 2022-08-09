@@ -29,6 +29,8 @@ class OFPLANETSANDGUNS_API UOPAG_EnemyManagerComponent : public UActorComponent
 	TArray<FOPAG_EnemyLevel*> BaseEnemyLevels;
 	int32 EnemyDeathCount;
 
+	static constexpr int32 SpawnAttempts = 3;
+
 public:	
 	// Sets default values for this component's properties
 	UOPAG_EnemyManagerComponent();
