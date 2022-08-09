@@ -61,4 +61,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float RagdollDurationSeconds = 2.f;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG Loot Drop System", meta = (AllowPrivateAccess = true))
+	class UOPAG_LootDropSystemComponent* LootDropSystemComponent;
 };
