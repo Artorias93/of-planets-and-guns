@@ -11,10 +11,13 @@
 #include "Characters/Player/OPAG_Player.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Characters/Enemies/OPAG_LootDropSystemComponent.h"
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	LootDropSystemComponent = CreateDefaultSubobject<UOPAG_LootDropSystemComponent>(TEXT("Loot Drop System Component"));
 }
 
 void AOPAG_Enemy::BeginPlay()
