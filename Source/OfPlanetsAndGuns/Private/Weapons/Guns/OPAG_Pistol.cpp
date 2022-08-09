@@ -2,7 +2,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include <Kismet/GameplayStatics.h>
-#include <Engine/StaticMeshActor.h>
 #include "Characters/Enemies/OPAG_Enemy.h"
 
 AOPAG_Pistol::AOPAG_Pistol()
