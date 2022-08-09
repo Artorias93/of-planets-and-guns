@@ -206,8 +206,18 @@ FVector AOPAG_GunBase::ApplyWeaponRange(const FVector StartLocation, const FVect
 TArray<AActor*> AOPAG_GunBase::CheckWhatActorsIgnoreLinetrace()
 {
 	TArray<AActor*> Objects;
+	this->GetAllChildActors(Objects);
 	Objects.Add(GetParentActor());
 	Objects.Add(this);
+	
+	if (const AOPAG_Player* const Player = Cast<AOPAG_Player>(GetParentActor()))
+	{
+		if (Player->GetShield() != nullptr)
+		{
+			Objects.Add(Player->GetShield());
+		}
+	}
+
 	return Objects;
 }
 #pragma endregion Shooting Utility

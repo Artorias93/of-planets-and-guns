@@ -114,8 +114,6 @@ void AOPAG_Player::Tick(float DeltaTime)
 	{
 		Shield->SetActorLocation(GetActorLocation());
 	}
-
-	//UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), GetHealth());
 }
 
 void AOPAG_Player::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -780,24 +778,28 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 			EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 		}
 	}
-
 }
-
 #pragma endregion Timeline
 
 #pragma region Health
 
 void AOPAG_Player::HealthChanged(const FOnAttributeChangeData& Data)
 {
-	UE_LOG(LogTemp, Warning, TEXT("New Health: %f"), Data.NewValue);
-	UE_LOG(LogTemp, Warning, TEXT("Max Health: %f"), GetHealthMax());
+	//UE_LOG(LogTemp, Warning, TEXT("New Health: %f"), Data.NewValue);
+	//UE_LOG(LogTemp, Warning, TEXT("Max Health: %f"), GetHealthMax());
 
 	EMS->HealthChanged.Broadcast(Data.NewValue, GetHealthMax());
 }
+#pragma endregion
 
+#pragma region Shield
 void AOPAG_Player::SetShield(AActor* NewShield)
 {
 	Shield = NewShield;
 }
 
-#pragma endregion
+AActor* AOPAG_Player::GetShield() const
+{
+	return Shield;
+}
+#pragma endregion Shield

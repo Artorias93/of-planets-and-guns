@@ -119,5 +119,5 @@ protected:
 	FVector2D CalculateRandPointInCircle() const;
 	FVector ApplyNoise(const FVector Direction) const;
 	FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction) const;
-	virtual TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
+	TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
 };

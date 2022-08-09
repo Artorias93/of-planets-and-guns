@@ -110,9 +110,6 @@ protected:
 	// Shoot behavior
 	UFUNCTION(BlueprintCallable) void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
 
-	// Shoot utility
-	virtual TArray<AActor*> CheckWhatActorsIgnoreLinetrace() override;
-
 	// Utility for link modules and sockets
 	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;
 	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;

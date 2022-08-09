@@ -220,30 +220,6 @@ USceneComponent* AOPAG_ModularGun::GetMuzzle() const
 }
 #pragma endregion Shoot Behavior
 
-#pragma region Shoot Utility
-TArray<AActor*> AOPAG_ModularGun::CheckWhatActorsIgnoreLinetrace()
-{
-	TArray<AActor*> Objects;
-	Objects.Add(GetParentActor());
-	Objects.Add(this);
-	Objects.Add(Barrel->GetChildActor());
-	Objects.Add(Stock->GetChildActor());
-	Objects.Add(Grip->GetChildActor());
-	Objects.Add(Magazine->GetChildActor());
-
-	// Unique control are for sight and accessory because the gun exist without this two elements
-	if (Sight->GetChildActor())
-	{
-		Objects.Add(Sight->GetChildActor());
-	}
-	if (Accessory->GetChildActor())
-	{
-		Objects.Add(Accessory->GetChildActor());
-	}
-	return Objects;
-}
-#pragma endregion Shoot Utility
-
 #pragma region Create and Attach Modules
 void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules)
 {

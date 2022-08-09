@@ -253,5 +253,5 @@ public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
 	void HealthChanged(const FOnAttributeChangeData& Data);
 	void SetShield(AActor* NewShield);
-
+	AActor* GetShield() const;
 };
