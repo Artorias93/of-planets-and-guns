@@ -110,6 +110,11 @@ void AOPAG_Player::Tick(float DeltaTime)
 
 	UpdateComparison();
 
+	if (Shield != nullptr)
+	{
+		Shield->SetActorLocation(GetActorLocation());
+	}
+
 	//UE_LOG(LogTemp, Warning, TEXT("The float value is: %f"), GetHealth());
 }
 
@@ -259,6 +264,9 @@ void AOPAG_Player::InitializeAbilities()
 
 	// This ability allow you to cure the player
 	InitializeAbility(HealthPotion, 0);
+
+	// This ability allow you to shield the player
+	InitializeAbility(ShieldAbility, 0);
 }
 
 void AOPAG_Player::ActiveDash()
@@ -782,4 +790,10 @@ void AOPAG_Player::HealthChanged(const FOnAttributeChangeData& Data)
 
 	EMS->HealthChanged.Broadcast(Data.NewValue, GetHealthMax());
 }
+
+void AOPAG_Player::SetShield(AActor* NewShield)
+{
+	Shield = NewShield;
+}
+
 #pragma endregion
