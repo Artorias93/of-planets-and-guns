@@ -27,13 +27,7 @@ public:
 		virtual void Death() override;
 
 	UFUNCTION(BlueprintCallable, Category = "Normal Turret")
-		FRotator GetTurretHeadRotation() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Normal Turret")
 		UNiagaraComponent* GetLaserBeam() const;
-
-	virtual void Tick(float DeltaSeconds) override;
-	virtual void BeginPlay() override;
 
 	void StartShooting();
 	
@@ -46,6 +40,9 @@ public:
 protected:	
 
 	FVector GetRandomImpulseVector() const;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
+		float Damage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
 		USceneComponent* Muzzle;
@@ -61,9 +58,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
 		USoundBase* ShootSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
-		FRotator TurretHeadRotation;
 
 	UPROPERTY(VisibleAnywhere)
 		UNiagaraComponent* LaserBeam;

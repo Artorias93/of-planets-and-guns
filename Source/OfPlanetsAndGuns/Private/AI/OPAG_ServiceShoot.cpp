@@ -85,7 +85,7 @@ void UOPAG_ServiceShoot::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTCompone
 				LaserBeam->SetVisibility(true);				
 			}			
 
-			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::TurretStartShooting, 5.f, false);
+			GetWorld()->GetTimerManager().SetTimer(StartShootingTimerHandle, this, &UOPAG_ServiceShoot::TurretStartShooting, StartShootingTimer, false);
 		}
 	}
 }
