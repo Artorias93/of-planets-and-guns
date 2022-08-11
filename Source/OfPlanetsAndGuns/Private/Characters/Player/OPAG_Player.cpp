@@ -83,6 +83,8 @@ void AOPAG_Player::BeginPlay()
 			BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AOPAG_Player::HealthChanged);
 	}
 
+	GetCharacterMovement()->DisableMovement();
+
 	InitializeAbilities();
 	InitDefaultValues();
 	InitADSTimeline();
@@ -93,7 +95,6 @@ void AOPAG_Player::BeginPlay()
 	BindEvents();
 	BroadcastEvents();
 
-	GetCharacterMovement()->DisableMovement();
 
 }
 
@@ -791,7 +792,7 @@ void AOPAG_Player::SavePlayerState()
 {
 	FOPAG_PlayerState NewState;
 
-
+	NewState.LoadType = PlayerStateLoadType::PREVIOUS_STAGE;
 	NewState.Health = GetHealth();
 	NewState.DashCount = DashCount;
 	NewState.GoldAmount = InventorySystemComp->GoldAmount;
@@ -807,14 +808,17 @@ void AOPAG_Player::SavePlayerState()
 
 void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 {
-	if (StateToApply.Health <= 0.f) return;
+	if (StateToApply.LoadType == PlayerStateLoadType::NOT_LOADED) return;
+	if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
+	{
+		SetHealth(StateToApply.Health);
+		DashCount = StateToApply.DashCount;
+		EMS->DashAmountChanged.Broadcast(DashCount);
+		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
+		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
+	}
 
-	SetHealth(StateToApply.Health);
-	DashCount = StateToApply.DashCount;
-	InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
 	InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
-	InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
-	EMS->DashAmountChanged.Broadcast(DashCount);
 
 	if (StateToApply.PrimaryGun.GunClass)
 	{
@@ -825,15 +829,19 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 
 			PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
 			PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
-			PrimaryGun->AmmoCurrent = StateToApply.PrimaryGun.AmmoCurrent;
-			PrimaryGun->AmmoMax = StateToApply.PrimaryGun.AmmoMax;
+
 			AttachDefaultGuns();
 
+			if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
+			{
+				PrimaryGun->AmmoCurrent = StateToApply.PrimaryGun.AmmoCurrent;
+				PrimaryGun->AmmoMax = StateToApply.PrimaryGun.AmmoMax;
+			}
 			if (StateToApply.bIsPrimaryActive) SwapGuns();
-
 
 			EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 			EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
+
 		}
 	}
 }

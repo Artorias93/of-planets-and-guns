@@ -5,10 +5,13 @@
 
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Managers/OPAG_SaveGame.h"
+#include "Util/OPAG_UtilityFunctionLibrary.h"
 
 void UOPAG_GameInstance::BindEvents()
 {
 	UOPAG_EventManagerSubsystem* EMS = GetSubsystem<UOPAG_EventManagerSubsystem>();
+	EMS->StageManagerInit.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerInitialized);
 	EMS->StageManagerReady.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerReady);
 	EMS->StageLoaded.AddDynamic(this, &UOPAG_GameInstance::OnStageLoaded);
 	EMS->StageCleared.AddDynamic(this, &UOPAG_GameInstance::OnStageCleared);
@@ -69,6 +72,43 @@ void UOPAG_GameInstance::SplitStageGens()
 	}
 }
 
+void UOPAG_GameInstance::LoadSaveGameState()
+{
+	// Retrieve and cast the USaveGame object to UOPAG_SaveGame.
+	if (UOPAG_SaveGame* LoadedGame = Cast<UOPAG_SaveGame>(UGameplayStatics::LoadGameFromSlot(
+		PlayerSaveSlotName, 0)))
+	{
+		PlayerState = LoadedGame->PlayerState;
+		PlayerState.LoadType = PlayerStateLoadType::SAVE_FILE;
+
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(GetWorld(),
+			"Player Data Loaded", EMessageSeverity::Info);
+	}
+}
+
+void UOPAG_GameInstance::SaveGameState()
+{
+	if (UOPAG_SaveGame* SaveGameInstance = Cast<UOPAG_SaveGame>(
+		UGameplayStatics::CreateSaveGameObject(UOPAG_SaveGame::StaticClass())))
+	{
+
+		// Set data on the savegame object.
+		SaveGameInstance->PlayerState = PlayerState;
+
+		// Start async save process.
+		UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, 
+			PlayerSaveSlotName, 0,
+			FAsyncSaveGameToSlotDelegate::CreateLambda(
+				[this](const FString& SlotName, const int32 SlotIndex, bool Success)
+				{
+					UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(GetWorld(),
+					Success ? "Player Data Saved" : "Player Data Failed To Save",
+						EMessageSeverity::Info);
+				})
+		);
+	}
+}
+
 void UOPAG_GameInstance::Init()
 {
 	Super::Init();
@@ -82,7 +122,6 @@ void UOPAG_GameInstance::Init()
 	LoadPlanetTable();
 	CurrentPlanet = Planets[0];
 	LoadGenerationTable();
-
 }
 
 void UOPAG_GameInstance::StartStage(const EStageType StageType)
@@ -93,13 +132,32 @@ void UOPAG_GameInstance::StartStage(const EStageType StageType)
 void UOPAG_GameInstance::SavePlayerState(FOPAG_PlayerState NewPlayerState)
 {
 	PlayerState = NewPlayerState;
+	SaveGameState();
 	StartStage(NextStage);
 }
 
 void UOPAG_GameInstance::SendPlayerState()
 {
-	if (PlayerState.Health > 0.f)
+	if (!CurrentWorld || GetWorld()->GetCurrentLevel()->GetWorld()->GetFullName() != CurrentWorld->GetFullName())
+	{
+		GetEventManager()->PlacePlayerAtStart.Broadcast(
+			GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator()->GetActorTransform());
+		// pretty bad hardcoded 2 here.. but we don't want 1 cause then it's gonna divide by 0
+		// (cause it removes the starting room)
+		GetEventManager()->StageLoaded.Broadcast(2);
+		return;
+	}
+
+	if (PlayerState.LoadType == PlayerStateLoadType::NOT_LOADED)
+		LoadSaveGameState();
+
+	if (PlayerState.LoadType != PlayerStateLoadType::NOT_LOADED)
 		GetEventManager()->ApplyPlayerState.Broadcast(PlayerState);
+}
+
+void UOPAG_GameInstance::OnStageManagerInitialized(const UWorld* const World)
+{
+	CurrentWorld = World;
 }
 
 void UOPAG_GameInstance::OnStageManagerReady()

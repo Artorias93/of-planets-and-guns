@@ -13,6 +13,7 @@ class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomManager;
 class AOPAG_Enemy;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageManagerInit, const UWorld* const, World);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageManagerReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneration, StageGenData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRoomSpawned, AOPAG_RoomManager* const, RoomManager);
@@ -77,6 +78,8 @@ class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSub
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable, Category = StageManager)
+		FStageManagerInit StageManagerInit;
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
 		FStageManagerReady StageManagerReady;
 	UPROPERTY(BlueprintAssignable, Category = StageManager)

@@ -640,6 +640,16 @@ void AOPAG_StageManager::UnloadLevels()
 	}
 }
 
+void AOPAG_StageManager::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
+	const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
+	if (GI)
+	{
+		GI->GetEventManager()->StageManagerInit.Broadcast(GetWorld());
+	}
+}
+
 void AOPAG_StageManager::LoadLevels(AOPAG_RoomStreamingVolume* Volume)
 {
 	for (ULevelStreamingDynamic* StreamingLevel : Volume->StreamingLevels)

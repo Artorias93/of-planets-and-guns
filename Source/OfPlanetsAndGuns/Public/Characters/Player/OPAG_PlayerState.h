@@ -3,11 +3,22 @@
 #include "Weapons/Guns/OPAG_GunState.h"
 #include "OPAG_PlayerState.generated.h"
 
+UENUM(BlueprintType)
+enum class PlayerStateLoadType : uint8
+{
+	NOT_LOADED,
+	SAVE_FILE,
+	PREVIOUS_STAGE
+};
+
 
 USTRUCT(BlueprintType)
 struct FOPAG_PlayerState : public FTableRowBase
 {
 	GENERATED_BODY();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = LoadType)
+		PlayerStateLoadType LoadType = PlayerStateLoadType::NOT_LOADED;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
 		float Health = 0.f;

@@ -30,8 +30,11 @@ class OFPLANETSANDGUNS_API UOPAG_GameInstance : public UGameInstance
 	int32 CurrentStage;
 	int32 CurrentStageRoomCount;
 	uint8 bNextStageIsSafe : 1;
+	const UWorld* CurrentWorld;
 
 	FOPAG_PlayerState PlayerState;
+
+	const char* PlayerSaveSlotName = "PlayerSaveSlot";
 
 public:
 
@@ -45,6 +48,9 @@ private:
 
 	void SplitStageGens();
 
+	void LoadSaveGameState();
+	void SaveGameState();
+
 public:
 
 	virtual void Init() override;
@@ -57,6 +63,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SendPlayerState();
 
+	UFUNCTION()
+		void OnStageManagerInitialized(const UWorld* const World);
 	UFUNCTION()
 		void OnStageManagerReady();
 	UFUNCTION()
