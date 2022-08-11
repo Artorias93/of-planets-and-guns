@@ -77,24 +77,28 @@ void AOPAG_Player::BeginPlay()
 	UUserWidget* Crosshair = CreateWidget<UUserWidget>(GetWorld(), CrosshairClass);
 	Crosshair->AddToViewport();
 	
+	// Init player health
 	if (BaseAttributeSet && AbilitySystemComp)
 	{
-		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(
-			BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AOPAG_Player::HealthChanged);
+		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AOPAG_Player::HealthChanged);
 	}
 
+	// All init variables
 	InitializeAbilities();
 	InitDefaultValues();
 	InitADSTimeline();
 	InitDashTimeline();
 	InitRecoilTimeline();
+
+	// Attach primary and secondary guns on player
 	AttachDefaultGuns();
 
+	// Binds and broad all player's events
 	BindEvents();
 	BroadcastEvents();
 
+	// Disable movement on start [Wait the loading scene]
 	GetCharacterMovement()->DisableMovement();
-
 }
 
 void AOPAG_Player::Tick(float DeltaTime)
@@ -116,12 +120,64 @@ void AOPAG_Player::Tick(float DeltaTime)
 	}
 }
 
+void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	static const FName NameCurrentHealth = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealth);
+	static const FName NameCurrentHealthMax = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealthMax);
+	static const FName NameCurrentGunStats = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurretGunStats);
+	static const FName NameCurrentGunModules = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurretGunModules);
+	static const FName NameCurrentPrimaryGun = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurrentPrimaryGun);
+
+	if (PropertyChangedEvent.Property)
+	{
+		const FName PropName = PropertyChangedEvent.MemberProperty->GetFName();
+		if (PropName == NameCurrentHealth)
+		{
+			SetHealth(CurrentHealth);
+		}
+		if (PropName == NameCurrentHealthMax && BaseAttributeSet)
+		{
+			SetHealthMax(CurrentHealthMax);
+		}
+		if (PropName == NameCurrentGunStats)
+		{
+			CurrentGun->Stats = DebugCurretGunStats;
+		}
+		if (PropName == NameCurrentGunModules)
+		{
+			PrimaryGun->CreateAndAttachAllModules(DebugCurretGunModules);
+			DebugCurretGunStats = CurrentGun->Stats;
+		}
+		if (PropName == NameCurrentPrimaryGun)
+		{
+			PrimaryGunComponent->SetChildActorClass(DebugCurrentPrimaryGun);
+			if (PrimaryGunComponent->GetChildActor())
+			{
+				AActor* Target = PrimaryGunComponent->GetChildActor();
+				Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripSocketName);
+				PrimaryGun = Cast<AOPAG_ModularGun>(Target);
+				CurrentGun = PrimaryGun;
+			}
+		}
+	}
+
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
 void AOPAG_Player::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
+void AOPAG_Player::TeleportPlayerToStart(FTransform StartLocation)
+{
+	TeleportTo(StartLocation.GetLocation(), FRotator::ZeroRotator);
+	GetController()->SetControlRotation(StartLocation.Rotator());
+	GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Walking;
+}
+
+#pragma region BindsAndBroadcast
 void AOPAG_Player::BroadcastEvents()
 {
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
@@ -130,7 +186,7 @@ void AOPAG_Player::BroadcastEvents()
 	EMS->RequestPlayerState.Broadcast();
 }
 
-void AOPAG_Player::BindEvents() 
+void AOPAG_Player::BindEvents()
 {
 	EMS->RequestSavePlayerState.AddDynamic(this, &AOPAG_Player::SavePlayerState);
 	EMS->ApplyPlayerState.AddDynamic(this, &AOPAG_Player::ApplyPlayerState);
@@ -157,6 +213,7 @@ void AOPAG_Player::BindEvents()
 
 	EMS->AmmoPickedUp.AddDynamic(this, &AOPAG_Player::IncrementPrimaryGunAmmo);
 }
+#pragma endregion BindsAndBroadcast
 
 #pragma region Init
 void AOPAG_Player::InitDefaultValues()
@@ -213,45 +270,6 @@ void AOPAG_Player::InitRecoilTimeline()
 	}
 }
 #pragma endregion Init
-
-void AOPAG_Player::TeleportPlayerToStart(FTransform StartLocation)
-{;
-	TeleportTo(StartLocation.GetLocation(), FRotator::ZeroRotator);
-	GetController()->SetControlRotation(StartLocation.Rotator());
-	GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Walking;
-}
-
-void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	static const FName NameCurrentHealth = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealth);
-	static const FName NameCurrentHealthMax = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealthMax);
-	static const FName NameCurrentGunStats = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurretGunStats);
-	static const FName NameCurrentGunModules = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurretGunModules);
-
-	if (PropertyChangedEvent.Property)
-	{
-		const FName PropName = PropertyChangedEvent.MemberProperty->GetFName();
-		if (PropName == NameCurrentHealth)
-		{
-			SetHealth(CurrentHealth);
-		}
-		if (PropName == NameCurrentHealthMax && BaseAttributeSet)
-		{
-			SetHealthMax(CurrentHealthMax);
-		}
-		if (PropName == NameCurrentGunStats)
-		{
-			CurrentGun->Stats = DebugCurretGunStats;
-		}
-		if (PropName == NameCurrentGunModules)
-		{
-			PrimaryGun->CreateAndAttachAllModules(DebugCurretGunModules);
-			DebugCurretGunStats = CurrentGun->Stats;
-		}
-	}
-
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-}
 
 #pragma region MathematicUtility
 const FVector AOPAG_Player::CalculateThrowForce() const

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Interactables/OPAG_LootBox.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
 #include <Components/PrimitiveComponent.h>
@@ -52,6 +49,9 @@ void AOPAG_LootBox::Interact_Implementation()
 	const FVector Force = Lid->GetUpVector() * ThrowItems + Lid->GetForwardVector() * ThrowItems;
 	Lid->AddForce(Force, NAME_None, true);
 
+	// Set can interact to false after player interact with box
+	bIsInteractable = false;
+
 	// Active Timer for spawn items
 	SpawnItem();
 }
@@ -61,6 +61,7 @@ bool AOPAG_LootBox::CanInteract_Implementation()
 	return bIsInteractable;
 }
 
+// Call method for any item in the list
 void AOPAG_LootBox::SpawnItem()
 {
 	if (Items.Num() == 0)

@@ -132,17 +132,19 @@ public:
 	TSubclassOf<UGameplayAbility> ShieldAbility;
 
 public:
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "With this variable is possible to modify the main stats of current gun."))
 	FOPAG_GunStats DebugCurretGunStats;
 
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "With this variable is possible to modify the modules of primary gun."))
 	FOPAG_GunModules DebugCurretGunModules;
 
-public:
-	UPROPERTY(Category = "Debug", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "With this variable is possible to modify the primary gun's type."))
+	TSubclassOf<AOPAG_ModularGun> DebugCurrentPrimaryGun;
+
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the current player's life."))
 	int CurrentHealth = 0;
 
-	UPROPERTY(Category = "Debug", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the max player's life."))
 	int CurrentHealthMax = 0;
 
 private:
