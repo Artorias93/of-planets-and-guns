@@ -71,6 +71,9 @@ public:
 	int ReductionSpreadRadius = 10;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	float ReductionSpreadRadiusShootingMax = 10.f;
+
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
 public:
@@ -82,6 +85,9 @@ public:
 
 	UPROPERTY(Category = "Sound", EditDefaultsOnly, BlueprintReadWrite)
 	USoundBase* ShootSound;
+
+protected:
+	float ReductionSpreadRadiusShooting = 1.f;
 
 protected:
 	UPROPERTY()
@@ -108,6 +114,7 @@ public:
 
 	// Camera behavior
 	UCameraComponent* GetADSCamera() const;
+	void ResetReductionSpreadRadiusShooting();
 protected:
 	// Main system for shooting
 	virtual void ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);

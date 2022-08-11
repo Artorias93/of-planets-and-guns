@@ -66,6 +66,8 @@ public:
 
 	UFUNCTION() void Shoot();
 
+	UFUNCTION() void StopShoot();
+
 	UFUNCTION() void SwapGuns();
 
 	UFUNCTION() void ReloadGun();

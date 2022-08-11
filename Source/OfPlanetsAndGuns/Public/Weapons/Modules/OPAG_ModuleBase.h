@@ -43,7 +43,7 @@ public:
 	int EquippableFireTypes;
 
 
-	void ApplyForce_Implementation() override;
+	void ApplyForce_Implementation(const FVector Force) override;
 
 protected:
 	virtual void BeginPlay() override;

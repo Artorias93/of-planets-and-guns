@@ -61,6 +61,12 @@ UCameraComponent* AOPAG_GunBase::GetADSCamera() const
 {
 	return ADSCamera;
 }
+
+void AOPAG_GunBase::ResetReductionSpreadRadiusShooting()
+{
+	ReductionSpreadRadiusShooting = 1.f;
+}
+
 #pragma endregion GET
 
 #pragma region Mathematic Utility
@@ -79,6 +85,8 @@ void AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direct
 	bCanShoot = false;
 
 	ShootLineTrace(StartShootLocation, Direction, ShooterCharacter);
+
+	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
 
 	const float Seconds = CalculateRateInSeconds(Stats.FireRate);
 	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
@@ -172,7 +180,7 @@ float AOPAG_GunBase::CalculateSpreadRadius() const
 			return SpreadRadius * ReductionSpreadRadius;
 		}
 	}
-	return SpreadRadius;
+	return SpreadRadius * ReductionSpreadRadiusShooting;
 }
 
 FVector2D AOPAG_GunBase::CalculateRandPointInCircle() const

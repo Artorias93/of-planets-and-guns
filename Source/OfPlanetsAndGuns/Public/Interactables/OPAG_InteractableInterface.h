@@ -26,5 +26,5 @@ public:
 		bool CanInteract();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		void ApplyForce();
+		void ApplyForce(const FVector Force);
 };

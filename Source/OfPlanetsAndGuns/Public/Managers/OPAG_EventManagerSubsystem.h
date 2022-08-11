@@ -64,6 +64,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopJumping);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwapGuns);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadGun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShoot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractWithItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwitchToADSCamera);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetFPSCamera);
@@ -175,6 +176,9 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FShoot Shoot;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FStopShoot StopShoot;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FSwapGuns SwapGuns;

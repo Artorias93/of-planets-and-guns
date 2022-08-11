@@ -80,7 +80,15 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	void ApplyForce_Implementation() override;
+	void ApplyForce_Implementation(const FVector Force) override;
+
+	// Setter and Getter
+	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
+	FOPAG_GunModules GetModulesStruct() const;
+
+	// Utility for link modules and sockets
+	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;
+	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
 
 	// Reload system
 	void Reload();
@@ -110,10 +118,6 @@ protected:
 	// Shoot behavior
 	UFUNCTION(BlueprintCallable) void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
 
-	// Utility for link modules and sockets
-	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;
-	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
-
 	// Create and Attach module behavior
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const;
 	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule,
@@ -124,4 +128,6 @@ protected:
 	void UpdateAmmo();
 	void WaitReloadingTimer();
 	void PopulateAmmoTable();
+
+	void CheckIfPhysical() const;
 };

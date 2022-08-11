@@ -32,7 +32,7 @@ void AOPAG_Pistol::ShootLineTrace(FVector StartShootLocation, FVector Direction,
 	FHitResult OutHit;
 	const TArray<AActor*> ActorsToIgnore = CheckWhatActorsIgnoreLinetrace();
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
-		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+		ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
 	// If Actor is inherited by character base, invoke take damage
 	if (bIsHit)

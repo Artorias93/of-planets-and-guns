@@ -40,6 +40,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	void ApplyForce_Implementation() override;
+	void ApplyForce_Implementation(const FVector Force) override;
 
 };

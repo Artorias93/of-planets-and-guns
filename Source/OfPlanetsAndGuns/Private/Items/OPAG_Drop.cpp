@@ -35,10 +35,9 @@ void AOPAG_Drop::Tick(float DeltaTime)
 
 }
 
-void AOPAG_Drop::ApplyForce_Implementation()
+void AOPAG_Drop::ApplyForce_Implementation(const FVector Force)
 {
 	Sphere->SetSimulatePhysics(true);
-	const FVector Force = Sphere->GetUpVector() * 20000.f + Sphere->GetForwardVector() * 20000.f;
 	Sphere->AddForce(Force, NAME_None, true);
 }
 

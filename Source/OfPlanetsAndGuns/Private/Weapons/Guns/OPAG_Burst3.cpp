@@ -1,5 +1,6 @@
 #include "Weapons/Guns/OPAG_Burst3.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include <Kismet/GameplayStatics.h>
 
 AOPAG_Burst3::AOPAG_Burst3()
 {
@@ -11,6 +12,8 @@ void AOPAG_Burst3::Shoot(FVector StartShootLocation, FVector Direction, const AO
 	bCanShoot = false;
 
 	ShootBurst();
+
+	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
 }
 
 void AOPAG_Burst3::ShootBurst()
@@ -30,6 +33,9 @@ void AOPAG_Burst3::ShootBurst()
 
 			// Decrement number of consecutive projectiles
 			BurstProjectileCount--;
+
+			// Play sound
+			UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 
 			// Re-call this method
 			GetWorld()->GetTimerManager().SetTimer(ShootBurstHandle, this, &AOPAG_Burst3::ShootBurst, TimeForAnyNextProjectile, false);

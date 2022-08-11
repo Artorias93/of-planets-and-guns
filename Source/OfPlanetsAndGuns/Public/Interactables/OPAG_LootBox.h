@@ -29,7 +29,10 @@ public:
 
 public:
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	float ExplosionForce = 100.f;
+	float ThrowLid = 100.f;
+
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	float ThrowItems = 100.f;
 
 private:
 	TArray<TSubclassOf<AActor>> Items;   

@@ -145,6 +145,7 @@ void AOPAG_Player::BindEvents()
 	EMS->Jumping.AddDynamic(this, &AOPAG_Player::Jumping);
 	EMS->StopJumping.AddDynamic(this, &AOPAG_Player::StopJumping);
 	EMS->Shoot.AddDynamic(this, &AOPAG_Player::Shoot);
+	EMS->StopShoot.AddDynamic(this, &AOPAG_Player::StopShoot);
 	EMS->SwapGuns.AddDynamic(this, &AOPAG_Player::SwapGuns);
 	EMS->ReloadGun.AddDynamic(this, &AOPAG_Player::ReloadGun);
 	EMS->InteractWithItem.AddDynamic(this, &AOPAG_Player::InteractWithItem);
@@ -157,6 +158,7 @@ void AOPAG_Player::BindEvents()
 	EMS->AmmoPickedUp.AddDynamic(this, &AOPAG_Player::IncrementPrimaryGunAmmo);
 }
 
+#pragma region Init
 void AOPAG_Player::InitDefaultValues()
 {
 	// Set secondary with hidden because the primary guns is start gun
@@ -167,7 +169,9 @@ void AOPAG_Player::InitDefaultValues()
 	if (PrimaryGunComponent->GetChildActor())
 	{
 		CurrentGun = Cast<AOPAG_GunBase>(PrimaryGunComponent->GetChildActor());
-		PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());;
+		PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
+		DebugCurretGunStats = CurrentGun->Stats;
+		DebugCurretGunModules = PrimaryGun->GetModulesStruct();
 	}
 	if (Camera)
 	{
@@ -208,6 +212,7 @@ void AOPAG_Player::InitRecoilTimeline()
 		RecoilTimeline->AddInterpFloat(RecoilCurveFloat, OnRecoilTimelineProgress);
 	}
 }
+#pragma endregion Init
 
 void AOPAG_Player::TeleportPlayerToStart(FTransform StartLocation)
 {;
@@ -220,6 +225,8 @@ void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 {
 	static const FName NameCurrentHealth = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealth);
 	static const FName NameCurrentHealthMax = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealthMax);
+	static const FName NameCurrentGunStats = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurretGunStats);
+	static const FName NameCurrentGunModules = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurretGunModules);
 
 	if (PropertyChangedEvent.Property)
 	{
@@ -231,6 +238,15 @@ void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 		if (PropName == NameCurrentHealthMax && BaseAttributeSet)
 		{
 			SetHealthMax(CurrentHealthMax);
+		}
+		if (PropName == NameCurrentGunStats)
+		{
+			CurrentGun->Stats = DebugCurretGunStats;
+		}
+		if (PropName == NameCurrentGunModules)
+		{
+			PrimaryGun->CreateAndAttachAllModules(DebugCurretGunModules);
+			DebugCurretGunStats = CurrentGun->Stats;
 		}
 	}
 
@@ -336,6 +352,7 @@ void AOPAG_Player::SwapGuns()
 			CurrentGun = PrimaryGun;
 		}
 
+		DebugCurretGunStats = CurrentGun->Stats;
 		EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 	}
@@ -383,6 +400,11 @@ void AOPAG_Player::Shoot()
 		EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 	}
+}
+
+void AOPAG_Player::StopShoot()
+{
+	CurrentGun->ResetReductionSpreadRadiusShooting();
 }
 
 // Check if guns can shoot (control if gun is shooting, if player isn't reloading gun and gun has enough ammo)
@@ -516,6 +538,10 @@ void AOPAG_Player::InteractWithItem()
 		{
 			InteractWithModule(Module);
 		}
+		else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
+		{
+			PickupGun(Gun);
+		}
 		else
 		{
 			IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
@@ -563,13 +589,52 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 				FActorSpawnParameters SpawnParams;
 				AOPAG_ModuleBase* OldModule = GetWorld()->SpawnActor<AOPAG_ModuleBase>(OldModuleClass, ModuleSpawnLocation, FRotator::ZeroRotator, SpawnParams);
 				OldModule->SetParameters(OldModuleRarity, OldModuleStats, OldModuleEquippable);
-
-				// Throw the old module
-				UPrimitiveComponent* SphereComponent = OldModule->GetSphereComponent();
-				ThrowScrap(SphereComponent);
+				OldModule->ApplyForce_Implementation(CalculateThrowForce());
 			}
 		}
 	}
+}
+
+void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
+{
+	//New Gun Modules
+	const int NewAmmoCurrent = Gun->AmmoCurrent;
+	const int NewAmmoMax = Gun->AmmoMax;
+	const TSubclassOf<AOPAG_ModularGun> NewGunClass = Gun->GetClass();
+	const FOPAG_GunModules NewGunModules = Gun->GetModulesStruct();
+
+	//Old Gun Modules
+	const int OldAmmoCurrent = PrimaryGun->AmmoCurrent;
+	const int OldAmmoMax = PrimaryGun->AmmoMax;
+	const TSubclassOf<AOPAG_ModularGun> OldGunClass = PrimaryGun->GetClass();
+	const FOPAG_GunModules OldGunModules = PrimaryGun->GetModulesStruct();
+
+	if (NewGunClass == nullptr || OldGunClass == nullptr)
+	{
+		return;
+	}
+	
+	// Destroy the pickup's gun
+	Gun->Destroy();
+
+	// Attach new gun
+	PrimaryGunComponent->SetChildActorClass(NewGunClass);
+	if (PrimaryGunComponent->GetChildActor())
+	{
+		AActor* Target = PrimaryGunComponent->GetChildActor();
+		Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripSocketName);
+		PrimaryGun = Cast<AOPAG_ModularGun>(Target);
+		PrimaryGun->SetAmmoParams(NewAmmoCurrent, NewAmmoMax);
+		PrimaryGun->CreateAndAttachAllModules(NewGunModules);
+		CurrentGun = PrimaryGun;
+	}
+
+	// Spawn the old primary gun in scene
+	const FVector GunSpawnLocation = CalculateModuleSpawnLocation();
+	AOPAG_ModularGun* OldGun = GetWorld()->SpawnActor<AOPAG_ModularGun>(OldGunClass, GunSpawnLocation, FRotator::ZeroRotator);
+	OldGun->SetAmmoParams(OldAmmoCurrent, OldAmmoMax);
+	OldGun->CreateAndAttachAllModules(OldGunModules);
+	OldGun->ApplyForce_Implementation(CalculateThrowForce());
 }
 
 const FVector AOPAG_Player::CalculateModuleSpawnLocation() const
@@ -656,13 +721,6 @@ void AOPAG_Player::UpdateComparison() {
 		}
 	}
 
-}
-
-void AOPAG_Player::ThrowScrap(UPrimitiveComponent* Target)
-{
-	const FVector Force = CalculateThrowForce();
-	Target->SetSimulatePhysics(true);
-	Target->AddImpulse(Force, NAME_None, false);
 }
 #pragma endregion LookAtInteractable
 

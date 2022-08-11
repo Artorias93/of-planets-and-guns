@@ -9,6 +9,8 @@
 #include "InputActionValue.h"
 #include "OPAG_PlayerState.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include "Weapons/Guns/OPAG_GunStats.h"
+#include "Weapons/Guns/OPAG_GunState.h"
 #include "OPAG_Player.generated.h"
 
 class UOPAG_AttributeSetBase;
@@ -130,6 +132,13 @@ public:
 	TSubclassOf<UGameplayAbility> ShieldAbility;
 
 public:
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite)
+	FOPAG_GunStats DebugCurretGunStats;
+
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite)
+	FOPAG_GunModules DebugCurretGunModules;
+
+public:
 	UPROPERTY(Category = "Debug", EditDefaultsOnly, BlueprintReadWrite)
 	int CurrentHealth = 0;
 
@@ -194,12 +203,14 @@ private:
 	void CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection); 
 	AActor* CheckLookAtInteractableItems();
 	const FVector CalculateModuleSpawnLocation() const;
-	void ThrowScrap(UPrimitiveComponent* Target);
 	void UpdateComparison();
 
 	// Interact with items
 	void InteractWithModule(AOPAG_ModuleBase* Module);
 	void PickupModule(AOPAG_ModuleBase* Module);
+
+	// Interact with guns
+	void PickupGun(AOPAG_ModularGun* Gun);
 
 public:
 	UFUNCTION() void MoveForward(const FInputActionValue& Value);
@@ -213,6 +224,8 @@ public:
 	UFUNCTION() void Jumping();
 
 	UFUNCTION() void Shoot();
+
+	UFUNCTION() void StopShoot();
 
 	UFUNCTION() void SwapGuns();
 
@@ -240,18 +253,19 @@ public:
 	UFUNCTION() void RecoilTimelineProgress(float Value);
 
 public:
-	UFUNCTION()
-		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
+	UFUNCTION() void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
 			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-		void SavePlayerState();
-	UFUNCTION()
-		void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
+	UFUNCTION() void SavePlayerState();
+
+	UFUNCTION() void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
 
 public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
+
 	void HealthChanged(const FOnAttributeChangeData& Data);
+
+	// Getter and setter for shield element
 	void SetShield(AActor* NewShield);
 	AActor* GetShield() const;
 };

@@ -49,7 +49,7 @@ void AOPAG_LootBox::Interact_Implementation()
 {
 	// Explosion behavior with half parabolic method
 	Lid->SetSimulatePhysics(true);
-	const FVector Force = Lid->GetUpVector() * ExplosionForce + Lid->GetForwardVector() * ExplosionForce;
+	const FVector Force = Lid->GetUpVector() * ThrowItems + Lid->GetForwardVector() * ThrowItems;
 	Lid->AddForce(Force, NAME_None, true);
 
 	// Active Timer for spawn items
@@ -84,7 +84,8 @@ void AOPAG_LootBox::SpawnItem()
 	IOPAG_InteractableInterface* TheInterface = Cast<IOPAG_InteractableInterface>(Item);
 	if (TheInterface)
 	{
-		TheInterface->ApplyForce_Implementation();
+		const FVector Force = Item->GetActorUpVector() * ThrowLid + Item->GetActorForwardVector() * ThrowLid;
+		TheInterface->ApplyForce_Implementation(Force);
 	}
 
 	// Re-call this method for any items

@@ -29,10 +29,9 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	Accessory = CreateDefaultSubobject<UChildActorComponent>(TEXT("Accessory"));
 }
 
-void AOPAG_ModularGun::ApplyForce_Implementation()
+void AOPAG_ModularGun::ApplyForce_Implementation(const FVector Force)
 {
 	Receiver->SetSimulatePhysics(true);
-	const FVector Force = Receiver->GetUpVector() * 20000.f + Receiver->GetForwardVector() * 20000.f;
 	Receiver->AddForce(Force, NAME_None, true);
 }
 
@@ -62,6 +61,7 @@ void AOPAG_ModularGun::BeginPlay()
 
 	CreateAndAttachAllModules(StandardModules);
 	PopulateAmmoTable();
+	CheckIfPhysical();
 
 	AmmoCurrent = Stats.ClipSize;
 }
@@ -81,7 +81,37 @@ void AOPAG_ModularGun::PopulateAmmoTable()
 	}
 }
 
+void AOPAG_ModularGun::CheckIfPhysical() const
+{
+	// Control if module has parent gun -> is attached
+	if (GetParentActor() == nullptr)
+	{
+		Receiver->SetSimulatePhysics(true);
+	}
+}
+
+#pragma region Setter
+void AOPAG_ModularGun::SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax)
+{
+	AmmoCurrent = NewAmmoCurrent;
+	AmmoMax = NewAmmoMax;
+}
+#pragma endregion Setter
+
 #pragma region GET
+FOPAG_GunModules AOPAG_ModularGun::GetModulesStruct() const
+{
+	FOPAG_GunModules GunModules;
+	GunModules.Barrel = Barrel->GetChildActorClass();
+	GunModules.Stock = Stock->GetChildActorClass();
+	GunModules.Grip = Grip->GetChildActorClass();
+	GunModules.Magazine = Magazine->GetChildActorClass();
+	GunModules.Sight = Sight->GetChildActorClass();
+	GunModules.Accessory = Accessory->GetChildActorClass();
+
+	return GunModules;
+}
+
 // Return module by child actor of socket
 AOPAG_ModuleBase* AOPAG_ModularGun::GetModule(const UChildActorComponent* const ChildComponent) const
 {
