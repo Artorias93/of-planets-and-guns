@@ -11,7 +11,7 @@ class OFPLANETSANDGUNS_API UOPAG_TaskCharge : public UOPAG_TaskBase
 	GENERATED_BODY()
 
 	/////////////////////////////
-	//Variables
+	//Functions
 	/////////////////////////////
 
 public:

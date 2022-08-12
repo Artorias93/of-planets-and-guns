@@ -3,7 +3,6 @@
 #include <BehaviorTree/BlackboardComponent.h>
 #include <Perception/AISense_Damage.h>
 #include <Kismet/GameplayStatics.h>
-#include <Kismet/KismetMathLibrary.h>
 #include <BrainComponent.h>
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
