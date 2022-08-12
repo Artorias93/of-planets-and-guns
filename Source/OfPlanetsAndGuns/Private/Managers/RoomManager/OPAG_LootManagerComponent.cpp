@@ -28,6 +28,8 @@ void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 {
+	if (!LootBox) return;
+
 	TArray<TSubclassOf<AActor>> Items;
 	for (FOPAG_LootChance* Drop : Drops)
 	{

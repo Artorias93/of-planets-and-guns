@@ -118,7 +118,8 @@ void AOPAG_Zipline::OverlapPointBBegin(UPrimitiveComponent* OverlappedComponent,
 
 
 void AOPAG_Zipline::OverlapReset(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn()) {
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController && OtherActor == PlayerController->GetPawn()) {
 		bCanPlayerInteract = false;
 	}
 }
