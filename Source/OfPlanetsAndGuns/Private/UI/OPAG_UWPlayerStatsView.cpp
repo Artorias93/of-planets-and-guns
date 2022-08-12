@@ -13,8 +13,6 @@
 
 void UOPAG_UWPlayerStatsView::NativeConstruct() {
 	BindEvents();
-
-	InitDashIcons(5);
 }
 
 void UOPAG_UWPlayerStatsView::BindEvents()

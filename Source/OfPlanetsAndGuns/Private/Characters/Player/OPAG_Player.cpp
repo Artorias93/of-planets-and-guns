@@ -185,6 +185,10 @@ void AOPAG_Player::BroadcastEvents()
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 	EMS->DashAmountChanged.Broadcast(DashCount);
 	EMS->RequestPlayerState.Broadcast();
+
+	for (int i = 0; i < DashMaxCount; i++) {
+		EMS->DashAmountIncrement.Broadcast();
+	}
 }
 
 void AOPAG_Player::BindEvents()
