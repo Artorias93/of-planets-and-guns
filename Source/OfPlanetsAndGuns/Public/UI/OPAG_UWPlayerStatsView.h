@@ -12,6 +12,8 @@
 class UTextBlock;
 class UProgressBar;
 class UImage;
+class UHorizontalBox;
+class UTexture2D;
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWPlayerStatsView : public UUserWidget
@@ -21,12 +23,14 @@ class OFPLANETSANDGUNS_API UOPAG_UWPlayerStatsView : public UUserWidget
 	void BindEvents();
 
 	UPROPERTY(meta = (BindWidget))
-		UImage* DashIcon;
+		UImage* DashIconOld;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* DashAmountText;
 	UPROPERTY(meta = (BindWidget))
 		UProgressBar* DashChargeBar;
 
+	UPROPERTY(meta =(BindWidget))
+		UHorizontalBox* DashBox;
 	UPROPERTY(meta = (BindWidget))
 		UProgressBar* HealthBar;
 	UPROPERTY(meta = (BindWidget))
@@ -41,6 +45,19 @@ public:
 	void UpdateDashAmountText(const int CurrentValue);
 	UFUNCTION()
 	void UpdateDashChargeBar(const float CurrentValue, const float MaxValue);
+	UFUNCTION()
+	void IncrementDashAmount();
+	UFUNCTION()
+	void DecrementDashAmount();
 
 	void NativeConstruct();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		UTexture2D* DashIconTexture;
+
+	UFUNCTION()
+	void InitDashIcons(const int DashAmount);
+
+private:
+	int LastDashIconIndex = 0;
 };
