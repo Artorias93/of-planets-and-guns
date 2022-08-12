@@ -21,6 +21,13 @@ AOPAG_Enemy::AOPAG_Enemy()
 
 	SpawnParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle System Component"));
 	SpawnParticle->SetupAttachment(GetMesh());
+
+	const auto ObjectFinder = ConstructorHelpers::FObjectFinder<UParticleSystem>(
+		TEXT("ParticleSystem'/Game/OfPlanetsAndGuns/Effects/FX_EnemySpawn.FX_EnemySpawn'"));
+	if (ObjectFinder.Succeeded())
+	{
+		SpawnParticle->Template = ObjectFinder.Object;
+	}
 }
 
 void AOPAG_Enemy::BeginPlay()
