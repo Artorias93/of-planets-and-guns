@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Items/OPAG_Drop.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -37,7 +34,6 @@ void AOPAG_Drop::Tick(float DeltaTime)
 
 void AOPAG_Drop::ApplyForce_Implementation(const FVector Force)
 {
-	Sphere->SetSimulatePhysics(true);
-	Sphere->AddForce(Force, NAME_None, true);
+	DropMesh->SetSimulatePhysics(true);
+	DropMesh->AddForce(Force, NAME_None, true);
 }
-

@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -40,21 +38,17 @@ private:
 	FTimerHandle SpawnItemsHandle;
 	
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	void SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList);
 	void SetModules(FOPAG_GunModules& ModulesStruct);
 	
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		void Interact();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) void Interact();
 	virtual void Interact_Implementation() override;
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		bool CanInteract();
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
 
 	UFUNCTION() void SpawnItem();

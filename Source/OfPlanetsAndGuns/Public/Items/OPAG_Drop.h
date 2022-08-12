@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -26,12 +24,14 @@ class OFPLANETSANDGUNS_API AOPAG_Drop : public AActor, public IOPAG_Interactable
 public:	
 	AOPAG_Drop();
 
-	UPROPERTY(Category = "Drop stuff", EditAnywhere, BlueprintReadWrite)
-		UStaticMeshComponent* DropMesh;
-	UPROPERTY(Category = "Drop stuff", EditAnywhere, BlueprintReadWrite)
-		USphereComponent* Sphere;
-	UPROPERTY(Category = "Drop stuff", EditDefaultsOnly, BlueprintReadWrite)
-		EDropType DropType;
+	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	UStaticMeshComponent* DropMesh;
+	
+	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	USphereComponent* Sphere;
+	
+	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	EDropType DropType;
 
 protected:
 	virtual void BeginPlay() override;
