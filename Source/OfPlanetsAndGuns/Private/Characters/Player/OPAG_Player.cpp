@@ -272,6 +272,8 @@ void AOPAG_Player::ActiveDash()
 
 			EMS->DashAmountChanged.Broadcast(DashCount);
 
+			EMS->DashAmountDecrement.Broadcast();
+
 			if (bIsFirstDash)
 			{
 				bIsFirstDash = false;
@@ -692,6 +694,7 @@ void AOPAG_Player::DashTimelineFinished()
 	DashTimeline->SetTimelineLength(DashRestoreTime);
 	DashCount++;
 	EMS->DashAmountChanged.Broadcast(DashCount);
+	EMS->DashAmountIncrement.Broadcast();
 
 	if (DashCount < DashMaxCount)
 	{

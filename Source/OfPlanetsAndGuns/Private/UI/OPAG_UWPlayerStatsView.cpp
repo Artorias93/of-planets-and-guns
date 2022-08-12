@@ -5,11 +5,16 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Blueprint/WidgetTree.h"
 
 void UOPAG_UWPlayerStatsView::NativeConstruct() {
 	BindEvents();
+
+	InitDashIcons(5);
 }
 
 void UOPAG_UWPlayerStatsView::BindEvents()
@@ -21,6 +26,9 @@ void UOPAG_UWPlayerStatsView::BindEvents()
 		EMS->ShieldChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateShieldBar);
 		EMS->DashAmountChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashAmountText);
 		EMS->DashChargeChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashChargeBar);
+
+		EMS->DashAmountIncrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::IncrementDashAmount);
+		EMS->DashAmountDecrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::DecrementDashAmount);
 	}
 }
 
@@ -55,5 +63,37 @@ void UOPAG_UWPlayerStatsView::UpdateDashChargeBar(const float CurrentValue, cons
 
 	if (DashChargeBar && (Percentage >= 0.0f && Percentage <= 1.0f)) {
 		DashChargeBar->SetPercent(Percentage);
+	}
+}
+
+void UOPAG_UWPlayerStatsView::IncrementDashAmount()
+{
+	UImage* const NewDashIcon = WidgetTree->ConstructWidget<UImage>();
+
+	if (DashIconTexture) {
+		NewDashIcon->SetBrushFromTexture(DashIconTexture);
+	}
+
+	if (NewDashIcon)
+		DashBox->AddChild(NewDashIcon);
+
+	UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(DashBox->GetSlots()[(DashBox->GetChildrenCount() - 1)]);
+
+	if (MyBoxSlot) {
+		MyBoxSlot->SetPadding(FMargin(5, 5, 5, 5));
+	}
+}
+
+void UOPAG_UWPlayerStatsView::DecrementDashAmount()
+{
+	if (DashBox->GetChildrenCount() > 0) {
+		DashBox->RemoveChildAt((DashBox->GetChildrenCount() - 1));
+	}
+}
+
+void UOPAG_UWPlayerStatsView::InitDashIcons(const int DashAmount)
+{
+	for (int i = 0; i < DashAmount; i++) {
+		IncrementDashAmount();
 	}
 }
