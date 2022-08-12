@@ -1,8 +1,11 @@
 #include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
 #include "Components/BoxComponent.h"
 //My Classes
+#include "NiagaraCommon.h"
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "Components/CapsuleComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 {
@@ -27,10 +30,27 @@ AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 	ShieldMesh = CreateDefaultSubobject<UStaticMeshComponent>("Shield Mesh Component");
 	if (ShieldMesh)
 	{
-		ShieldMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "LeftHandSocket");
+		ShieldMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
+			"LeftHandSocket");
 		ShieldMesh->SetCanEverAffectNavigation(false);
 		ShieldMesh->ComponentTags.Add(FName("Shield"));
 	}
+
+	ParticleComponent1 = CreateDefaultSubobject<UParticleSystemComponent>("Booster Component 1");
+	if(ParticleComponent1)
+	{
+		ParticleComponent1->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
+			"BoosterLeftSocket");
+	}
+	
+	ParticleComponent2 = CreateDefaultSubobject<UParticleSystemComponent>("Booster Component 2");
+	if(ParticleComponent2)
+	{
+		ParticleComponent2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
+			"BoosterRightSocket");
+	}
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_ShieldEnemy::OnOverlapBegin);
 }
 
 void AOPAG_ShieldEnemy::BeginPlay()
@@ -60,6 +80,7 @@ void AOPAG_ShieldEnemy::OnAttackBegin(UAnimMontage* Montage)
 {
 	bUseControllerRotationYaw = false;
 }
+
 
 //The attack collision & damage is computed only when the animation montage's notify is reached
 void AOPAG_ShieldEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload& NotifyPayload)
@@ -113,6 +134,15 @@ void AOPAG_ShieldEnemy::Death()
 	Super::Death();
 }
 
+void AOPAG_ShieldEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(AOPAG_Player* const OverlapPlayer = Cast<AOPAG_Player>(OtherActor))
+	{
+		OverlapPlayer->ReceiveDamage(ChargeDamage);
+	}
+}
+
 bool AOPAG_ShieldEnemy::GetIsCharging() const
 {
 	return bIsCharging;
@@ -123,7 +153,31 @@ void AOPAG_ShieldEnemy::SetIsCharging(const bool Value)
 	bIsCharging = Value;
 }
 
-UStaticMeshComponent* AOPAG_ShieldEnemy::GetShieldMesh()
+UStaticMeshComponent* AOPAG_ShieldEnemy::GetShieldMesh() const
 {
 	return ShieldMesh;
+}
+
+void AOPAG_ShieldEnemy::TurnOnBoosters() const
+{
+	if(ParticleComponent1)
+	{
+		ParticleComponent1->SetVisibility(true);
+	}
+	if(ParticleComponent2)
+	{
+		ParticleComponent1->SetVisibility(true);
+	}
+}
+
+void AOPAG_ShieldEnemy::TurnOffBoosters() const
+{
+	if(ParticleComponent1)
+	{
+		ParticleComponent1->SetVisibility(false);
+	}
+	if(ParticleComponent2)
+	{
+		ParticleComponent1->SetVisibility(false);
+	}
 }
