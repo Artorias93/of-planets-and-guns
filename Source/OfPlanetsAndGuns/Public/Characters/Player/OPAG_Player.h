@@ -26,6 +26,9 @@ UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, Category = "GameplayAbility System")
+	const class UOPAG_AttributeSetPlayer* AttributeSetPlayer;
 	
 public:
 	AOPAG_Player();
@@ -91,19 +94,10 @@ public:
 	bool bIsFirstDash = true;
 
 	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
-	int DashCount = 5;
-
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
-	int DashMaxCount = 5;
-
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
 	float DashSpeed = 10000.f;
 
 	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
 	float DashLenght = 500.f;
-
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
-	float DashRestoreTime = 5.f;
 
 public:
 	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
@@ -116,6 +110,9 @@ public:
 	TArray<TEnumAsByte<EObjectTypeQuery>> InteractableTypesQuery;
 
 public: 
+	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<UGameplayAbility> PlayerShieldAbility;
+
 	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UGameplayAbility> Stamina;
 
@@ -141,17 +138,21 @@ public:
 	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "With this variable is possible to modify the primary gun's type."))
 	TSubclassOf<AOPAG_ModularGun> DebugCurrentPrimaryGun;
 
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the current player's life."))
-	int CurrentHealth = 0;
-
 	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the max player's life."))
-	int CurrentHealthMax = 0;
+	int DebugHealthMax = 0;
+
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the max player's dash count."))
+	int DebugDashMaxCount = 0;
+
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the restore timer player's dash."))
+	float DebugDashRestoreTime = 0.f;
 
 private:
 	const FName GripSocketName = "GripPoint";
 	const float LookUpDistanceToPlayer = 150.f;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
+	bool bIsShieldBroken = false;
 	float GunPreADSRoll = 0;
 	AActor* InteractableObject = nullptr;
 	AActor* PreviousLookedAtModule = nullptr;
@@ -162,6 +163,10 @@ private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
+private:
+	FTimerHandle RestartShieldPlayerHandle;
+	FTimerHandle ShieldPlayerCooldownHandle;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -171,6 +176,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	virtual void ReceiveDamage(const float Damage) override;
 
 private:
 	// Events system
@@ -183,8 +189,7 @@ private:
 	void InitDashTimeline();
 	void InitRecoilTimeline();
 
-	UFUNCTION()
-	void TeleportPlayerToStart(FTransform StartLocation);
+	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);
 
 	// Mathematics utility
 	const FVector CalculateThrowForce() const;
@@ -215,6 +220,10 @@ private:
 
 	// Interact with guns
 	void PickupGun(AOPAG_ModularGun* Gun);
+
+	// Timer
+	void ResetShieldTimer();
+	void ShieldCooldownTimer();
 
 public:
 	UFUNCTION() void MoveForward(const FInputActionValue& Value);

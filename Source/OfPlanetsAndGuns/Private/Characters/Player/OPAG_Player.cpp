@@ -24,6 +24,8 @@
 #include "Characters/Player/OPAG_PlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Characters/Player/OPAG_AttributeSetPlayer.h"
+#include <AbilitySystemBlueprintLibrary.h>
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -80,6 +82,7 @@ void AOPAG_Player::BeginPlay()
 	// Init player health
 	if (BaseAttributeSet && AbilitySystemComp)
 	{
+		AttributeSetPlayer = Cast<UOPAG_AttributeSetPlayer>(BaseAttributeSet);
 		AbilitySystemComp->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetHealthAttribute()).AddUObject(this, &AOPAG_Player::HealthChanged);
 	}
 
@@ -97,7 +100,6 @@ void AOPAG_Player::BeginPlay()
 	// Binds and broad all player's events
 	BindEvents();
 	BroadcastEvents();
-
 }
 
 void AOPAG_Player::Tick(float DeltaTime)
@@ -119,25 +121,59 @@ void AOPAG_Player::Tick(float DeltaTime)
 	}
 }
 
+void AOPAG_Player::ReceiveDamage(const float Damage)
+{
+	check(AttributeSetPlayer);
+
+	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
+	{
+		Super::ReceiveDamage(Damage);
+
+		// Restart Shield
+		GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
+		GetWorld()->GetTimerManager().ClearTimer(ShieldPlayerCooldownHandle);
+		GetWorld()->GetTimerManager().SetTimer(ShieldPlayerCooldownHandle, this, &AOPAG_Player::ShieldCooldownTimer, AttributeSetPlayer->GetShieldCooldown(), false);
+		bIsShieldBroken = true;
+		UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
+		return;
+	}
+	if (AbilitySystemComp && BaseAttributeSet)
+	{
+		AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
+
+		//TODO: Rename BasicShot in AbilityTakeDamage
+		AbilitySystemComp->TryActivateAbilityByClass(PlayerShieldAbility);
+
+		const FGameplayTag HitGameplayTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.shield.hitEvent"));
+		FGameplayEventData HitEventData = FGameplayEventData();
+		HitEventData.Target = this;
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
+		UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
+	}
+}
+
 #if WITH_EDITOR
 void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
-	static const FName NameCurrentHealth = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealth);
-	static const FName NameCurrentHealthMax = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealthMax);
+	// Health
+	static const FName NameCurrentHealthMax = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugHealthMax);
+
+	// Guns and Modules
 	static const FName NameCurrentGunStats = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurretGunStats);
 	static const FName NameCurrentGunModules = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurretGunModules);
 	static const FName NameCurrentPrimaryGun = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugCurrentPrimaryGun);
 
+	// Dash
+	static const FName NameDashMaxCount = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugDashMaxCount);
+	static const FName NameDashRestoreTime = GET_MEMBER_NAME_CHECKED(AOPAG_Player, DebugDashRestoreTime);
+
 	if (PropertyChangedEvent.Property)
 	{
 		const FName PropName = PropertyChangedEvent.MemberProperty->GetFName();
-		if (PropName == NameCurrentHealth)
-		{
-			SetHealth(CurrentHealth);
-		}
 		if (PropName == NameCurrentHealthMax && BaseAttributeSet)
 		{
-			SetHealthMax(CurrentHealthMax);
+			SetHealthMax(DebugHealthMax);
 		}
 		if (PropName == NameCurrentGunStats)
 		{
@@ -158,6 +194,14 @@ void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 				PrimaryGun = Cast<AOPAG_ModularGun>(Target);
 				CurrentGun = PrimaryGun;
 			}
+		}
+		if (PropName == NameDashMaxCount)
+		{
+			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), DebugDashMaxCount);
+		}
+		if (PropName == NameDashRestoreTime)
+		{
+			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashRestoreTimeAttribute(), DebugDashRestoreTime);
 		}
 	}
 
@@ -183,11 +227,15 @@ void AOPAG_Player::BroadcastEvents()
 {
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
-	EMS->DashAmountChanged.Broadcast(DashCount);
+	EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
 	EMS->RequestPlayerState.Broadcast();
 
-	for (int i = 0; i < DashMaxCount; i++) {
-		EMS->DashAmountIncrement.Broadcast();
+	if (AttributeSetPlayer)
+	{
+		for (int i = 0; i < AttributeSetPlayer->GetDashMaxCount(); i++) 
+		{
+			EMS->DashAmountIncrement.Broadcast();
+		}
 	}
 }
 
@@ -239,6 +287,12 @@ void AOPAG_Player::InitDefaultValues()
 	{
 		CurrentCamera = Camera;
 	}
+	if (AttributeSetPlayer != nullptr)
+	{
+		DebugHealthMax = AttributeSetPlayer->GetMaxHealth();
+		DebugDashMaxCount = AttributeSetPlayer->GetDashMaxCount();
+		DebugDashRestoreTime = AttributeSetPlayer->GetDashRestoreTime();
+	}
 }
 
 void AOPAG_Player::InitADSTimeline()
@@ -289,6 +343,8 @@ const FVector AOPAG_Player::CalculateThrowForce() const
 #pragma region Ability
 void AOPAG_Player::InitializeAbilities()
 {
+	InitializeAbility(PlayerShieldAbility, 0);
+
 	// Initialize and active stamina ability for health behavior
 	InitializeAbility(Stamina, 0);
 	AbilitySystemComp->TryActivateAbilityByClass(Stamina, true);
@@ -308,14 +364,14 @@ void AOPAG_Player::InitializeAbilities()
 
 void AOPAG_Player::ActiveDash()
 {
-	if (AbilitySystemComp && DashTimeline && DashCount > 0)
+	if (AbilitySystemComp && DashTimeline && AttributeSetPlayer->GetDashCount() > 0)
 	{
 		const bool bSuccess = AbilitySystemComp->TryActivateAbilityByClass(Dash, true);
 		if (bSuccess)
 		{
-			DashCount--;
+			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), AttributeSetPlayer->GetDashCount() - 1);
 
-			EMS->DashAmountChanged.Broadcast(DashCount);
+			EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
 
 			EMS->DashAmountDecrement.Broadcast();
 
@@ -782,12 +838,12 @@ void AOPAG_Player::ADSTimelineProgress(float Value)
 
 void AOPAG_Player::DashTimelineFinished()
 {
-	DashTimeline->SetTimelineLength(DashRestoreTime);
-	DashCount++;
-	EMS->DashAmountChanged.Broadcast(DashCount);
+	DashTimeline->SetTimelineLength(AttributeSetPlayer->GetDashRestoreTime());
+	AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), AttributeSetPlayer->GetDashCount() + 1);
+	EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
 	EMS->DashAmountIncrement.Broadcast();
 
-	if (DashCount < DashMaxCount)
+	if (AttributeSetPlayer->GetDashCount() < AttributeSetPlayer->GetDashMaxCount())
 	{
 		DashTimeline->PlayFromStart();
 	}
@@ -819,7 +875,7 @@ void AOPAG_Player::SavePlayerState()
 
 	NewState.LoadType = PlayerStateLoadType::PREVIOUS_STAGE;
 	NewState.Health = GetHealth();
-	NewState.DashCount = DashCount;
+	NewState.DashCount = AttributeSetPlayer->GetDashCount();
 	NewState.GoldAmount = InventorySystemComp->GoldAmount;
 	NewState.BoltsAmount = InventorySystemComp->BoltsAmount;
 	NewState.PotionsAmount = InventorySystemComp->PotionsAmount;
@@ -837,8 +893,8 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 	if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
 	{
 		SetHealth(StateToApply.Health);
-		DashCount = StateToApply.DashCount;
-		EMS->DashAmountChanged.Broadcast(DashCount);
+		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), StateToApply.DashCount);
+		EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
 		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
 		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
 	}
@@ -893,3 +949,31 @@ AActor* AOPAG_Player::GetShield() const
 	return Shield;
 }
 #pragma endregion Shield
+
+#pragma region Timer
+void AOPAG_Player::ResetShieldTimer()
+{
+	if (AbilitySystemComp != nullptr && AttributeSetPlayer != nullptr)
+	{
+		if (AttributeSetPlayer->GetShieldCapacity() >= AttributeSetPlayer->GetShieldCapacityMax())
+		{
+			GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
+			bIsShieldBroken = false;
+			return;
+		}
+
+		const float NewShieldCapicityValue = FMath::Clamp(AttributeSetPlayer->GetShieldCapacity() + AttributeSetPlayer->GetShieldRechargeRate(), 0.f, AttributeSetPlayer->GetShieldCapacityMax());
+		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), NewShieldCapicityValue);
+		UE_LOG(LogTemp, Warning, TEXT("Current Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
+	}
+}
+
+void AOPAG_Player::ShieldCooldownTimer()
+{
+	if (AttributeSetPlayer != nullptr)
+	{
+		GetWorld()->GetTimerManager().SetTimer(RestartShieldPlayerHandle, this, &AOPAG_Player::ResetShieldTimer, 1.f, true);
+		UE_LOG(LogTemp, Warning, TEXT("Complete Shield Recharge Cooldown"));
+	}
+}
+#pragma endregion Timer
