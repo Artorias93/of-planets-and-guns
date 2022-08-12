@@ -26,6 +26,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetIsCharging(const bool Value);
 
+	UStaticMeshComponent* GetShieldMesh();
+
 protected:
 
 	virtual void BeginPlay() override;

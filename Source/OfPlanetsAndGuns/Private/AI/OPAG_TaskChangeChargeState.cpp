@@ -20,10 +20,14 @@ EBTNodeResult::Type UOPAG_TaskChangeChargeState::ExecuteTask(UBehaviorTreeCompon
 			if(bIsCharging)
 			{
 				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+				ShieldEnemy->GetShieldMesh()->AttachToComponent(ShieldEnemy->GetMesh(),
+					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "ChargingShieldSocket");
 			}
 			else
 			{
 				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+				ShieldEnemy->GetShieldMesh()->AttachToComponent(ShieldEnemy->GetMesh(),
+					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "LeftHandSocket");
 			}
 			return EBTNodeResult::Succeeded;
 		}

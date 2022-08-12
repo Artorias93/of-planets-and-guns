@@ -122,3 +122,8 @@ void AOPAG_ShieldEnemy::SetIsCharging(const bool Value)
 {
 	bIsCharging = Value;
 }
+
+UStaticMeshComponent* AOPAG_ShieldEnemy::GetShieldMesh()
+{
+	return ShieldMesh;
+}
