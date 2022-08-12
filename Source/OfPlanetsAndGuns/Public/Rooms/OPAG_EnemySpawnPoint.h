@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "OPAG_EnemySpawnPoint.generated.h"
 
+class UBillboardComponent;
 class AOPAG_Enemy;
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_EnemySpawnPoint : public AActor

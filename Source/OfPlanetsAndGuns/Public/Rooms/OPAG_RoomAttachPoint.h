@@ -7,6 +7,7 @@
 #include "OPAG_RoomAttachPoint.generated.h"
 
 class UArrowComponent;
+class UBillboardComponent;
 class AOPAG_RoomManager;
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_RoomAttachPoint : public AActor

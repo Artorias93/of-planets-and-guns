@@ -5,8 +5,9 @@ UDamageExecutionGAS::UDamageExecutionGAS(const FObjectInitializer& ObjectInitial
 	const FDamageAttributes DamageStruct;
 
 	RelevantAttributesToCapture.Add(DamageStruct.HealthDef);
+#if WITH_EDITORONLY_DATA
 	InvalidScopedModifierAttributes.Add(DamageStruct.HealthDef);
-
+#endif
 	RelevantAttributesToCapture.Add(DamageStruct.DamageTakenAmountDef);
 }
 

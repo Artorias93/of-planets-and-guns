@@ -1,5 +1,4 @@
 #include "Weapons/Modules/OPAG_BarrelBase.h"
-#include "Components/ChildActorComponent.h"
 
 AOPAG_BarrelBase::AOPAG_BarrelBase()
 {

@@ -221,7 +221,7 @@ void AOPAG_Player::TeleportPlayerToStart(FTransform StartLocation)
 	GetController()->SetControlRotation(StartLocation.Rotator());
 	GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Walking;
 }
-
+#if WITH_EDITOR
 void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	static const FName NameCurrentHealth = GET_MEMBER_NAME_CHECKED(AOPAG_Player, CurrentHealth);
@@ -253,7 +253,7 @@ void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
-
+#endif
 #pragma region MathematicUtility
 const FVector AOPAG_Player::CalculateThrowForce() const
 {
