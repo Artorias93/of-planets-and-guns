@@ -65,34 +65,6 @@ void AOPAG_NormalTurret::Death()
 	Super::Death();
 }
 
-void AOPAG_NormalTurret::Tick(float DeltaSeconds)
-{
-	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
-	{
-		if (const AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
-		{
-			//Since the Anim BP sets the rotation in "ADD" mode, we need to subtract the whole actor rotation
-			TurretHeadRotation = UKismetMathLibrary::FindLookAtRotation(Muzzle->GetComponentLocation(),
-				Player->GetActorLocation()) - GetActorRotation();
-	
-			//TurretHeadRotation = FRotator(NewRotation.Pitch, 0, 0);
-
-			/*FVector LookAtDirection = Player->GetActorLocation() - Muzzle->GetComponentLocation();
-			LookAtDirection.Normalize();
-			FRotator Rotation = LookAtDirection.Rotation();
-
-			TurretHeadRotation = Rotation;*/
-
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *TurretHeadRotation.ToString());
-		}
-	}
-}
-
-void AOPAG_NormalTurret::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void AOPAG_NormalTurret::StartShooting()
 {
 	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
@@ -100,6 +72,8 @@ void AOPAG_NormalTurret::StartShooting()
 	ShootLineTrace(StartLocation, TurretShootDirection);
 	
 	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+
+	// activate shoot effect
 	UGameplayStatics::SpawnEmitterAttached(
 		MuzzleParticle,
 		Muzzle,
@@ -111,8 +85,6 @@ void AOPAG_NormalTurret::StartShooting()
 		EPSCPoolMethod::None,
 		true
 	);
-
-	UE_LOG(LogTemp, Warning, TEXT("Turret is shooting"));
 }
 
 void AOPAG_NormalTurret::GetShootingDirection(FVector& Start, FVector& ShootDirection, float const ShootingAccuracyTolerance /* = 0 */)
@@ -148,6 +120,7 @@ void AOPAG_NormalTurret::ShootLineTrace(FVector StartShootLocation, FVector Dire
 	// Initialize out of hit and if check is true (hit object in scene) so the actor is cast to character and control the return value
 	FHitResult OutHit;
 	TArray<AActor*> ActorsToIgnore = GetAllActorsToIgnore();
+
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, StartShootLocation + Direction * 2000, ObjectTypesQuery, false,
 		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
@@ -159,7 +132,7 @@ void AOPAG_NormalTurret::ShootLineTrace(FVector StartShootLocation, FVector Dire
 		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 		if (Character)
 		{
-			Character->ReceiveDamage(50.f);
+			Character->ReceiveDamage(Damage);
 		}
 	}
 }
@@ -178,11 +151,6 @@ FVector AOPAG_NormalTurret::GetRandomImpulseVector() const
 	return FVector(FMath::FRandRange(-900.f, 900.f),
 		FMath::FRandRange(-900.f, 900.f),
 		FMath::FRandRange(-900.f, 900.f));
-}
-
-FRotator AOPAG_NormalTurret::GetTurretHeadRotation() const
-{
-	return TurretHeadRotation;
 }
 
 UNiagaraComponent* AOPAG_NormalTurret::GetLaserBeam() const
