@@ -11,7 +11,7 @@ class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_Interacta
 {
 	GENERATED_BODY()
 
-	bool bIsInteractable = true;
+	bool bIsInteractable = false;
 
 public:	
 	AOPAG_LootBox();
@@ -43,6 +43,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	void SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList);
+	void Unlock();
 	void SetModules(FOPAG_GunModules& ModulesStruct);
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) void Interact();

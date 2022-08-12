@@ -643,6 +643,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	Gun->Destroy();
 
 	// Attach new gun
+	PrimaryGunComponent->SetChildActorClass(nullptr);
 	PrimaryGunComponent->SetChildActorClass(NewGunClass);
 	if (PrimaryGunComponent->GetChildActor())
 	{

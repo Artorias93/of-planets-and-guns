@@ -37,6 +37,11 @@ void AOPAG_LootBox::SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList)
 	Items = ItemsList;
 }
 
+void AOPAG_LootBox::Unlock()
+{
+	bIsInteractable = true;
+}
+
 void AOPAG_LootBox::SetModules(FOPAG_GunModules& ModulesStruct)
 {
 	Modules = ModulesStruct;

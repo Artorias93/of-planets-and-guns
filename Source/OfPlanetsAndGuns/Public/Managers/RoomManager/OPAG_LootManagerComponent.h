@@ -37,8 +37,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void GenerateLoot(const float DifficultyValue);
+	void Unlock() const;
 
 private:
 	void PopulateLootLists();
-	TSubclassOf<AActor> SelectRandomicModules(const int FireMask, const EModuleTypes ModuleType);
+	TSubclassOf<AActor> SelectRandomModules(const int FireMask, const EModuleTypes ModuleType);
 };
