@@ -54,10 +54,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 		UTexture2D* DashIconTexture;
-
-	UFUNCTION()
-	void InitDashIcons(const int DashAmount);
-
-private:
-	int LastDashIconIndex = 0;
 };
