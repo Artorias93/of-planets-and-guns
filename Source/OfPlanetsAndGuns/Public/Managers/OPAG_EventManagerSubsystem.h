@@ -44,7 +44,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartRun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
@@ -178,8 +177,6 @@ public:
 		FPauseGame PauseGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FResumeGame ResumeGame;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
-		FStartRun StartRun;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQuitGame QuitGame;
 

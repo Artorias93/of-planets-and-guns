@@ -16,6 +16,8 @@ void UOPAG_UWGameOverView::NativeConstruct()
 
 void UOPAG_UWGameOverView::ExitButtonClicked()
 {
+	ExitButton->OnClicked.RemoveDynamic(this, &UOPAG_UWGameOverView::ExitButtonClicked);
+
 	auto GI = GetGameInstance<UOPAG_GameInstance>();
 	if (GI)
 		GI->GetEventManager()->LoadMainMenu.Broadcast();

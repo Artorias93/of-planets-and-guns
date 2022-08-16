@@ -26,7 +26,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 	if (MainMenuViewWidgetClass)
 	{
 		MainMenuViewWidget = CreateWidget<UOPAG_UWMainMenuView>(GetWorld(), MainMenuViewWidgetClass);
-
+		
 		if (MainMenuViewWidget) {
 			MainMenuViewWidget->AddToViewport(1);
 		}
@@ -49,7 +49,4 @@ void AOPAG_MainMenuHUD::ShowHubView()
 	}
 
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
-
-	if (EMS)
-		EMS->StartRun.Broadcast();
 }

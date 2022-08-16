@@ -181,6 +181,12 @@ void AOPAG_GameplayHUD::HideGunCompareView()
 
 void AOPAG_GameplayHUD::ShowGameOverView()
 {
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (PC) {
+		PC->SetInputMode(FInputModeUIOnly());
+		PC->bShowMouseCursor = true;
+	}
 
 	if (GameOverViewWidget) {
 		GameOverViewWidget->AddToViewport(3);

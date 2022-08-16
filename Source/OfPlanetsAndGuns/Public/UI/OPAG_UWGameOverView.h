@@ -15,7 +15,7 @@ class OFPLANETSANDGUNS_API UOPAG_UWGameOverView : public UUserWidget
 {
 	GENERATED_BODY()
 
-		UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget))
 		UButton* ExitButton;
 
 public:
