@@ -11,6 +11,7 @@
 #include "UI/OPAG_UWGunCompareView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "UI/OPAG_UWGameOverView.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 
 
@@ -29,6 +30,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->UnlookedAtModule.AddDynamic(this, &AOPAG_GameplayHUD::HideModuleCompareView);
 		EMS->LookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::ShowGunCompareView);
 		EMS->UnlookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::HideGunCompareView);
+		EMS->PlayerDied.AddDynamic(this, &AOPAG_GameplayHUD::ShowGameOverView);
 	}
 }
 
@@ -87,6 +89,11 @@ void AOPAG_GameplayHUD::BeginPlay()
 	if (GunCompareViewWidgetClass)
 	{
 		GunCompareViewWidget = CreateWidget<UOPAG_UWGunCompareView>(GetWorld(), GunCompareViewWidgetClass);
+	}
+
+	if (GameOverViewWidgetClass)
+	{
+		GameOverViewWidget = CreateWidget<UOPAG_UWGameOverView>(GetWorld(), GameOverViewWidgetClass);
 	}
 }
 
@@ -169,5 +176,13 @@ void AOPAG_GameplayHUD::HideGunCompareView()
 {
 	if (GunCompareViewWidget) {
 		GunCompareViewWidget->RemoveFromViewport();
+	}
+}
+
+void AOPAG_GameplayHUD::ShowGameOverView()
+{
+
+	if (GameOverViewWidget) {
+		GameOverViewWidget->AddToViewport(3);
 	}
 }

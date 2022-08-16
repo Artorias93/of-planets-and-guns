@@ -164,6 +164,8 @@ private:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Death() override;
+	virtual void FellOutOfWorld(const UDamageType& dmgType) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;

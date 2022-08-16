@@ -41,6 +41,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Planet Data")
 		UDataTable* PlanetTable;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main Menu")
+		TSoftObjectPtr<UWorld> MainMenuLevel;
+
 private:
 	void BindEvents();
 	void LoadPlanetTable();
@@ -54,6 +57,12 @@ private:
 public:
 
 	virtual void Init() override;
+
+	UFUNCTION(BlueprintCallable)
+		void LoadMainMenu();
+
+	UFUNCTION(BlueprintCallable)
+		void LoadPlanet(int PlanetIndex);
 
 	UFUNCTION(BlueprintCallable)
 		void StartStage(const EStageType StageType);
