@@ -1,14 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_UWHubView.h"
+#include "UI/OPAG_MainMenuHUD.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Components/Button.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
-
 
 void UOPAG_UWHubView::NativeConstruct()
 {
@@ -18,28 +15,14 @@ void UOPAG_UWHubView::NativeConstruct()
 
 void UOPAG_UWHubView::BindEvents()
 {
-
+	UpgradeSystemButton->OnClicked.AddDynamic(this, &UOPAG_UWHubView::UpgradeSystemButtonClicked);
 }
 
-/*
-void UOPAG_UWHubView::UpdateModuleName(UTextBlock* TextBlock, const FString& Name)
+void UOPAG_UWHubView::UpgradeSystemButtonClicked()
 {
-	if(TextBlock)
-		TextBlock->SetText(FText::FromString(Name));
-}
-*/
+	UpgradeSystemButton->OnClicked.RemoveDynamic(this, &UOPAG_UWHubView::UpgradeSystemButtonClicked);
 
-void UOPAG_UWHubView::UpdateBoltsValue(const int Value)
-{
-	/*if (BoltsAmountText && Value >= 0) {
-		BoltsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
-	}*/
-}
-
-void UOPAG_UWHubView::UpdatePotionsValue(const int Value)
-{
-
-	/*if (PotionsAmountText && Value >= 0) {
-		PotionsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
-	}*/
+	AOPAG_MainMenuHUD* MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	if (MyHUD)
+		MyHUD->ShowUpgradeSystemView();
 }

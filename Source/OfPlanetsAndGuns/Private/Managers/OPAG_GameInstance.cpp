@@ -162,7 +162,7 @@ void UOPAG_GameInstance::SendPlayerState()
 		// pretty bad hardcoded 2 here.. but we don't want 1 cause then it's gonna divide by 0
 		// (cause it removes the starting room)
 		GetEventManager()->StageLoaded.Broadcast(2);
-		return;
+		//return; //BEWARE!!!!! BEWAREEEEEEEEE!!!!!!!
 	}
 
 	if (PlayerState.LoadType == PlayerStateLoadType::NOT_LOADED)

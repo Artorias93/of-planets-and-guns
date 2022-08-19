@@ -25,6 +25,10 @@ private:
 		class UOPAG_UWHubView* HubViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWHubView> HubViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWUpgradeSystemView* UpgradeSystemWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWUpgradeSystemView> UpgradeSystemWidgetClass;
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,5 +37,7 @@ public:
 	virtual void DrawHUD() override;
 
 	UFUNCTION()
-	void ShowHubView();
+		void ShowHubView();
+	UFUNCTION()
+		void ShowUpgradeSystemView();
 };

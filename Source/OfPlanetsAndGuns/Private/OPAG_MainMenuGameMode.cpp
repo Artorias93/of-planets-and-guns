@@ -9,18 +9,18 @@ AOPAG_MainMenuGameMode::AOPAG_MainMenuGameMode()
 {
 	static ConstructorHelpers::FClassFinder<AOPAG_MainMenuHUD> MainMenuHUDClass(TEXT("/Game/OfPlanetsAndGuns/UI/BP_MainMenuHUD"));
 
-	if (MainMenuHUDClass.Class != NULL) {
+	if (MainMenuHUDClass.Class != nullptr) {
 		HUDClass = MainMenuHUDClass.Class;
 	}
-	
 }
 
+/*
 void AOPAG_MainMenuGameMode::SwitchToHubHUD()
 {
-	static ConstructorHelpers::FClassFinder<AOPAG_HubHUD> HubHUDClass(TEXT("/Game/OfPlanetsAndGuns/UI/BP_HubHUD"));
+	//static ConstructorHelpers::FClassFinder<AOPAG_HubHUD> HubHUDClass(TEXT("/Game/OfPlanetsAndGuns/UI/BP_HubHUD"));
 
-	if (HubHUDClass.Class != NULL) {
-		HUDClass = HubHUDClass.Class;
+	if (HubHUDClass != NULL) {
+		HUDClass = HubHUDClass;
 	}
 }
 
@@ -44,3 +44,4 @@ void AOPAG_MainMenuGameMode::SwitchToHubHUD()
 //	}
 //}
 
+*/

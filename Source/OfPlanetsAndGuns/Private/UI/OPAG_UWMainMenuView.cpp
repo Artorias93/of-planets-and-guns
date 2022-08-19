@@ -28,13 +28,9 @@ void UOPAG_UWMainMenuView::NewRunButtonClicked()
 {
 	NewRunButton->OnClicked.RemoveDynamic(this, &UOPAG_UWMainMenuView::NewRunButtonClicked);
 
-	/*AOPAG_MainMenuHUD* MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	AOPAG_MainMenuHUD* MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	if (MyHUD)
-		MyHUD->ShowHubView();*/
-
-	AOPAG_MainMenuGameMode* MainMenuGameMode = Cast<AOPAG_MainMenuGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
-	if (MainMenuGameMode != nullptr)
-		MainMenuGameMode->SwitchToHubHUD();
+		MyHUD->ShowHubView();
 }
 
 void UOPAG_UWMainMenuView::OptionsButtonClicked()
@@ -46,4 +42,3 @@ void UOPAG_UWMainMenuView::QuitButtonClicked()
 {
 
 }
-

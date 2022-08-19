@@ -6,6 +6,7 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "UI/OPAG_UWMainMenuView.h"
 #include "UI/OPAG_UWHubView.h"
+#include "UI/OPAG_UWUpgradeSystemView.h"
 
 void AOPAG_MainMenuHUD::DrawHUD()
 {
@@ -36,6 +37,11 @@ void AOPAG_MainMenuHUD::BeginPlay()
 	{
 		HubViewWidget = CreateWidget<UOPAG_UWHubView>(GetWorld(), HubViewWidgetClass);
 	}
+
+	if (UpgradeSystemWidgetClass)
+	{
+		UpgradeSystemWidget = CreateWidget<UOPAG_UWUpgradeSystemView>(GetWorld(), UpgradeSystemWidgetClass);
+	}
 }
 
 void AOPAG_MainMenuHUD::ShowHubView()
@@ -47,6 +53,15 @@ void AOPAG_MainMenuHUD::ShowHubView()
 	if (HubViewWidget) {
 		HubViewWidget->AddToViewport(1);
 	}
+}
 
-	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+void AOPAG_MainMenuHUD::ShowUpgradeSystemView()
+{
+	if (HubViewWidget) {
+		HubViewWidget->RemoveFromViewport();
+	}
+
+	if (UpgradeSystemWidget) {
+		UpgradeSystemWidget->AddToViewport(1);
+	}
 }
