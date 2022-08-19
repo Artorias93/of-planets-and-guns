@@ -3,10 +3,15 @@
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AOPAG_MeleeEnemy::AOPAG_MeleeEnemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	//When the melee walks it doesn't have to look at the player, or it slides on the ground
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationYaw = false;
 
 	//Components creation
 	DamageCollisionBox = CreateDefaultSubobject<UBoxComponent>("Damage Collision Box Component");
@@ -35,25 +40,29 @@ void AOPAG_MeleeEnemy::BeginPlay()
 	{
 		AnimInstance->OnMontageStarted.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackBegin);
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackNotify);
-		AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackEnd);
+		//AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackEnd);
 	}
 }
 
 void AOPAG_MeleeEnemy::Attack()
 {
-	AnimInstance->Montage_Play(MeleeAttackMontage, MeleeAttackMontagePlayRate /* = 1.9f */);
+	AnimInstance->Montage_Play(MeleeAttackMontage, MeleeAttackMontagePlayRate);
 }
 
 //Stops the enemy's ability to turn in the direction of the focus actor during the attack animation 
 void AOPAG_MeleeEnemy::OnAttackBegin(UAnimMontage* Montage)
 {
-	bUseControllerRotationYaw = false;
+	//Locks the horizontal rotation for the duration of the attack animation
+	//bUseControllerRotationYaw = false;
+	//Locks the Y axis of the rotation so that the enemy is never rotated upwards or downwards while attacking
+	SetActorRotation(FRotator(0.f, GetActorRotation().Yaw, GetActorRotation().Roll));
 }
 
 //Resumes the enemy's ability to turn in the direction of the focus actor after the attack animation is done
 void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 {
-	bUseControllerRotationYaw = true;
+	//Resumes the horizontal rotation following the controller's
+	//bUseControllerRotationYaw = true;
 }
 
 //The attack collision & damage is computed only when the animation montage's notify is reached
