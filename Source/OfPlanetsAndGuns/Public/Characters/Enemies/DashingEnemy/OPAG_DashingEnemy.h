@@ -7,5 +7,9 @@
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_DashingEnemy : public AOPAG_MeleeEnemy
 {
-	GENERATED_BODY()	
+	GENERATED_BODY()
+
+	virtual void BeginPlay() override;
+	virtual void OnAttackBegin(UAnimMontage* Montage) override;
+	virtual void OnAttackEnd(UAnimMontage* Montage, bool bInterrupted) override;
 };
