@@ -13,6 +13,9 @@ class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomManager;
 class AOPAG_Enemy;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStartPlanet, int, PlanetIndex);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadMainMenu);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageManagerInit, const UWorld* const, World);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageManagerReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneration, StageGenData);
@@ -35,12 +38,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestSavePlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestPlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSavePlayerState, FOPAG_PlayerState, PlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FApplyPlayerState, const FOPAG_PlayerState&, PlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartRun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
@@ -82,6 +85,11 @@ class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSub
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable, Category = Game)
+		FStartPlanet StartPlanet;
+	UPROPERTY(BlueprintAssignable, Category = Game)
+		FLoadMainMenu LoadMainMenu;
+
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
 		FStageManagerInit StageManagerInit;
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
@@ -123,6 +131,8 @@ public:
 		FSavePlayerState SavePlayerState;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FApplyPlayerState ApplyPlayerState;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FPlayerDied PlayerDied;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FHealthChanged HealthChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
@@ -167,8 +177,6 @@ public:
 		FPauseGame PauseGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FResumeGame ResumeGame;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
-		FStartRun StartRun;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQuitGame QuitGame;
 

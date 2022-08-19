@@ -61,10 +61,10 @@ void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 			const int FireMask = 1 << (int)DefaultGun->FireType;
 
 			// Select random modules to attach 
-			TSubclassOf<AActor> Barrel = SelectRandomicModules(FireMask, EModuleTypes::Barrel);
-			TSubclassOf<AActor> Stock = SelectRandomicModules(FireMask, EModuleTypes::Stock);
-			TSubclassOf<AActor> Grip = SelectRandomicModules(FireMask, EModuleTypes::Grip);
-			TSubclassOf<AActor> Magazine = SelectRandomicModules(FireMask, EModuleTypes::Magazine);
+			TSubclassOf<AActor> Barrel = SelectRandomModules(FireMask, EModuleTypes::Barrel);
+			TSubclassOf<AActor> Stock = SelectRandomModules(FireMask, EModuleTypes::Stock);
+			TSubclassOf<AActor> Grip = SelectRandomModules(FireMask, EModuleTypes::Grip);
+			TSubclassOf<AActor> Magazine = SelectRandomModules(FireMask, EModuleTypes::Magazine);
 
 			// Create struct and set this struct in the loot box
 			FOPAG_GunModules ModulesStruct;
@@ -123,6 +123,11 @@ void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 	LootBox->SetItemsToSpawn(Items);
 }
 
+void UOPAG_LootManagerComponent::Unlock() const
+{
+	if (LootBox) LootBox->Unlock();
+}
+
 void UOPAG_LootManagerComponent::PopulateLootLists()
 {
 	const FString Context;
@@ -149,7 +154,7 @@ void UOPAG_LootManagerComponent::PopulateLootLists()
 	}
 }
 
-TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomicModules(const int FireMask, const EModuleTypes ModuleType)
+TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(const int FireMask, const EModuleTypes ModuleType)
 {
 	TArray<TSubclassOf<AActor>> EquippableModules;
 	UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);

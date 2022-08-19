@@ -12,7 +12,8 @@
 
 void UOPAG_UWHubView::NativeConstruct()
 {
-
+	Super::NativeConstruct();
+	BindEvents();
 }
 
 void UOPAG_UWHubView::BindEvents()
@@ -20,4 +21,25 @@ void UOPAG_UWHubView::BindEvents()
 
 }
 
+/*
+void UOPAG_UWHubView::UpdateModuleName(UTextBlock* TextBlock, const FString& Name)
+{
+	if(TextBlock)
+		TextBlock->SetText(FText::FromString(Name));
+}
+*/
 
+void UOPAG_UWHubView::UpdateBoltsValue(const int Value)
+{
+	if (BoltsAmountText && Value >= 0) {
+		BoltsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
+	}
+}
+
+void UOPAG_UWHubView::UpdatePotionsValue(const int Value)
+{
+
+	if (PotionsAmountText && Value >= 0) {
+		PotionsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
+	}
+}

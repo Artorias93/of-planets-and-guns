@@ -21,6 +21,10 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->PauseGame.AddDynamic(this, &UOPAG_GameInstance::OnPauseGame);
 	EMS->ResumeGame.AddDynamic(this, &UOPAG_GameInstance::OnResumeGame);
 
+	EMS->LoadMainMenu.AddDynamic(this, &UOPAG_GameInstance::LoadMainMenu);
+	EMS->StartPlanet.AddDynamic(this, &UOPAG_GameInstance::LoadPlanet);
+
+
 	EMS->RequestPlayerState.AddDynamic(this, &UOPAG_GameInstance::SendPlayerState);
 	EMS->SavePlayerState.AddDynamic(this, &UOPAG_GameInstance::SavePlayerState);
 }
@@ -124,6 +128,17 @@ void UOPAG_GameInstance::Init()
 	LoadGenerationTable();
 }
 
+void UOPAG_GameInstance::LoadMainMenu()
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), MainMenuLevel);
+}
+
+void UOPAG_GameInstance::LoadPlanet(int PlanetIndex)
+{
+	CurrentPlanet = Planets[PlanetIndex];
+	StartStage(EStageType::Stage);
+}
+
 void UOPAG_GameInstance::StartStage(const EStageType StageType)
 {
 	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), CurrentPlanet->PlanetPersistentLevel);
@@ -133,12 +148,14 @@ void UOPAG_GameInstance::SavePlayerState(FOPAG_PlayerState NewPlayerState)
 {
 	PlayerState = NewPlayerState;
 	SaveGameState();
-	StartStage(NextStage);
+	if (PlayerState.Health > 0)
+		StartStage(NextStage);
 }
 
 void UOPAG_GameInstance::SendPlayerState()
 {
-	if (!CurrentWorld || GetWorld()->GetCurrentLevel()->GetWorld()->GetFullName() != CurrentWorld->GetFullName())
+	const auto World = GetWorld();
+	if (!CurrentWorld || !World || World->GetFullName() != CurrentWorld->GetFullName())
 	{
 		GetEventManager()->PlacePlayerAtStart.Broadcast(
 			GetWorld()->GetFirstPlayerController()->GetPawnOrSpectator()->GetActorTransform());

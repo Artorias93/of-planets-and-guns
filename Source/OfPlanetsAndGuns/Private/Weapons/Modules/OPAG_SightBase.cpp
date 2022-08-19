@@ -28,9 +28,10 @@ void AOPAG_SightBase::Tick(float DeltaTime)
 
 }
 
-void AOPAG_SightBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
+void AOPAG_SightBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats,
+	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
-	Super::OnAttach(NewRarity, NewStats, NewEquippableFireTypes);
+	Super::OnAttach(NewRarity, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
 
 	CameraComponent->SetComponentTickEnabled(true);
 }

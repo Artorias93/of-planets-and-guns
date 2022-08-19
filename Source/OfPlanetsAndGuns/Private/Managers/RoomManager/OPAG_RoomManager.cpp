@@ -169,6 +169,7 @@ void AOPAG_RoomManager::RoomCleared()
 {
 	bIsRoomCleared = true;
 	DoorManager->OpenDoors();
+	LootManager->Unlock();
 	const UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
 	if (GI != nullptr)
 	{

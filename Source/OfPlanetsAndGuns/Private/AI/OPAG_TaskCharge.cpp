@@ -1,6 +1,5 @@
 #include "AI/OPAG_TaskCharge.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
@@ -24,7 +23,7 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 				const FVector PlayerPos = Player->GetActorLocation();
 
 				FVector OutDir;
-				float OutLength;			
+				float OutLength;		
 				(PlayerPos - EnemyPos).ToDirectionAndLength(OutDir, OutLength);
 
 				const FVector ChargePoint = EnemyPos + OutDir * (OutLength + ChargeDistanceBehindPlayer);
@@ -43,7 +42,6 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 
 					return EBTNodeResult::Succeeded;
 				}
-
 				if(GEngine)
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE FOUND"));
 			}			

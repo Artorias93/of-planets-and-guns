@@ -80,7 +80,8 @@ void AOPAG_ModuleBase::ApplyForce_Implementation(const FVector Force)
 }
 #pragma endregion Interface
 
-void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
+void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, 
+	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
 	SetParameters(NewRarity, NewStats, NewEquippableFireTypes);
 }

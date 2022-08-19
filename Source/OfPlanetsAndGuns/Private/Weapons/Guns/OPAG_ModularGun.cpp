@@ -291,7 +291,8 @@ bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSub
 	AOPAG_ModuleBase* Module = GetModule(ModuleSlot);
 	if (Module)
 	{
-		Module->OnAttach(NewModuleRarity, NewModuleStats, NewModuleEquippableFireTypes);
+		Module->OnAttach(NewModuleRarity, NewModuleStats, NewModuleEquippableFireTypes, 
+			GetParentActor() == GetWorld()->GetFirstPlayerController()->GetPawn());
 
 		const FName SocketName = GetSocketNameByModuleType(Module->Type);
 		Module->AttachToComponent(Receiver, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);

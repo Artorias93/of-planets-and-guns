@@ -3,7 +3,6 @@
 #include <BehaviorTree/BlackboardComponent.h>
 #include <Perception/AISense_Damage.h>
 #include <Kismet/GameplayStatics.h>
-#include <Kismet/KismetMathLibrary.h>
 #include <BrainComponent.h>
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
@@ -12,12 +11,23 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_LootDropSystemComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	LootDropSystemComponent = CreateDefaultSubobject<UOPAG_LootDropSystemComponent>(TEXT("Loot Drop System Component"));
+
+	SpawnParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle System Component"));
+	SpawnParticle->SetupAttachment(GetMesh());
+
+	const auto ObjectFinder = ConstructorHelpers::FObjectFinder<UParticleSystem>(
+		TEXT("ParticleSystem'/Game/OfPlanetsAndGuns/Effects/FX_EnemySpawn.FX_EnemySpawn'"));
+	if (ObjectFinder.Succeeded())
+	{
+		SpawnParticle->Template = ObjectFinder.Object;
+	}
 }
 
 void AOPAG_Enemy::BeginPlay()

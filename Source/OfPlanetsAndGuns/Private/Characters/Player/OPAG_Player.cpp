@@ -102,6 +102,19 @@ void AOPAG_Player::BeginPlay()
 	BroadcastEvents();
 }
 
+void AOPAG_Player::Death()
+{
+	Super::Death();
+	SavePlayerState();
+	EMS->PlayerDied.Broadcast();
+}
+
+void AOPAG_Player::FellOutOfWorld(const UDamageType& dmgType)
+{
+	if (GetHealth() > 0.f)
+		ReceiveDamage(GetHealth() + 1.f); //+1 just to make sure it overkills
+}
+
 void AOPAG_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -699,6 +712,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	Gun->Destroy();
 
 	// Attach new gun
+	PrimaryGunComponent->SetChildActorClass(nullptr);
 	PrimaryGunComponent->SetChildActorClass(NewGunClass);
 	if (PrimaryGunComponent->GetChildActor())
 	{
