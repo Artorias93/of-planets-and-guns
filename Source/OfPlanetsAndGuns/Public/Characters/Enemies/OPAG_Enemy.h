@@ -64,4 +64,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG Loot Drop System", meta = (AllowPrivateAccess = true))
 	class UOPAG_LootDropSystemComponent* LootDropSystemComponent;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	UParticleSystemComponent* SpawnParticle;
 };
