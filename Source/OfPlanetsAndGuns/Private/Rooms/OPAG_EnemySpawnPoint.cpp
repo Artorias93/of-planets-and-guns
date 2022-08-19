@@ -5,6 +5,7 @@
 
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include "Components/BillboardComponent.h"
+#include "Util/OPAG_UtilityFunctionLibrary.h"
 
 
 // Sets default values
@@ -17,25 +18,6 @@ AOPAG_EnemySpawnPoint::AOPAG_EnemySpawnPoint()
 	RootComponent = Billboard;
 	Billboard->bIsScreenSizeScaled = true;
 	Billboard->ScreenSize = -0.002f;
-}
-
-TSoftClassPtr<AOPAG_Enemy> AOPAG_EnemySpawnPoint::GetRandomEnemy(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap)
-{
-	const float RandomChance = FMath::FRandRange(0.f, 1.f);
-	float Sum = 0.f;
-	TArray<TSoftClassPtr<AOPAG_Enemy>> Keys;
-	EnemyMap.GetKeys(Keys);
-	TSoftClassPtr<AOPAG_Enemy> ChosenEnemy = Keys.Last();
-	for (TSoftClassPtr<AOPAG_Enemy> Key : Keys)
-	{
-		Sum += EnemyMap[Key];
-		if (RandomChance < Sum)
-		{
-			ChosenEnemy = Key;
-			break;
-		}
-	}
-	return ChosenEnemy;
 }
 
 // Called when the game starts or when spawned
@@ -53,9 +35,9 @@ void AOPAG_EnemySpawnPoint::Tick(float DeltaTime)
 }
 
 TArray<TSoftObjectPtr<AOPAG_Enemy>> AOPAG_EnemySpawnPoint::SpawnEnemies(
-	TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const
+	TMap<TSubclassOf<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const
 {
-	const TSoftClassPtr<AOPAG_Enemy> EnemyToSpawn = GetRandomEnemy(EnemyMap);
+	const TSubclassOf<AOPAG_Enemy> EnemyToSpawn = UOPAG_UtilityFunctionLibrary::GetRandomItem(EnemyMap);
 	const FActorSpawnParameters SpawnInfo;
 	TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnedEnemies;
 	TSoftObjectPtr<AOPAG_Enemy> Enemy = GetWorld()->SpawnActor<AOPAG_Enemy>(EnemyToSpawn.Get(), 

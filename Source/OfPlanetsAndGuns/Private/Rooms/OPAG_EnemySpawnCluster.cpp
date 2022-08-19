@@ -33,7 +33,7 @@ int32 AOPAG_EnemySpawnCluster::GetSpawnerCount() const
 }
 
 TArray<TSoftObjectPtr<AOPAG_Enemy>> AOPAG_EnemySpawnCluster::SpawnEnemies(
-	TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const
+	TMap<TSubclassOf<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const
 {
 	TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnedEnemies;
 	TArray<AOPAG_EnemySpawnPoint*> ShuffledSpawners = Spawners;

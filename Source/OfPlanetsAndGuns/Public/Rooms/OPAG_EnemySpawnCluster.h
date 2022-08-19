@@ -29,6 +29,6 @@ public:
 
 	virtual int32 GetSpawnerCount() const override;
 	virtual TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnEnemies(
-		TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const override;
+		TMap<TSubclassOf<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const override;
 
 };

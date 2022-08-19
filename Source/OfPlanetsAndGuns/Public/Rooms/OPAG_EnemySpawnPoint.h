@@ -20,9 +20,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UBillboardComponent* Billboard;
 
-private:
-	static TSoftClassPtr<AOPAG_Enemy> GetRandomEnemy(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap);
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,7 +30,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		virtual TArray<TSoftObjectPtr<AOPAG_Enemy>> SpawnEnemies(
-			TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const;
+			TMap<TSubclassOf<AOPAG_Enemy>, float>& EnemyMap, int32 Amount) const;
 
 	UFUNCTION(BlueprintCallable)
 		virtual int32 GetSpawnerCount() const;

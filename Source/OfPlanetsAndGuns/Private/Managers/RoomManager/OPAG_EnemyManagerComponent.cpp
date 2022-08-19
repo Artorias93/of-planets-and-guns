@@ -30,15 +30,6 @@ void UOPAG_EnemyManagerComponent::LoadEnemyLevelData()
 
 }
 
-float UOPAG_EnemyManagerComponent::GaussianProbabilityModifier(const float Level) const
-{
-	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
-		UGameplayStatics::GetGameInstance(GetWorld()));
-	float ModifiedLevel = GI->GetStageDifficulty() - Level;
-	ModifiedLevel /= Spread;
-	return FMath::Exp(FMath::Pow(ModifiedLevel, 2.f) * -0.5f);
-}
-
 int32 UOPAG_EnemyManagerComponent::GetSpawnerCount() const
 {
 	int32 SpawnCount = 0;
@@ -49,24 +40,12 @@ int32 UOPAG_EnemyManagerComponent::GetSpawnerCount() const
 	return SpawnCount;
 }
 
-void UOPAG_EnemyManagerComponent::GetMappedEnemies(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyProbabilityMap)
+void UOPAG_EnemyManagerComponent::GetBaseMappedEnemies(TMap<TSubclassOf<AOPAG_Enemy>, float>& EnemyProbabilityMap)
 {
-	float OverallProbability = 0;
-	TArray<TSoftClassPtr<AOPAG_Enemy>> Keys;
-
 	LoadEnemyLevelData();
 	for (const FOPAG_EnemyLevel* BaseEnemyLevel : BaseEnemyLevels)
 	{
-		float Probability = GaussianProbabilityModifier(BaseEnemyLevel->Level);
-		OverallProbability += Probability;
-		TSoftClassPtr<AOPAG_Enemy> Enemy = BaseEnemyLevel->Enemy;
-		EnemyProbabilityMap.Add(Enemy, Probability);
-		Keys.Add(Enemy);
-	}
-
-	for (TSoftClassPtr<AOPAG_Enemy> Enemy : Keys)
-	{
-		EnemyProbabilityMap[Enemy] /= OverallProbability;
+		EnemyProbabilityMap.Add(BaseEnemyLevel->Enemy, BaseEnemyLevel->Level);
 	}
 }
 
@@ -122,11 +101,15 @@ void UOPAG_EnemyManagerComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 void UOPAG_EnemyManagerComponent::SpawnWave()
 {
+	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
+		UGameplayStatics::GetGameInstance(GetWorld()));
+	checkf(GI, TEXT("Couldn't find GameInstace"));
+	const float Difficulty = GI->GetStageDifficulty();
+
 	if (TotalEnemyAmount == 0)
 	{
-		UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
-			UGameplayStatics::GetGameInstance(GetWorld()));
-		TotalEnemyAmount = GetSpawnerCount() * FMath::RoundToInt(GI->GetStageDifficulty() * 2.f);
+		
+		TotalEnemyAmount = GetSpawnerCount() * FMath::RoundToInt(Difficulty * 2.f);
 	}
 	if (EnemiesInRoom.Num() == 0)
 	{
@@ -140,8 +123,10 @@ void UOPAG_EnemyManagerComponent::SpawnWave()
 
 		UOPAG_UtilityFunctionLibrary::ShuffleArray(Spawners);
 
-		TMap<TSoftClassPtr<AOPAG_Enemy>, float> EnemyProbabilityMap;
-		GetMappedEnemies(EnemyProbabilityMap);
+		TMap<TSubclassOf<AOPAG_Enemy>, float> EnemyProbabilityMap;
+		GetBaseMappedEnemies(EnemyProbabilityMap);
+		UOPAG_UtilityFunctionLibrary::MapBaseItemsWithDifficulty(EnemyProbabilityMap, Difficulty);
+
 		for (int i = 0; i < SpawnAttempts && EnemiesToSpawnNextWave > 0; ++i)
 		{
 			for (const TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)
