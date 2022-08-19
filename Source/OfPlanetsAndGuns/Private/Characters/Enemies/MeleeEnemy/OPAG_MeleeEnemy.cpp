@@ -2,6 +2,7 @@
 #include <Components/BoxComponent.h>
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
+#include "Characters/Enemies/DashingEnemy/OPAG_DashingEnemy.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -40,7 +41,7 @@ void AOPAG_MeleeEnemy::BeginPlay()
 	{
 		AnimInstance->OnMontageStarted.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackBegin);
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackNotify);
-		//AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackEnd);
+		AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_MeleeEnemy::OnAttackEnd);
 	}
 }
 
@@ -52,8 +53,13 @@ void AOPAG_MeleeEnemy::Attack()
 //Stops the enemy's ability to turn in the direction of the focus actor during the attack animation 
 void AOPAG_MeleeEnemy::OnAttackBegin(UAnimMontage* Montage)
 {
-	//Locks the horizontal rotation for the duration of the attack animation
-	//bUseControllerRotationYaw = false;
+	//Only the dashing enemy uses the AIController's rotation
+	if(Cast<AOPAG_DashingEnemy>(this))
+	{
+		//Locks the horizontal rotation for the duration of the attack animation
+		bUseControllerRotationYaw = false;
+		UE_LOG(LogTemp, Warning, TEXT("ININININININ"));
+	}
 	//Locks the Y axis of the rotation so that the enemy is never rotated upwards or downwards while attacking
 	SetActorRotation(FRotator(0.f, GetActorRotation().Yaw, GetActorRotation().Roll));
 }
@@ -61,8 +67,13 @@ void AOPAG_MeleeEnemy::OnAttackBegin(UAnimMontage* Montage)
 //Resumes the enemy's ability to turn in the direction of the focus actor after the attack animation is done
 void AOPAG_MeleeEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 {
-	//Resumes the horizontal rotation following the controller's
-	//bUseControllerRotationYaw = true;
+	//Only the dashing enemy uses the AIController's rotation
+	if(Cast<AOPAG_DashingEnemy>(this))
+	{
+		//Resumes the horizontal rotation following the controller's
+		bUseControllerRotationYaw = true;
+		UE_LOG(LogTemp, Warning, TEXT("OUTOUTOUTOUTOU"));
+	}	
 }
 
 //The attack collision & damage is computed only when the animation montage's notify is reached
