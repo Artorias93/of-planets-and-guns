@@ -22,7 +22,7 @@ public:
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
 	virtual void Death() override;
 
-private:
+protected:
 
 	virtual void BeginPlay() override;
 
@@ -39,7 +39,7 @@ private:
 	//Variables
 	/////////////////////////////
 
-private: 
+protected: 
 
 	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
 	UAnimMontage* MeleeAttackMontage;
