@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include "Components/TimelineComponent.h"
 #include "OPAG_Enemy.generated.h"
 
 class UBehaviorTree;
@@ -40,6 +41,12 @@ protected:
 
 	void DropAndDespawn();
 
+	void InitSpawnFX();
+
+	UFUNCTION() void SpawnFXProgress(FVector Value);
+
+	UFUNCTION() void SpawnFXFinished();
+
 	//virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */) override;
 	
 	/////////////////////////////
@@ -67,4 +74,21 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	UParticleSystemComponent* SpawnParticle;
+
+
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
+	UMaterialInstance* SpawnMaterial;
+
+	TArray<UMaterial*> NormalMaterials;
+	UMaterialInstanceDynamic* ActiveMaterial;
+
+	UPROPERTY()
+		UTimelineComponent* SpawnTimeline;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta = (AllowPrivateAccess = true))
+		UCurveVector* SpawnFXCurve;
+
+	FOnTimelineVector OnSpawnFXTimelineProgress;
+	FOnTimelineEventStatic OnSpawnFXTimelineFinished;
 };
