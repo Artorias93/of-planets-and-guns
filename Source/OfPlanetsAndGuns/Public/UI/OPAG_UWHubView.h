@@ -34,10 +34,10 @@ class OFPLANETSANDGUNS_API UOPAG_UWHubView : public UUserWidget
 	*/
 
 	//Player's stuff
-	UPROPERTY(meta = (BindWidget))
+	/*UPROPERTY(meta = (BindWidget))
 		UTextBlock* BoltsAmountText;
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* PotionsAmountText;
+		UTextBlock* PotionsAmountText;*/
 
 	UPROPERTY(meta = (BindWidget))
 		UButton* PlayButton;

@@ -16,8 +16,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWUpgradeSystemView : public UUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(meta = (BindWidget))
-		class UListView* InventoryListView;
+	/*UPROPERTY(meta = (BindWidget))
+		class UListView* InventoryListView;*/
 
 private:
 	UPROPERTY()

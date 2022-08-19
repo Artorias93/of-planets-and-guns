@@ -13,5 +13,5 @@ void UOPAG_UWUpgradeSystemView::NativeConstruct()
 
 	// Imagine we have an inventory class that provides us with the following:
 	TArray<UOPAG_UWUpgradeSystemItemView*> Inventory;
-	InventoryListView->SetListItems(InventoryItems);
+	//InventoryListView->SetListItems(InventoryItems);
 }

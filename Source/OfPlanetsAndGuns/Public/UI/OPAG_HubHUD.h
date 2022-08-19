@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
-#include "OPAG_UpgradeSystemHUD.generated.h"
+#include "OPAG_HubHUD.generated.h"
 
 class UOPAG_UWUpgradeSystemView;
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_UpgradeSystemHUD : public AHUD
+class OFPLANETSANDGUNS_API AOPAG_HubHUD : public AHUD
 {
 	GENERATED_BODY()
 

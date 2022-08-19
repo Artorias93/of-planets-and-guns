@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/IUserObjectListEntry.h"
 #include "OPAG_UWUpgradeSystemItemView.generated.h"
 
 class UImage;
 class UTextBlock;
-
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWUpgradeSystemItemView : public UUserWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
-public:
+ public:
 	UPROPERTY(meta = (BindWidget))
 		UImage* AbilityLevel1;
 	UPROPERTY(meta = (BindWidget))

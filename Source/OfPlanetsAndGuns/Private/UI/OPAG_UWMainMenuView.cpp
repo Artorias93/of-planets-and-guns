@@ -9,6 +9,8 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "UI/OPAG_MainMenuHUD.h"
+#include "OPAG_MainMenuGameMode.h"
+#include "Kismet/GameplayStatics.h" 
 
 void UOPAG_UWMainMenuView::NativeConstruct() {
 	Super::NativeConstruct();
@@ -26,9 +28,13 @@ void UOPAG_UWMainMenuView::NewRunButtonClicked()
 {
 	NewRunButton->OnClicked.RemoveDynamic(this, &UOPAG_UWMainMenuView::NewRunButtonClicked);
 
-	AOPAG_MainMenuHUD* MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	/*AOPAG_MainMenuHUD* MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
 	if (MyHUD)
-		MyHUD->ShowHubView();
+		MyHUD->ShowHubView();*/
+
+	AOPAG_MainMenuGameMode* MainMenuGameMode = Cast<AOPAG_MainMenuGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (MainMenuGameMode != nullptr)
+		MainMenuGameMode->SwitchToHubHUD();
 }
 
 void UOPAG_UWMainMenuView::OptionsButtonClicked()

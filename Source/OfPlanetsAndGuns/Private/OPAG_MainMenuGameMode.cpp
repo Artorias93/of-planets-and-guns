@@ -3,6 +3,7 @@
 
 #include "OPAG_MainMenuGameMode.h"
 #include "UI/OPAG_MainMenuHUD.h"
+#include "UI/OPAG_HubHUD.h"
 
 AOPAG_MainMenuGameMode::AOPAG_MainMenuGameMode()
 {
@@ -13,3 +14,33 @@ AOPAG_MainMenuGameMode::AOPAG_MainMenuGameMode()
 	}
 	
 }
+
+void AOPAG_MainMenuGameMode::SwitchToHubHUD()
+{
+	static ConstructorHelpers::FClassFinder<AOPAG_HubHUD> HubHUDClass(TEXT("/Game/OfPlanetsAndGuns/UI/BP_HubHUD"));
+
+	if (HubHUDClass.Class != NULL) {
+		HUDClass = HubHUDClass.Class;
+	}
+}
+
+//void AOPAG_MainMenuGameMode::SwitchToHubHUD()
+//{
+//	SwitchHUDClass(AOPAG_HubHUD::StaticClass(), "/Game/OfPlanetsAndGuns/UI/BP_HubHUD");
+//}
+//
+//void AOPAG_MainMenuGameMode::SwitchToMainMenuHUD()
+//{
+//	SwitchHUDClass(AOPAG_MainMenuHUD::StaticClass(), "/Game/OfPlanetsAndGuns/UI/BP_MainMenuHUD");
+//}
+//
+//template<class T>
+//void AOPAG_MainMenuGameMode::SwitchHUDClass(const T HUDClassEntry, const FString RefPath)
+//{
+//	static ConstructorHelpers::FClassFinder<HUDClassEntry> NewHUDClass(TEXT(RefPath));
+//
+//	if (NewHUDClass.Class) {
+//		HUDClass = NewHUDClass.Class;
+//	}
+//}
+

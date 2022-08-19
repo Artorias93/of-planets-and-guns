@@ -16,4 +16,15 @@ class OFPLANETSANDGUNS_API AOPAG_MainMenuGameMode : public AGameModeBase
 
 	AOPAG_MainMenuGameMode();
 
+	//static ConstructorHelpers::FClassFinder<class AOPAG_HubHUD> HubHUDClass;
+
+public:
+	void SwitchToHubHUD();
+	
+	/*template<class T>
+	void SwitchHUDClass(const T HubClass, const FString RefPath);
+
+public:
+	void SwitchToHubHUD();
+	void SwitchToMainMenuHUD();*/
 };

@@ -16,6 +16,8 @@ class AOPAG_Enemy;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStartPlanet, int, PlanetIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadMainMenu);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOpenHub);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageManagerInit, const UWorld* const, World);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageManagerReady);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGenerateStage, FOPAG_StageGeneration, StageGenData);
@@ -89,6 +91,9 @@ public:
 		FStartPlanet StartPlanet;
 	UPROPERTY(BlueprintAssignable, Category = Game)
 		FLoadMainMenu LoadMainMenu;
+
+	UPROPERTY(BlueprintAssignable, Category = Game)
+		FOpenHub OpenHub;
 
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
 		FStageManagerInit StageManagerInit;

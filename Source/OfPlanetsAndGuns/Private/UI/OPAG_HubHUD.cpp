@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "UI/OPAG_UpgradeSystemHUD.h"
+#include "UI/OPAG_HubHUD.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "UI/OPAG_UWUpgradeSystemView.h"
 #include "UI/OPAG_UWHubView.h"
 
 
-void AOPAG_UpgradeSystemHUD::BeginPlay()
+void AOPAG_HubHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -30,12 +30,12 @@ void AOPAG_UpgradeSystemHUD::BeginPlay()
 	}
 }
 
-void AOPAG_UpgradeSystemHUD::DrawHUD()
+void AOPAG_HubHUD::DrawHUD()
 {
 	Super::DrawHUD();
 }
 
-void AOPAG_UpgradeSystemHUD::ShowUpgradeSystem()
+void AOPAG_HubHUD::ShowUpgradeSystem()
 {
 	if (UpgradeSystemWidget) 
 	{
