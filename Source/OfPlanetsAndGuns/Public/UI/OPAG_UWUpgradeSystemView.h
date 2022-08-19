@@ -9,6 +9,7 @@
 class UOPAG_UWUpgradeSystemItemView;
 class UOPAG_EventManagerSubsystem;
 class UTextBlock;
+class UVerticalBox;
 struct FOPAG_PlayerState;
 
 UCLASS()
@@ -18,22 +19,17 @@ class OFPLANETSANDGUNS_API UOPAG_UWUpgradeSystemView : public UUserWidget
 
 	void BindEvents();
 
-	//FOPAG_PlayerState* tempPlayerState;
-
-	//UOPAG_EventManagerSubsystem* const EMS;
-
 protected:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(meta = (BindWidget))
-		class UListView* InventoryListView;
-
-	UPROPERTY(meta = (BindWidget))
 		class UTextBlock* BoltsAmountText;
+	UPROPERTY(meta = (BindWidget))
+		class UVerticalBox* EntriesVerticalBox;
 
 private:
 	UPROPERTY()
-		class UOPAG_UWUpgradeSystemView* UpgradeSystemWidget;
+		class UOPAG_UWUpgradeSystemItemView* UpgradeSystemItemWidget;
 	UPROPERTY(EditAnywhere, Category = "Widgets")
 		TSubclassOf<UOPAG_UWUpgradeSystemItemView> UpgradeSystemItemViewWidgetClass;
 

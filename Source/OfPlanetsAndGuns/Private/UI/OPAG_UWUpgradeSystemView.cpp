@@ -4,7 +4,7 @@
 #include "UI/OPAG_UWUpgradeSystemView.h"
 #include "UI/OPAG_UWUpgradeSystemItemView.h"
 #include "Components/TextBlock.h"
-#include "Components/ListView.h"
+#include "Components/VerticalBox.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Player/OPAG_PlayerState.h"
@@ -20,12 +20,6 @@ void UOPAG_UWUpgradeSystemView::NativeConstruct()
 
 	if (EMS)
 		EMS->RequestPlayerState.Broadcast();
-
-
-	// Imagine we have an inventory class that provides us with the following:
-	TArray<UOPAG_UWUpgradeSystemItemView*> Inventory;
-
-	InventoryListView->SetListItems(Inventory);
 }
 
 void UOPAG_UWUpgradeSystemView::BindEvents()
@@ -41,6 +35,7 @@ void UOPAG_UWUpgradeSystemView::ApplyPlayerState(const FOPAG_PlayerState& StateT
 	if (BoltsAmountText) {
 		BoltsAmountText->SetText(FText::FromString(FString::FromInt(StateToApply.BoltsAmount)));
 	}
+
+	UOPAG_UWUpgradeSystemItemView* Entry = CreateWidget<UOPAG_UWUpgradeSystemItemView>(this, UpgradeSystemItemViewWidgetClass);
+	EntriesVerticalBox->AddChildToVerticalBox(Entry);
 }
-
-
