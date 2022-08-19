@@ -8,6 +8,9 @@
 #include <Kismet/GameplayStatics.h>
 #include "Items/OPAG_Drop.h"
 
+#include "Managers/RoomManager/OPAG_RoomManager.h"
+#include "Rooms/OPAG_LootSpawnPoint.h"
+
 UOPAG_LootManagerComponent::UOPAG_LootManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -18,6 +21,7 @@ void UOPAG_LootManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SpawnLootContainers();
 }
 
 void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -28,6 +32,76 @@ void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 {
+	GenerateIndividualLoot(LootBoxA.Key, LootBoxA.Value, DifficultyValue);
+	GenerateIndividualLoot(LootBoxB.Key, LootBoxB.Value, DifficultyValue);
+}
+
+void UOPAG_LootManagerComponent::Unlock() const
+{
+	if (LootBoxA.Key) LootBoxA.Key->Unlock();
+	if (LootBoxB.Key) LootBoxB.Key->Unlock();
+}
+
+void UOPAG_LootManagerComponent::SpawnLootContainers()
+{
+	if (Spawners.Num() == 0)
+	{
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(
+			this,
+			"No loot spawners found for " + GetOwner<AOPAG_RoomManager>()->Level.GetAssetName(), 
+			EMessageSeverity::Warning);
+		return;
+	}
+	int RoomWeight = 0;
+	AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
+	if (RoomManager)
+	{
+		RoomWeight = RoomManager->Weight;
+	}
+
+
+	if (RoomWeight < 2) // 0 or 1 weight
+	{
+		LootBoxA.Key = GetWorld()->SpawnActor<AOPAG_LootBox>(SmallLootBoxClass,
+			Spawners[0]->GetActorLocation(), Spawners[0]->GetActorRotation());
+	}
+	else  //2 or more weight
+	{
+		if (FMath::RandRange(0, 100) <= VendorChance)
+		{
+			Vendor = GetWorld()->SpawnActor<AActor>(VendorClass,
+				Spawners[0]->GetActorLocation(), Spawners[0]->GetActorRotation());
+		}
+		else
+		{
+			LootBoxA.Key = GetWorld()->SpawnActor<AOPAG_LootBox>(LargeLootBoxClass,
+				Spawners[0]->GetActorLocation(), Spawners[0]->GetActorRotation());
+		}
+
+		if (RoomWeight > 2) //3 or more weight
+		{
+
+			if (Spawners.Num() < 2)
+			{
+				UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(
+					this,
+					"Missing second loot spawner for " + GetOwner<AOPAG_RoomManager>()->Level.GetAssetName(),
+					EMessageSeverity::Warning);
+				return;
+			}
+
+			AOPAG_LootBox* SpawnedLootBox = GetWorld()->SpawnActor<AOPAG_LootBox>(SmallLootBoxClass,
+				Spawners[1]->GetActorLocation(), Spawners[1]->GetActorRotation());
+			if (!LootBoxA.Key)
+				LootBoxA.Key = SpawnedLootBox;
+			else LootBoxB.Key = SpawnedLootBox;
+		}
+	}
+}
+
+void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, TArray<FOPAG_LootChance*>& LootChance, const float DifficultyValue)
+{
+
 	if (!LootBox)	return;
 
 	// Populate items list 
@@ -160,17 +234,16 @@ void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 	LootBox->SetItemsToSpawn(Items);
 }
 
-void UOPAG_LootManagerComponent::Unlock() const
-{
-	if (LootBox) LootBox->Unlock();
-}
-
 void UOPAG_LootManagerComponent::PopulateLootLists()
 {
 	const FString Context;
-	if (LootBox->LootChanceTable)
+	if (LootBoxA.Key && LootBoxA.Key->LootChanceTable)
 	{
-		LootBox->LootChanceTable->GetAllRows(Context, LootChance);
+		LootBoxA.Key->LootChanceTable->GetAllRows(Context, LootBoxA.Value);
+	}
+	if (LootBoxB.Key && LootBoxB.Key->LootChanceTable)
+	{
+		LootBoxB.Key->LootChanceTable->GetAllRows(Context, LootBoxB.Value);
 	}
 	if (LootDropTable)
 	{

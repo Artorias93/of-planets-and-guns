@@ -8,6 +8,7 @@
 #include "Components/ActorComponent.h"
 #include "OPAG_LootManagerComponent.generated.h"
 
+class AOPAG_LootSpawnPoint;
 class AOPAG_LootBox;
 class AOPAG_ModuleBase;
 
@@ -29,13 +30,29 @@ public:
 	UDataTable* LootGunTable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
-	AOPAG_LootBox* LootBox;
+		TArray<AOPAG_LootSpawnPoint*> Spawners;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager", Meta = (UIMin = 0.f, UIMax = 100.f))
+		float VendorChance = 30.f;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
+		TSubclassOf<AOPAG_LootBox> SmallLootBoxClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
+		TSubclassOf<AOPAG_LootBox> LargeLootBoxClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
+		TSubclassOf<AActor> VendorClass;
 
 private:
-	TArray<FOPAG_LootChance*> LootChance;
+	TPair<AOPAG_LootBox*, TArray<FOPAG_LootChance*>> LootBoxA;
+	TPair<AOPAG_LootBox*, TArray<FOPAG_LootChance*>> LootBoxB;
+
 	TArray<FOPAG_DropList*> Drops;
 	TArray<FOPAG_ModuleList*> Modules;
 	TArray<FOPAG_GunList*> Guns;
+
+	AActor* Vendor;
 
 protected:
 	virtual void BeginPlay() override;
@@ -47,6 +64,9 @@ public:
 	void Unlock() const;
 
 private:
+	void SpawnLootContainers();
+
+	void GenerateIndividualLoot(AOPAG_LootBox* LootBox, TArray<FOPAG_LootChance*>& LootChance, const float DifficultyValue);
 	void PopulateLootLists();
 	TSubclassOf<AActor> SelectRandomModules(const float DifficultyValue, const int FireMask);
 	TSubclassOf<AActor> SelectRandomModules(const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes);

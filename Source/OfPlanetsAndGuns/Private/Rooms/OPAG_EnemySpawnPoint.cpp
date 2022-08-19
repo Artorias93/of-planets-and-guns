@@ -18,6 +18,10 @@ AOPAG_EnemySpawnPoint::AOPAG_EnemySpawnPoint()
 	RootComponent = Billboard;
 	Billboard->bIsScreenSizeScaled = true;
 	Billboard->ScreenSize = -0.002f;
+
+	const auto SpriteFinder = ConstructorHelpers::FObjectFinder<UTexture2D>(
+		TEXT("Texture2D'/Game/OfPlanetsAndGuns/UI/Billboards/EnemySpawnerBillboard.EnemySpawnerBillboard'"));
+	if (SpriteFinder.Succeeded()) Billboard->SetSprite(SpriteFinder.Object);
 }
 
 // Called when the game starts or when spawned

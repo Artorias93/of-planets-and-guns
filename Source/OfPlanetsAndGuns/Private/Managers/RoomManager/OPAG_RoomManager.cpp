@@ -17,6 +17,7 @@
 #include "Rooms/OPAG_RoomStreamingVolume.h"
 #include "Interactables/OPAG_LootBox.h"
 #include "Managers/RoomManager/OPAG_LootManagerComponent.h"
+#include "Rooms/OPAG_LootSpawnPoint.h"
 
 
 // Sets default values
@@ -95,9 +96,10 @@ void AOPAG_RoomManager::UpdateData()
 			It->UpdateAttachPointData(this);
 		}
 
-		for (TActorIterator<AOPAG_LootBox> It(World); It; ++It)
+		LootManager->Spawners.Empty();
+		for (TActorIterator<AOPAG_LootSpawnPoint> It(World); It; ++It)
 		{
-			LootManager->LootBox = *It;
+			LootManager->Spawners.Add(*It);
 		}
 
 		if (DataTable != nullptr)
