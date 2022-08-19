@@ -85,6 +85,7 @@ public:
 	// Setter and Getter
 	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
 	FOPAG_GunModules GetModulesStruct() const;
+	FOPAG_GunModules GetStandardModulesStruct() const;
 
 	// Utility for link modules and sockets
 	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;

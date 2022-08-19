@@ -20,15 +20,22 @@ public:
 	UOPAG_LootManagerComponent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
-	UDataTable* LootTable;
+	UDataTable* LootDropTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
+	UDataTable* LootModuleTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
+	UDataTable* LootGunTable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
 	AOPAG_LootBox* LootBox;
 
 private:
-	TArray<FOPAG_LootChance*> Drops;
-	TArray<FOPAG_LootChance*> Modules;
-	TArray<FOPAG_LootChance*> Guns;
+	TArray<FOPAG_LootChance*> LootChance;
+	TArray<FOPAG_DropList*> Drops;
+	TArray<FOPAG_ModuleList*> Modules;
+	TArray<FOPAG_GunList*> Guns;
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,5 +48,6 @@ public:
 
 private:
 	void PopulateLootLists();
-	TSubclassOf<AActor> SelectRandomModules(const int FireMask, const EModuleTypes ModuleType);
+	TSubclassOf<AActor> SelectRandomModules(const float DifficultyValue, const int FireMask);
+	TSubclassOf<AActor> SelectRandomModules(const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes);
 };

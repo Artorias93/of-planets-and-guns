@@ -6,6 +6,7 @@
 #include "Weapons/Guns/OPAG_ModularGun.h"
 #include "Characters/Player/OPAG_Player.h"
 #include <Kismet/GameplayStatics.h>
+#include "Items/OPAG_Drop.h"
 
 UOPAG_LootManagerComponent::UOPAG_LootManagerComponent()
 {
@@ -16,8 +17,7 @@ UOPAG_LootManagerComponent::UOPAG_LootManagerComponent()
 void UOPAG_LootManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	PopulateLootLists();
+
 }
 
 void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -28,98 +28,135 @@ void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 {
-	if (!LootBox) return;
+	if (!LootBox)	return;
+
+	// Populate items list 
+	PopulateLootLists();
 
 	TArray<TSubclassOf<AActor>> Items;
-	for (FOPAG_LootChance* Drop : Drops)
+
+	// Drop variables
+	for (FOPAG_DropList* Drop : Drops)
 	{
-		if (Drop->LootChance == 100.f)
+		for (FOPAG_LootChance* Loot : LootChance)
 		{
-			Items.Add(Drop->DropClass);
-		}
-		else
-		{
-			const float RandomDropChance = FMath::RandRange(0.f, 100.f);
-			if (Drop->LootChance >= RandomDropChance)
+			if (Loot->LootType == Drop->DropType)
 			{
-				Items.Add(Drop->DropClass);
+				if (Loot->LootChance == 100.f)
+				{
+					Items.Add(Drop->DropClass);
+					break;
+				}
+				else
+				{
+					const float RandomDropChance = FMath::RandRange(0.f, 100.f);
+					if (Loot->LootChance >= RandomDropChance)
+					{
+						Items.Add(Drop->DropClass);
+						break;
+					}
+				}
 			}
 		}
 	}
 
 	// Guns Or Modules
-	const float RandomChance = FMath::RandRange(0.f, 100.f);
-	float Sum = 0.f;
+	const float RandomGunOrModuleChance = FMath::RandRange(0.f, 100.f);
 	TSubclassOf<AActor> Item = nullptr;
-	for (FOPAG_LootChance* Gun : Guns)
+	if (LootChance[3]->LootChance >= RandomGunOrModuleChance)
 	{
-		Sum += Gun->LootChance;
-		if (RandomChance < Gun->LootChance)
+		// If is guns
+		const float RandomGunChance = FMath::RandRange(0.f, 100.f);
+		float Sum = 0.f;
+		for (FOPAG_GunList* Gun : Guns)
 		{
-			// Init gun's fire type (util for pick random modules)
-			AOPAG_ModularGun* DefaultGun = Gun->DropClass->GetDefaultObject<AOPAG_ModularGun>();
-			const int FireMask = 1 << (int)DefaultGun->FireType;
-
-			// Select random modules to attach 
-			TSubclassOf<AActor> Barrel = SelectRandomModules(FireMask, EModuleTypes::Barrel);
-			TSubclassOf<AActor> Stock = SelectRandomModules(FireMask, EModuleTypes::Stock);
-			TSubclassOf<AActor> Grip = SelectRandomModules(FireMask, EModuleTypes::Grip);
-			TSubclassOf<AActor> Magazine = SelectRandomModules(FireMask, EModuleTypes::Magazine);
-
-			// Create struct and set this struct in the loot box
-			FOPAG_GunModules ModulesStruct;
-			ModulesStruct.Barrel = Barrel;
-			ModulesStruct.Stock = Stock;
-			ModulesStruct.Grip = Grip;
-			ModulesStruct.Magazine = Magazine;
-			LootBox->SetModules(ModulesStruct);
-
-
-			Item = Gun->DropClass;
-			Items.Add(Item);
-			break;
-		}
-	}
-	if (!Item)
-	{
-		AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-		if (Player)
-		{
-			TArray<TSubclassOf<AActor>> EquippableModules;
-			UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
-			EFireTypes FireType = Player->PrimaryGun->FireType;
-			for (FOPAG_LootChance* Module : Modules)
+			Sum += Gun->GunChance;
+			if (RandomGunChance < Sum)
 			{
-				AOPAG_ModuleBase* TempModule = Module->DropClass->GetDefaultObject<AOPAG_ModuleBase>();
-				if (TempModule)
+				// Init gun's fire type (util for pick random modules)
+				AOPAG_ModularGun* DefaultGun = Gun->GunClass->GetDefaultObject<AOPAG_ModularGun>();
+				const int FireMask = 1 << (int)DefaultGun->FireType;
+				const int RandomNumberOfModules = FMath::RandRange(LootBox->MinModules, LootBox->MaxModules);
+
+				// Create array of modules type
+				TArray<EModuleTypes> ModuleTypes;
+				ModuleTypes.Add(EModuleTypes::Barrel);
+				ModuleTypes.Add(EModuleTypes::Stock);
+				ModuleTypes.Add(EModuleTypes::Grip);
+				ModuleTypes.Add(EModuleTypes::Magazine);
+				ModuleTypes.Add(EModuleTypes::Sight);
+				ModuleTypes.Add(EModuleTypes::Accessory);
+
+				// Select random modules to attach 
+				FOPAG_GunModules ModulesStruct = DefaultGun->GetStandardModulesStruct();
+				int Count = 0;
+				while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 				{
-					const int EquippableType = TempModule->EquippableFireTypes;
-					const int FireMask = 1 << (int)FireType;
-					if (FireMask & EquippableType)
+					const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
+					TSubclassOf<AActor> Module = SelectRandomModules(DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+					if (Module != nullptr)
 					{
-						Sum += Module->LootChance;
-						if (RandomChance < Sum)
+						switch (ModuleTypes[RandomModuleIndex])
 						{
-							Item = Module->DropClass;
-							Items.Add(Item);
+						case EModuleTypes::Barrel:
+							ModulesStruct.Barrel = Module;
+							break;
+						case EModuleTypes::Stock:
+							ModulesStruct.Stock = Module;
+							break;
+						case EModuleTypes::Grip:
+							ModulesStruct.Grip = Module;
+							break;
+						case EModuleTypes::Magazine:
+							ModulesStruct.Magazine = Module;
+							break;
+						case EModuleTypes::Sight:
+							ModulesStruct.Sight = Module;
+							break;
+						case EModuleTypes::Accessory:
+							ModulesStruct.Accessory = Module;
+							break;
+						default:
+							UE_LOG(LogTemp, Error, TEXT("Module types error!"));
 							break;
 						}
-						EquippableModules.Add(Module->DropClass);
+
+						Count++;
 					}
+
+					// Remove the select index for no-repeat the same or not fiend module
+					ModuleTypes.RemoveAt(RandomModuleIndex);
 				}
+
+				LootBox->SetModules(ModulesStruct);
+
+				Item = Gun->GunClass;
+				Items.Add(Item);
+				break;
 			}
-			if (!Item)
+		}
+	}
+	if (Item == nullptr)
+	{
+		AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (Player != nullptr)
+		{
+			UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
+			int Count = 0;
+			while (Count < LootBox->NumberOfModulesToSpawn && Count < Modules.Num())
 			{
-				if (EquippableModules.Num() > 0)
+				const int FireMask = 1 << (int)Player->PrimaryGun->FireType;
+				Item = SelectRandomModules(DifficultyValue, FireMask);
+				if (!Items.Contains(Item))
 				{
-					UOPAG_UtilityFunctionLibrary::ShuffleArray(EquippableModules);
-					Items.Add(EquippableModules[0]);
+					Items.Add(Item);
 				}
+				Count++;
 			}
 		}
 	}
 
-	// Set items in the lootbox
+	// Set items in the loot-box
 	LootBox->SetItemsToSpawn(Items);
 }
 
@@ -131,68 +168,72 @@ void UOPAG_LootManagerComponent::Unlock() const
 void UOPAG_LootManagerComponent::PopulateLootLists()
 {
 	const FString Context;
-	TArray<FOPAG_LootChance*> TempList;
-	if (LootTable)
+	if (LootBox->LootChanceTable)
 	{
-		LootTable->GetAllRows(Context, TempList);
+		LootBox->LootChanceTable->GetAllRows(Context, LootChance);
 	}
-
-	for (FOPAG_LootChance* Item : TempList)
+	if (LootDropTable)
 	{
-		switch (Item->DropType)
-		{
-			case ELootType::Drop :
-				Drops.Add(Item);
-				break;
-			case ELootType::Module :
-				Modules.Add(Item);
-				break;
-			case ELootType::Gun :
-				Guns.Add(Item);
-				break;
-		}
+		LootDropTable->GetAllRows(Context, Drops);
+	}
+	if (LootModuleTable)
+	{
+		LootModuleTable->GetAllRows(Context, Modules);
+	}
+	if (LootGunTable)
+	{
+		LootGunTable->GetAllRows(Context, Guns);
 	}
 }
 
-TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(const int FireMask, const EModuleTypes ModuleType)
+TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(const float DifficultyValue, const int FireMask)
 {
-	TArray<TSubclassOf<AActor>> EquippableModules;
+	TMap<TSubclassOf<AOPAG_ModuleBase>, float> ModuleMap;
 	UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
-	float Sum = 0.f;
-	const float RandomChance = FMath::RandRange(0.f, 100.f);
-
-	for (FOPAG_LootChance* Lootable : Modules)
+	for (FOPAG_ModuleList* Module : Modules)
 	{
-		AOPAG_ModuleBase* DefaultModule = Lootable->DropClass->GetDefaultObject<AOPAG_ModuleBase>();
+		AOPAG_ModuleBase* DefaultModule = Module->ModuleClass->GetDefaultObject<AOPAG_ModuleBase>();
 		if (DefaultModule)
 		{
 			const int EquippableType = DefaultModule->EquippableFireTypes;
-			if (DefaultModule->Type == ModuleType && FireMask & EquippableType)
+			if (FireMask & EquippableType)
 			{
-				Sum += Lootable->LootChance;
-				if (RandomChance < Sum)
-				{
-					return Lootable->DropClass;
-				}
-				EquippableModules.Add(Lootable->DropClass);
+				float Probability = Module->ModuleLevel;
+				TSubclassOf<AOPAG_ModuleBase> ModuleClass = Module->ModuleClass;
+				ModuleMap.Add(ModuleClass, Probability);
 			}
 		}
 	}
-	if (EquippableModules.Num() > 0)
+	if (ModuleMap.Num() > 0)
 	{
-		UOPAG_UtilityFunctionLibrary::ShuffleArray(EquippableModules);
-		for (TSubclassOf<AActor> Equippable : EquippableModules)
+		UOPAG_UtilityFunctionLibrary::MapBaseItemsWithDifficulty(ModuleMap, DifficultyValue);
+		return UOPAG_UtilityFunctionLibrary::GetRandomItem(ModuleMap);
+	}
+	return nullptr;
+}
+
+TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes)
+{
+	TMap<TSubclassOf<AOPAG_ModuleBase>, float> ModuleMap;
+	UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
+	for (FOPAG_ModuleList* Module : Modules)
+	{
+		AOPAG_ModuleBase* DefaultModule = Module->ModuleClass->GetDefaultObject<AOPAG_ModuleBase>();
+		if (DefaultModule)
 		{
-			AOPAG_ModuleBase* DefaultModule = Equippable->GetDefaultObject<AOPAG_ModuleBase>();
-			if (DefaultModule)
+			const int EquippableType = DefaultModule->EquippableFireTypes;
+			if (FireMask & EquippableType && DefaultModule->Type == ModuleTypes)
 			{
-				const int EquippableType = DefaultModule->EquippableFireTypes;
-				if (DefaultModule->Type == ModuleType && FireMask & EquippableType)
-				{
-					return Equippable;
-				}
+				float Probability = Module->ModuleLevel;
+				TSubclassOf<AOPAG_ModuleBase> ModuleClass = Module->ModuleClass;
+				ModuleMap.Add(ModuleClass, Probability);
 			}
 		}
+	}
+	if (ModuleMap.Num() > 0)
+	{
+		UOPAG_UtilityFunctionLibrary::MapBaseItemsWithDifficulty(ModuleMap, DifficultyValue);
+		return UOPAG_UtilityFunctionLibrary::GetRandomItem(ModuleMap);
 	}
 	return nullptr;
 }

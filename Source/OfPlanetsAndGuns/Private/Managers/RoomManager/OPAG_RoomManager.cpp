@@ -182,7 +182,10 @@ void AOPAG_RoomManager::OnStageDifficultyUpdated()
 	if (!bIsAwaitingDifficultyUpdate) return;
 	bIsAwaitingDifficultyUpdate = false;
 
-	LootManager->GenerateLoot(0);
+	UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
+	checkf(GI, TEXT("Couldn't find Game Instance!"));
+
+	LootManager->GenerateLoot(GI->GetStageDifficulty());
 
 	if (EnemyManager->GetSpawnerCount() == 0)
 	{

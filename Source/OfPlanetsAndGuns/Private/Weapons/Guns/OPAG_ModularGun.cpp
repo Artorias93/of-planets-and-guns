@@ -53,13 +53,7 @@ void AOPAG_ModularGun::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FOPAG_GunModules StandardModules;
-	StandardModules.Barrel = StandardBarrel;
-	StandardModules.Stock = StandardStock;
-	StandardModules.Grip = StandardGrip;
-	StandardModules.Magazine = StandardMagazine;
-
-	CreateAndAttachAllModules(StandardModules);
+	CreateAndAttachAllModules(GetStandardModulesStruct());
 	PopulateAmmoTable();
 	CheckIfPhysical();
 
@@ -110,6 +104,17 @@ FOPAG_GunModules AOPAG_ModularGun::GetModulesStruct() const
 	GunModules.Accessory = Accessory->GetChildActorClass();
 
 	return GunModules;
+}
+
+FOPAG_GunModules AOPAG_ModularGun::GetStandardModulesStruct() const
+{
+	FOPAG_GunModules StandardModules;
+	StandardModules.Barrel = StandardBarrel;
+	StandardModules.Stock = StandardStock;
+	StandardModules.Grip = StandardGrip;
+	StandardModules.Magazine = StandardMagazine;
+
+	return StandardModules;
 }
 
 // Return module by child actor of socket
