@@ -1,8 +1,9 @@
 #include "AI/OPAG_TaskChangeChargeState.h"
-
+#include "Components/CapsuleComponent.h"
+//My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
-#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UOPAG_TaskChangeChargeState::UOPAG_TaskChangeChargeState(FObjectInitializer const& ObjectInitializer)
 {
@@ -23,9 +24,11 @@ EBTNodeResult::Type UOPAG_TaskChangeChargeState::ExecuteTask(UBehaviorTreeCompon
 				ShieldEnemy->GetShieldMesh()->AttachToComponent(ShieldEnemy->GetMesh(),
 					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "ChargingShieldSocket");
 				ShieldEnemy->TurnOnBoosters();
+				ShieldEnemy->GetCharacterMovement()->GravityScale = 0.f;
 			}
 			else
 			{
+				ShieldEnemy->GetCharacterMovement()->GravityScale = 1.f;
 				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 				ShieldEnemy->GetShieldMesh()->AttachToComponent(ShieldEnemy->GetMesh(),
 					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "LeftHandSocket");

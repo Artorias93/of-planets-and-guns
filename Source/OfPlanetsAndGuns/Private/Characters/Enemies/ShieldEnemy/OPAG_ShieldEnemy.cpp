@@ -5,6 +5,7 @@
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 
 AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
@@ -115,6 +116,7 @@ void AOPAG_ShieldEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
 
 void AOPAG_ShieldEnemy::Death()
 {
+	GetCharacterMovement()->GravityScale = 1.f;
 	//Weapon & Shield Mesh ragdoll functions
 	if(SwordMesh)
 	{
