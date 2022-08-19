@@ -4,19 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Blueprint/IUserObjectListEntry.h"
 #include "OPAG_UWUpgradeSystemView.generated.h"
 
 class UOPAG_UWUpgradeSystemItemView;
 
 UCLASS()
-class OFPLANETSANDGUNS_API UOPAG_UWUpgradeSystemView : public UUserWidget, public IUserObjectListEntry
+class OFPLANETSANDGUNS_API UOPAG_UWUpgradeSystemView : public UUserWidget
 {
 	GENERATED_BODY()	
 
 protected:
 	virtual void NativeConstruct() override;
-	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
+
+	UPROPERTY(meta = (BindWidget))
+		class UListView* InventoryListView;
 
 private:
 	UPROPERTY()

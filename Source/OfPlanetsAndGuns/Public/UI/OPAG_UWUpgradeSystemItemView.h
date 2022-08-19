@@ -9,8 +9,9 @@
 class UImage;
 class UTextBlock;
 
+
 UCLASS()
-class OFPLANETSANDGUNS_API UOPAG_UWUpgradeSystemItemView : public UUserWidget
+class OFPLANETSANDGUNS_API UOPAG_UWUpgradeSystemItemView : public UUserWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
@@ -25,8 +26,10 @@ public:
 		UImage* AbilityLevel4;
 	UPROPERTY(meta = (BindWidget))
 		UImage* AbilityLevel5;
-
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* AbilityName;
+
+protected:
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 	
 };
