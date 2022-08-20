@@ -192,6 +192,92 @@ FName AOPAG_ModularGun::GetSocketNameByModuleType(const EModuleTypes ModuleType)
 }
 
 
+void AOPAG_ModularGun::DetachAllModules(const FVector Force)
+{
+	DetachModule(Barrel, Force);
+	DetachModule(Stock, Force);
+	DetachModule(Grip, Force);
+	DetachModule(Magazine, Force);
+	DetachModule(Sight, Force);
+	DetachModule(Accessory, Force);
+}
+
+void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVector Force)
+{
+	if (ChildModule->GetChildActor() == nullptr)
+	{
+		return;
+	}
+
+	const AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (Player == nullptr)
+	{
+		return;
+	}
+
+	// Control check for don't consider the standard module
+	AOPAG_ModuleBase* CurrentChildModule = GetModule(ChildModule);
+	switch (CurrentChildModule->Type)
+	{
+	case EModuleTypes::Barrel:
+		if (CurrentChildModule->GetClass() == StandardBarrel)
+		{
+			return;
+		}
+		break;
+	case EModuleTypes::Stock:
+		if (CurrentChildModule->GetClass() == StandardStock)
+		{
+			return;
+		}
+		break;
+	case EModuleTypes::Grip:
+		if (CurrentChildModule->GetClass() == StandardGrip)
+		{
+			return;
+		}
+		break;
+	case EModuleTypes::Magazine:
+		if (CurrentChildModule->GetClass() == StandardMagazine)
+		{
+			return;
+		}
+		break;
+	}
+
+	const TSubclassOf<AOPAG_ModuleBase> TempModuleClass = CurrentChildModule->GetClass();
+	const FOPAG_GunStats TempModuleStats = CurrentChildModule->Stats;
+	const EModuleRarity TempModuleRarity = CurrentChildModule->Rarity;
+	const int TempModuleEquippableFireTypes = CurrentChildModule->EquippableFireTypes;
+
+	// Destroy ChildActor
+	ChildModule->DestroyChildActor();
+
+	// Spawn new module
+	const FVector SpawnLocation = Player->GetActorLocation();
+	const FRotator SpawnRotator = FRotator::ZeroRotator;
+	AActor* TempActor = GetWorld()->SpawnActor(TempModuleClass, &SpawnLocation, &SpawnRotator);
+	AOPAG_ModuleBase* TempModule = Cast<AOPAG_ModuleBase>(TempActor);
+	TempModule->ApplyForce_Implementation(Force);
+
+	// If the module isn't the standard, so is important attach the standard 
+	switch (TempModule->Type)
+	{
+	case EModuleTypes::Barrel:
+		CreateModule(ChildModule, StandardBarrel);
+		break;
+	case EModuleTypes::Stock:
+		CreateModule(ChildModule, StandardStock);
+		break;
+	case EModuleTypes::Grip:
+		CreateModule(ChildModule, StandardGrip);
+		break;
+	case EModuleTypes::Magazine:
+		CreateModule(ChildModule, StandardMagazine);
+		break;
+	}
+}
+
 UCameraComponent* AOPAG_ModularGun::GetSightCamera() const
 {
 	if (Sight->GetChildActor())
