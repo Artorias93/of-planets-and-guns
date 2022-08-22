@@ -46,16 +46,11 @@ void AOPAG_RoomManager::PreInitializeComponents()
 	const auto World = AActor::GetWorld();
 	if (World != nullptr)
 	{
-		const auto GameState = World->GetGameState();;
-		if (GameState != nullptr && GameState->HasBegunPlay())
+		const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
+		if (GI)
 		{
-			const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
-			if (GI)
-			{
-				GI->GetEventManager()->RoomSpawned.Broadcast(this);
-				GI->GetEventManager()->StageDifficultyUpdated.AddDynamic(this, &AOPAG_RoomManager::OnStageDifficultyUpdated);
-				return;
-			}
+			GI->GetEventManager()->RoomSpawned.Broadcast(this);
+			GI->GetEventManager()->StageDifficultyUpdated.AddDynamic(this, &AOPAG_RoomManager::OnStageDifficultyUpdated);
 		}
 	}
 }
