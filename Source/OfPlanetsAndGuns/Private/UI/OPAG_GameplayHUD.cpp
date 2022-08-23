@@ -173,11 +173,12 @@ void AOPAG_GameplayHUD::HideModuleCompareView()
 	}
 }
 
-void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName)
+void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName, 
+	const EFireTypes OtherGunType)
 {
 	if (GunCompareViewWidget) {
 		GunCompareViewWidget->AddToViewport(3);
-		GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName);
+		GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
 	}
 }
 
@@ -202,7 +203,7 @@ void AOPAG_GameplayHUD::ShowGameOverView()
 	}
 }
 
-void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, FString InteractText)
+void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, const FString InteractText)
 {
 	if (InteractViewWidget) {
 		InteractViewWidget->AddToViewport(3);

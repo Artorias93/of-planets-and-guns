@@ -60,7 +60,8 @@ const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModule
 const int, EquippableTypes);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FLookedAtGun, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, OtherGunStats, const FString, OtherGunName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FLookedAtGun, const FOPAG_GunStats, GunStats, 
+const FOPAG_GunStats, OtherGunStats, const FString, OtherGunName, const EFireTypes, OtherGunType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);

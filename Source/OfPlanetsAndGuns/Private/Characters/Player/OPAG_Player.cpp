@@ -773,7 +773,7 @@ void AOPAG_Player::UpdateComparison() {
 			const FOPAG_GunStats OtherGunStats = Gun->Stats;
 			const FString OtherGunName = (Gun->Name).ToString();
 
-			EMS->LookedAtGun.Broadcast(PrimaryGun->Stats, OtherGunStats, OtherGunName);
+			EMS->LookedAtGun.Broadcast(PrimaryGun->Stats, OtherGunStats, OtherGunName, Gun->FireType);
 
 			PreviousLookedAtModule = InteractableObject;
 		}

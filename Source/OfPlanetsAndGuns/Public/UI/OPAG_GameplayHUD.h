@@ -83,7 +83,8 @@ public:
 	void HideModuleCompareView();
 
 	UFUNCTION()
-	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName);
+	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName,
+		const EFireTypes OtherGunType);
 	UFUNCTION()
 	void HideGunCompareView();
 
@@ -91,7 +92,7 @@ public:
 	void ShowGameOverView();
 
 	UFUNCTION()
-	void ShowInteractView(bool bCanInteract, FString InteractText);
+	void ShowInteractView(bool bCanInteract, const FString InteractText);
 	UFUNCTION()
 	void HideInteractView();
 };
