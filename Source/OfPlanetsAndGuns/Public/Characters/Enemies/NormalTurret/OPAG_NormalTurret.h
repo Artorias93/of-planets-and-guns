@@ -41,6 +41,9 @@ protected:
 
 	FVector GetRandomImpulseVector() const;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Normal Turret")
+		float ExplosionPower = 900.f;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
 		float Damage;
 

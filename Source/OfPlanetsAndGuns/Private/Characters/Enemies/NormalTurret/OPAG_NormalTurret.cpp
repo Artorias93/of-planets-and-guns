@@ -148,9 +148,9 @@ TArray<AActor*> AOPAG_NormalTurret::GetAllActorsToIgnore()
 //Returns a random vector in a range (the bounds of the range can be set in editor)
 FVector AOPAG_NormalTurret::GetRandomImpulseVector() const
 {
-	return FVector(FMath::FRandRange(-900.f, 900.f),
-		FMath::FRandRange(-900.f, 900.f),
-		FMath::FRandRange(-900.f, 900.f));
+	return FVector(FMath::FRandRange(-ExplosionPower, ExplosionPower),
+		FMath::FRandRange(-ExplosionPower, ExplosionPower),
+		FMath::FRandRange(-ExplosionPower, ExplosionPower));
 }
 
 UNiagaraComponent* AOPAG_NormalTurret::GetLaserBeam() const
