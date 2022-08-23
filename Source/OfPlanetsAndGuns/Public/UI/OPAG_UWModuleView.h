@@ -24,6 +24,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWModuleView : public UUserWidget
 		UTextBlock* ModuleName;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ModuleRarity;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* ModuleType;
 
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* DamageText;
@@ -74,7 +76,7 @@ public:
 public:
 	UFUNCTION()
 		void UpdateModuleValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& CurrentModuleStats, 
-			const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
+			const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType);
 
 	void NativeConstruct();
 

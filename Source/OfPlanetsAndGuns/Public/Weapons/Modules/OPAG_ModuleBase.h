@@ -57,6 +57,7 @@ public:
 	void SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
 
 	static FString GetRarityName(EModuleRarity ModuleRarity);
+	static FString GetTypeName(EModuleTypes ModuleType);
 
 	UPrimitiveComponent* GetSphereComponent() const;
 

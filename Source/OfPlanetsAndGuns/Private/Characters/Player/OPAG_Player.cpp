@@ -570,8 +570,6 @@ void AOPAG_Player::ResetFPSCamera()
 #pragma region LookAtInteractable
 void AOPAG_Player::InteractWithItem()
 {
-	//EMS->LookedAtInteractable
-
 	if (InteractableObject && 
 		InteractableObject->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()) &&
 		IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
@@ -791,7 +789,7 @@ void AOPAG_Player::UpdateComparison() {
 			}
 
 			EMS->LookedAtModule.Broadcast(PrimaryGun->Stats, CurrentModuleStats, Module->Stats,
-				Module->Name, Module->Rarity);
+				Module->Name, Module->Rarity, Module->Type);
 
 			PreviousLookedAtModule = InteractableObject;
 		}

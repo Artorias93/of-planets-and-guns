@@ -57,6 +57,14 @@ FString AOPAG_ModuleBase::GetRarityName(EModuleRarity ModuleRarity)
 	return RarityName;
 }
 
+FString AOPAG_ModuleBase::GetTypeName(EModuleTypes ModuleType)
+{
+	FString TypeName;
+	UEnum::GetValueAsString(ModuleType, TypeName);
+	TypeName.RemoveAt(0, 14, true);
+	return TypeName;
+}
+
 UPrimitiveComponent* AOPAG_ModuleBase::GetSphereComponent() const
 {
 	return Sphere;

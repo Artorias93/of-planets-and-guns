@@ -13,10 +13,11 @@ void UOPAG_UWModuleView::NativeConstruct()
 }
 
 void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& CurrentModuleStats,
-	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity)
+	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType)
 {
 	ModuleName->SetText(FText::FromString(OtherModuleName));
 	ModuleRarity->SetText(FText::FromString(AOPAG_ModuleBase::GetRarityName(OtherModuleRarity)));
+	ModuleType->SetText(FText::FromString(AOPAG_ModuleBase::GetTypeName(OtherModuleType)));
 
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, CurrentModuleStats.Damage, OtherModuleStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);
