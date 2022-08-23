@@ -77,7 +77,8 @@ public:
 
 	UFUNCTION()
 	void ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule,
-		const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType);
+		const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, 
+		const EModuleTypes OtherModuleType, const int EquippableTypes);
 	UFUNCTION()
 	void HideModuleCompareView();
 

@@ -11,7 +11,7 @@
 void UOPAG_UWInteractView::NativeConstruct()
 {
 	Super::NativeConstruct();
-	BindEvents();
+	//BindEvents();
 }
 
 void UOPAG_UWInteractView::BindEvents()

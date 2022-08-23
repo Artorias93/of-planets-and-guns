@@ -54,9 +54,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountDecrement);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLookedAtInteractable, bool, IsInteractable, FString, InteractText);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtInteractable);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FLookedAtModule, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, CurrentModule, 
-const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_SevenParams(FLookedAtModule, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, CurrentModule, 
+const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
+const int, EquippableTypes);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FLookedAtGun, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, OtherGunStats, const FString, OtherGunName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtGun);
 

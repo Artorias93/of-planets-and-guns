@@ -28,6 +28,15 @@ class OFPLANETSANDGUNS_API UOPAG_UWModuleView : public UUserWidget
 		UTextBlock* ModuleType;
 
 	UPROPERTY(meta = (BindWidget))
+		UImage* FullyAutomaticIcon;
+	UPROPERTY(meta = (BindWidget))
+		UImage* Burst3Icon;
+	UPROPERTY(meta = (BindWidget))
+		UImage* ShotgunIcon;
+	UPROPERTY(meta = (BindWidget))
+		UImage* SingleShotIcon;
+
+	UPROPERTY(meta = (BindWidget))
 		UTextBlock* DamageText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* FireRateText;
@@ -76,7 +85,8 @@ public:
 public:
 	UFUNCTION()
 		void UpdateModuleValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& CurrentModuleStats, 
-			const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType);
+			const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, 
+			const EModuleTypes OtherModuleType, const int EquippableTypes);
 
 	void NativeConstruct();
 

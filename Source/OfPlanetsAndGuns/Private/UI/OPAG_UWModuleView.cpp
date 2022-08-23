@@ -6,6 +6,7 @@
 #include "Kismet/KismetTextLibrary.h"
 #include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "Components/TextBlock.h"
+#include "Components/Image.h"
 
 void UOPAG_UWModuleView::NativeConstruct()
 {
@@ -13,11 +14,37 @@ void UOPAG_UWModuleView::NativeConstruct()
 }
 
 void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& CurrentModuleStats,
-	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType)
+	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType, 
+	const int EquippableTypes)
 {
+	FullyAutomaticIcon->SetBrushTintColor(FLinearColor::White);
+	SingleShotIcon->SetBrushTintColor(FLinearColor::White);
+	Burst3Icon->SetBrushTintColor(FLinearColor::White);
+	ShotgunIcon->SetBrushTintColor(FLinearColor::White);
+
 	ModuleName->SetText(FText::FromString(OtherModuleName));
 	ModuleRarity->SetText(FText::FromString(AOPAG_ModuleBase::GetRarityName(OtherModuleRarity)));
 	ModuleType->SetText(FText::FromString(AOPAG_ModuleBase::GetTypeName(OtherModuleType)));
+	
+	int ResAR = EquippableTypes;
+	bool AR = ResAR & 1;
+	if (AR)
+		FullyAutomaticIcon->SetBrushTintColor(FLinearColor::Blue);
+
+	int ResSs = ResAR >> 1;
+	bool Ss = ResSs & 1;
+	if (Ss)
+		SingleShotIcon->SetBrushTintColor(FLinearColor::Blue);
+
+	int ResB3 = ResSs >> 1;
+	bool B3 = ResB3 & 1;
+	if (B3)
+		Burst3Icon->SetBrushTintColor(FLinearColor::Blue);
+
+	int ResShg = ResB3 >> 1;
+	bool Shg = ResShg & 1;
+	if (Shg)
+		ShotgunIcon->SetBrushTintColor(FLinearColor::Blue);
 
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, CurrentModuleStats.Damage, OtherModuleStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);

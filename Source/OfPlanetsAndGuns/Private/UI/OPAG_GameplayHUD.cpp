@@ -32,7 +32,6 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->LookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::ShowGunCompareView);
 		EMS->UnlookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::HideGunCompareView);
 		EMS->PlayerDied.AddDynamic(this, &AOPAG_GameplayHUD::ShowGameOverView);
-		//
 		EMS->LookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::ShowInteractView);
 		EMS->UnlookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::HideInteractView);
 	}
@@ -158,11 +157,12 @@ void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 }
 
 void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, 
-	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType)
+	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
+	const int EquippableTypes)
 {
 	if (ModuleViewWidget) {
 		ModuleViewWidget->AddToViewport(3);
-		ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity, OtherModuleType);
+		ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity, OtherModuleType, EquippableTypes);
 	}
 }
 
