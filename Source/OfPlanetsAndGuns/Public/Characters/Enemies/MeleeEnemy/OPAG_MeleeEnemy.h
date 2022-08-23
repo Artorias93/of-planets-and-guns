@@ -22,24 +22,24 @@ public:
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
 	virtual void Death() override;
 
-private:
+protected:
 
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void OnAttackBegin(UAnimMontage* Montage);
+	virtual void OnAttackBegin(UAnimMontage* Montage);
 
 	UFUNCTION()
 	void OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload& NotifyPayload);
 
 	UFUNCTION()
-	void OnAttackEnd(UAnimMontage* Montage, bool bInterrupted);
+	virtual void OnAttackEnd(UAnimMontage* Montage, bool bInterrupted);
 
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
 
-private: 
+protected: 
 
 	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
 	UAnimMontage* MeleeAttackMontage;

@@ -17,6 +17,7 @@
 #include "Rooms/OPAG_RoomStreamingVolume.h"
 #include "Interactables/OPAG_LootBox.h"
 #include "Managers/RoomManager/OPAG_LootManagerComponent.h"
+#include "Rooms/OPAG_LootSpawnPoint.h"
 
 
 // Sets default values
@@ -45,16 +46,11 @@ void AOPAG_RoomManager::PreInitializeComponents()
 	const auto World = AActor::GetWorld();
 	if (World != nullptr)
 	{
-		const auto GameState = World->GetGameState();;
-		if (GameState != nullptr && GameState->HasBegunPlay())
+		const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
+		if (GI)
 		{
-			const UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(GetGameInstance());
-			if (GI)
-			{
-				GI->GetEventManager()->RoomSpawned.Broadcast(this);
-				GI->GetEventManager()->StageDifficultyUpdated.AddDynamic(this, &AOPAG_RoomManager::OnStageDifficultyUpdated);
-				return;
-			}
+			GI->GetEventManager()->RoomSpawned.Broadcast(this);
+			GI->GetEventManager()->StageDifficultyUpdated.AddDynamic(this, &AOPAG_RoomManager::OnStageDifficultyUpdated);
 		}
 	}
 }
@@ -95,9 +91,10 @@ void AOPAG_RoomManager::UpdateData()
 			It->UpdateAttachPointData(this);
 		}
 
-		for (TActorIterator<AOPAG_LootBox> It(World); It; ++It)
+		LootManager->Spawners.Empty();
+		for (TActorIterator<AOPAG_LootSpawnPoint> It(World); It; ++It)
 		{
-			LootManager->LootBox = *It;
+			LootManager->Spawners.Add(*It);
 		}
 
 		if (DataTable != nullptr)
@@ -182,7 +179,10 @@ void AOPAG_RoomManager::OnStageDifficultyUpdated()
 	if (!bIsAwaitingDifficultyUpdate) return;
 	bIsAwaitingDifficultyUpdate = false;
 
-	LootManager->GenerateLoot(0);
+	UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
+	checkf(GI, TEXT("Couldn't find Game Instance!"));
+
+	LootManager->GenerateLoot(GI->GetStageDifficulty());
 
 	if (EnemyManager->GetSpawnerCount() == 0)
 	{

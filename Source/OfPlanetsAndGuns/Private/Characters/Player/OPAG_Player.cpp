@@ -666,6 +666,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		PrimaryGun->SetAmmoParams(NewAmmoCurrent, NewAmmoMax);
 		PrimaryGun->CreateAndAttachAllModules(NewGunModules);
 		CurrentGun = PrimaryGun;
+		DebugCurretGunStats = CurrentGun->Stats;
 	}
 
 	// Spawn the old primary gun in scene
@@ -673,6 +674,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	AOPAG_ModularGun* OldGun = GetWorld()->SpawnActor<AOPAG_ModularGun>(OldGunClass, GunSpawnLocation, FRotator::ZeroRotator);
 	OldGun->SetAmmoParams(OldAmmoCurrent, OldAmmoMax);
 	OldGun->CreateAndAttachAllModules(OldGunModules);
+	OldGun->DetachAllModules(CalculateThrowForce());
 	OldGun->ApplyForce_Implementation(CalculateThrowForce());
 }
 

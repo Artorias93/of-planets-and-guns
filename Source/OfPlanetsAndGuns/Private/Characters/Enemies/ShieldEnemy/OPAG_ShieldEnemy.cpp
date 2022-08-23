@@ -12,6 +12,10 @@ AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	//When the melee walks it doesn't have to look at the player, or it slides on the ground
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationYaw = false;
+
 	//Components creation
 	DamageCollisionBox = CreateDefaultSubobject<UBoxComponent>("Attack Damage Collision Box Component");
 	if(DamageCollisionBox)
@@ -65,7 +69,7 @@ void AOPAG_ShieldEnemy::BeginPlay()
 	{
 		AnimInstance->OnMontageStarted.AddDynamic(this, &AOPAG_ShieldEnemy::OnAttackBegin);
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &AOPAG_ShieldEnemy::OnAttackNotify);
-		AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_ShieldEnemy::OnAttackEnd);
+		//AnimInstance->OnMontageEnded.AddDynamic(this, &AOPAG_ShieldEnemy::OnAttackEnd);
 	}
 
 	bIsCharging = false;
@@ -79,9 +83,18 @@ void AOPAG_ShieldEnemy::Attack()
 //Stops the enemy's ability to turn in the direction of the focus actor during the attack animation 
 void AOPAG_ShieldEnemy::OnAttackBegin(UAnimMontage* Montage)
 {
-	bUseControllerRotationYaw = false;
+	//Locks the horizontal rotation for the duration of the attack animation
+	//bUseControllerRotationYaw = false;
+	//Locks the Y axis of the rotation so that the enemy is never rotated upwards or downwards while attacking
+	SetActorRotation(FRotator(0.f, GetActorRotation().Yaw, GetActorRotation().Roll));
 }
 
+//Resumes the enemy's ability to turn in the direction of the focus actor after the attack animation is done
+void AOPAG_ShieldEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
+{
+	//Resumes the horizontal rotation following the controller's
+	//bUseControllerRotationYaw = true;
+}
 
 //The attack collision & damage is computed only when the animation montage's notify is reached
 void AOPAG_ShieldEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointNotifyPayload& NotifyPayload)
@@ -106,12 +119,6 @@ void AOPAG_ShieldEnemy::OnAttackNotify(FName FunctionName, const FBranchingPoint
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("MISS..."));
 		}
 	}	
-}
-
-//Resumes the enemy's ability to turn in the direction of the focus actor after the attack animation is done
-void AOPAG_ShieldEnemy::OnAttackEnd(UAnimMontage* Montage, bool bInterrupted)
-{
-	bUseControllerRotationYaw = true;
 }
 
 void AOPAG_ShieldEnemy::Death()
