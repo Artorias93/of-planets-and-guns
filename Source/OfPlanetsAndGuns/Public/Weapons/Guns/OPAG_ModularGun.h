@@ -50,6 +50,9 @@ public:
 
 public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	float PriceBase = .0f;
+
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	FOPAG_GunStats BaseStats;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
@@ -84,6 +87,8 @@ public:
 	void ApplyForce_Implementation(const FVector Force) override;
 	void ApplyFly_Implementation() override;
 	void FlyRotationTimer_Implementation() override;
+	bool CanBuy_Implementation() override;
+	const float GetPriceTotal_Implementation() override;
 
 	// Setter and Getter
 	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);

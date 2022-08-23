@@ -16,6 +16,8 @@
 #include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
 #include <Kismet/GameplayStatics.h>
+#include "Interactables/OPAG_Vendor.h"
+#include "Characters/Player/OPAG_InventorySystemComponent.h"
 
 AOPAG_ModularGun::AOPAG_ModularGun()
 {
@@ -27,6 +29,39 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	Magazine = CreateDefaultSubobject<UChildActorComponent>(TEXT("Magazine"));
 	Sight = CreateDefaultSubobject<UChildActorComponent>(TEXT("Sight"));
 	Accessory = CreateDefaultSubobject<UChildActorComponent>(TEXT("Accessory"));
+}
+
+const float AOPAG_ModularGun::GetPriceTotal_Implementation()
+{
+	float PriceTotal = .0f;
+
+	PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Barrel));
+	PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Stock));
+	PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Grip));
+	PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Magazine));
+
+	if(GetModule(Sight) != nullptr)
+		PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Sight));
+	if(GetModule(Accessory) != nullptr)
+		PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Accessory));
+
+	return PriceTotal;
+}
+
+bool AOPAG_ModularGun::CanBuy_Implementation()
+{
+	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (Player == nullptr)
+	{
+		return false;
+	}
+
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	if (Vendor != nullptr && Player->InventorySystemComp->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
+	{
+		return true;
+	}
+	return false;
 }
 
 void AOPAG_ModularGun::FlyRotationTimer_Implementation()

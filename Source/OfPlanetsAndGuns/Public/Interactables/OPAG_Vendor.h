@@ -11,6 +11,9 @@
 
 class UStaticMeshComponent;
 class UBoxComponent;
+class UTextRenderComponent;
+class UChildActorComponent;
+class UOPAG_EventManagerSubsystem;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Vendor : public AActor, public IOPAG_InteractableInterface
@@ -32,13 +35,26 @@ public:
 
 	// Positions of the two guns and three modules
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		USceneComponent* MerchSpawnPoint_Gun1;
+		UChildActorComponent* ChildActor_Gun1;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		USceneComponent* MerchSpawnPoint_Gun2;
+		UChildActorComponent* ChildActor_Gun2;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		USceneComponent* MerchSpawnPoint_Module1;
+		UChildActorComponent* ChildActor_Module1;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		USceneComponent* MerchSpawnPoint_Module2;
+		UChildActorComponent* ChildActor_Module2;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UTextRenderComponent* PriceTextRender_Gun1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UTextRenderComponent* PriceTextRender_Gun2;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UTextRenderComponent* PriceTextRender_Module1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UTextRenderComponent* PriceTextRender_Module2;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UDataTable* DataTableGuns;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -49,6 +65,7 @@ public:
 	bool bIsInfinitelyInteractable = false;
 
 private:
+	UOPAG_EventManagerSubsystem* EMS;
 	TArray<FOPAG_ModuleList*> ModulesList;
 	TArray<FOPAG_GunList*> GunsList;
 	FOPAG_GunModules Modules;
@@ -70,7 +87,10 @@ public:
 	virtual bool CanInteract_Implementation() override;
 
 	void SpawnItem(const float RoomDifficulty);
-
 	void AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue);
+
+public:
+	UFUNCTION() void DisableGunTextInVendor(AOPAG_ModularGun* Gun);
+	UFUNCTION() void DisableModuleTextInVendor(AOPAG_ModuleBase* Module);
 
 };

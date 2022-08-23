@@ -12,6 +12,8 @@
 class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomManager;
 class AOPAG_Enemy;
+class AOPAG_ModularGun;
+class AOPAG_ModuleBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStartPlanet, int, PlanetIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadMainMenu);
@@ -79,6 +81,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetFPSCamera);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUsePotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableGunTextInVendor, AOPAG_ModularGun*, Gun);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableModuleTextInVendor, AOPAG_ModuleBase*, Module);
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
@@ -227,5 +232,11 @@ public:
 		FActiveDash ActiveDash;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
-		FActiveGunAbility ActiveGunAbility;
+		FActiveGunAbility ActiveGunAbility; 
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Vendor")
+	FDisableGunTextInVendor DisableGunTextInVendor;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Vendor")
+	FDisableModuleTextInVendor DisableModuleTextInVendor;
 };

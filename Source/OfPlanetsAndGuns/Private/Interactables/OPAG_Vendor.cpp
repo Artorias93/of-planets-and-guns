@@ -8,6 +8,10 @@
 #include "Characters/Player/OPAG_Player.h"
 #include <Kismet/GameplayStatics.h>
 #include <Components/BoxComponent.h>
+#include <Components/TextRenderComponent.h>
+#include <Components/ChildActorComponent.h>
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "../../Public/Managers/OPAG_GameInstance.h"
 
 // Sets default values
 AOPAG_Vendor::AOPAG_Vendor()
@@ -32,18 +36,46 @@ AOPAG_Vendor::AOPAG_Vendor()
 		Pedestal->SetupAttachment(RootComponent);
 	}
 
-	MerchSpawnPoint_Gun1 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Gun1");
-	if (MerchSpawnPoint_Gun1)
-		MerchSpawnPoint_Gun1->SetupAttachment(RootComponent);
-	MerchSpawnPoint_Gun2 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Gun2");
-	if (MerchSpawnPoint_Gun2)
-		MerchSpawnPoint_Gun2->SetupAttachment(RootComponent);
-	MerchSpawnPoint_Module1 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Module1");
-	if (MerchSpawnPoint_Module1)
-		MerchSpawnPoint_Module1->SetupAttachment(RootComponent);
-	MerchSpawnPoint_Module2 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Module2");
-	if (MerchSpawnPoint_Module2)
-		MerchSpawnPoint_Module2->SetupAttachment(RootComponent);
+	PriceTextRender_Gun1 = CreateDefaultSubobject<UTextRenderComponent>(TEXT("PriceTextRender_Gun1"));
+	if (PriceTextRender_Gun1)
+	{
+		PriceTextRender_Gun1->SetVisibility(false);
+		PriceTextRender_Gun1->SetupAttachment(RootComponent);
+	}
+
+	PriceTextRender_Gun2 = CreateDefaultSubobject<UTextRenderComponent>(TEXT("PriceTextRender_Gun2"));
+	if (PriceTextRender_Gun2)
+	{
+		PriceTextRender_Gun2->SetVisibility(false);
+		PriceTextRender_Gun2->SetupAttachment(RootComponent);
+	}
+
+	PriceTextRender_Module1 = CreateDefaultSubobject<UTextRenderComponent>(TEXT("PriceTextRender_Module1"));
+	if (PriceTextRender_Module1)
+	{
+		PriceTextRender_Module1->SetVisibility(false);
+		PriceTextRender_Module1->SetupAttachment(RootComponent);
+	}
+
+	PriceTextRender_Module2 = CreateDefaultSubobject<UTextRenderComponent>(TEXT("PriceTextRender_Module2"));
+	if (PriceTextRender_Module2)
+	{
+		PriceTextRender_Module2->SetVisibility(false);
+		PriceTextRender_Module2->SetupAttachment(RootComponent);
+	}
+
+	ChildActor_Gun1 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Gun1");
+	if (ChildActor_Gun1)
+		ChildActor_Gun1->SetupAttachment(RootComponent);
+	ChildActor_Gun2 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Gun2");
+	if (ChildActor_Gun2)
+		ChildActor_Gun2->SetupAttachment(RootComponent);
+	ChildActor_Module1 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Module1");
+	if (ChildActor_Module1)
+		ChildActor_Module1->SetupAttachment(RootComponent);
+	ChildActor_Module2 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Module2");
+	if (ChildActor_Module2)
+		ChildActor_Module2->SetupAttachment(RootComponent);
 }
 
 void AOPAG_Vendor::PopulateGunAndModuleArray()
@@ -63,7 +95,12 @@ void AOPAG_Vendor::PopulateGunAndModuleArray()
 void AOPAG_Vendor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	check(EMS);
 	
+	EMS->DisableGunTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableGunTextInVendor);
+	EMS->DisableModuleTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableModuleTextInVendor);
 }
 
 // Called every frame
@@ -77,7 +114,6 @@ void AOPAG_Vendor::Unlock()
 {
 	bIsInteractable = true;
 }
-
 
 void AOPAG_Vendor::Interact_Implementation()
 {
@@ -107,9 +143,18 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 	}
 
 	TArray<AOPAG_ModularGun*> TempGunsList;
+
+	TArray<UChildActorComponent*> ChildActorGuns;
+	ChildActorGuns.Add(ChildActor_Gun1);
+	ChildActorGuns.Add(ChildActor_Gun2);
+
 	TArray<FVector> TempGunsSpawnLocation;
-	TempGunsSpawnLocation.Add(MerchSpawnPoint_Gun1->GetComponentLocation());
-	TempGunsSpawnLocation.Add(MerchSpawnPoint_Gun2->GetComponentLocation());
+	TempGunsSpawnLocation.Add(ChildActor_Gun1->GetComponentLocation());
+	TempGunsSpawnLocation.Add(ChildActor_Gun2->GetComponentLocation());
+
+	TArray<UTextRenderComponent*> TempGunsTextRender;
+	TempGunsTextRender.Add(PriceTextRender_Gun1);
+	TempGunsTextRender.Add(PriceTextRender_Gun2);
 
 	for (int i = 0; i < 2; i++) {
 		const float RandomGunChance = FMath::RandRange(0.f, 100.f);
@@ -122,8 +167,12 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 			Sum += Gun->GunChance;
 			if (RandomGunChance <= Sum)
 			{			
-				AOPAG_ModularGun* NewGun = Cast<AOPAG_ModularGun>(GetWorld()->SpawnActor(Gun->GunClass, &TempGunsSpawnLocation[i], &SpawnRotator));
-				NewGun->ApplyFly_Implementation();
+				ChildActorGuns[i]->SetChildActorClass(Gun->GunClass);
+
+				AOPAG_ModularGun* NewGun = Cast<AOPAG_ModularGun>(ChildActorGuns[i]->GetChildActor());
+				TempGunsTextRender[i]->SetVisibility(true);
+				IOPAG_InteractableInterface::Execute_ApplyFly(NewGun);
+
 				TempGunsList.Add(NewGun);
 
 				GunsList.Remove(Gun); // to avoid two guns of same type
@@ -132,12 +181,21 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 		}
 	}
 	if (TempGunsList.Num() != 2) {
-		AOPAG_ModularGun* NewGun = Cast<AOPAG_ModularGun>(GetWorld()->SpawnActor(GunsList[0]->GunClass, &TempGunsSpawnLocation[1], &SpawnRotator));
-		NewGun->ApplyFly_Implementation();
+		ChildActorGuns[1]->SetChildActorClass(GunsList[0]->GunClass);
+
+		AOPAG_ModularGun* NewGun = Cast<AOPAG_ModularGun>(ChildActorGuns[1]->GetChildActor());
+		IOPAG_InteractableInterface::Execute_ApplyFly(NewGun);
+
 		TempGunsList.Add(NewGun);
 	}
-	AttachModulesToGun(*TempGunsList[0], false, RoomDifficulty );
+
+	// Attach modules to guns
+	AttachModulesToGun(*TempGunsList[0], false, RoomDifficulty);
 	AttachModulesToGun(*TempGunsList[1], true, RoomDifficulty);
+
+	// Set price to texts
+	TempGunsTextRender[0]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[0])));
+	TempGunsTextRender[1]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[1])));
 
 	// Spawn two modules
 	if (ModulesList.Num() == 0)
@@ -148,11 +206,19 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 
 	// Init modules list to spawn
 	TArray<TSubclassOf<AActor>> ModulesToSpawnList;
+
+	TArray<UChildActorComponent*> ChildActorModules;
+	ChildActorModules.Add(ChildActor_Module1);
+	ChildActorModules.Add(ChildActor_Module2);
 	
 	// Init modules spawn locations
 	TArray<FVector> TempModulesSpawnLocation;
-	TempModulesSpawnLocation.Add(MerchSpawnPoint_Module1->GetComponentLocation());
-	TempModulesSpawnLocation.Add(MerchSpawnPoint_Module2->GetComponentLocation());
+	TempModulesSpawnLocation.Add(ChildActor_Module1->GetComponentLocation());
+	TempModulesSpawnLocation.Add(ChildActor_Module2->GetComponentLocation());
+
+	TArray<UTextRenderComponent*> TempModulesTextRender;
+	TempModulesTextRender.Add(PriceTextRender_Module1);
+	TempModulesTextRender.Add(PriceTextRender_Module2);
 
 	// Init player for check fire type gun
 	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
@@ -169,8 +235,12 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 
 		// Select random module
 		TSubclassOf<AActor> NewModuleClass = UOPAG_LootManagerComponent::SelectRandomModules(ModulesList, RoomDifficulty, FireMask);
-		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(GetWorld()->SpawnActor(NewModuleClass, &TempModulesSpawnLocation[i], &SpawnRotator));
-		NewModule->ApplyFly_Implementation();
+		ChildActorModules[i]->SetChildActorClass(NewModuleClass);
+
+		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(ChildActorModules[i]->GetChildActor());
+		TempModulesTextRender[i]->SetVisibility(true);
+		TempModulesTextRender[i]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(NewModule)));
+		IOPAG_InteractableInterface::Execute_ApplyFly(NewModule);
 	}
 }
 
@@ -234,4 +304,28 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 	}
 
 	Gun.CreateAndAttachAllModules(ModulesStruct);
+}
+
+void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)
+{
+	if (ChildActor_Gun1->GetChildActor() == Gun)
+	{
+		PriceTextRender_Gun1->SetVisibility(false);
+	}
+	else if (ChildActor_Gun2->GetChildActor() == Gun)
+	{
+		PriceTextRender_Gun2->SetVisibility(false);
+	}
+}
+
+void AOPAG_Vendor::DisableModuleTextInVendor(AOPAG_ModuleBase* Module)
+{
+	if (ChildActor_Module1->GetChildActor() == Module)
+	{
+		PriceTextRender_Module1->SetVisibility(false);
+	}
+	else if (ChildActor_Module2->GetChildActor() == Module)
+	{
+		PriceTextRender_Module2->SetVisibility(false);
+	}
 }

@@ -33,4 +33,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void FlyRotationTimer();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool CanBuy();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	const float GetPriceTotal();
 };
