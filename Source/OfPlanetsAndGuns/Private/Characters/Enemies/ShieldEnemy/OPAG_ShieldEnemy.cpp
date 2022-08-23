@@ -29,7 +29,8 @@ AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 	SwordMesh = CreateDefaultSubobject<UStaticMeshComponent>("Sword Mesh Component");
 	if (SwordMesh)
 	{
-		SwordMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, "RightHandSocketShield");
+		SwordMesh->AttachToComponent(GetMesh(),
+			FAttachmentTransformRules::KeepRelativeTransform, "RightHandSocket");
 	}
 
 	ShieldMesh = CreateDefaultSubobject<UStaticMeshComponent>("Shield Mesh Component");
@@ -45,14 +46,14 @@ AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 	if(ParticleComponent1)
 	{
 		ParticleComponent1->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
-			"BoosterLeftSocket");
+			"LeftFootSocket");
 	}
 	
 	ParticleComponent2 = CreateDefaultSubobject<UParticleSystemComponent>("Booster Component 2");
 	if(ParticleComponent2)
 	{
 		ParticleComponent2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
-			"BoosterRightSocket");
+			"RightFootSocket");
 	}
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_ShieldEnemy::OnOverlapBegin);

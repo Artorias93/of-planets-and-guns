@@ -22,7 +22,7 @@ EBTNodeResult::Type UOPAG_TaskChangeChargeState::ExecuteTask(UBehaviorTreeCompon
 			{
 				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 				ShieldEnemy->GetShieldMesh()->AttachToComponent(ShieldEnemy->GetMesh(),
-					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "ChargingShieldSocket");
+					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "TopHeadSocket");
 				ShieldEnemy->TurnOnBoosters();
 				ShieldEnemy->GetCharacterMovement()->GravityScale = 0.f;
 				ShieldEnemy->bUseControllerRotationYaw = false;
