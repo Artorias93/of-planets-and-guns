@@ -52,7 +52,10 @@ protected:
 	class UAISenseConfig_Sight* PerceptionSightConfig;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UAISenseConfig_Damage* PerceptionDamageConfig;	
+	class UAISenseConfig_Damage* PerceptionDamageConfig;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UAISenseConfig_Hearing* PerceptionHearingConfig;
 	
 	FTimerHandle LoseSightTimerHandle;
 };
