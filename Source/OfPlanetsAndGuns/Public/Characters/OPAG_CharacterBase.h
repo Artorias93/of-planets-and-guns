@@ -42,6 +42,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void FellOutOfWorld(const UDamageType& dmgType) override;
 	virtual void Death();
 
 public:

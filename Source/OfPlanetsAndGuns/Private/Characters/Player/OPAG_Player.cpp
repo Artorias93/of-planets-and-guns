@@ -108,12 +108,6 @@ void AOPAG_Player::Death()
 	EMS->PlayerDied.Broadcast();
 }
 
-void AOPAG_Player::FellOutOfWorld(const UDamageType& dmgType)
-{
-	if (GetHealth() > 0.f)
-		ReceiveDamage(GetHealth() + 1.f); //+1 just to make sure it overkills
-}
-
 void AOPAG_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -877,34 +871,36 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 
 		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
 		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
+
+		if (StateToApply.PrimaryGun.GunClass)
+		{
+			PrimaryGunComponent->SetChildActorClass(StateToApply.PrimaryGun.GunClass);
+			if (PrimaryGunComponent->GetChildActor())
+			{
+				SwapGuns();
+
+				PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
+				PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
+
+				AttachDefaultGuns();
+
+				if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
+				{
+					PrimaryGun->AmmoCurrent = StateToApply.PrimaryGun.AmmoCurrent;
+					PrimaryGun->AmmoMax = StateToApply.PrimaryGun.AmmoMax;
+				}
+				if (StateToApply.bIsPrimaryActive) SwapGuns();
+
+				EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
+				EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
+
+			}
+		}
 	}
 
 	InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
 
-	if (StateToApply.PrimaryGun.GunClass)
-	{
-		PrimaryGunComponent->SetChildActorClass(StateToApply.PrimaryGun.GunClass);
-		if (PrimaryGunComponent->GetChildActor())
-		{
-			SwapGuns();
-
-			PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
-			PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
-
-			AttachDefaultGuns();
-
-			if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
-			{
-				PrimaryGun->AmmoCurrent = StateToApply.PrimaryGun.AmmoCurrent;
-				PrimaryGun->AmmoMax = StateToApply.PrimaryGun.AmmoMax;
-			}
-			if (StateToApply.bIsPrimaryActive) SwapGuns();
-
-			EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
-			EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
-
-		}
-	}
+	
 }
 #pragma endregion Timeline
 
