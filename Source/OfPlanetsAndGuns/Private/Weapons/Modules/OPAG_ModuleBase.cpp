@@ -22,6 +22,11 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 	}
 }
 
+FString AOPAG_ModuleBase::InteractString_Implementation()
+{
+	return "Pick up module [E]";
+}
+
 void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();

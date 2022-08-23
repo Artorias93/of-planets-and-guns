@@ -26,5 +26,8 @@ public:
 		bool CanInteract();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		FString InteractString();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void ApplyForce(const FVector Force);
 };

@@ -29,6 +29,11 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	Accessory = CreateDefaultSubobject<UChildActorComponent>(TEXT("Accessory"));
 }
 
+FString AOPAG_ModularGun::InteractString_Implementation()
+{
+	return "Swap gun [E]";
+}
+
 void AOPAG_ModularGun::ApplyForce_Implementation(const FVector Force)
 {
 	Receiver->SetSimulatePhysics(true);

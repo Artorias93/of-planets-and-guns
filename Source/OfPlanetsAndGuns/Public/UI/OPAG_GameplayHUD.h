@@ -55,6 +55,10 @@ private:
 		class UOPAG_UWGameOverView* GameOverViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWGameOverView> GameOverViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWInteractView* InteractViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWInteractView> InteractViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
@@ -84,4 +88,9 @@ public:
 
 	UFUNCTION()
 	void ShowGameOverView();
+
+	UFUNCTION()
+	void ShowInteractView(bool bCanInteract, FString InteractText);
+	UFUNCTION()
+	void HideInteractView();
 };

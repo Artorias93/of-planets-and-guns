@@ -48,6 +48,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* Accessory;
 
+
 public:
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	FOPAG_GunStats BaseStats;
@@ -116,6 +117,7 @@ public:
 	// Interactable methods
 	virtual void Interact_Implementation() override;
 	virtual bool CanInteract_Implementation() override;
+	FString InteractString_Implementation() override;
 
 	// Detach all modules
 	void DetachAllModules(const FVector Force);

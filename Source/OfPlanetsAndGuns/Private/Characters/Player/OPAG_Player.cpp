@@ -124,6 +124,8 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// Initialize the object seen by the player
 	InteractableObject = CheckLookAtInteractableItems();
 
+	UpdateInteractableMessage();
+
 	UpdateComparison();
 
 	if (Shield != nullptr)
@@ -568,6 +570,8 @@ void AOPAG_Player::ResetFPSCamera()
 #pragma region LookAtInteractable
 void AOPAG_Player::InteractWithItem()
 {
+	//EMS->LookedAtInteractable
+
 	if (InteractableObject && 
 		InteractableObject->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()) &&
 		IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
@@ -719,6 +723,37 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 		}
 	}
 	return nullptr;
+}
+
+void AOPAG_Player::UpdateInteractableMessage() {
+
+	if (bHasAlreadyLooked) {
+		bHasAlreadyLooked = InteractableObject != nullptr;
+		if (!bHasAlreadyLooked) {
+			EMS->UnlookedAtInteractable.Broadcast();
+		}
+	}
+
+	if (!bHasAlreadyLooked && InteractableObject) {
+		IOPAG_InteractableInterface* Int = Cast<IOPAG_InteractableInterface>(InteractableObject);
+
+		if (Int) {
+			bool bCanInteract = Int->CanInteract_Implementation();
+			FString str = Int->InteractString_Implementation();
+			EMS->LookedAtInteractable.Broadcast(bCanInteract, str);
+			bHasAlreadyLooked = true;
+		}
+	}
+
+	//DON'T TOUCH!
+	//if(b)
+	// b = Int != Nullptr;
+	//	if(!b)
+	//		EMS->UnLooked
+	// 
+	//if(!b && Int) 
+		//EMS -> LookedAtInt
+		//b = true;
 }
 
 void AOPAG_Player::UpdateComparison() {

@@ -31,14 +31,14 @@ class OFPLANETSANDGUNS_API UOPAG_UWHubView : public UUserWidget
 		UTextBlock* SightName;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* AccessoryName;
-	*/
+	
 
 	//Player's stuff
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* BoltsAmountText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* PotionsAmountText;
-
+	*/
 	UPROPERTY(meta = (BindWidget))
 		UButton* PlayButton;
 
@@ -52,7 +52,7 @@ public:
 		void UpdateModuleName(UTextBlock* TextBlock, const FString& Name);
 	*/
 	UFUNCTION()
-		void UpdateBoltsValue(const int Value);
+		void UpdateBoltsValue (int Value);
 	UFUNCTION()
-		void UpdatePotionsValue(const int Value);
+		void UpdatePotionsValue(int Value);
 };

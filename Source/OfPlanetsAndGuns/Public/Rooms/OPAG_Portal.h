@@ -23,7 +23,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Portal, Meta=(ExposeOnSpawn = true))
 	EStageType PortalType;
 
-
 private:
 
 
@@ -44,11 +43,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void Interact();
+
 	virtual void Interact_Implementation() override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool CanInteract();
+
 	virtual bool CanInteract_Implementation() override;
 
+	FString InteractString_Implementation() override;
 
 };

@@ -12,6 +12,7 @@
 #include "Blueprint/WidgetTree.h"
 
 void UOPAG_UWPlayerStatsView::NativeConstruct() {
+	Super::NativeConstruct();
 	BindEvents();
 }
 

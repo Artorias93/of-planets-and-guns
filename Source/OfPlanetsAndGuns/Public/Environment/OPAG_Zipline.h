@@ -70,6 +70,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool CanInteract();
+
 	virtual bool CanInteract_Implementation() override;
 
 private: 
@@ -96,5 +97,8 @@ private:
 
 	UFUNCTION()
 		void OverlapReset(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+public:
+	FString InteractString_Implementation() override;
 
 };

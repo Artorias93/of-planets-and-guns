@@ -45,6 +45,7 @@ public:
 
 	void ApplyForce_Implementation(const FVector Force) override;
 
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -66,6 +67,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		FString InteractString();
+	FString InteractString_Implementation() override;
 
 private:
 	void CheckIfPhysical() const;

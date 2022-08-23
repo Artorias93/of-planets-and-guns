@@ -9,6 +9,7 @@
 #include "UI/OPAG_UWLoadingScreenView.h"
 #include "UI/OPAG_UWModuleView.h"
 #include "UI/OPAG_UWGunCompareView.h"
+#include "UI/OPAG_UWInteractView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "UI/OPAG_UWGameOverView.h"
@@ -31,6 +32,9 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->LookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::ShowGunCompareView);
 		EMS->UnlookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::HideGunCompareView);
 		EMS->PlayerDied.AddDynamic(this, &AOPAG_GameplayHUD::ShowGameOverView);
+		//
+		EMS->LookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::ShowInteractView);
+		EMS->UnlookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::HideInteractView);
 	}
 }
 
@@ -94,6 +98,11 @@ void AOPAG_GameplayHUD::BeginPlay()
 	if (GameOverViewWidgetClass)
 	{
 		GameOverViewWidget = CreateWidget<UOPAG_UWGameOverView>(GetWorld(), GameOverViewWidgetClass);
+	}
+
+	if (InteractViewWidgetClass)
+	{
+		InteractViewWidget = CreateWidget<UOPAG_UWInteractView>(GetWorld(), InteractViewWidgetClass);
 	}
 }
 
@@ -190,5 +199,20 @@ void AOPAG_GameplayHUD::ShowGameOverView()
 
 	if (GameOverViewWidget) {
 		GameOverViewWidget->AddToViewport(3);
+	}
+}
+
+void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, FString InteractText)
+{
+	if (InteractViewWidget) {
+		InteractViewWidget->AddToViewport(3);
+		InteractViewWidget->UpdateInteractText(bCanInteract, InteractText);
+	}
+}
+
+void AOPAG_GameplayHUD::HideInteractView()
+{
+	if (InteractViewWidget) {
+		InteractViewWidget->RemoveFromViewport();
 	}
 }
