@@ -6,6 +6,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Damage.h"
+#include "Perception/AISenseConfig_Hearing.h"
 //My classes
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include "Characters/Player/OPAG_Player.h"
@@ -22,17 +23,17 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
 	PerceptionSightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AI Sight Config"));
 	PerceptionDamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("AI Damage Config"));
-
-	//Done directly in the blueprint
-	// PerceptionSightConfig->SightRadius = SightSenseRadius;
-	// PerceptionSightConfig->LoseSightRadius = LoseSightSenseRadius;
-	// PerceptionSightConfig->PeripheralVisionAngleDegrees = SightPeripheralVisionDegrees;
+	PerceptionHearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("AI Gearing Config"));
 	
 	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-	PerceptionSightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	PerceptionHearingConfig->DetectionByAffiliation.bDetectNeutrals = true;
+	PerceptionHearingConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	PerceptionHearingConfig->DetectionByAffiliation.bDetectFriendlies = true;
 	PerceptionComp->ConfigureSense(*PerceptionSightConfig);
 	PerceptionComp->ConfigureSense(*PerceptionDamageConfig);
+	PerceptionComp->ConfigureSense(*PerceptionHearingConfig);
 	PerceptionComp->SetDominantSense(PerceptionSightConfig->GetSenseImplementation());
 }
 

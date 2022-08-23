@@ -432,6 +432,8 @@ void AOPAG_Player::Shoot()
 		FVector Direction;
 		GetShootingDirection(StartLocation, Direction);
 		CurrentGun->Shoot(StartLocation, Direction, this);
+		//TODO: Should this be on the gun?
+		MakeNoise(1, this);
 		Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 		RecoilTimeline->PlayFromStart();
 
