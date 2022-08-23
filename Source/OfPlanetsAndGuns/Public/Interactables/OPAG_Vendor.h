@@ -4,6 +4,7 @@
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "GameFramework/Actor.h"
 #include "Weapons/Guns/OPAG_GunState.h"
+#include "Engine/DataTable.h"
 #include "OPAG_Vendor.generated.h"
 
 
@@ -32,13 +33,17 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		USceneComponent* MerchSpawnPoint_Module2;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		USceneComponent* MerchSpawnPoint_Module3;
-
+		UDataTable* DataTableGuns;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UDataTable* DataTableModules;
 
 private:
-	TArray<TSubclassOf<AActor>> Guns;
+	TArray<TSubclassOf<AActor>> GunsList;
+	TArray<TSubclassOf<AActor>> ModulesList;
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
+
+	void PopulateGunAndModuleArray();
 
 protected:
 	virtual void BeginPlay() override;

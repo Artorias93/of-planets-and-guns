@@ -13,28 +13,38 @@ AOPAG_Vendor::AOPAG_Vendor()
 	if (Pedestal)
 		RootComponent = Pedestal;
 
-	MerchSpawnPoint_Gun1 = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint_Gun1");
+	MerchSpawnPoint_Gun1 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Gun1");
 	if (MerchSpawnPoint_Gun1)
 		MerchSpawnPoint_Gun1->SetupAttachment(RootComponent);
-	MerchSpawnPoint_Gun2 = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint_Gun2");
+	MerchSpawnPoint_Gun2 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Gun2");
 	if (MerchSpawnPoint_Gun2)
 		MerchSpawnPoint_Gun2->SetupAttachment(RootComponent);
-	MerchSpawnPoint_Module1 = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint_Module1");
+	MerchSpawnPoint_Module1 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Module1");
 	if (MerchSpawnPoint_Module1)
 		MerchSpawnPoint_Module1->SetupAttachment(RootComponent);
-	MerchSpawnPoint_Module2 = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint_Module2");
+	MerchSpawnPoint_Module2 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Module2");
 	if (MerchSpawnPoint_Module2)
 		MerchSpawnPoint_Module2->SetupAttachment(RootComponent);
-	MerchSpawnPoint_Module3 = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint_Module3");
-	if (MerchSpawnPoint_Module3)
-		MerchSpawnPoint_Module3->SetupAttachment(RootComponent);
+}
 
+void AOPAG_Vendor::PopulateGunAndModuleArray()
+{
+	const FString Context;
+	if (DataTableModules)
+	{
+		DataTableModules->GetAllRows(Context, ModulesList);
+	}
+	if (DataTableGuns)
+	{
+		DataTableGuns->GetAllRows(Context, GunsList);
+	}
 }
 
 // Called when the game starts or when spawned
 void AOPAG_Vendor::BeginPlay()
 {
 	Super::BeginPlay();
+	PopulateGunAndModuleArray();
 	
 }
 
@@ -53,10 +63,10 @@ void AOPAG_Vendor::Unlock()
 void AOPAG_Vendor::SetGunMerchToSpawn(TArray<TSubclassOf<AActor>>& GunList)
 {
 	if (GunList.Num() != 2) {
-		UE_LOG(LogTemp, Warning, TEXT("SetGunMerchToSpawn expects 2 elements!"));
+		UE_LOG(LogTemp, Warning, TEXT("VENDOR: SetGunMerchToSpawn expects 2 elements!"));
 		return;
 	}
-	Guns = GunList;
+	GunsList = GunList;
 }
 
 void AOPAG_Vendor::SetModuleMerchToSpawn(FOPAG_GunModules& ModulesStruct)
@@ -83,8 +93,10 @@ bool AOPAG_Vendor::CanInteract_Implementation()
 // Call method for spawning all guns
 void AOPAG_Vendor::SpawnItem()
 {
-	if (Guns.Num() == 0)
+	
+	if (GunsList.Num() == 0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("VENDOR: Empty GunList as input to SpawnItem."));
 		return;
 	}
 
@@ -92,9 +104,9 @@ void AOPAG_Vendor::SpawnItem()
 	const FVector SpawnLocation_1 = MerchSpawnPoint_Gun1->GetComponentLocation();
 	const FVector SpawnLocation_2 = MerchSpawnPoint_Gun2->GetComponentLocation();
 	const FRotator SpawnRotator = FRotator::ZeroRotator;
-	AActor* Gun1 = GetWorld()->SpawnActor(Guns[0], &SpawnLocation_1, &SpawnRotator);
-	AActor* Gun2 = GetWorld()->SpawnActor(Guns[1], &SpawnLocation_2, &SpawnRotator);
-	Guns.Empty();
+	AActor* Gun1 = GetWorld()->SpawnActor(GunsList[0], &SpawnLocation_1, &SpawnRotator);
+	AActor* Gun2 = GetWorld()->SpawnActor(GunsList[1], &SpawnLocation_2, &SpawnRotator);
+	GunsList.Empty();
 
 	// gun is generated with random modules
 	if (AOPAG_ModularGun* GunModular1 = Cast<AOPAG_ModularGun>(Gun1))
