@@ -15,8 +15,9 @@ enum class ELootType : uint8
 	Gold,
 	Ammo,
 	Bolts,
+	Potion,
 	Module,
-	Gun,
+	Gun
 };
 
 USTRUCT(BlueprintType)

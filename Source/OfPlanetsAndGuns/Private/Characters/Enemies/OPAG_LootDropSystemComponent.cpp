@@ -16,29 +16,47 @@ void UOPAG_LootDropSystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PopulateLootChanceArray();
+
 	AOPAG_Enemy* Enemy = GetOwner<AOPAG_Enemy>();
 	if (Enemy) {
 		Owner = Enemy;
 	}
 }
 
+void UOPAG_LootDropSystemComponent::PopulateLootChanceArray()
+{
+	const FString Context;
+	if (LootChanceTable)
+		LootChanceTable->GetAllRows(Context, LootArray);
+	if (DropListTable)
+		DropListTable->GetAllRows(Context, DropArray);
+}
+
 void UOPAG_LootDropSystemComponent::DropLoot() const
 {
-	for (FOPAG_Loot Loot : LootArray)
-	{
-		float Chance = FMath::RandRange(0.f, 1.f);
+	float Chance = FMath::RandRange(0.f, 100.f);
 
-		if (Chance < Loot.DroppingChance) {
+	for (FOPAG_LootChance *Item : LootArray)
+	{
+		if (!Item) continue;
+		if (Chance < Item->LootChance) {
+
 
 			FVector SpawnLocation = Owner->GetActorLocation();
 
-			if (Loot.Drop) {
-				AOPAG_Drop* DropObj = GetWorld()->SpawnActor<AOPAG_Drop>(Loot.Drop, FVector::RightVector, FRotator::ZeroRotator);
+			for (FOPAG_DropList* Drop : DropArray) {
+				if (!Drop) continue;
+				if (Item->LootType == Drop->DropType) {
+					AOPAG_Drop* DropObj = GetWorld()->SpawnActor<AOPAG_Drop>(Drop->DropClass, SpawnLocation, FRotator::ZeroRotator);
 
-				if (DropObj) {
-					DropObj->Sphere->SetSimulatePhysics(true);
+					if (DropObj) {
+						DropObj->Sphere->SetSimulatePhysics(true);
+						return;
+					}
 				}
 			}
+
 		}
 	}
 }

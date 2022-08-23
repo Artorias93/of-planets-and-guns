@@ -105,6 +105,9 @@ void AOPAG_Enemy::Death()
 
 void AOPAG_Enemy::DropAndDespawn()
 {
+	// Drop loot
+	LootDropSystemComponent->DropLoot();
+
 	//Fill with everything from drops to enemy manager stuff
 
 	GetWorld()->GetTimerManager().ClearTimer(RagdollTimerHandle);
