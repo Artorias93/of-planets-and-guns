@@ -1,6 +1,7 @@
 #include "AI/OPAG_TaskCharge.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "NavigationSystem.h"
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
@@ -35,16 +36,21 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 					BoxTraceHalfSize, FRotator::ZeroRotator, TraceTypeQuery1,
 					false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true))
 				{
-					if(GEngine)
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE NOT FOUND"));
-					
-					AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
-
-					return EBTNodeResult::Succeeded;
+					if(const UNavigationSystemV1* const NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
+					{
+						FNavLocation NavLocation;
+						if(NavSystem->ProjectPointToNavigation(ChargePoint, NavLocation, QueryingExtent))
+						{
+							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE NOT FOUND"));
+                            					
+							AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
+                            
+							return EBTNodeResult::Succeeded;
+						}						
+					}					
 				}
-				if(GEngine)
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE FOUND"));
-			}			
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE FOUND"));
+			}
 		}
 	}
 	return EBTNodeResult::Failed;
