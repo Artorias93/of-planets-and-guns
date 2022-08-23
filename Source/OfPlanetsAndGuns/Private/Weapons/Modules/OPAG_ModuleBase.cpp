@@ -78,6 +78,20 @@ void AOPAG_ModuleBase::ApplyForce_Implementation(const FVector Force)
 	ModuleMesh->SetSimulatePhysics(true);
 	ModuleMesh->AddForce(Force, NAME_None, true);
 }
+
+void AOPAG_ModuleBase::ApplyFly_Implementation()
+{
+	ModuleMesh->SetSimulatePhysics(false);
+	GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModuleBase::FlyRotationTimer_Implementation, .01f, true);
+}
+
+void AOPAG_ModuleBase::FlyRotationTimer_Implementation()
+{
+	// on every frame change rotationg for a smooth rotating actor
+	FRotator NewRotation = FRotator(0, 1, 0);
+	FQuat QuatRotation = FQuat(NewRotation);
+	ModuleMesh->AddWorldRotation(QuatRotation, false, 0, ETeleportType::None);
+}
 #pragma endregion Interface
 
 void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, 

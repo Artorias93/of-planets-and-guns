@@ -97,7 +97,6 @@ void AOPAG_Player::BeginPlay()
 	// Binds and broad all player's events
 	BindEvents();
 	BroadcastEvents();
-
 }
 
 void AOPAG_Player::Death()

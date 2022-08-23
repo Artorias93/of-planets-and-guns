@@ -44,6 +44,11 @@ public:
 
 
 	void ApplyForce_Implementation(const FVector Force) override;
+	void ApplyFly_Implementation() override;
+	void FlyRotationTimer_Implementation() override;
+
+private:
+	FTimerHandle FlyRotationHandle;
 
 protected:
 	virtual void BeginPlay() override;

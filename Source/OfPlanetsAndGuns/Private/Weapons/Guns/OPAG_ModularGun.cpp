@@ -29,6 +29,20 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	Accessory = CreateDefaultSubobject<UChildActorComponent>(TEXT("Accessory"));
 }
 
+void AOPAG_ModularGun::FlyRotationTimer_Implementation()
+{
+	// on every frame change rotationg for a smooth rotating actor
+	FRotator NewRotation = FRotator(0, 1, 0);
+	FQuat QuatRotation = FQuat(NewRotation);
+	Receiver->AddWorldRotation(QuatRotation, false, 0, ETeleportType::None);
+}
+
+void AOPAG_ModularGun::ApplyFly_Implementation()
+{
+	Receiver->SetSimulatePhysics(false);
+	GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModularGun::FlyRotationTimer_Implementation, .01f, true);
+}
+
 void AOPAG_ModularGun::ApplyForce_Implementation(const FVector Force)
 {
 	Receiver->SetSimulatePhysics(true);
@@ -219,30 +233,30 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 	AOPAG_ModuleBase* CurrentChildModule = GetModule(ChildModule);
 	switch (CurrentChildModule->Type)
 	{
-	case EModuleTypes::Barrel:
-		if (CurrentChildModule->GetClass() == StandardBarrel)
-		{
-			return;
-		}
-		break;
-	case EModuleTypes::Stock:
-		if (CurrentChildModule->GetClass() == StandardStock)
-		{
-			return;
-		}
-		break;
-	case EModuleTypes::Grip:
-		if (CurrentChildModule->GetClass() == StandardGrip)
-		{
-			return;
-		}
-		break;
-	case EModuleTypes::Magazine:
-		if (CurrentChildModule->GetClass() == StandardMagazine)
-		{
-			return;
-		}
-		break;
+		case EModuleTypes::Barrel:
+			if (CurrentChildModule->GetClass() == StandardBarrel)
+			{
+				return;
+			}
+			break;
+		case EModuleTypes::Stock:
+			if (CurrentChildModule->GetClass() == StandardStock)
+			{
+				return;
+			}
+			break;
+		case EModuleTypes::Grip:
+			if (CurrentChildModule->GetClass() == StandardGrip)
+			{
+				return;
+			}
+			break;
+		case EModuleTypes::Magazine:
+			if (CurrentChildModule->GetClass() == StandardMagazine)
+			{
+				return;
+			}
+			break;
 	}
 
 	const TSubclassOf<AOPAG_ModuleBase> TempModuleClass = CurrentChildModule->GetClass();
@@ -252,6 +266,7 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 
 	// Destroy ChildActor
 	ChildModule->DestroyChildActor();
+	ChildModule->SetChildActorClass(nullptr);
 
 	// Spawn new module
 	const FVector SpawnLocation = Player->GetActorLocation();

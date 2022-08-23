@@ -9,6 +9,8 @@
 #include "Weapons/Guns/OPAG_ModularGun.h"
 #include "OPAG_Vendor.generated.h"
 
+class UStaticMeshComponent;
+class UBoxComponent;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Vendor : public AActor, public IOPAG_InteractableInterface
@@ -25,6 +27,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* Pedestal;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UBoxComponent* BoxCollision;
+
 	// Positions of the two guns and three modules
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		USceneComponent* MerchSpawnPoint_Gun1;
@@ -38,6 +43,10 @@ public:
 		UDataTable* DataTableGuns;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UDataTable* DataTableModules;
+
+public:
+	UPROPERTY(Category = Debug, EditAnywhere, BlueprintReadWrite)
+	bool bIsInfinitelyInteractable = false;
 
 private:
 	TArray<FOPAG_ModuleList*> ModulesList;

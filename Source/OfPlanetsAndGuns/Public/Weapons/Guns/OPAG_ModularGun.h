@@ -72,6 +72,7 @@ public:
 		TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
 
 private:
+	FTimerHandle FlyRotationHandle;
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
 
 protected:
@@ -81,6 +82,8 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	void ApplyForce_Implementation(const FVector Force) override;
+	void ApplyFly_Implementation() override;
+	void FlyRotationTimer_Implementation() override;
 
 	// Setter and Getter
 	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);

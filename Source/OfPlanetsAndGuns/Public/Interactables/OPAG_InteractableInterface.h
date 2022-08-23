@@ -27,4 +27,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void ApplyForce(const FVector Force);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void ApplyFly();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void FlyRotationTimer();
 };

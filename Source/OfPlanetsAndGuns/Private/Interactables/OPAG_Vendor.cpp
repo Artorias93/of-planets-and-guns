@@ -5,6 +5,9 @@
 #include "Util/OPAG_UtilityFunctionLibrary.h"
 #include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "Managers/RoomManager/OPAG_LootManagerComponent.h"
+#include "Characters/Player/OPAG_Player.h"
+#include <Kismet/GameplayStatics.h>
+#include <Components/BoxComponent.h>
 
 // Sets default values
 AOPAG_Vendor::AOPAG_Vendor()
@@ -12,9 +15,22 @@ AOPAG_Vendor::AOPAG_Vendor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
+	if (BoxCollision != nullptr)
+	{
+		BoxCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+		BoxCollision->SetBoxExtent(FVector(32.f, 200.f, 32.f));
+		RootComponent = BoxCollision;
+	}
+
 	Pedestal = CreateDefaultSubobject<UStaticMeshComponent>("Pedestal");
-	if (Pedestal)
-		RootComponent = Pedestal;
+	if (Pedestal != nullptr)
+	{
+		Pedestal->SetCollisionProfileName(TEXT("BlockAll"));
+		Pedestal->SetWorldLocation(FVector(.0f, -60.f, -30.f));
+		Pedestal->SetWorldScale3D(FVector(1.f, 3.f, 1.5f));
+		Pedestal->SetupAttachment(RootComponent);
+	}
 
 	MerchSpawnPoint_Gun1 = CreateDefaultSubobject<USceneComponent>("LootSpawnPoint_Gun1");
 	if (MerchSpawnPoint_Gun1)
@@ -47,7 +63,6 @@ void AOPAG_Vendor::PopulateGunAndModuleArray()
 void AOPAG_Vendor::BeginPlay()
 {
 	Super::BeginPlay();
-	PopulateGunAndModuleArray();
 	
 }
 
@@ -67,9 +82,9 @@ void AOPAG_Vendor::Unlock()
 void AOPAG_Vendor::Interact_Implementation()
 {
 	// Interacting with Vendor spawns merch. Set to false to avoid respawn.
-	bIsInteractable = false;
+	bIsInteractable = bIsInfinitelyInteractable;
 
-	// Play some particle effect?
+	PopulateGunAndModuleArray();
 
 	// Active Timer for spawn items
 	SpawnItem(666);
@@ -83,6 +98,8 @@ bool AOPAG_Vendor::CanInteract_Implementation()
 // Call method for spawning all guns
 void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 {	
+	const FRotator SpawnRotator = FRotator::ZeroRotator;
+
 	if (GunsList.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("VENDOR: Empty GunList as input to SpawnItem."));
@@ -104,10 +121,9 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 		{
 			Sum += Gun->GunChance;
 			if (RandomGunChance <= Sum)
-			{
-				const FRotator SpawnRotator = FRotator::ZeroRotator;
-				
+			{			
 				AOPAG_ModularGun* NewGun = Cast<AOPAG_ModularGun>(GetWorld()->SpawnActor(Gun->GunClass, &TempGunsSpawnLocation[i], &SpawnRotator));
+				NewGun->ApplyFly_Implementation();
 				TempGunsList.Add(NewGun);
 
 				GunsList.Remove(Gun); // to avoid two guns of same type
@@ -116,12 +132,46 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 		}
 	}
 	if (TempGunsList.Num() != 2) {
-		const FRotator SpawnRotator = FRotator::ZeroRotator;
 		AOPAG_ModularGun* NewGun = Cast<AOPAG_ModularGun>(GetWorld()->SpawnActor(GunsList[0]->GunClass, &TempGunsSpawnLocation[1], &SpawnRotator));
+		NewGun->ApplyFly_Implementation();
 		TempGunsList.Add(NewGun);
 	}
 	AttachModulesToGun(*TempGunsList[0], false, RoomDifficulty );
 	AttachModulesToGun(*TempGunsList[1], true, RoomDifficulty);
+
+	// Spawn two modules
+	if (ModulesList.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("VENDOR: Empty ModulesList as input to SpawnItem."));
+		return;
+	}
+
+	// Init modules list to spawn
+	TArray<TSubclassOf<AActor>> ModulesToSpawnList;
+	
+	// Init modules spawn locations
+	TArray<FVector> TempModulesSpawnLocation;
+	TempModulesSpawnLocation.Add(MerchSpawnPoint_Module1->GetComponentLocation());
+	TempModulesSpawnLocation.Add(MerchSpawnPoint_Module2->GetComponentLocation());
+
+	// Init player for check fire type gun
+	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (Player == nullptr)	return;
+
+	// Init fire type
+	const int FireMask = 1 << (int)Player->PrimaryGun->FireType;
+
+	// Spawn two modules
+	for (int i = 0; i < 2; i++)
+	{
+		// Shuffle modules list
+		UOPAG_UtilityFunctionLibrary::ShuffleArray(ModulesList);
+
+		// Select random module
+		TSubclassOf<AActor> NewModuleClass = UOPAG_LootManagerComponent::SelectRandomModules(ModulesList, RoomDifficulty, FireMask);
+		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(GetWorld()->SpawnActor(NewModuleClass, &TempModulesSpawnLocation[i], &SpawnRotator));
+		NewModule->ApplyFly_Implementation();
+	}
 }
 
 void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue)
@@ -185,4 +235,3 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 
 	Gun.CreateAndAttachAllModules(ModulesStruct);
 }
-
