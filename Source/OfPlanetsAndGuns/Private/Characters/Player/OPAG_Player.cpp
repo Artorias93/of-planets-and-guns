@@ -98,6 +98,7 @@ void AOPAG_Player::BeginPlay()
 	BindEvents();
 	BroadcastEvents();
 
+	InitDashValues();
 }
 
 void AOPAG_Player::Death()
@@ -196,12 +197,7 @@ void AOPAG_Player::BroadcastEvents()
 {
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
-	EMS->DashAmountChanged.Broadcast(DashCount);
 	EMS->RequestPlayerState.Broadcast();
-
-	for (int i = 0; i < DashMaxCount; i++) {
-		EMS->DashAmountIncrement.Broadcast();
-	}
 }
 
 void AOPAG_Player::BindEvents()
@@ -252,6 +248,8 @@ void AOPAG_Player::InitDefaultValues()
 	{
 		CurrentCamera = Camera;
 	}
+
+	bIsDashAlreadyInitialized = false;
 }
 
 void AOPAG_Player::InitADSTimeline()
@@ -286,6 +284,26 @@ void AOPAG_Player::InitRecoilTimeline()
 		OnRecoilTimelineProgress.BindUFunction(this, FName("RecoilTimelineProgress"));
 		RecoilTimeline->AddInterpFloat(RecoilCurveFloat, OnRecoilTimelineProgress);
 	}
+}
+
+void AOPAG_Player::InitDashValues()
+{
+	if (bIsDashAlreadyInitialized)
+		return;
+
+	bIsDashAlreadyInitialized = true;
+
+	if (DashCount < DashMaxCount && bIsFirstDash)
+	{
+		bIsFirstDash = false;
+		DashTimeline->PlayFromStart();
+	}
+
+	for (int i = 0; i < DashCount; i++) {
+		EMS->DashAmountIncrement.Broadcast();
+	}
+
+	EMS->DashAmountChanged.Broadcast(DashCount);
 }
 #pragma endregion Init
 
@@ -854,7 +872,9 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 	{
 		SetHealth(StateToApply.Health);
 		DashCount = StateToApply.DashCount;
-		EMS->DashAmountChanged.Broadcast(DashCount);
+		bIsDashAlreadyInitialized = false;
+		InitDashValues();
+
 		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
 		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
 	}

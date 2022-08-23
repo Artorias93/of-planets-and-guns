@@ -150,6 +150,7 @@ public:
 private:
 	const FName GripSocketName = "GripPoint";
 	const float LookUpDistanceToPlayer = 150.f;
+	bool bIsDashAlreadyInitialized;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
 	float GunPreADSRoll = 0;
@@ -184,6 +185,7 @@ private:
 	void InitADSTimeline();
 	void InitDashTimeline();
 	void InitRecoilTimeline();
+	void InitDashValues();
 
 	UFUNCTION()
 	void TeleportPlayerToStart(FTransform StartLocation);
