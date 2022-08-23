@@ -2,6 +2,9 @@
 #include "Weapons/Guns/OPAG_ModularGun.h"
 #include <Components/PrimitiveComponent.h>
 #include "Interactables/OPAG_InteractableInterface.h"
+#include "Util/OPAG_UtilityFunctionLibrary.h"
+#include "Weapons/Modules/OPAG_ModuleBase.h"
+#include "Managers/RoomManager/OPAG_LootManagerComponent.h"
 
 // Sets default values
 AOPAG_Vendor::AOPAG_Vendor()
@@ -60,19 +63,6 @@ void AOPAG_Vendor::Unlock()
 	bIsInteractable = true;
 }
 
-void AOPAG_Vendor::SetGunMerchToSpawn(TArray<TSubclassOf<AActor>>& GunList)
-{
-	if (GunList.Num() != 2) {
-		UE_LOG(LogTemp, Warning, TEXT("VENDOR: SetGunMerchToSpawn expects 2 elements!"));
-		return;
-	}
-	GunsList = GunList;
-}
-
-void AOPAG_Vendor::SetModuleMerchToSpawn(FOPAG_GunModules& ModulesStruct)
-{
-	Modules = ModulesStruct;
-}
 
 void AOPAG_Vendor::Interact_Implementation()
 {
@@ -82,7 +72,7 @@ void AOPAG_Vendor::Interact_Implementation()
 	// Play some particle effect?
 
 	// Active Timer for spawn items
-	SpawnItem();
+	SpawnItem(666);
 }
 
 bool AOPAG_Vendor::CanInteract_Implementation()
@@ -91,41 +81,108 @@ bool AOPAG_Vendor::CanInteract_Implementation()
 }
 
 // Call method for spawning all guns
-void AOPAG_Vendor::SpawnItem()
-{
-	
+void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
+{	
 	if (GunsList.Num() == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("VENDOR: Empty GunList as input to SpawnItem."));
 		return;
 	}
 
-	// Spawn Guns
-	const FVector SpawnLocation_1 = MerchSpawnPoint_Gun1->GetComponentLocation();
-	const FVector SpawnLocation_2 = MerchSpawnPoint_Gun2->GetComponentLocation();
-	const FRotator SpawnRotator = FRotator::ZeroRotator;
-	AActor* Gun1 = GetWorld()->SpawnActor(GunsList[0], &SpawnLocation_1, &SpawnRotator);
-	AActor* Gun2 = GetWorld()->SpawnActor(GunsList[1], &SpawnLocation_2, &SpawnRotator);
-	GunsList.Empty();
+	TArray<AOPAG_ModularGun*> TempGunsList;
+	TArray<FVector> TempGunsSpawnLocation;
+	TempGunsSpawnLocation.Add(MerchSpawnPoint_Gun1->GetComponentLocation());
+	TempGunsSpawnLocation.Add(MerchSpawnPoint_Gun2->GetComponentLocation());
 
-	// gun is generated with random modules
-	if (AOPAG_ModularGun* GunModular1 = Cast<AOPAG_ModularGun>(Gun1))
-	{
-		GunModular1->CreateAndAttachAllModules(Modules);
+	for (int i = 0; i < 2; i++) {
+		const float RandomGunChance = FMath::RandRange(0.f, 100.f);
+		float Sum = 0.f;
+
+		UOPAG_UtilityFunctionLibrary::ShuffleArray(GunsList);
+
+		for (FOPAG_GunList* Gun : GunsList)
+		{
+			Sum += Gun->GunChance;
+			if (RandomGunChance <= Sum)
+			{
+				const FRotator SpawnRotator = FRotator::ZeroRotator;
+				
+				AOPAG_ModularGun* NewGun = Cast<AOPAG_ModularGun>(GetWorld()->SpawnActor(Gun->GunClass, &TempGunsSpawnLocation[i], &SpawnRotator));
+				TempGunsList.Add(NewGun);
+
+				GunsList.Remove(Gun); // to avoid two guns of same type
+				break;
+			}
+		}
 	}
-	if (AOPAG_ModularGun* GunModular2 = Cast<AOPAG_ModularGun>(Gun2))
+	if (TempGunsList.Num() != 2) {
+		const FRotator SpawnRotator = FRotator::ZeroRotator;
+		AOPAG_ModularGun* NewGun = Cast<AOPAG_ModularGun>(GetWorld()->SpawnActor(GunsList[0]->GunClass, &TempGunsSpawnLocation[1], &SpawnRotator));
+		TempGunsList.Add(NewGun);
+	}
+	AttachModulesToGun(*TempGunsList[0], false, RoomDifficulty );
+	AttachModulesToGun(*TempGunsList[1], true, RoomDifficulty);
+}
+
+void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue)
+{
+	int MinModules = IsPowerful ? 2 : 0;
+	int MaxModules = IsPowerful ? 6 : 3;
+
+	// Init gun's fire type (util for pick random modules)
+	const int FireMask = 1 << (int)Gun.FireType;
+	const int RandomNumberOfModules = FMath::RandRange(MinModules, MaxModules);
+
+	// Create array of modules type
+	TArray<EModuleTypes> ModuleTypes;
+	ModuleTypes.Add(EModuleTypes::Barrel);
+	ModuleTypes.Add(EModuleTypes::Stock);
+	ModuleTypes.Add(EModuleTypes::Grip);
+	ModuleTypes.Add(EModuleTypes::Magazine);
+	ModuleTypes.Add(EModuleTypes::Sight);
+	ModuleTypes.Add(EModuleTypes::Accessory);
+
+	// Select random modules to attach 
+	FOPAG_GunModules ModulesStruct = Gun.GetStandardModulesStruct();
+	int Count = 0;
+	while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 	{
-		GunModular2->CreateAndAttachAllModules(Modules);
+		const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
+		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModules(ModulesList, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+		if (Module != nullptr)
+		{
+			switch (ModuleTypes[RandomModuleIndex])
+			{
+			case EModuleTypes::Barrel:
+				ModulesStruct.Barrel = Module;
+				break;
+			case EModuleTypes::Stock:
+				ModulesStruct.Stock = Module;
+				break;
+			case EModuleTypes::Grip:
+				ModulesStruct.Grip = Module;
+				break;
+			case EModuleTypes::Magazine:
+				ModulesStruct.Magazine = Module;
+				break;
+			case EModuleTypes::Sight:
+				ModulesStruct.Sight = Module;
+				break;
+			case EModuleTypes::Accessory:
+				ModulesStruct.Accessory = Module;
+				break;
+			default:
+				UE_LOG(LogTemp, Error, TEXT("Module types error!"));
+				break;
+			}
+
+			Count++;
+		}
+
+		// Remove the select index for no-repeat the same or not fiend module
+		ModuleTypes.RemoveAt(RandomModuleIndex);
 	}
 
-	// Apply constant rotation to the gun? Maybe property of all interactables?
-	// Hereunder code for applying force:
-	//IOPAG_InteractableInterface* TheInterface = Cast<IOPAG_InteractableInterface>(Item);
-	//if (TheInterface)
-	//{
-	//	const FVector Force = Item->GetActorUpVector() * ThrowLid + Item->GetActorForwardVector() * ThrowLid;
-	//	TheInterface->ApplyForce_Implementation(Force);
-	//}
-
+	Gun.CreateAndAttachAllModules(ModulesStruct);
 }
 

@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "Weapons/Guns/OPAG_GunState.h"
 #include "Engine/DataTable.h"
+#include "Managers/RoomManager/OPAG_LootChance.h"
+#include "Weapons/Guns/OPAG_ModularGun.h"
 #include "OPAG_Vendor.generated.h"
 
 
@@ -38,8 +40,8 @@ public:
 		UDataTable* DataTableModules;
 
 private:
-	TArray<TSubclassOf<AActor>> GunsList;
-	TArray<TSubclassOf<AActor>> ModulesList;
+	TArray<FOPAG_ModuleList*> ModulesList;
+	TArray<FOPAG_GunList*> GunsList;
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
 
@@ -51,8 +53,6 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	void Unlock();
-	void SetGunMerchToSpawn(TArray<TSubclassOf<AActor>>& GunList);
-	void SetModuleMerchToSpawn(FOPAG_GunModules& ModulesStruct);
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) void Interact();
 	virtual void Interact_Implementation() override;
@@ -60,6 +60,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
 
-	UFUNCTION() void SpawnItem();
+	void SpawnItem(const float RoomDifficulty);
+
+	void AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue);
 
 };
