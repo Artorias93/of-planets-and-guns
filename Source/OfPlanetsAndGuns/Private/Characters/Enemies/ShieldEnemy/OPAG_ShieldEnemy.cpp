@@ -175,7 +175,7 @@ void AOPAG_ShieldEnemy::TurnOnBoosters() const
 	}
 	if(ParticleComponent2)
 	{
-		ParticleComponent1->SetVisibility(true);
+		ParticleComponent2->SetVisibility(true);
 	}
 }
 
@@ -187,6 +187,6 @@ void AOPAG_ShieldEnemy::TurnOffBoosters() const
 	}
 	if(ParticleComponent2)
 	{
-		ParticleComponent1->SetVisibility(false);
+		ParticleComponent2->SetVisibility(false);
 	}
 }

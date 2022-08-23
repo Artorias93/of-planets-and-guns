@@ -41,6 +41,7 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 						FNavLocation NavLocation;
 						if(NavSystem->ProjectPointToNavigation(ChargePoint, NavLocation, QueryingExtent))
 						{
+							UE_LOG(LogTemp, Warning, TEXT("%s"), *ChargePoint.ToString());
 							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE NOT FOUND"));
                             					
 							AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
