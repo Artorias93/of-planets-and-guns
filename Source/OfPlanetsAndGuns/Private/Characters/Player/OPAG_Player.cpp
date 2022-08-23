@@ -100,6 +100,19 @@ void AOPAG_Player::BeginPlay()
 
 }
 
+void AOPAG_Player::Death()
+{
+	Super::Death();
+	SavePlayerState();
+	EMS->PlayerDied.Broadcast();
+}
+
+void AOPAG_Player::FellOutOfWorld(const UDamageType& dmgType)
+{
+	if (GetHealth() > 0.f)
+		ReceiveDamage(GetHealth() + 1.f); //+1 just to make sure it overkills
+}
+
 void AOPAG_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -643,6 +656,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	Gun->Destroy();
 
 	// Attach new gun
+	PrimaryGunComponent->SetChildActorClass(nullptr);
 	PrimaryGunComponent->SetChildActorClass(NewGunClass);
 	if (PrimaryGunComponent->GetChildActor())
 	{
@@ -652,6 +666,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		PrimaryGun->SetAmmoParams(NewAmmoCurrent, NewAmmoMax);
 		PrimaryGun->CreateAndAttachAllModules(NewGunModules);
 		CurrentGun = PrimaryGun;
+		DebugCurretGunStats = CurrentGun->Stats;
 	}
 
 	// Spawn the old primary gun in scene
@@ -659,6 +674,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	AOPAG_ModularGun* OldGun = GetWorld()->SpawnActor<AOPAG_ModularGun>(OldGunClass, GunSpawnLocation, FRotator::ZeroRotator);
 	OldGun->SetAmmoParams(OldAmmoCurrent, OldAmmoMax);
 	OldGun->CreateAndAttachAllModules(OldGunModules);
+	OldGun->DetachAllModules(CalculateThrowForce());
 	OldGun->ApplyForce_Implementation(CalculateThrowForce());
 }
 

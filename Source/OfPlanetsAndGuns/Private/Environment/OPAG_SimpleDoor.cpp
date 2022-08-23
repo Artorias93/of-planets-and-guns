@@ -16,6 +16,7 @@ AOPAG_SimpleDoor::AOPAG_SimpleDoor()
 	Door->SetupAttachment(RootComponent);
 	CollisionVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionVolume"));
 	CollisionVolume->SetupAttachment(RootComponent);
+	CollisionVolume->SetCollisionProfileName(TEXT("BlockAllDynamic"));
 	CollisionVolume->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 	Timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Movement Timeline"));
 }

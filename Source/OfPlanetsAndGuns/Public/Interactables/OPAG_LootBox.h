@@ -11,26 +11,38 @@ class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_Interacta
 {
 	GENERATED_BODY()
 
-	bool bIsInteractable = true;
+	bool bIsInteractable = false;
 
 public:	
 	AOPAG_LootBox();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UStaticMeshComponent* Lid;
+	UStaticMeshComponent* Lid;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UStaticMeshComponent* Crate;
+	UStaticMeshComponent* Crate;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		USceneComponent* LootSpawnPoint;
+	USceneComponent* LootSpawnPoint;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
+	UDataTable* LootChanceTable;
+
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	float ThrowLid = 100.f;
 
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	float ThrowItems = 100.f;
+
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	int MinModules = 0;
+
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	int MaxModules = 3;
+
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	int NumberOfModulesToSpawn = 1;
 
 private:
 	TArray<TSubclassOf<AActor>> Items;   
@@ -43,6 +55,7 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	void SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList);
+	void Unlock();
 	void SetModules(FOPAG_GunModules& ModulesStruct);
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) void Interact();

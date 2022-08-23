@@ -11,6 +11,7 @@
 #include "UI/OPAG_MainMenuHUD.h"
 
 void UOPAG_UWMainMenuView::NativeConstruct() {
+	Super::NativeConstruct();
 	BindEvents();
 }
 

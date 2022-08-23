@@ -59,9 +59,7 @@ private:
 
 	void LoadEnemyLevelData();
 
-	float GaussianProbabilityModifier(float Level) const;
-
-	void GetMappedEnemies(TMap<TSoftClassPtr<AOPAG_Enemy>, float>& EnemyProbabilityMap);
+	void GetBaseMappedEnemies(TMap<TSubclassOf<AOPAG_Enemy>, float>& EnemyProbabilityMap);
 
 	UFUNCTION()
 		void OnEnemyDeath(const AOPAG_Enemy* const Enemy);

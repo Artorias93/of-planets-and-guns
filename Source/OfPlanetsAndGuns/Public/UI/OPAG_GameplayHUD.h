@@ -51,7 +51,10 @@ private:
 		class UOPAG_UWGunCompareView* GunCompareViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWGunCompareView> GunCompareViewWidgetClass;
-	
+	UPROPERTY()
+		class UOPAG_UWGameOverView* GameOverViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWGameOverView> GameOverViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
@@ -78,4 +81,7 @@ public:
 	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName);
 	UFUNCTION()
 	void HideGunCompareView();
+
+	UFUNCTION()
+	void ShowGameOverView();
 };

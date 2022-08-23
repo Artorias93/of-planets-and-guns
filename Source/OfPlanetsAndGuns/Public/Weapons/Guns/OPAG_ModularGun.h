@@ -85,6 +85,7 @@ public:
 	// Setter and Getter
 	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
 	FOPAG_GunModules GetModulesStruct() const;
+	FOPAG_GunModules GetStandardModulesStruct() const;
 
 	// Utility for link modules and sockets
 	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;
@@ -105,14 +106,20 @@ public:
 
 	void GetCurrentState(FOPAG_GunState& GunState) const;
 
+	// Shooting with throwable
 	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
 
+	// Get for modules
 	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
 	FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
+	// Interactable methods
 	virtual void Interact_Implementation() override;
-
 	virtual bool CanInteract_Implementation() override;
+
+	// Detach all modules
+	void DetachAllModules(const FVector Force);
+	void DetachModule(UChildActorComponent* ChildModule, const FVector Force);
 
 protected:
 	// Shoot behavior

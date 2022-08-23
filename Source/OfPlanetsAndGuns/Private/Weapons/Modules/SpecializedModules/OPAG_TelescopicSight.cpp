@@ -53,9 +53,11 @@ void AOPAG_TelescopicSight::BeginPlay()
 }
 
 void AOPAG_TelescopicSight::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats,
-	const int NewEquippableFireTypes)
+	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
-	Super::OnAttach(NewRarity, NewStats, NewEquippableFireTypes);
+	Super::OnAttach(NewRarity, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
+
+	if (!bIsAttachedToPlayer) return;
 
 	ScopeCapture->SetComponentTickEnabled(true);
 	ScopeView->SetVisibility(true);

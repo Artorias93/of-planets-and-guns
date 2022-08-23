@@ -3,8 +3,8 @@
 #include <BehaviorTree/BlackboardComponent.h>
 #include <Perception/AISense_Damage.h>
 #include <Kismet/GameplayStatics.h>
-#include <Kismet/KismetMathLibrary.h>
 #include <BrainComponent.h>
+#include <Curves/CurveVector.h>
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/OPAG_AttributeSetBase.h"
@@ -12,12 +12,39 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_LootDropSystemComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	LootDropSystemComponent = CreateDefaultSubobject<UOPAG_LootDropSystemComponent>(TEXT("Loot Drop System Component"));
+
+	SpawnParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle System Component"));
+	SpawnParticle->SetupAttachment(GetMesh());
+
+	SpawnTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("SpawnTimeline"));
+
+	const auto SpawnParticleFinder = ConstructorHelpers::FObjectFinder<UParticleSystem>(
+		TEXT("ParticleSystem'/Game/OfPlanetsAndGuns/Effects/Teleportation/P_Teleportation.P_Teleportation'"));
+	if (SpawnParticleFinder.Succeeded())
+	{
+		SpawnParticle->Template = SpawnParticleFinder.Object;
+	}
+
+	const auto SpawnMaterialFinder = ConstructorHelpers::FObjectFinder<UMaterialInstance>(
+		TEXT("MaterialInstanceConstant'/Game/OfPlanetsAndGuns/Effects/Teleportation/body/MI_Orange.MI_Orange'"));
+	if (SpawnMaterialFinder.Succeeded())
+	{
+		SpawnMaterial = SpawnMaterialFinder.Object;
+	}
+
+	const auto SpawnFXCurveFinder = ConstructorHelpers::FObjectFinder<UCurveVector>(
+		TEXT("CurveVector'/Game/OfPlanetsAndGuns/Characters/Common/Curve_EnemySpawnFX_Vector.Curve_EnemySpawnFX_Vector'"));
+	if (SpawnFXCurveFinder.Succeeded())
+	{
+		SpawnFXCurve = SpawnFXCurveFinder.Object;
+	}
 }
 
 void AOPAG_Enemy::BeginPlay()
@@ -29,6 +56,8 @@ void AOPAG_Enemy::BeginPlay()
 	{
 		AIController->GetBlackboardComponent()->SetValueAsBool("bUsingPatrolPath", bUsingPatrolPath);
 	}
+
+	InitSpawnFX();
 }
 
 void AOPAG_Enemy::UpdateSpeed(float const NewSpeed) const
@@ -83,6 +112,47 @@ void AOPAG_Enemy::DropAndDespawn()
 	const auto GI = GetGameInstance<UOPAG_GameInstance>();
 	if (GI) GI->GetEventManager()->EnemyKilled.Broadcast(this);
 	Destroy();
+}
+
+void AOPAG_Enemy::InitSpawnFX()
+{
+	if (SpawnFXCurve)
+	{
+		ActiveMaterial = UMaterialInstanceDynamic::Create(SpawnMaterial, this);
+		int i = 0;
+		for (UMaterialInterface* MaterialInterface : GetMesh()->GetMaterials())
+		{
+			NormalMaterials.Add(MaterialInterface->GetMaterial());
+			GetMesh()->SetMaterial(i, ActiveMaterial);
+			++i;
+		}
+
+		SpawnTimeline->SetLooping(false);
+
+		OnSpawnFXTimelineProgress.BindUFunction(this, FName("SpawnFXProgress"));
+		SpawnTimeline->AddInterpVector(SpawnFXCurve, OnSpawnFXTimelineProgress);
+
+		OnSpawnFXTimelineFinished.BindUFunction(this, FName("SpawnFXFinished"));
+		SpawnTimeline->SetTimelineFinishedFunc(OnSpawnFXTimelineFinished);
+
+		SpawnTimeline->PlayFromStart();
+	}
+}
+
+void AOPAG_Enemy::SpawnFXProgress(FVector Value)
+{
+	ActiveMaterial->SetScalarParameterValue(TEXT("Amount"), Value.X);
+	ActiveMaterial->SetScalarParameterValue(TEXT("Boost"), Value.Y);
+}
+
+void AOPAG_Enemy::SpawnFXFinished()
+{
+	for (int i = 0; i < NormalMaterials.Num(); ++i)
+	{
+		GetMesh()->SetMaterial(i, NormalMaterials[i]);
+	}
+	SpawnParticle->Deactivate();
+	SpawnParticle->DestroyComponent();
 }
 
 #pragma region Getters & Setters
