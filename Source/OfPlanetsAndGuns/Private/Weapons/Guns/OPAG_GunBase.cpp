@@ -162,14 +162,19 @@ void AOPAG_GunBase::ResetShootTimer()
 #pragma region Shooting Utility
 float AOPAG_GunBase::CalculateSpread() const
 {
-	const float Spread = (SpreadMax * (ShootConeLenght - Stats.Accuracy)) / 100;
+	static constexpr float InternalRange = MaxInternalAccuracy - MinInternalAccuracy;
+
+	const float InternalAccuracy = ((Stats.Accuracy * InternalRange) / 100.f) + MinInternalAccuracy;
+
+	const float ClampedAccuracy = FMath::Clamp(InternalAccuracy, MinInternalAccuracy, MaxInternalAccuracy);
+	const float Spread = (SpreadMax * (ShootConeLength - ClampedAccuracy)) / 100;
 	return Spread;
 }
 
 float AOPAG_GunBase::CalculateSpreadRadius() const
 {
 	const float Spread = CalculateSpread();
-	const float SpreadRadius = FMath::Tan(Spread / 2) * ShootConeLenght;
+	const float SpreadRadius = FMath::Tan(Spread / 2) * ShootConeLength;
 	
 	const AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(GetParentActor());
 	if (Character)
@@ -198,7 +203,7 @@ FVector AOPAG_GunBase::ApplyNoise(const FVector Direction) const
 {
 	const FRotator Rotation = Direction.Rotation();
 	const FVector2D Point = CalculateRandPointInCircle();
-	const FVector SpreadVector = FVector(0, Point.X * SpreadMultiplier, Point.Y * SpreadMultiplier) + FVector::ForwardVector * ShootConeLenght;
+	const FVector SpreadVector = FVector(0, Point.X * SpreadMultiplier, Point.Y * SpreadMultiplier) + FVector::ForwardVector * ShootConeLength;
 	const FVector NewDirection = Rotation.RotateVector(SpreadVector);
 	return NewDirection;
 }

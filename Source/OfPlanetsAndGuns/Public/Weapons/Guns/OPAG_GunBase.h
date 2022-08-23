@@ -65,7 +65,7 @@ public:
 	float ProjectileRange = 2000.f;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
-	float ShootConeLenght = 100.f;
+	float ShootConeLength = 100.f;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	int ReductionSpreadRadius = 10;
@@ -88,6 +88,9 @@ public:
 
 protected:
 	float ReductionSpreadRadiusShooting = 1.f;
+
+	static constexpr float MinInternalAccuracy = 97.f;
+	static constexpr float MaxInternalAccuracy = 100.f;
 
 protected:
 	UPROPERTY()
