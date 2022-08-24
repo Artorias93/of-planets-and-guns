@@ -12,6 +12,7 @@
 class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomManager;
 class AOPAG_Enemy;
+class AOPAG_AbilityBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStartPlanet, int, PlanetIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadMainMenu);
@@ -80,11 +81,16 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUsePotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, TSubclassOf<AOPAG_AbilityBase>, AbilityClass, const AActor*, Caller, FVector, Position, AOPAG_AbilityBase*, CastedAbility);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
+
+	FVector C;
+
 	UPROPERTY(BlueprintAssignable, Category = Game)
 		FStartPlanet StartPlanet;
 	UPROPERTY(BlueprintAssignable, Category = Game)
@@ -228,4 +234,7 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FActiveGunAbility ActiveGunAbility;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+		FCastAbility CastAbility;
 };

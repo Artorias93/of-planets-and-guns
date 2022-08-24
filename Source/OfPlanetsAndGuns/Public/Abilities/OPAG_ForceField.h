@@ -3,19 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Abilities/OPAG_AbilityBase.h"
 #include "OPAG_ForceField.generated.h"
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_ForceField : public AActor
+class OFPLANETSANDGUNS_API AOPAG_ForceField : public AOPAG_AbilityBase
 {
 	GENERATED_BODY()
 	
 public:	
 	AOPAG_ForceField();
 
-protected:
-
-	UPROPERTY(EditAnywhere, Category = "Mesh")
-		class UStaticMeshComponent* Mesh;
+protected:	
 };
