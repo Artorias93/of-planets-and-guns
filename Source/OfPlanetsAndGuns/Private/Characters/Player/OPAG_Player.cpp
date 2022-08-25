@@ -197,7 +197,7 @@ void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 			if (PrimaryGunComponent->GetChildActor())
 			{
 				AActor* Target = PrimaryGunComponent->GetChildActor();
-				Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripSocketName);
+				Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripPrimarySocketName);
 				PrimaryGun = Cast<AOPAG_ModularGun>(Target);
 				CurrentGun = PrimaryGun;
 			}
@@ -434,12 +434,12 @@ void AOPAG_Player::AttachDefaultGuns()
 	if (PrimaryGunComponent->GetChildActor())
 	{
 		AActor* Target = PrimaryGunComponent->GetChildActor();
-		Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripSocketName);
+		Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripPrimarySocketName);
 	}
 	if (SecondaryGunComponent->GetChildActor())
 	{
 		AActor* Target = SecondaryGunComponent->GetChildActor();
-		Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripSocketName);
+		Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripSecondarySocketName);
 	}
 }
 
@@ -454,12 +454,14 @@ void AOPAG_Player::SwapGuns()
 			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
 			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
 			CurrentGun = SecondaryGun;
+			bisSecondaryGun = true;
 		}
 		else
 		{
 			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
 			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
 			CurrentGun = PrimaryGun;
+			bisSecondaryGun = false;
 		}
 
 		DebugCurretGunStats = CurrentGun->Stats;
@@ -475,7 +477,7 @@ void AOPAG_Player::ReloadGun()
 	if (bIsPrimaryGun && !CheckIsReloading && PrimaryGun->AmmoCurrent < PrimaryGun->Stats.ClipSize)
 	{
 		PrimaryGun->Reload();
-		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
+		Mesh1P->GetAnimInstance()->Montage_Play(PrimaryReloadMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 	}
 }
 
@@ -506,7 +508,7 @@ void AOPAG_Player::Shoot()
 		CurrentGun->Shoot(StartLocation, Direction, this);
 		//TODO: Should this be on the gun?
 		MakeNoise(1, this);
-		Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
+		Mesh1P->GetAnimInstance()->Montage_Play(PrimaryShootMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 		RecoilTimeline->PlayFromStart();
 
 		EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
@@ -753,7 +755,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	if (PrimaryGunComponent->GetChildActor())
 	{
 		AActor* Target = PrimaryGunComponent->GetChildActor();
-		Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripSocketName);
+		Target->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, GripPrimarySocketName);
 		PrimaryGun = Cast<AOPAG_ModularGun>(Target);
 		PrimaryGun->SetAmmoParams(NewAmmoCurrent, NewAmmoMax);
 		PrimaryGun->CreateAndAttachAllModules(NewGunModules);
@@ -876,6 +878,10 @@ void AOPAG_Player::UsePotion()
 const bool AOPAG_Player::GetIsADS() const
 {
 	return bIsInADS;
+}
+const bool AOPAG_Player::GetIsSecondaryGun() const
+{
+	return bisSecondaryGun;
 }
 #pragma endregion GET
 

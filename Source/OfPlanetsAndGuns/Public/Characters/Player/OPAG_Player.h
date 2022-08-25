@@ -59,10 +59,10 @@ public:
 	UCameraComponent* CurrentCamera;
 
 	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
-	UAnimMontage* FireMontageToPlay;
+	UAnimMontage* PrimaryShootMontageToPlay;
 
 	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
-	UAnimMontage* ReloadMontageToPlay;
+	UAnimMontage* PrimaryReloadMontageToPlay;
 
 	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
 	UTimelineComponent* ADSTimeline;
@@ -148,12 +148,14 @@ public:
 	float DebugDashRestoreTime = 0.f;
 
 private:
-	const FName GripSocketName = "GripPoint";
+	const FName GripPrimarySocketName = "GripPrimaryPoint";
+	const FName GripSecondarySocketName = "GripSecondaryPoint";
 	const float LookUpDistanceToPlayer = 150.f;
 	bool bIsDashAlreadyInitialized;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
 	bool bIsShieldBroken = false;
+	bool bisSecondaryGun = false;
 	float GunPreADSRoll = 0;
 	AActor* InteractableObject = nullptr;
 	AActor* PreviousLookedAtModule = nullptr;
@@ -278,6 +280,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
+	UFUNCTION(BlueprintCallable) const bool GetIsSecondaryGun() const;
 
 	void HealthChanged(const FOnAttributeChangeData& Data);
 
