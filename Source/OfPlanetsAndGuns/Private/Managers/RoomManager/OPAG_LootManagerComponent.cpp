@@ -10,6 +10,7 @@
 
 #include "Managers/RoomManager/OPAG_RoomManager.h"
 #include "Rooms/OPAG_LootSpawnPoint.h"
+#include "Interactables/OPAG_Vendor.h"
 
 UOPAG_LootManagerComponent::UOPAG_LootManagerComponent()
 {
@@ -69,7 +70,7 @@ void UOPAG_LootManagerComponent::SpawnLootContainers()
 	{
 		if (FMath::RandRange(0, 100) <= VendorChance)
 		{
-			Vendor = GetWorld()->SpawnActor<AActor>(VendorClass,
+			Vendor = GetWorld()->SpawnActor<AOPAG_Vendor>(VendorClass,
 				Spawners[0]->GetActorLocation(), Spawners[0]->GetActorRotation());
 		}
 		else
@@ -167,7 +168,7 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 				while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 				{
 					const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
-					TSubclassOf<AActor> Module = SelectRandomModules(DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+					TSubclassOf<AActor> Module = SelectRandomModules(Modules, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
 					if (Module != nullptr)
 					{
 						switch (ModuleTypes[RandomModuleIndex])
@@ -220,7 +221,7 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 			while (Count < LootBox->NumberOfModulesToSpawn && Count < Modules.Num())
 			{
 				const int FireMask = 1 << (int)Player->PrimaryGun->FireType;
-				Item = SelectRandomModules(DifficultyValue, FireMask);
+				Item = SelectRandomModules(Modules, DifficultyValue, FireMask);
 				if (!Items.Contains(Item))
 				{
 					Items.Add(Item);
@@ -259,11 +260,11 @@ void UOPAG_LootManagerComponent::PopulateLootLists()
 	}
 }
 
-TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(const float DifficultyValue, const int FireMask)
+TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask)
 {
 	TMap<TSubclassOf<AOPAG_ModuleBase>, float> ModuleMap;
-	UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
-	for (FOPAG_ModuleList* Module : Modules)
+	UOPAG_UtilityFunctionLibrary::ShuffleArray(ModulesList);
+	for (FOPAG_ModuleList* Module : ModulesList)
 	{
 		AOPAG_ModuleBase* DefaultModule = Module->ModuleClass->GetDefaultObject<AOPAG_ModuleBase>();
 		if (DefaultModule)
@@ -285,11 +286,11 @@ TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(const float 
 	return nullptr;
 }
 
-TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes)
+TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes)
 {
 	TMap<TSubclassOf<AOPAG_ModuleBase>, float> ModuleMap;
-	UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
-	for (FOPAG_ModuleList* Module : Modules)
+	UOPAG_UtilityFunctionLibrary::ShuffleArray(ModulesList);
+	for (FOPAG_ModuleList* Module : ModulesList)
 	{
 		AOPAG_ModuleBase* DefaultModule = Module->ModuleClass->GetDefaultObject<AOPAG_ModuleBase>();
 		if (DefaultModule)

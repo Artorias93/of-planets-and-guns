@@ -10,8 +10,6 @@
 class USphereComponent;
 class UStaticMeshComponent;
 
-
-
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_ModuleBase : public AActor, public IOPAG_InteractableInterface
 {
@@ -42,8 +40,21 @@ public:
 	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = "EFireTypes"))
 	int EquippableFireTypes;
 
+	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
+	int Level = 0;
 
+	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
+	float PriceBase = .0f;
+
+public:
 	void ApplyForce_Implementation(const FVector Force) override;
+	void ApplyFly_Implementation() override;
+	void FlyRotationTimer_Implementation() override;
+	bool CanBuy_Implementation() override;
+	const float GetPriceTotal_Implementation() override;
+
+private:
+	FTimerHandle FlyRotationHandle;
 
 protected:
 	virtual void BeginPlay() override;

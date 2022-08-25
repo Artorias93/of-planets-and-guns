@@ -11,6 +11,7 @@
 class AOPAG_LootSpawnPoint;
 class AOPAG_LootBox;
 class AOPAG_ModuleBase;
+class AOPAG_Vendor;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OFPLANETSANDGUNS_API UOPAG_LootManagerComponent : public UActorComponent
@@ -42,7 +43,7 @@ public:
 		TSubclassOf<AOPAG_LootBox> LargeLootBoxClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
-		TSubclassOf<AActor> VendorClass;
+		TSubclassOf<AOPAG_Vendor> VendorClass;
 
 private:
 	TPair<AOPAG_LootBox*, TArray<FOPAG_LootChance*>> LootBoxA;
@@ -52,7 +53,7 @@ private:
 	TArray<FOPAG_ModuleList*> Modules;
 	TArray<FOPAG_GunList*> Guns;
 
-	AActor* Vendor;
+	AOPAG_Vendor* Vendor;
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,12 +63,13 @@ public:
 
 	void GenerateLoot(const float DifficultyValue);
 	void Unlock() const;
+	static TSubclassOf<AActor> SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask);
+	static TSubclassOf<AActor> SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes);
 
 private:
 	void SpawnLootContainers();
 
 	void GenerateIndividualLoot(AOPAG_LootBox* LootBox, TArray<FOPAG_LootChance*>& LootChance, const float DifficultyValue);
 	void PopulateLootLists();
-	TSubclassOf<AActor> SelectRandomModules(const float DifficultyValue, const int FireMask);
-	TSubclassOf<AActor> SelectRandomModules(const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes);
+
 };

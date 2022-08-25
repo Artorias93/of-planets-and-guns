@@ -29,6 +29,10 @@ public:
 	
 	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
 	USphereComponent* Sphere;
+
+public:
+	UPROPERTY(Category = "Drop Stuff", EditAnywhere, BlueprintReadWrite)
+	int Amount = 1;
 	
 	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
 	EDropType DropType;

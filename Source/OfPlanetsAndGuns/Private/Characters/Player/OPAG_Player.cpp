@@ -100,8 +100,6 @@ void AOPAG_Player::BeginPlay()
 	// Binds and broad all player's events
 	BindEvents();
 	BroadcastEvents();
-
-	InitDashValues();
 }
 
 void AOPAG_Player::Death()
@@ -645,20 +643,38 @@ void AOPAG_Player::ResetFPSCamera()
 void AOPAG_Player::InteractWithItem()
 {
 	if (InteractableObject && 
-		InteractableObject->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()) &&
-		IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
+		InteractableObject->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
 	{
-		if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+		if (IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
 		{
-			InteractWithModule(Module);
+			if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+			{
+				InteractWithModule(Module);
+			}
+			else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
+			{
+				PickupGun(Gun);
+			}
+			else
+			{
+				IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
+			}
 		}
-		else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
+		if (IOPAG_InteractableInterface::Execute_CanBuy(InteractableObject))
 		{
-			PickupGun(Gun);
-		}
-		else
-		{
-			IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
+			InventorySystemComp->GoldAmount -= IOPAG_InteractableInterface::Execute_GetPriceTotal(InteractableObject);
+			EMS->GoldChanged.Broadcast(InventorySystemComp->GoldAmount);
+
+			if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+			{
+				EMS->DisableModuleTextInVendor.Broadcast(Module);
+				InteractWithModule(Module);
+			}
+			else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
+			{
+				EMS->DisableGunTextInVendor.Broadcast(Gun);
+				PickupGun(Gun);
+			}
 		}
 	}
 }
