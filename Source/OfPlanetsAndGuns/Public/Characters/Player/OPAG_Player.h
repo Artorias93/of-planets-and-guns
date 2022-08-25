@@ -153,6 +153,7 @@ private:
 	bool bIsDashAlreadyInitialized;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
+	bool bHasAlreadyLooked = false;
 	bool bIsShieldBroken = false;
 	float GunPreADSRoll = 0;
 	AActor* InteractableObject = nullptr;
@@ -215,6 +216,8 @@ private:
 	void CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection); 
 	AActor* CheckLookAtInteractableItems();
 	const FVector CalculateModuleSpawnLocation() const;
+
+	void UpdateInteractableMessage();
 	void UpdateComparison();
 
 	// Interact with items

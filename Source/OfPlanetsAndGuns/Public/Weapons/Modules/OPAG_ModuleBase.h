@@ -56,6 +56,7 @@ public:
 private:
 	FTimerHandle FlyRotationHandle;
 
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -67,6 +68,7 @@ public:
 	void SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
 
 	static FString GetRarityName(EModuleRarity ModuleRarity);
+	static FString GetTypeName(EModuleTypes ModuleType);
 
 	UPrimitiveComponent* GetSphereComponent() const;
 
@@ -77,6 +79,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		FString InteractString();
+	FString InteractString_Implementation() override;
 
 private:
 	void CheckIfPhysical() const;

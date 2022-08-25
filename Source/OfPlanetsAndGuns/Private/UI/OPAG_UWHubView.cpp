@@ -29,17 +29,20 @@ void UOPAG_UWHubView::UpdateModuleName(UTextBlock* TextBlock, const FString& Nam
 }
 */
 
-void UOPAG_UWHubView::UpdateBoltsValue(const int Value)
+void UOPAG_UWHubView::UpdateBoltsValue(int Value)
 {
+	/*
 	if (BoltsAmountText && Value >= 0) {
 		BoltsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
 	}
+	*/
 }
 
-void UOPAG_UWHubView::UpdatePotionsValue(const int Value)
+void UOPAG_UWHubView::UpdatePotionsValue(int Value)
 {
-
+	/*
 	if (PotionsAmountText && Value >= 0) {
 		PotionsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
 	}
+	*/
 }

@@ -55,6 +55,10 @@ private:
 		class UOPAG_UWGameOverView* GameOverViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWGameOverView> GameOverViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWInteractView* InteractViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWInteractView> InteractViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
@@ -73,15 +77,22 @@ public:
 
 	UFUNCTION()
 	void ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule,
-		const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity);
+		const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, 
+		const EModuleTypes OtherModuleType, const int EquippableTypes);
 	UFUNCTION()
 	void HideModuleCompareView();
 
 	UFUNCTION()
-	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName);
+	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName,
+		const EFireTypes OtherGunType);
 	UFUNCTION()
 	void HideGunCompareView();
 
 	UFUNCTION()
 	void ShowGameOverView();
+
+	UFUNCTION()
+	void ShowInteractView(bool bCanInteract, const FString InteractText);
+	UFUNCTION()
+	void HideInteractView();
 };

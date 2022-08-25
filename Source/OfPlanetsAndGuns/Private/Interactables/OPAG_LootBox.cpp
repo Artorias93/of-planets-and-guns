@@ -20,6 +20,16 @@ AOPAG_LootBox::AOPAG_LootBox()
 		LootSpawnPoint->SetupAttachment(RootComponent);
 }
 
+FString AOPAG_LootBox::InteractString_Implementation()
+{
+	if (bHasBeenOpened)
+		return "";
+	else if(!bIsInteractable)
+		return "Locked";
+	else 
+		return "Open Lootbox [E]";
+}
+
 void AOPAG_LootBox::BeginPlay()
 {
 	Super::BeginPlay();
@@ -61,6 +71,8 @@ void AOPAG_LootBox::Interact_Implementation()
 	Lid->AddTorqueInRadians(RandomDir * 100, NAME_None, true);
 	// Set can interact to false after player interact with box
 	bIsInteractable = false;
+
+	bHasBeenOpened = true;
 
 	// Active Timer for spawn items
 	SpawnItem();

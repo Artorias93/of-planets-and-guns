@@ -11,6 +11,7 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 
 void UOPAG_UWGunView::NativeConstruct() {
+	Super::NativeConstruct();
 	BindEvents();
 }
 

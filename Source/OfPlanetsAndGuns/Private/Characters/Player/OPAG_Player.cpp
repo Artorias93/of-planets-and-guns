@@ -120,6 +120,8 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// Initialize the object seen by the player
 	InteractableObject = CheckLookAtInteractableItems();
 
+	UpdateInteractableMessage();
+
 	UpdateComparison();
 
 	if (Shield != nullptr)
@@ -813,6 +815,42 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 	return nullptr;
 }
 
+void AOPAG_Player::UpdateInteractableMessage() {
+
+	if (bHasAlreadyLooked) {
+		bHasAlreadyLooked = InteractableObject != nullptr;
+		if (!bHasAlreadyLooked) {
+			EMS->UnlookedAtInteractable.Broadcast();
+		}
+	}
+
+	if (!bHasAlreadyLooked && InteractableObject) {
+		IOPAG_InteractableInterface* Int = Cast<IOPAG_InteractableInterface>(InteractableObject);
+
+		AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject);
+
+		if (Int) {
+			if (Gun && !(Gun->CanInteract_Implementation()))
+				return;
+
+			bool bCanInteract = Int->CanInteract_Implementation();
+			FString str = Int->InteractString_Implementation();
+			EMS->LookedAtInteractable.Broadcast(bCanInteract, str);
+			bHasAlreadyLooked = true;
+		}
+	}
+
+	//DON'T TOUCH!
+	//if(b)
+	// b = Int != Nullptr;
+	//	if(!b)
+	//		EMS->UnLooked
+	// 
+	//if(!b && Int) 
+		//EMS -> LookedAtInt
+		//b = true;
+}
+
 void AOPAG_Player::UpdateComparison() {
 
 	if (InteractableObject == PreviousLookedAtModule)
@@ -832,13 +870,14 @@ void AOPAG_Player::UpdateComparison() {
 			const FOPAG_GunStats OtherGunStats = Gun->Stats;
 			const FString OtherGunName = (Gun->Name).ToString();
 
-			EMS->LookedAtGun.Broadcast(PrimaryGun->Stats, OtherGunStats, OtherGunName);
+			EMS->LookedAtGun.Broadcast(PrimaryGun->Stats, OtherGunStats, OtherGunName, Gun->FireType);
 
 			PreviousLookedAtModule = InteractableObject;
 		}
 
 		AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject);
-		if (Module && IOPAG_InteractableInterface::Execute_CanInteract(Module)) {
+		if (Module && IOPAG_InteractableInterface::Execute_CanInteract(Module)) 
+		{
 
 			FOPAG_GunStats CurrentModuleStats;
 			AOPAG_ModuleBase* CurrentModule = PrimaryGun->GetModuleBySocketType(Module->Type);
@@ -848,7 +887,7 @@ void AOPAG_Player::UpdateComparison() {
 			}
 
 			EMS->LookedAtModule.Broadcast(PrimaryGun->Stats, CurrentModuleStats, Module->Stats,
-				Module->Name, Module->Rarity);
+				Module->Name, Module->Rarity, Module->Type, Module->EquippableFireTypes);
 
 			PreviousLookedAtModule = InteractableObject;
 		}

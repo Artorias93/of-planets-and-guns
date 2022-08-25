@@ -12,6 +12,7 @@
 #include "Blueprint/WidgetTree.h"
 
 void UOPAG_UWPlayerStatsView::NativeConstruct() {
+	Super::NativeConstruct();
 	BindEvents();
 }
 
@@ -86,12 +87,5 @@ void UOPAG_UWPlayerStatsView::DecrementDashAmount()
 {
 	if (DashBox->GetChildrenCount() > 0) {
 		DashBox->RemoveChildAt((DashBox->GetChildrenCount() - 1));
-	}
-}
-
-void UOPAG_UWPlayerStatsView::InitDashIcons(const int DashAmount)
-{
-	for (int i = 0; i < DashAmount; i++) {
-		IncrementDashAmount();
 	}
 }

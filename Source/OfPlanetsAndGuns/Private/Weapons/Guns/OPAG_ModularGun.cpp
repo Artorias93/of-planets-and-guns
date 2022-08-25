@@ -78,6 +78,11 @@ void AOPAG_ModularGun::ApplyFly_Implementation()
 	GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModularGun::FlyRotationTimer_Implementation, .01f, true);
 }
 
+FString AOPAG_ModularGun::InteractString_Implementation()
+{
+	return "Swap gun [E]";
+}
+
 void AOPAG_ModularGun::ApplyForce_Implementation(const FVector Force)
 {
 	Receiver->SetSimulatePhysics(true);
