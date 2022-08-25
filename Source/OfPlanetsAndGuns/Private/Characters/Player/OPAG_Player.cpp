@@ -735,7 +735,12 @@ void AOPAG_Player::UpdateInteractableMessage() {
 	if (!bHasAlreadyLooked && InteractableObject) {
 		IOPAG_InteractableInterface* Int = Cast<IOPAG_InteractableInterface>(InteractableObject);
 
+		AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject);
+
 		if (Int) {
+			if (Gun && !(Gun->CanInteract_Implementation()))
+				return;
+
 			bool bCanInteract = Int->CanInteract_Implementation();
 			FString str = Int->InteractString_Implementation();
 			EMS->LookedAtInteractable.Broadcast(bCanInteract, str);
