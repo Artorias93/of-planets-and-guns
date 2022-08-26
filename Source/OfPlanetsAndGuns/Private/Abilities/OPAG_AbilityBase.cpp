@@ -15,6 +15,12 @@ void AOPAG_AbilityBase::SetCaller(AActor* AbilityCaller)
 	this->Caller = AbilityCaller;
 }
 
+void AOPAG_AbilityBase::SetTarget(const AActor* AbilityTarget)
+{
+	this->Target = AbilityTarget;
+}
+
+
 // Called when the game starts or when spawned
 void AOPAG_AbilityBase::BeginPlay()
 {
@@ -27,6 +33,14 @@ void AOPAG_AbilityBase::BeginPlay()
 	{
 
 	}
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_AbilityBase::DestroyAbility, Duration, false);
+}
+
+void AOPAG_AbilityBase::DestroyAbility()
+{
+	Destroy();
 }
 
 void AOPAG_AbilityBase::Init(EAbilityTypes AbilityType) {}

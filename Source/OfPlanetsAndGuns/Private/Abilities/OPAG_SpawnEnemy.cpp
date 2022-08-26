@@ -43,3 +43,10 @@ void AOPAG_SpawnEnemy::SpawnEnemy(T EnemyClass)
 
 	AOPAG_Enemy* Enemy = GetWorld()->SpawnActor<AOPAG_Enemy>(EnemyClass, GetActorLocation(), GetActorLocation().ToOrientationRotator(), SpawnInfo);
 }
+
+void AOPAG_SpawnEnemy::DestroyAbility()
+{
+	this->SetActorEnableCollision(false);
+
+	Super::DestroyAbility();
+}

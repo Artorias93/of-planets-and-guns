@@ -44,3 +44,11 @@ void AOPAG_RayAbility::Init(EAbilityTypes AbilityType)
 
 }
 
+void AOPAG_RayAbility::DestroyAbility()
+{
+	AbilityCollider->SetCollisionProfileName(TEXT("NoCollision"));
+	this->SetActorEnableCollision(false);
+
+	Super::DestroyAbility();
+}
+

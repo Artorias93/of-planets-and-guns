@@ -40,5 +40,5 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
-		void CastAbility(enum EAbilityTypes AbilityEnum, AActor* Caller, FVector Position);
+		void CastAbility(enum EAbilityTypes AbilityEnum, AActor* Caller, FVector Position, FRotator Rotation, const AActor* Target);
 };

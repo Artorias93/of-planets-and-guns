@@ -53,7 +53,7 @@ void UOPAG_AbilityCasterComponent::BeginPlay()
 	}
 }
 
-void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor* Caller, FVector Position)
+void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor* Caller, FVector Position, FRotator Rotation, const AActor* Target)
 {
 	UClass* AbilityClass = nullptr;
 
@@ -96,9 +96,10 @@ void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor
 	
 	if (AbilityClass != nullptr)
 	{
-		AOPAG_AbilityBase* Ability = GetWorld()->SpawnActor<AOPAG_AbilityBase>(AbilityClass, Position, FRotator::ZeroRotator, SpawnInfo);
+		AOPAG_AbilityBase* Ability = GetWorld()->SpawnActor<AOPAG_AbilityBase>(AbilityClass, Position, Rotation, SpawnInfo);
 
 		Ability->SetCaller(Caller);
+		Ability->SetTarget(Target);
 		Ability->Init(AbilityType);
 	}	
 }

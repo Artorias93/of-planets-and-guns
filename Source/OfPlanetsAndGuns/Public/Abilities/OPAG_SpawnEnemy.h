@@ -18,7 +18,10 @@ public:
 		UDataTable* SpawnableEnemiesTable;
 
 protected:
-	virtual void BeginPlay() override;	
+	virtual void BeginPlay() override;
+
+	virtual void DestroyAbility() override;
+
 	
 	TArray<struct FOPAG_AbilityTypeToEnemyMapping*> SpawnableEnemiesList;
 

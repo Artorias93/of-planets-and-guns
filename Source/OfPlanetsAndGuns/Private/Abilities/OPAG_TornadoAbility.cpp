@@ -36,4 +36,10 @@ void AOPAG_TornadoAbility::Init(EAbilityTypes AbilityType)
 	
 }
 
+void AOPAG_TornadoAbility::DestroyAbility()
+{
+	AbilityCollider->SetCollisionProfileName(TEXT("NoCollision"));
+	this->SetActorEnableCollision(false);
 
+	Super::DestroyAbility();
+}

@@ -16,8 +16,12 @@ class OFPLANETSANDGUNS_API AOPAG_AbilityBase : public AActor
 public:	
 	AOPAG_AbilityBase();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+	float Duration;
+
 public:
 	void SetCaller(AActor* Caller);
+	void SetTarget(const AActor* Target);
 	virtual void Init(EAbilityTypes AbilityType);
 
 protected:
@@ -28,4 +32,9 @@ protected:
 
 	UPROPERTY()
 		AActor* Caller;	
+
+	UPROPERTY()
+		const AActor* Target;
+
+	virtual void DestroyAbility();
 };

@@ -51,12 +51,12 @@ void AOPAG_MageEnemy::BeginPlay()
 			DownLeftCorner.X -= 750;
 			DownLeftCorner.Y -= 750;
 
-			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, UpRightCorner);
-			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, UpLeftCorner);
-			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, DownRightCorner);
-			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, DownLeftCorner);
+			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, UpRightCorner, GetActorRotation(), nullptr);
+			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, UpLeftCorner, GetActorRotation(), nullptr);
+			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, DownRightCorner, GetActorRotation(), nullptr);
+			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, DownLeftCorner, GetActorRotation(), nullptr);
 
-			EMS->CastAbility.Broadcast(EAbilityTypes::ForceField, this, GetActorLocation());
+			EMS->CastAbility.Broadcast(EAbilityTypes::ForceField, this, GetActorLocation(), GetActorRotation(), nullptr);
 		}
 	}	
 }
@@ -95,7 +95,11 @@ void AOPAG_MageEnemy::OnBrokenForceField()
 	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition);
 	EMS->CastAbility.Broadcast(EAbilityTypes::Crack, this, GetRandomPointInRadius());
 	EMS->CastAbility.Broadcast(EAbilityTypes::Ray, this, GetActorLocation());*/
-	EMS->CastAbility.Broadcast(EAbilityTypes::Supernova, this, SupernovaPosition);
+	EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_ShieldEnemy, this, SupernovaPosition, GetActorRotation(), GetFocusedActor());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition, GetActorRotation(), GetFocusedActor());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Crack, this, GetRandomPointInRadius(), GetActorRotation(), GetFocusedActor());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Ray, this, GetRandomPointInRadius(), GetActorRotation(), GetFocusedActor());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Supernova, this, SupernovaPosition, GetActorRotation(), GetFocusedActor());
 }
 
 FVector AOPAG_MageEnemy::GetRandomPointInRadius()
@@ -117,4 +121,14 @@ FVector AOPAG_MageEnemy::GetRandomPointInRadius()
 		}
 	}
 	return GetActorLocation();
+}
+
+AActor* AOPAG_MageEnemy::GetFocusedActor() const
+{
+	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	{
+		return AIController->GetFocusActor();
+	}
+
+	return nullptr;
 }

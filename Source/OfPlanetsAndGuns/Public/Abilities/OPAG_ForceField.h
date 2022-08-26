@@ -24,6 +24,9 @@ protected:
 	UFUNCTION()
 	void OnPillarDestroyed();
 
+	UFUNCTION()
+	virtual void DestroyAbility() override;
+
 	int AvailablePillarsAmount = 0;
 
 	TArray<AActor*> Pillars;

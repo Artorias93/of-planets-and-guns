@@ -48,3 +48,11 @@ void AOPAG_ForceField::OnPillarDestroyed()
 	}
 
 }
+
+void AOPAG_ForceField::DestroyAbility()
+{
+	AbilityMesh->SetCollisionProfileName(TEXT("NoCollision"));
+	this->SetActorEnableCollision(false);
+
+	Super::DestroyAbility();
+}

@@ -83,7 +83,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUsePotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCastAbility, EAbilityTypes, AbilityType, AActor*, Caller, FVector, Position);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FCastAbility, EAbilityTypes, AbilityType, AActor*, Caller, FVector, Position, FRotator, Rotation, const AActor*, Target);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBrokenForceField);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyedPillar);
 

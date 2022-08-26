@@ -14,15 +14,17 @@ class OFPLANETSANDGUNS_API AOPAG_SupernovaAbility : public AOPAG_AbilityBase
 {
 	GENERATED_BODY()
 
-		bool bShoot = false;
-
+	bool bShoot = false;
+	FVector TargetLocation; 
 public:
 	AOPAG_SupernovaAbility();
-	virtual void Init(EAbilityTypes AbilityType) override;
+	virtual void Init(EAbilityTypes AbilityType) override;	
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void DestroyAbility() override;
 
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 		class UStaticMeshComponent* AbilityMesh;

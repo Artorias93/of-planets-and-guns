@@ -13,10 +13,12 @@ class OFPLANETSANDGUNS_API AOPAG_RayAbility : public AOPAG_AbilityBase
 	
 public:
 	AOPAG_RayAbility();
-	virtual void Init(EAbilityTypes AbilityType) override;
+	virtual void Init(EAbilityTypes AbilityType) override;	
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void DestroyAbility() override;
 
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 		class UStaticMeshComponent* AbilityMesh;

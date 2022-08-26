@@ -31,6 +31,14 @@ void AOPAG_CrackAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAc
 	}
 }
 
+void AOPAG_CrackAbility::DestroyAbility()
+{
+	AbilityCollider->SetCollisionProfileName(TEXT("NoCollision"));
+	this->SetActorEnableCollision(false);
+
+	Super::DestroyAbility();
+}
+
 void AOPAG_CrackAbility::Init(EAbilityTypes AbilityType)
 {
 

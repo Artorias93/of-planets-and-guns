@@ -33,15 +33,15 @@ void AOPAG_SupernovaAbility::BeginPlay()
 void AOPAG_SupernovaAbility::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("ticking"));
-	if (bShoot)
+
+	if (bShoot && Target != nullptr)
 	{
-		FVector CurrentLocation = this->GetActorLocation();
+		FVector CurrentLocation = GetActorLocation();
+		FVector MovementVector = TargetLocation - CurrentLocation;
+		FVector Velocity{ MovementVector.Normalize() * speed * DeltaTime };
+		FVector NewLocation = CurrentLocation + Velocity;
 
-		CurrentLocation.X += speed * DeltaTime; // use X Y or Z.  Use -= to go the opposite way
-		CurrentLocation.Z -= speed/2 * DeltaTime; // use X Y or Z.  Use -= to go the opposite way
-
-		SetActorLocation(CurrentLocation);
+		SetActorLocation(NewLocation);
 	}
 }
 
@@ -53,16 +53,27 @@ void AOPAG_SupernovaAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp,
 	}
 
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AbilityParticleHit, OtherActor->GetActorLocation(), GetActorRotation());
+	AbilityCollider->SetCollisionProfileName(TEXT("NoCollision"));
+	this->SetActorEnableCollision(false);
 }
 
 void AOPAG_SupernovaAbility::ShootProjectile()
 {
 	bShoot = true;
 	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AbilityParticleProjectile, GetActorLocation(), GetActorRotation());
+	TargetLocation = Target->GetActorLocation();
 	UNiagaraFunctionLibrary::SpawnSystemAttached(AbilityParticleProjectile, AbilityCollider, "", GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false);
 }
 
 void AOPAG_SupernovaAbility::Init(EAbilityTypes AbilityType)
 {
 
+}
+
+void AOPAG_SupernovaAbility::DestroyAbility()
+{
+	AbilityCollider->SetCollisionProfileName(TEXT("NoCollision"));
+	this->SetActorEnableCollision(false);
+
+	Super::DestroyAbility();
 }
