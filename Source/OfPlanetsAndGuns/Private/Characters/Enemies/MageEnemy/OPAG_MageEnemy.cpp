@@ -2,59 +2,60 @@
 
 
 #include "Characters/Enemies/MageEnemy/OPAG_MageEnemy.h"
-#include "Characters/Enemies/PillarEnemy/OPAG_PillarEnemy.h"
 #include "Components/ChildActorComponent.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
-#include "Abilities/OPAG_AbilityCaster.h"
-#include "Abilities/OPAG_ForceField.h"
+#include "Abilities/OPAG_AbilityCasterComponent.h"
 
 AOPAG_MageEnemy::AOPAG_MageEnemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	AbilityCaster = CreateDefaultSubobject<UOPAG_AbilityCasterComponent>("AbilityCaster");
 }
 
 void AOPAG_MageEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+	this->SetActorEnableCollision(false);
+
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	// Check if already exists an Ability Caster instance, if yes use it, otherwise create it
-	AActor* AbilityCasterActor = UGameplayStatics::GetActorOfClass(GetWorld(), AOPAG_AbilityCaster::StaticClass());
-	if (AbilityCasterActor != nullptr)
-	{
-		AbilityCaster = Cast<AOPAG_AbilityCaster>(AbilityCasterActor);
-	}
-	else
-		AbilityCaster = GetWorld()->SpawnActor<AOPAG_AbilityCaster>(AOPAG_AbilityCaster::StaticClass(), this->GetActorLocation(), this->GetActorRotation(), SpawnInfo);
-	
-	// retrieve all pillars in game. The amount will determine when the first phase will finish
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_PillarEnemy::StaticClass(), Pillars);
-	AvailablePillarsAmount = Pillars.Num();
-
-	// if no pillars are already spawned, then the enemy will go direcetly in second phase
-	if (AvailablePillarsAmount <= 0)
-		FightStatus = FIGHT_STATUS::SECOND;
 
 	if (EMS != nullptr)
 	{
 		EMS->EnemyKilled.AddDynamic(this,
 			&AOPAG_MageEnemy::OnEnemyDeath);
 
+		EMS->BrokenForceField.AddDynamic(this,
+			&AOPAG_MageEnemy::OnBrokenForceField);
+
 		// the check is mandatory even if we don't use it directly, since the Ability Caster will receive the event
 		if (AbilityCaster != nullptr)
 		{			
-			FVector Location = GetActorLocation();
-			Location.Z -= 300;
+			FVector UpRightCorner = GetActorLocation();
+			UpRightCorner.X += 750;
+			UpRightCorner.Y += 750;
+			FVector UpLeftCorner = GetActorLocation();
+			UpLeftCorner.X += 750;
+			UpLeftCorner.Y -= 750;
+			FVector DownRightCorner = GetActorLocation();
+			DownRightCorner.X -= 750;
+			DownRightCorner.Y += 750;
+			FVector DownLeftCorner = GetActorLocation();
+			DownLeftCorner.X -= 750;
+			DownLeftCorner.Y -= 750;
 
-			EMS->CastAbility.Broadcast(AOPAG_ForceField::StaticClass(), this, Location, ForceField);
+			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, UpRightCorner);
+			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, UpLeftCorner);
+			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, DownRightCorner);
+			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, DownLeftCorner);
+
+			EMS->CastAbility.Broadcast(EAbilityTypes::ForceField, this, GetActorLocation());
 		}
-	}
-
-	
+	}	
 }
 
 void AOPAG_MageEnemy::Attack()
@@ -64,22 +65,21 @@ void AOPAG_MageEnemy::Attack()
 
 void AOPAG_MageEnemy::Death()
 {
-
+	Super::Death();
 }
 
 void AOPAG_MageEnemy::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 {
-	
-	if (const AOPAG_PillarEnemy* Pillar = Cast<AOPAG_PillarEnemy>(Enemy))
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Pillar destroyed"));
-		DestroyedPillarCounter++;
 
-		// if all pillars are destroyed, then will start the second phase
-		if (DestroyedPillarCounter >= AvailablePillarsAmount)
-		{
-			FightStatus = FIGHT_STATUS::SECOND;
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Second phase has begun"));
-		}
-	}
+}
+
+void AOPAG_MageEnemy::OnBrokenForceField()
+{
+	FightStatus = EFightStatus::SecondPhase;
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Second Stage started"));	
+
+	GetMesh()->SetCollisionProfileName(TEXT("BlockAll"));
+	this->SetActorEnableCollision(true);
+
+	EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_ShieldEnemy, this, GetActorLocation());
 }

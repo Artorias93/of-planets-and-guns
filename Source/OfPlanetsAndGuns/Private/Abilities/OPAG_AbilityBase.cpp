@@ -2,7 +2,6 @@
 
 
 #include "Abilities/OPAG_AbilityBase.h"
-#include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 
 // Sets default values
@@ -12,6 +11,11 @@ AOPAG_AbilityBase::AOPAG_AbilityBase()
 
 	AbilityMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	AbilityMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+}
+
+void AOPAG_AbilityBase::SetCaller(AActor* AbilityCaller)
+{
+	this->Caller = AbilityCaller;
 }
 
 // Called when the game starts or when spawned
@@ -27,3 +31,5 @@ void AOPAG_AbilityBase::BeginPlay()
 
 	}
 }
+
+void AOPAG_AbilityBase::Init(EAbilityTypes AbilityType) {}

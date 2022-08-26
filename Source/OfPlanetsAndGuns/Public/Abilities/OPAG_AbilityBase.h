@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Abilities/OPAG_AbilityTypes.h"
 #include "OPAG_AbilityBase.generated.h"
 
 UCLASS()
@@ -14,11 +16,18 @@ class OFPLANETSANDGUNS_API AOPAG_AbilityBase : public AActor
 public:	
 	AOPAG_AbilityBase();
 
+public:
+	void SetCaller(AActor* Caller);
+	virtual void Init(EAbilityTypes AbilityType);
+
 protected:
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override;	
 
 	UPROPERTY()
-		class UOPAG_EventManagerSubsystem* EMS;
+		UOPAG_EventManagerSubsystem* EMS;
+
+	UPROPERTY()
+		AActor* Caller;
 
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 		class UStaticMeshComponent* AbilityMesh;

@@ -6,11 +6,11 @@
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include "OPAG_MageEnemy.generated.h"
 
-UENUM(BlueprintType)
-enum FIGHT_STATUS
+UENUM()
+enum EFightStatus
 {
-	FIRST UMETA(DisplayName = "FIRST PHASE"),
-	SECOND UMETA(DisplayName = "SECOND PHASE")
+	FirstPhase UMETA(DisplayName = "FIRST PHASE"),
+	SecondPhase UMETA(DisplayName = "SECOND PHASE")
 };
 
 UCLASS()
@@ -26,25 +26,19 @@ public:
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
 		virtual void Death() override;	
 
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override;	
 
 protected:
 
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
 		void OnEnemyDeath(const AOPAG_Enemy* const Enemy);
 
-	UPROPERTY(EditAnywhere, Category = "OPAG AI")
-		class AOPAG_ForceField* ForceField;
+	UFUNCTION(CallInEditor, Category = "OPAG AI")
+		void OnBrokenForceField();	
 
-	UPROPERTY()
-	class AOPAG_AbilityCaster* AbilityCaster;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Caster")
+		class UOPAG_AbilityCasterComponent* AbilityCaster;
 
 private:
-	FIGHT_STATUS FightStatus = FIGHT_STATUS::FIRST;
-
-	int AvailablePillarsAmount = 0;
-
-	int DestroyedPillarCounter = 0;
-
-	TArray<class AActor*> Pillars;		
+	EFightStatus FightStatus = EFightStatus::FirstPhase;
 };
