@@ -85,21 +85,26 @@ void AOPAG_MageEnemy::OnBrokenForceField()
 	GetMesh()->SetCollisionProfileName(TEXT("BlockAll"));
 	this->SetActorEnableCollision(true);
 
-	FVector TornadoPosition = GetRandomPointInRadius();
-	TornadoPosition.Z += 250;
+	FVector TornadoPosition1 = GetRandomPointInRadius();
+	TornadoPosition1.Z += 250;
+
+	FVector TornadoPosition2 = GetRandomPointInRadius();
+	TornadoPosition2.Z += 250;
+
+	FVector TornadoPosition3 = GetRandomPointInRadius();
+	TornadoPosition3.Z += 250;
 
 	FVector SupernovaPosition = GetActorLocation();
 	SupernovaPosition.Z += 500;
 
-	/*EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_ShieldEnemy, this, GetRandomPointInRadius());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition);
-	EMS->CastAbility.Broadcast(EAbilityTypes::Crack, this, GetRandomPointInRadius());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Ray, this, GetActorLocation());*/
-	EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_ShieldEnemy, this, SupernovaPosition, GetActorRotation(), GetFocusedActor());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition, GetActorRotation(), GetFocusedActor());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Crack, this, GetRandomPointInRadius(), GetActorRotation(), GetFocusedActor());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Ray, this, GetRandomPointInRadius(), GetActorRotation(), GetFocusedActor());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Supernova, this, SupernovaPosition, GetActorRotation(), GetFocusedActor());
+	
+	//EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_ShieldEnemy, this, SupernovaPosition, GetActorRotation(), GetFocusedActor());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition1, GetActorRotation(), GetFocusedActor());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition2, GetActorRotation(), GetFocusedActor());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition3, GetActorRotation(), GetFocusedActor());
+	//EMS->CastAbility.Broadcast(EAbilityTypes::Crack, this, GetRandomPointInRadius(), GetActorRotation(), GetFocusedActor());
+	//EMS->CastAbility.Broadcast(EAbilityTypes::Ray, this, GetRandomPointInRadius(), GetActorRotation(), GetFocusedActor());
+	//EMS->CastAbility.Broadcast(EAbilityTypes::Supernova, this, SupernovaPosition, GetActorRotation(), GetFocusedActor());
 }
 
 FVector AOPAG_MageEnemy::GetRandomPointInRadius()

@@ -18,8 +18,12 @@ public:
 	AOPAG_TornadoAbility();
 	virtual void Init(EAbilityTypes AbilityType) override;	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float Speed;
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void DestroyAbility() override;
 

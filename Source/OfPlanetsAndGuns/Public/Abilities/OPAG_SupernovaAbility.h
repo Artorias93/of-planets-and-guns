@@ -20,6 +20,9 @@ public:
 	AOPAG_SupernovaAbility();
 	virtual void Init(EAbilityTypes AbilityType) override;	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float Speed;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -39,9 +42,7 @@ protected:
 		class UNiagaraSystem* AbilityParticleProjectile;
 
 	UPROPERTY(EditAnywhere, Category = "Particle Hit")
-		class UNiagaraSystem* AbilityParticleHit;
-
-	float speed = 1000;
+		class UNiagaraSystem* AbilityParticleHit;	
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

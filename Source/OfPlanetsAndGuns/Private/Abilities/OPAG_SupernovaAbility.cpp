@@ -38,7 +38,7 @@ void AOPAG_SupernovaAbility::Tick(float DeltaTime)
 	{
 		FVector CurrentLocation = GetActorLocation();
 		FVector MovementVector = TargetLocation - CurrentLocation;
-		FVector Velocity{ MovementVector.Normalize() * speed * DeltaTime };
+		FVector Velocity{ MovementVector.Normalize() * Speed * DeltaTime };
 		FVector NewLocation = CurrentLocation + Velocity;
 
 		SetActorLocation(NewLocation);
