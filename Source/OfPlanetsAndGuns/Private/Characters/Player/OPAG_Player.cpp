@@ -356,7 +356,7 @@ void AOPAG_Player::InitDashValues()
 		EMS->DashAmountIncrement.Broadcast();
 	}
 
-	EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
+	//EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
 }
 #pragma endregion Init
 
@@ -983,7 +983,7 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 	{
 		SetHealth(StateToApply.Health);
 		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), StateToApply.DashCount);
-		EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
+		//EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
 		bIsDashAlreadyInitialized = false;
 		InitDashValues();	
 	
