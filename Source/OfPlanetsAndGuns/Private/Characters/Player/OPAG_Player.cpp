@@ -26,6 +26,7 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Characters/Player/OPAG_AttributeSetPlayer.h"
 #include <AbilitySystemBlueprintLibrary.h>
+#include "Characters/Enemies/OPAG_Enemy.h"
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -133,6 +134,9 @@ void AOPAG_Player::Tick(float DeltaTime)
 	{
 		Shield->SetActorLocation(GetActorLocation());
 	}
+
+	// Check if player sees enemy (for health bar)
+	LookAtEnemy();
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage)
@@ -785,13 +789,13 @@ const FVector AOPAG_Player::CalculateModuleSpawnLocation() const
 	return SpawnLocation;
 }
 
-void AOPAG_Player::CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection)
+void AOPAG_Player::CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection, float MaxDistance)
 {
 	const FVector CameraRotationToForward = FRotationMatrix(Camera->GetComponentRotation()).GetScaledAxis(EAxis::X);
 	const FVector CameraLocation = Camera->GetComponentLocation();
 
 	OutStartLocation = (CameraRotationToForward * LookUpDistanceToPlayer) + CameraLocation;
-	OutDirection = OutStartLocation + (CameraRotationToForward * LookUpMaxDistance);
+	OutDirection = OutStartLocation + (CameraRotationToForward * MaxDistance);
 }
 
 AActor* AOPAG_Player::CheckLookAtInteractableItems()
@@ -799,7 +803,7 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 	// Calculate main location for tracing
 	FVector CameraStartLocation;
 	FVector CameraDirection;
-	CalculateLookAtLocations(CameraStartLocation, CameraDirection);
+	CalculateLookAtLocations(CameraStartLocation, CameraDirection, LookUpMaxDistance);
 
 	// Calculate Tracing
 	TArray<FHitResult> OutHits;
@@ -895,6 +899,28 @@ void AOPAG_Player::UpdateComparison() {
 	}
 
 }
+
+void AOPAG_Player::LookAtEnemy()
+{
+	FVector StartLocation;
+	FVector OutDirection;
+	CalculateLookAtLocations(StartLocation, OutDirection, LookAtMaxEnemyDistance);
+	TArray<AActor*> ActorsToIgnore;
+	GetAllChildActors(ActorsToIgnore);
+	TArray<FHitResult> OutHitResults;
+	bool bResult = UKismetSystemLibrary::LineTraceMulti(GetWorld(), StartLocation, OutDirection,
+		ETraceTypeQuery::TraceTypeQuery1, true,  ActorsToIgnore, EDrawDebugTrace::None, OutHitResults, true);
+	if (bResult && OutHitResults.Num() > 0) {
+		for (int i = 0; i < OutHitResults.Num(); i++) {
+			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHitResults[i].Actor);
+			if (Enemy != nullptr) {
+				Enemy->SetHealthBarVisible();
+			}
+		}
+		return;
+	}
+}
+
 #pragma endregion LookAtInteractable
 
 #pragma region Others Input

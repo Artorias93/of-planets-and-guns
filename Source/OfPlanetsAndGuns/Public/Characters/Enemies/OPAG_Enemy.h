@@ -8,6 +8,8 @@
 class USphereComponent;
 class UBehaviorTree;
 class AOPAG_PatrolPath;
+class UWidgetComponent;
+class UOPAG_EnemyHealthBar;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Enemy : public AOPAG_CharacterBase
@@ -36,9 +38,13 @@ public:
 
 	AOPAG_PatrolPath* GetPatrolPath() const;
 
+	virtual void SetHealthBarVisible();
+
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	void DropAndDespawn();
 
@@ -83,6 +89,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	UParticleSystemComponent* SpawnParticle;
 
+	UPROPERTY(EditAnywhere, Category = "OPAG UI", meta = (AllowPrivateAccess = true))
+	UWidgetComponent* EnemyHealthBarComponent;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG UI", meta = (AllowPrivateAccess = true))
+	TSubclassOf<UUserWidget> EnemyHealthBarClass;
+
 
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
@@ -90,6 +102,8 @@ private:
 
 	TArray<UMaterial*> NormalMaterials;
 	UMaterialInstanceDynamic* ActiveMaterial;
+	UOPAG_EnemyHealthBar* EnemyHealthBar;
+
 
 	UPROPERTY()
 		UTimelineComponent* SpawnTimeline;
@@ -99,4 +113,8 @@ private:
 
 	FOnTimelineVector OnSpawnFXTimelineProgress;
 	FOnTimelineEventStatic OnSpawnFXTimelineFinished;
+	FTimerHandle UnseenByPlayerHandle;
+
+	UFUNCTION()
+	void ResetHealthBarHidden();
 };

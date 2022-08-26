@@ -104,6 +104,9 @@ public:
 	float LookUpMaxDistance = 100.f;
 
 	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
+	float LookAtMaxEnemyDistance = 9000.f;
+
+	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
 	float LookUpCapsuleRadius = 20.f;
 
 	UPROPERTY(Category = "LookupInteractableTypes", EditAnywhere, BlueprintReadWrite)
@@ -213,12 +216,15 @@ private:
 	virtual void GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance = 0) override;
 
 	// LookAt intractable items
-	void CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection); 
+	void CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection, float MaxDistance);
 	AActor* CheckLookAtInteractableItems();
 	const FVector CalculateModuleSpawnLocation() const;
 
 	void UpdateInteractableMessage();
 	void UpdateComparison();
+
+	// Lookat Enemy distance
+	void LookAtEnemy();
 
 	// Interact with items
 	void InteractWithModule(AOPAG_ModuleBase* Module);

@@ -5,6 +5,9 @@
 #include <Kismet/GameplayStatics.h>
 #include <BrainComponent.h>
 #include <Curves/CurveVector.h>
+#include <Kismet/KismetMathLibrary.h>
+#include <Components/WidgetComponent.h>
+#include <Components/ProgressBar.h>
 //My Classes
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/OPAG_AttributeSetBase.h"
@@ -14,10 +17,14 @@
 #include "Characters/Enemies/OPAG_LootDropSystemComponent.h"
 #include "Components/SphereComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "UI/OPAG_EnemyHealthBar.h"
+#include "Characters/OPAG_CharacterBase.h"
+
+
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	HeadCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Head Collider"));
 	HeadCollider->SetupAttachment(GetMesh(), TEXT("HeadCenter"));
@@ -51,11 +58,34 @@ AOPAG_Enemy::AOPAG_Enemy()
 	{
 		SpawnFXCurve = SpawnFXCurveFinder.Object;
 	}
+
+	EnemyHealthBarComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("EnemyHealthBar"));
+	if (EnemyHealthBarComponent != nullptr) {
+		EnemyHealthBarComponent->SetWorldLocation(FVector(0.f, 0.f, 150.f));
+		EnemyHealthBarComponent->SetWidgetSpace(EWidgetSpace::World);
+		EnemyHealthBarComponent->SetDrawSize(FVector2D(100.f, 10.f));
+		EnemyHealthBarComponent->SetupAttachment(RootComponent);
+	}
+
 }
 
 void AOPAG_Enemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (EnemyHealthBarComponent != nullptr) {
+		if (EnemyHealthBarComponent->GetWidgetClass() == nullptr)
+			EnemyHealthBarComponent->SetWidgetClass(EnemyHealthBarClass);
+		EnemyHealthBar = Cast<UOPAG_EnemyHealthBar>(EnemyHealthBarComponent->GetWidget());
+		if (EnemyHealthBar == nullptr) return;
+		const float HealthPercent = BaseAttributeSet->GetHealth() / BaseAttributeSet->GetMaxHealth();
+		EnemyHealthBar->GetProgressBar()->SetPercent(HealthPercent);
+		EnemyHealthBarComponent->SetHiddenInGame(true);
+		//UE_LOG(LogTemp, Warning, TEXT("Health enemy: %f "), HealthPercent);
+	}
+		
+
+
 
 	//Gets bUsingPatrolPath from the instance
 	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
@@ -64,6 +94,17 @@ void AOPAG_Enemy::BeginPlay()
 	}
 
 	InitSpawnFX();
+}
+
+void AOPAG_Enemy::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (EnemyHealthBarComponent != nullptr && !EnemyHealthBarComponent->bHiddenInGame) {
+		const AOPAG_Player* PlayerRef = GetWorld()->GetFirstPlayerController()->GetPawn<AOPAG_Player>(); // player ref
+		const FRotator LookToPlayerRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PlayerRef->GetActorLocation());		
+		EnemyHealthBarComponent->SetWorldRotation(LookToPlayerRotation);
+	}	
 }
 
 void AOPAG_Enemy::UpdateSpeed(float const NewSpeed) const
@@ -88,6 +129,10 @@ void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
 	//TODO: Remove the print to screen
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
+
+	// Update health bar
+	const float HealthPercent = BaseAttributeSet->GetHealth() / BaseAttributeSet->GetMaxHealth();
+	EnemyHealthBar->GetProgressBar()->SetPercent(HealthPercent);
 }
 
 void AOPAG_Enemy::Attack()
@@ -102,6 +147,9 @@ void AOPAG_Enemy::Death()
 	{
 		AIController->GetBrainComponent()->StopLogic("Death");
 	}
+
+	// Set HealthBar hidden
+	EnemyHealthBarComponent->SetHiddenInGame(true);
 
 	//Mesh ragdoll functions
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
@@ -175,5 +223,19 @@ AOPAG_PatrolPath* AOPAG_Enemy::GetPatrolPath() const
 {
 	return PatrolPath;
 }
+
+void AOPAG_Enemy::SetHealthBarVisible()
+{
+	EnemyHealthBarComponent->SetHiddenInGame(false);
+	GetWorld()->GetTimerManager().ClearTimer(UnseenByPlayerHandle);
+	GetWorld()->GetTimerManager().SetTimer(UnseenByPlayerHandle, this, &AOPAG_Enemy::ResetHealthBarHidden, 3.f, false);
+}
+
+void AOPAG_Enemy::ResetHealthBarHidden()
+{
+	EnemyHealthBarComponent->SetHiddenInGame(true);
+}
+
+
 
 #pragma endregion
