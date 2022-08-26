@@ -198,7 +198,6 @@ void AOPAG_Player::BroadcastEvents()
 {
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
-	EMS->DashAmountChanged.Broadcast(DashCount);
 	EMS->RequestPlayerState.Broadcast();
 
 	for (int i = 0; i < DashMaxCount; i++) {
@@ -329,8 +328,6 @@ void AOPAG_Player::ActiveDash()
 		if (bSuccess)
 		{
 			DashCount--;
-
-			EMS->DashAmountChanged.Broadcast(DashCount);
 
 			EMS->DashAmountDecrement.Broadcast();
 
@@ -814,7 +811,7 @@ void AOPAG_Player::UsePotion()
 		if (bSuccess)
 		{
 			InventorySystemComp->PotionsAmount--;
-			EMS->PotionsChanged.Broadcast(InventorySystemComp->PotionsAmount);
+			EMS->PotionsAmountDecrement.Broadcast();
 		}
 	}
 }
@@ -840,7 +837,6 @@ void AOPAG_Player::DashTimelineFinished()
 {
 	DashTimeline->SetTimelineLength(DashRestoreTime);
 	DashCount++;
-	EMS->DashAmountChanged.Broadcast(DashCount);
 	EMS->DashAmountIncrement.Broadcast();
 
 	if (DashCount < DashMaxCount)
@@ -894,7 +890,11 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 	{
 		SetHealth(StateToApply.Health);
 		DashCount = StateToApply.DashCount;
-		EMS->DashAmountChanged.Broadcast(DashCount);
+
+		for (int i = 0; i < DashCount; i++) {
+			EMS->DashAmountIncrement.Broadcast();
+		}
+
 		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
 		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
 	}

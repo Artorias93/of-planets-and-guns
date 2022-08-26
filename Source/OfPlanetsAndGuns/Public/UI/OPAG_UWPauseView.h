@@ -19,6 +19,13 @@ class OFPLANETSANDGUNS_API UOPAG_UWPauseView : public UUserWidget
 {
 	GENERATED_BODY()
 
+	void BindEvents();
+
+	UPROPERTY(meta = (BindWidget))
+		UImage* GoldIcon;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* GoldAmountText;
+
 	UPROPERTY(meta = (BindWidget))
 		UImage* PauseBackgroundImage;
 	UPROPERTY(meta = (BindWidget))
@@ -35,6 +42,9 @@ public:
 	void OptionsButtonClicked(); 
 	UFUNCTION()
 	void ExitButtonClicked();
+
+	UFUNCTION()
+	void UpdateGoldValue(const int Value);
 
 	void NativeConstruct();
 };

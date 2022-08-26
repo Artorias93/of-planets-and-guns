@@ -4,8 +4,11 @@
 #include "UI/OPAG_UWCurrencyView.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "Components/HorizontalBox.h"
+#include "Components/HorizontalBoxSlot.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Blueprint/WidgetTree.h"
 
 void UOPAG_UWCurrencyView::NativeConstruct() {
 	BindEvents();
@@ -16,29 +19,60 @@ void UOPAG_UWCurrencyView::BindEvents()
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 
 	if (EMS) {
-		EMS->GoldChanged.AddDynamic(this, &UOPAG_UWCurrencyView::UpdateGoldValue);
-		EMS->BoltsChanged.AddDynamic(this, &UOPAG_UWCurrencyView::UpdateBoltsValue);
-		EMS->PotionsChanged.AddDynamic(this, &UOPAG_UWCurrencyView::UpdatePotionsValue);
+		EMS->PotionsAmountIncrement.AddDynamic(this, &UOPAG_UWCurrencyView::IncrementPotionsAmount);
+		EMS->PotionsAmountDecrement.AddDynamic(this, &UOPAG_UWCurrencyView::DecrementPotionsAmount);
+
+		EMS->BoltsAmountIncrement.AddDynamic(this, &UOPAG_UWCurrencyView::IncrementBoltsAmount);
+		EMS->BoltsAmountDecrement.AddDynamic(this, &UOPAG_UWCurrencyView::DecrementBoltsAmount);
 	}
 }
 
-void UOPAG_UWCurrencyView::UpdateBoltsValue(const int Value)
+void UOPAG_UWCurrencyView::IncrementPotionsAmount()
 {
-	if (BoltsAmountText && Value >= 0) {
-		BoltsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
+	UImage* const NewPotionsIcon = WidgetTree->ConstructWidget<UImage>();
+
+	if (PotionsIconTexture) {
+		NewPotionsIcon->SetBrushFromTexture(PotionsIconTexture);
+	}
+
+	if (NewPotionsIcon)
+		PotionsBox->AddChild(NewPotionsIcon);
+
+	UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(PotionsBox->GetSlots()[(PotionsBox->GetChildrenCount() - 1)]);
+
+	if (MyBoxSlot) {
+		MyBoxSlot->SetPadding(FMargin(5, 5, 5, 5));
 	}
 }
 
-void UOPAG_UWCurrencyView::UpdateGoldValue(const int Value)
+void UOPAG_UWCurrencyView::DecrementPotionsAmount()
 {
-	if (GoldAmountText && Value >= 0) {
-		GoldAmountText->SetText(FText::FromString(FString::FromInt(Value)));
+	if (PotionsBox->GetChildrenCount() > 0) {
+		PotionsBox->RemoveChildAt((PotionsBox->GetChildrenCount() - 1));
 	}
 }
 
-void UOPAG_UWCurrencyView::UpdatePotionsValue(const int Value)
+void UOPAG_UWCurrencyView::IncrementBoltsAmount()
 {
-	if (PotionsAmountText && Value >= 0) {
-		PotionsAmountText->SetText(FText::FromString(FString::FromInt(Value)));
+	UImage* const NewBoltsIcon = WidgetTree->ConstructWidget<UImage>();
+
+	if (BoltsIconTexture) {
+		NewBoltsIcon->SetBrushFromTexture(BoltsIconTexture);
+	}
+
+	if (NewBoltsIcon)
+		BoltsBox->AddChild(NewBoltsIcon);
+
+	UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(BoltsBox->GetSlots()[(BoltsBox->GetChildrenCount() - 1)]);
+
+	if (MyBoxSlot) {
+		MyBoxSlot->SetPadding(FMargin(5, 5, 5, 5));
+	}
+}
+
+void UOPAG_UWCurrencyView::DecrementBoltsAmount()
+{
+	if (BoltsBox->GetChildrenCount() > 0) {
+		BoltsBox->RemoveChildAt((BoltsBox->GetChildrenCount() - 1));
 	}
 }
