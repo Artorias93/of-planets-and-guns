@@ -22,6 +22,7 @@ void UOPAG_UWGunView::BindEvents()
 	if (EMS) {
 		EMS->TotalAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateTotalAmmoText);
 		EMS->CurrentAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateCurrentAmmoText);
+		EMS->ColorAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateAmmoColor);
 	}
 }
 
@@ -36,5 +37,13 @@ void UOPAG_UWGunView::UpdateTotalAmmoText(const int CurrentValue)
 {
 	if (TotalAmmoText && CurrentValue >= 0) {
 		TotalAmmoText->SetText(FText::FromString(FString::FromInt(CurrentValue)));
+	}
+}
+
+void UOPAG_UWGunView::UpdateAmmoColor(const FLinearColor ColorParam)
+{
+	if (TotalAmmoText && CurrentAmmoText) {
+		CurrentAmmoText->SetColorAndOpacity(ColorParam);
+		TotalAmmoText->SetColorAndOpacity(ColorParam);
 	}
 }

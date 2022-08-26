@@ -36,7 +36,9 @@ public:
 	UFUNCTION()
 		void UpdateCurrentAmmoText(const int CurrentValue);
 	UFUNCTION()
-		void UpdateTotalAmmoText(const int CurrentValue);
+		void UpdateTotalAmmoText(const int CurrentValue); 
+	UFUNCTION()
+		void UpdateAmmoColor(const FLinearColor ColorParam);
 
 	void NativeConstruct();
 };

@@ -42,6 +42,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FColorAmmoChanged, const FLinearColor, ColorParam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
@@ -150,6 +151,8 @@ public:
 		FAmmoChanged TotalAmmoChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FAmmoChanged CurrentAmmoChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FColorAmmoChanged ColorAmmoChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FGoldChanged GoldChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
