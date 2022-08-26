@@ -9,6 +9,9 @@ enum class EAbilityTypes : uint8
 {
 	ForceField,
 	Tornado,
+	Crack,
+	Ray,
+	Supernova,
 	Spawn_ShieldEnemy,
 	Spawn_RangedEnemy,
 	Spawn_MachineGunEnemy,

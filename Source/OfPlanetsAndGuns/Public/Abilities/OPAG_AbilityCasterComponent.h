@@ -25,6 +25,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 		TSubclassOf<class AOPAG_TornadoAbility> TornadoAbilityClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+		TSubclassOf<class AOPAG_CrackAbility> CrackAbilityClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+		TSubclassOf<class AOPAG_RayAbility> RayAbilityClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+		TSubclassOf<class AOPAG_SupernovaAbility> SupernovaAbilityClass;
+
 	UPROPERTY()
 		class UOPAG_EventManagerSubsystem* EMS;
 

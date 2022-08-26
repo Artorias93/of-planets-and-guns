@@ -6,7 +6,6 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Abilities/OPAG_AbilityCasterComponent.h"
-#include "Abilities/OPAG_AbilityCasterComponent.h"
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "NavigationSystem.h"
 
@@ -87,10 +86,16 @@ void AOPAG_MageEnemy::OnBrokenForceField()
 	this->SetActorEnableCollision(true);
 
 	FVector TornadoPosition = GetRandomPointInRadius();
-	TornadoPosition.Z += 500;
+	TornadoPosition.Z += 250;
 
-	EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_ShieldEnemy, this, GetRandomPointInRadius());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, GetRandomPointInRadius());
+	FVector SupernovaPosition = GetActorLocation();
+	SupernovaPosition.Z += 500;
+
+	/*EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_ShieldEnemy, this, GetRandomPointInRadius());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition);
+	EMS->CastAbility.Broadcast(EAbilityTypes::Crack, this, GetRandomPointInRadius());
+	EMS->CastAbility.Broadcast(EAbilityTypes::Ray, this, GetActorLocation());*/
+	EMS->CastAbility.Broadcast(EAbilityTypes::Supernova, this, SupernovaPosition);
 }
 
 FVector AOPAG_MageEnemy::GetRandomPointInRadius()
