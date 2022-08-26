@@ -52,6 +52,8 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 		BehaviorTreeComponent->StartTree(*ControlledEnemy->GetBehaviorTree());
 
 		PerceptionComp->OnTargetPerceptionUpdated.AddDynamic(this, &AOPAG_AICBase::OnPerceptionUpdated);
+
+		GetBlackboardComponent()->SetValueAsObject("SelfActor", ControlledPawn);
 	}
 }
 
