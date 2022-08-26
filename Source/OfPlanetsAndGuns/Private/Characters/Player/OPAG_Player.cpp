@@ -472,7 +472,14 @@ void AOPAG_Player::ReloadGun()
 	if (bIsPrimaryGun && !CheckIsReloading && PrimaryGun->AmmoCurrent < PrimaryGun->Stats.ClipSize)
 	{
 		PrimaryGun->Reload();
-		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
+
+		const float ReloadAnimationLength = ReloadMontageToPlay->GetPlayLength();
+		const float ReloadTime = PrimaryGun->Stats.ReloadingTime;
+
+		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, 
+			ReloadAnimationLength / ReloadTime,
+			EMontagePlayReturnType::MontageLength, 
+			0, true);
 
 		EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
 	}
