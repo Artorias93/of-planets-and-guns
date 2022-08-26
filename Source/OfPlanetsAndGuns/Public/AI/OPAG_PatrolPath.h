@@ -26,8 +26,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "AI", Meta = (MakeEditWidget = true))
 	TArray<FVector> PatrolPathPoints;
 
-private:
+//private:
 	
-	UPROPERTY(EditAnywhere, Category = "AI", meta=(AllowPrivateAccess = true))
-	int StartingPatrolPathIndex; //Currently unused
+	//UPROPERTY(EditAnywhere, Category = "AI", meta=(AllowPrivateAccess = true))
+	//int StartingPatrolPathIndex; //Currently unused
 };

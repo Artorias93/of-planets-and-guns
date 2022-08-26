@@ -42,20 +42,6 @@ AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 		ShieldMesh->ComponentTags.Add(FName("Shield"));
 	}
 
-	ParticleComponent1 = CreateDefaultSubobject<UParticleSystemComponent>("Booster Component 1");
-	if(ParticleComponent1)
-	{
-		ParticleComponent1->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
-			"LeftFootSocket");
-	}
-	
-	ParticleComponent2 = CreateDefaultSubobject<UParticleSystemComponent>("Booster Component 2");
-	if(ParticleComponent2)
-	{
-		ParticleComponent2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
-			"RightFootSocket");
-	}
-
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_ShieldEnemy::OnOverlapBegin);
 }
 
@@ -166,28 +152,4 @@ void AOPAG_ShieldEnemy::SetIsCharging(const bool Value)
 UStaticMeshComponent* AOPAG_ShieldEnemy::GetShieldMesh() const
 {
 	return ShieldMesh;
-}
-
-void AOPAG_ShieldEnemy::TurnOnBoosters() const
-{
-	if(ParticleComponent1)
-	{
-		ParticleComponent1->SetVisibility(true);
-	}
-	if(ParticleComponent2)
-	{
-		ParticleComponent2->SetVisibility(true);
-	}
-}
-
-void AOPAG_ShieldEnemy::TurnOffBoosters() const
-{
-	if(ParticleComponent1)
-	{
-		ParticleComponent1->SetVisibility(false);
-	}
-	if(ParticleComponent2)
-	{
-		ParticleComponent2->SetVisibility(false);
-	}
 }

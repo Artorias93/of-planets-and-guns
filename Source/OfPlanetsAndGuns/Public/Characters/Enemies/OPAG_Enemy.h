@@ -35,6 +35,18 @@ public:
 
 	AOPAG_PatrolPath* GetPatrolPath() const;
 
+	UFUNCTION(BlueprintCallable)
+	bool GetIsJumping() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetIsJumping(const bool Value);
+
+	UFUNCTION(BlueprintCallable)
+	void TurnOnBoosters() const;
+
+	UFUNCTION(BlueprintCallable)
+	void TurnOffBoosters() const;
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -52,13 +64,17 @@ protected:
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
-
+	
 private:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (AllowPrivateAccess = true))
+	bool bIsJumping;	
+	
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	class UBehaviorTree* BehaviorTree;
+	UBehaviorTree* BehaviorTree;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	class AOPAG_PatrolPath* PatrolPath;
+	AOPAG_PatrolPath* PatrolPath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (ExposeOnSpawn, AllowPrivateAccess = true))
 	bool bUsingPatrolPath = false;
@@ -75,6 +91,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	UParticleSystemComponent* SpawnParticle;
 
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystemComponent* BoosterParticleComponent1;
+
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystemComponent* BoosterParticleComponent2;
+	
 
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
@@ -84,10 +106,10 @@ private:
 	UMaterialInstanceDynamic* ActiveMaterial;
 
 	UPROPERTY()
-		UTimelineComponent* SpawnTimeline;
+	UTimelineComponent* SpawnTimeline;
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta = (AllowPrivateAccess = true))
-		UCurveVector* SpawnFXCurve;
+	UCurveVector* SpawnFXCurve;
 
 	FOnTimelineVector OnSpawnFXTimelineProgress;
 	FOnTimelineEventStatic OnSpawnFXTimelineFinished;

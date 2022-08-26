@@ -30,10 +30,6 @@ public:
 	void SetIsCharging(const bool Value);
 	
 	UStaticMeshComponent* GetShieldMesh() const;
-	
-	void TurnOnBoosters() const;
-	
-	void TurnOffBoosters() const;
 
 protected:
 
@@ -92,12 +88,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* ShieldMesh;
-
-	UPROPERTY(VisibleAnywhere)
-	UParticleSystemComponent* ParticleComponent1;
-
-	UPROPERTY(VisibleAnywhere)
-	UParticleSystemComponent* ParticleComponent2;
 	
 	UPROPERTY(EditAnywhere, Category = "OPAG AI")
 	float ShieldWeaponDamage = 10.f;
