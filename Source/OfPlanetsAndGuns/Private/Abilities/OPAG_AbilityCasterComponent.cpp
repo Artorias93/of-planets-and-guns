@@ -6,24 +6,13 @@
 #include "Abilities/OPAG_AbilityBase.h"
 #include "Abilities/OPAG_ForceField.h"
 #include "Abilities/OPAG_SpawnEnemy.h"
+#include "Abilities/OPAG_TornadoAbility.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Abilities/OPAG_AbilityTypes.h"
 
 UOPAG_AbilityCasterComponent::UOPAG_AbilityCasterComponent()
 {
 	PrimaryComponentTick.bStartWithTickEnabled = false;
-
-	/*static ConstructorHelpers::FClassFinder<AOPAG_ForceField> ForceFieldClass(TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_ForceField.BP_ForceField_C'"));
-	if (ForceFieldClass.Succeeded())
-	{
-		ForceFieldAbilityClass = ForceFieldClass.Class;
-	}
-
-	static ConstructorHelpers::FClassFinder<AOPAG_SpawnEnemy> SpawnEnemyClass(TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_SpawnEnemy.BP_SpawnEnemy_C'"));
-	if (SpawnEnemyClass.Succeeded())
-	{
-		SpawnEnemyAbilityClass = SpawnEnemyClass.Class;
-	}*/
 }
 
 void UOPAG_AbilityCasterComponent::BeginPlay()
@@ -32,12 +21,15 @@ void UOPAG_AbilityCasterComponent::BeginPlay()
 
 	FString ForceFieldClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_ForceField.BP_ForceField_C'";
 	FString SpawnEnemyClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_SpawnEnemy.BP_SpawnEnemy_C'";
+	FString TornadoClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_TornadoAbility.BP_TornadoAbility_C'";
 
 	const TCHAR* ForceFieldClass= *ForceFieldClassPath;
 	const TCHAR* SpawnEnemyClass = *SpawnEnemyClassPath;
+	const TCHAR* TornadoClass = *TornadoClassPath;
 
 	ForceFieldAbilityClass = LoadObject<UClass>(nullptr, ForceFieldClass);
 	SpawnEnemyAbilityClass = LoadObject<UClass>(nullptr, SpawnEnemyClass);
+	TornadoAbilityClass = LoadObject<UClass>(nullptr, TornadoClass);
 
 	EMS = GetWorld()->GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	check(EMS);
@@ -68,6 +60,7 @@ void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor
 		break;
 
 	case EAbilityTypes::Tornado:
+		AbilityClass = TornadoAbilityClass;
 		break;
 
 	default:

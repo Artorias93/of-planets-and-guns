@@ -34,11 +34,15 @@ protected:
 		void OnEnemyDeath(const AOPAG_Enemy* const Enemy);
 
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
-		void OnBrokenForceField();	
+		void OnBrokenForceField();
+
+	FVector GetRandomPointInRadius();
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Caster")
 		class UOPAG_AbilityCasterComponent* AbilityCaster;
 
 private:
-	EFightStatus FightStatus = EFightStatus::FirstPhase;
+
+		EFightStatus FightStatus = EFightStatus::FirstPhase;
 };

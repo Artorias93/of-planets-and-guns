@@ -18,6 +18,9 @@ public:
 protected:
 	virtual void BeginPlay() override;		
 
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+		class UStaticMeshComponent* AbilityMesh;
+
 	UFUNCTION()
 	void OnPillarDestroyed();
 

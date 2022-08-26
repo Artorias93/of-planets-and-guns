@@ -7,10 +7,7 @@
 // Sets default values
 AOPAG_AbilityBase::AOPAG_AbilityBase()
 { 	
-	PrimaryActorTick.bCanEverTick = false;
-
-	AbilityMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	AbilityMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	PrimaryActorTick.bCanEverTick = false;	
 }
 
 void AOPAG_AbilityBase::SetCaller(AActor* AbilityCaller)

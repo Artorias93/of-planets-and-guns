@@ -27,8 +27,5 @@ protected:
 		UOPAG_EventManagerSubsystem* EMS;
 
 	UPROPERTY()
-		AActor* Caller;
-
-	UPROPERTY(EditAnywhere, Category = "Mesh")
-		class UStaticMeshComponent* AbilityMesh;
+		AActor* Caller;	
 };

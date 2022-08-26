@@ -10,7 +10,8 @@
 
 AOPAG_ForceField::AOPAG_ForceField()
 {
-	//static ConstructorHelpers::FObjectFinder<UStaticMesh>Mesh(TEXT("'/Game/OfPlanetsAndGuns/Characters/MageEnemy/S_ForceField.S_ForceField'"));
+	AbilityMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	AbilityMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 void AOPAG_ForceField::BeginPlay()
