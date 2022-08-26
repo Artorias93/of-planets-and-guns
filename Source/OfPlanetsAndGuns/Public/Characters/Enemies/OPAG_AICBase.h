@@ -36,6 +36,9 @@ private:
 
 protected:
 
+	UPROPERTY()
+	APawn* AIControlledPawn;
+
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float LoseSightTimer = 3.f;
 

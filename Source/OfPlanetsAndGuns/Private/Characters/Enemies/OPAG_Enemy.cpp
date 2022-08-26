@@ -31,6 +31,8 @@ AOPAG_Enemy::AOPAG_Enemy()
 	HeadCollider->SetRelativeScale3D(FVector::OneVector * 10.f);
 	HeadCollider->ComponentTags.Add(TEXT("Head"));
 
+	bIsJumping = false;
+
 	LootDropSystemComponent = CreateDefaultSubobject<UOPAG_LootDropSystemComponent>(TEXT("Loot Drop System Component"));
 
 	SpawnParticle = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle System Component"));
@@ -67,6 +69,20 @@ AOPAG_Enemy::AOPAG_Enemy()
 		EnemyHealthBarComponent->SetupAttachment(RootComponent);
 	}
 
+
+	BoosterParticleComponent1 = CreateDefaultSubobject<UParticleSystemComponent>("Booster Component 1");
+	if(BoosterParticleComponent1)
+	{
+		BoosterParticleComponent1->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
+			"LeftFootSocket");
+	}
+	
+	BoosterParticleComponent2 = CreateDefaultSubobject<UParticleSystemComponent>("Booster Component 2");
+	if(BoosterParticleComponent2)
+	{
+		BoosterParticleComponent2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
+			"RightFootSocket");
+	}
 }
 
 void AOPAG_Enemy::BeginPlay()
@@ -169,6 +185,40 @@ void AOPAG_Enemy::DropAndDespawn()
 	const auto GI = GetGameInstance<UOPAG_GameInstance>();
 	if (GI) GI->GetEventManager()->EnemyKilled.Broadcast(this);
 	Destroy();
+}
+
+bool AOPAG_Enemy::GetIsJumping() const
+{
+	return bIsJumping;
+}
+
+void AOPAG_Enemy::SetIsJumping(const bool Value)
+{
+	bIsJumping = Value;
+}
+
+void AOPAG_Enemy::TurnOnBoosters() const
+{
+	if(BoosterParticleComponent1)
+	{
+		BoosterParticleComponent1->SetVisibility(true);
+	}
+	if(BoosterParticleComponent2)
+	{
+		BoosterParticleComponent2->SetVisibility(true);
+	}
+}
+
+void AOPAG_Enemy::TurnOffBoosters() const
+{
+	if(BoosterParticleComponent1)
+	{
+		BoosterParticleComponent1->SetVisibility(false);
+	}
+	if(BoosterParticleComponent2)
+	{
+		BoosterParticleComponent2->SetVisibility(false);
+	}
 }
 
 void AOPAG_Enemy::InitSpawnFX()

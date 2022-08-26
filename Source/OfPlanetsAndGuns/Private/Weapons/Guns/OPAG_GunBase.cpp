@@ -91,6 +91,10 @@ void AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direct
 	const float Seconds = CalculateRateInSeconds(Stats.FireRate);
 	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
 	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+	if(AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
+	{
+		MakeNoise(1.f, CharacterOwner, CharacterOwner->GetActorLocation(), 0);
+	}	
 }
 
 void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
