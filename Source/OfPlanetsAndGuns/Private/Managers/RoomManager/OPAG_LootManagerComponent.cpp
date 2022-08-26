@@ -33,6 +33,9 @@ void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UOPAG_LootManagerComponent::GenerateLoot()
 {
+	// Populate items list 
+	PopulateLootLists();
+
 	const AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
 	checkf(RoomManager, TEXT("Bad Room Manager Owner"));
 
@@ -106,9 +109,6 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 {
 
 	if (!LootBox)	return;
-
-	// Populate items list 
-	PopulateLootLists();
 
 	TArray<TSubclassOf<AActor>> Items;
 

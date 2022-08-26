@@ -35,11 +35,17 @@ public:
 	UPROPERTY(Category = "Sound", EditDefaultsOnly, BlueprintReadWrite)
 		USoundBase* ExplosionSound;
 
-	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadOnly)
-		float Damage = 0;
+	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadWrite)
+		float Damage = 100.f;
+
+	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadWrite)
+		float Radius = 300.f;
 
 	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadOnly)
 		FVector ImpactPoint = FVector::ZeroVector;
+
+private:
+	virtual void DamageAllTargetsInRange();
 
 protected:
 	virtual void BeginPlay() override;
@@ -49,5 +55,8 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	virtual void Detonate();
 
 };
