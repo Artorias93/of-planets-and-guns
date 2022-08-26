@@ -119,12 +119,15 @@ void AOPAG_Player::Tick(float DeltaTime)
 	{
 		MakingAimCameraRotate();
 	}
+
 	// Initialize the object seen by the player
 	InteractableObject = CheckLookAtInteractableItems();
 
 	UpdateInteractableMessage();
 
 	UpdateComparison();
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractableObject->GetFullName());
 
 	if (Shield != nullptr)
 	{
@@ -822,30 +825,21 @@ void AOPAG_Player::UpdateInteractableMessage() {
 	}
 
 	if (!bHasAlreadyLooked && InteractableObject) {
-		IOPAG_InteractableInterface* Int = Cast<IOPAG_InteractableInterface>(InteractableObject);
+		//IOPAG_InteractableInterface* Int = Cast<IOPAG_InteractableInterface>(InteractableObject);
 
-		AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject);
+		AOPAG_ModularGun* const Gun = Cast<AOPAG_ModularGun>(InteractableObject);
 
-		if (Int) {
-			if (Gun && !(Gun->CanInteract_Implementation()))
+
+		//if (Int) {
+			if (Gun && !(IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject)))
 				return;
 
-			bool bCanInteract = Int->CanInteract_Implementation();
-			FString str = Int->InteractString_Implementation();
+			bool bCanInteract = IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject);
+			FString str = IOPAG_InteractableInterface::Execute_InteractString(InteractableObject);
 			EMS->LookedAtInteractable.Broadcast(bCanInteract, str);
 			bHasAlreadyLooked = true;
-		}
+		//}
 	}
-
-	//DON'T TOUCH!
-	//if(b)
-	// b = Int != Nullptr;
-	//	if(!b)
-	//		EMS->UnLooked
-	// 
-	//if(!b && Int) 
-		//EMS -> LookedAtInt
-		//b = true;
 }
 
 void AOPAG_Player::UpdateComparison() {

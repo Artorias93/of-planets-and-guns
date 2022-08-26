@@ -10,19 +10,19 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	ModuleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
+	if (ModuleMesh)
+	{
+		ModuleMesh->SetCollisionProfileName(TEXT("Weapon"));
+		RootComponent = ModuleMesh;
+	}
+
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	if (Sphere)
 	{
 		Sphere->SetSphereRadius(32.f);
 		Sphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-		RootComponent = Sphere;
-	}
-
-	ModuleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
-	if (ModuleMesh)
-	{
-		ModuleMesh->SetCollisionProfileName(TEXT("Weapon"));
-		ModuleMesh->SetupAttachment(Sphere);
+		Sphere->SetupAttachment(ModuleMesh);
 	}
 }
 
