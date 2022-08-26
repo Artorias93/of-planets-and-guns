@@ -127,7 +127,7 @@ void AOPAG_Player::Tick(float DeltaTime)
 
 	UpdateComparison();
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractableObject->GetFullName());
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractableObject->GetFullName());
 
 	if (Shield != nullptr)
 	{
@@ -870,16 +870,18 @@ void AOPAG_Player::UpdateComparison() {
 		AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject);
 		if (Module && IOPAG_InteractableInterface::Execute_CanInteract(Module)) 
 		{
-
 			FOPAG_GunStats CurrentModuleStats;
 			AOPAG_ModuleBase* CurrentModule = PrimaryGun->GetModuleBySocketType(Module->Type);
+
+			int CurrentFireTypeMask = 1 << (int)CurrentGun->FireType;
+			bool CanBeEquipped = (CurrentFireTypeMask & Module->EquippableFireTypes);
 
 			if (CurrentModule) {
 				CurrentModuleStats = CurrentModule->Stats;
 			}
 
 			EMS->LookedAtModule.Broadcast(PrimaryGun->Stats, CurrentModuleStats, Module->Stats,
-				Module->Name, Module->Rarity, Module->Type, Module->EquippableFireTypes);
+				Module->Name, Module->Rarity, Module->Type, Module->EquippableFireTypes, CanBeEquipped);
 
 			PreviousLookedAtModule = InteractableObject;
 		}

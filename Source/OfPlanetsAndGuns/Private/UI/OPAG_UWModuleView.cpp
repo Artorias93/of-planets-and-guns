@@ -15,7 +15,7 @@ void UOPAG_UWModuleView::NativeConstruct()
 
 void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& CurrentModuleStats,
 	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType, 
-	const int EquippableTypes)
+	const int EquippableTypes, const bool CanBeEquipped)
 {
 	FullyAutomaticIcon->SetBrushTintColor(FLinearColor::White);
 	SingleShotIcon->SetBrushTintColor(FLinearColor::White);

@@ -86,7 +86,7 @@ public:
 	UFUNCTION()
 		void UpdateModuleValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& CurrentModuleStats, 
 			const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, 
-			const EModuleTypes OtherModuleType, const int EquippableTypes);
+			const EModuleTypes OtherModuleType, const int EquippableTypes, const bool CanBeEquipped);
 
 	void NativeConstruct();
 
