@@ -11,6 +11,7 @@
  */
 class UTextBlock;
 class UImage;
+class UHorizontalBox;
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
@@ -20,25 +21,25 @@ class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
 	void BindEvents();
 
 	UPROPERTY(meta = (BindWidget))
-		UImage* GoldIcon;
+		UHorizontalBox* PotionsBox;
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* GoldAmountText;
-	UPROPERTY(meta = (BindWidget))
-		UImage* BoltsIcon;
-	UPROPERTY(meta = (BindWidget))
-		UTextBlock* BoltsAmountText;
-	UPROPERTY(meta = (BindWidget))
-		UImage* PotionsIcon;
-	UPROPERTY(meta = (BindWidget))
-		UTextBlock* PotionsAmountText;
+		UHorizontalBox* BoltsBox;
 
 public:
 	UFUNCTION()
-		void UpdateBoltsValue(const int Value);
+		void IncrementPotionsAmount();
 	UFUNCTION()
-		void UpdateGoldValue(const int Value);
+		void DecrementPotionsAmount();
+
 	UFUNCTION()
-		void UpdatePotionsValue(const int Value);
+		void IncrementBoltsAmount();
+	UFUNCTION()
+		void DecrementBoltsAmount();
 
 	void NativeConstruct();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		UTexture2D* PotionsIconTexture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		UTexture2D* BoltsIconTexture;
 };

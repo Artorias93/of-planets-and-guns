@@ -84,7 +84,7 @@ public:
 
 	UFUNCTION()
 	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName,
-		const EFireTypes OtherGunType);
+		const FString OtherGunType);
 	UFUNCTION()
 	void HideGunCompareView();
 

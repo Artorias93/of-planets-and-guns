@@ -48,11 +48,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountDecrement);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountIncrement);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountDecrement);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountIncrement);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountDecrement);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLookedAtInteractable, bool, IsInteractable, FString, InteractText);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtInteractable);
@@ -63,12 +67,10 @@ const int, EquippableTypes);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FLookedAtGun, const FOPAG_GunStats, GunStats, 
-const FOPAG_GunStats, OtherGunStats, const FString, OtherGunName, const EFireTypes, OtherGunType);
+const FOPAG_GunStats, OtherGunStats, const FString, OtherGunName, const FString, OtherGunFireType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPotionsChanged, int, CurrentValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
 
@@ -154,19 +156,19 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FAmmoChanged CurrentAmmoChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FDashAmountChanged DashAmountChanged;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FDashChargeChanged DashChargeChanged;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FGoldChanged GoldChanged;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FBoltsChanged BoltsChanged;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FPotionsChanged PotionsChanged; 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountIncrement DashAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountDecrement DashAmountDecrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FPotionsAmountIncrement PotionsAmountIncrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FPotionsAmountDecrement PotionsAmountDecrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FBoltsAmountIncrement BoltsAmountIncrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FBoltsAmountDecrement BoltsAmountDecrement;
 
 	//Gun stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)

@@ -118,6 +118,7 @@ public:
 	// Camera behavior
 	UCameraComponent* GetADSCamera() const;
 	void ResetReductionSpreadRadiusShooting();
+
 protected:
 	// Main system for shooting
 	virtual void ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);

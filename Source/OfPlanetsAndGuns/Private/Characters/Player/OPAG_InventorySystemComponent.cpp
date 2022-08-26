@@ -29,7 +29,7 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 		case EDropType::Bolts:
 			BoltsAmount += Target->Amount;
 			if (Owner && Owner->EMS) {
-				Owner->EMS->BoltsChanged.Broadcast(BoltsAmount);
+				Owner->EMS->BoltsAmountIncrement.Broadcast();
 			}
 			Target->Destroy();
 			break;
@@ -53,7 +53,7 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			if (PotionsAmount < 4) {
 				PotionsAmount += Target->Amount;
 				if (Owner && Owner->EMS) {
-					Owner->EMS->PotionsChanged.Broadcast(PotionsAmount);
+					Owner->EMS->PotionsAmountIncrement.Broadcast();
 				}
 				Target->Destroy();
 			}

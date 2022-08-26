@@ -333,6 +333,14 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 	}
 }
 
+FString AOPAG_ModularGun::GetFireTypeName(EFireTypes FireType)
+{
+	FString FireTypeName;
+	UEnum::GetValueAsString(FireType, FireTypeName);
+	FireTypeName.RemoveAt(0, 12, true);
+	return FireTypeName;
+}
+
 UCameraComponent* AOPAG_ModularGun::GetSightCamera() const
 {
 	if (Sight->GetChildActor())

@@ -13,10 +13,12 @@ void UOPAG_UWGunCompareView::NativeConstruct()
 }
 
 void UOPAG_UWGunCompareView::UpdateGunValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& OtherGunStats, 
-	const FString OtherGunName, const EFireTypes OtherGunType)
+	const FString OtherGunName, const FString OtherGunFireType)
 {
 	GunName->SetText(FText::FromString(OtherGunName));
+	GunType->SetText(FText::FromString(OtherGunFireType));
 
+	/*
 	switch (OtherGunType) {
 		case EFireTypes::FullyAutomatic:
 			GunType->SetText(FText::FromString("Fully Automatic"));
@@ -33,7 +35,7 @@ void UOPAG_UWGunCompareView::UpdateGunValues(const FOPAG_GunStats& GunStats, con
 		default:
 			break;
 	}
-
+	*/
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, OtherGunStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, OtherGunStats.FireRate);
 	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, GunStats.Accuracy, OtherGunStats.Accuracy);
