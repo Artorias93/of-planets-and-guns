@@ -82,7 +82,11 @@ void UOPAG_UWModuleView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* Stat
 
 	StatAmount->SetText(UKismetTextLibrary::Conv_FloatToText(NewStat, ERoundingMode::FromZero, false, true, 1, 324, 2, 2));
 	
-	DeltaString.Append(FString::SanitizeFloat(Delta, 2));
+	if(Delta == 0)
+		DeltaString.Append("-");
+	else
+		DeltaString.Append(FString::SanitizeFloat(Delta, 2));
+
 	DeltaText->SetText(FText::FromString(DeltaString));
 }
 
