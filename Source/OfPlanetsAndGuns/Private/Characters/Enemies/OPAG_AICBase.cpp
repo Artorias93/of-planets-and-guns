@@ -42,6 +42,9 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 {
 	Super::OnPossess(ControlledPawn);
 
+	//We need the AIControlledPawn pointer in the OnPerceptionUpdated method, so we set this class variable
+	AIControlledPawn = ControlledPawn;
+
 	const AOPAG_Enemy* const ControlledEnemy = Cast<AOPAG_Enemy>(ControlledPawn);
 	if(ControlledEnemy && ControlledEnemy->GetBehaviorTree())
 	{
@@ -53,11 +56,10 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 }
 
 void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
-{
+{	
 	//If the stimuli is of type hearing, the bot goes to the source of the sound (without setting its TargetActor)
-	if(Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>())
+	if(Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>() && UpdatedActor != AIControlledPawn)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Hearing!"));
 		GetBlackboardComponent()->SetValueAsVector("TargetLocation", UpdatedActor->GetActorLocation());
 	}
 	//Sight and damage senses only react to the player character
