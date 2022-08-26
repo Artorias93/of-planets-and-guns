@@ -24,6 +24,7 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->LoadMainMenu.AddDynamic(this, &UOPAG_GameInstance::LoadMainMenu);
 	EMS->StartPlanet.AddDynamic(this, &UOPAG_GameInstance::LoadPlanet);
 
+	EMS->PlayerDied.AddDynamic(this, &UOPAG_GameInstance::OnPlayerDeath);
 
 	EMS->RequestPlayerState.AddDynamic(this, &UOPAG_GameInstance::SendPlayerState);
 	EMS->SavePlayerState.AddDynamic(this, &UOPAG_GameInstance::SavePlayerState);
@@ -254,4 +255,9 @@ UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager() const
 float UOPAG_GameInstance::GetStageDifficulty()
 {
 	return CurrentDifficulty;
+}
+
+void UOPAG_GameInstance::OnPlayerDeath()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }

@@ -91,6 +91,8 @@ public:
 		void OnPauseGame();
 	UFUNCTION()
 		void OnResumeGame();
+	UFUNCTION()
+		void OnPlayerDeath();
 
 	UFUNCTION(BlueprintCallable, Category = "Event Manger")
 		UOPAG_EventManagerSubsystem* GetEventManager() const;
