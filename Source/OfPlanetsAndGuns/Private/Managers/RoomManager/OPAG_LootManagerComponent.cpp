@@ -272,9 +272,8 @@ TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG
 			const int EquippableType = DefaultModule->EquippableFireTypes;
 			if (FireMask & EquippableType)
 			{
-				float Probability = Module->ModuleLevel;
 				TSubclassOf<AOPAG_ModuleBase> ModuleClass = Module->ModuleClass;
-				ModuleMap.Add(ModuleClass, Probability);
+				ModuleMap.Add(ModuleClass, DefaultModule->Level);
 			}
 		}
 	}
@@ -298,9 +297,8 @@ TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG
 			const int EquippableType = DefaultModule->EquippableFireTypes;
 			if (FireMask & EquippableType && DefaultModule->Type == ModuleTypes)
 			{
-				float Probability = Module->ModuleLevel;
 				TSubclassOf<AOPAG_ModuleBase> ModuleClass = Module->ModuleClass;
-				ModuleMap.Add(ModuleClass, Probability);
+				ModuleMap.Add(ModuleClass, DefaultModule->Level);
 			}
 		}
 	}
