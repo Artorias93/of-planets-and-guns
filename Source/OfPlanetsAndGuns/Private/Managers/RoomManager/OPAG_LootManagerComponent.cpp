@@ -33,6 +33,9 @@ void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
 {
+	// Populate items list 
+	PopulateLootLists();
+
 	GenerateIndividualLoot(LootBoxA.Key, LootBoxA.Value, DifficultyValue);
 	GenerateIndividualLoot(LootBoxB.Key, LootBoxB.Value, DifficultyValue);
 }
@@ -104,9 +107,6 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 {
 
 	if (!LootBox)	return;
-
-	// Populate items list 
-	PopulateLootLists();
 
 	TArray<TSubclassOf<AActor>> Items;
 

@@ -417,12 +417,15 @@ void AOPAG_Player::ActiveDash()
 void AOPAG_Player::ActiveGunAbility()
 {
 	const bool bIsPrimaryGun = IsPrimaryGunActive();
-	if (AbilitySystemComp && bIsPrimaryGun && PrimaryGun->Accessory->GetChildActor())
+	if (AbilitySystemComp && bIsPrimaryGun && PrimaryGun->Accessory->GetChildActor() && InventorySystemComp->BoltsAmount > 0)
 	{
 		AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(PrimaryGun->Accessory->GetChildActor());
 		if (Module->Ability)
 		{
-			AbilitySystemComp->TryActivateAbilityByClass(Module->Ability, true);
+			if (AbilitySystemComp->TryActivateAbilityByClass(Module->Ability, true))
+			{
+				InventorySystemComp->BoltsAmount--;
+			}
 		}
 	}
 }
@@ -810,8 +813,10 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 	TArray<AActor*> ActorsToIgnore;
 	this->GetAllChildActors(ActorsToIgnore);
 	ActorsToIgnore.Add(this);
-	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), Camera->GetComponentLocation(), CameraDirection, LookUpCapsuleRadius, 0, InteractableTypesQuery,
-		false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMultiForObjects(GetWorld(), Camera->GetComponentLocation(), 
+		CameraDirection, LookUpCapsuleRadius, 0, InteractableTypesQuery,
+		false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true, 
+		FLinearColor::Red, FLinearColor::Green, 5.f);
 	if (bHasHit && OutHits.Num() > 0)
 	{
 		for (int i = 0; i < OutHits.Num(); ++i) {
