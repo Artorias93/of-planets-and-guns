@@ -10,6 +10,7 @@
 //My classes
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "Weapons/Guns/OPAG_GunBase.h"
 
 AOPAG_AICBase::AOPAG_AICBase()
 {
@@ -23,7 +24,7 @@ AOPAG_AICBase::AOPAG_AICBase()
 	PerceptionComp = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
 	PerceptionSightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("AI Sight Config"));
 	PerceptionDamageConfig = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("AI Damage Config"));
-	PerceptionHearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("AI Gearing Config"));
+	PerceptionHearingConfig = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("AI Hearing Config"));
 	
 	PerceptionSightConfig->DetectionByAffiliation.bDetectEnemies = true;
 	PerceptionSightConfig->DetectionByAffiliation.bDetectNeutrals = true;
@@ -53,8 +54,14 @@ void AOPAG_AICBase::OnPossess(APawn* ControlledPawn)
 
 void AOPAG_AICBase::OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
-	//Senses only react to the player character
-	if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))
+	//If the stimuli is of type hearing, the bot goes to the source of the sound (without setting its TargetActor)
+	if(Stimulus.Type == UAISense::GetSenseID<UAISense_Hearing>())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Hearing!"));
+		GetBlackboardComponent()->SetValueAsVector("TargetLocation", UpdatedActor->GetActorLocation());
+	}
+	//Sight and damage senses only react to the player character
+	else if (AOPAG_Player* const Player = Cast<AOPAG_Player>(UpdatedActor))
 	{
 		//If the player is seen set it to target actor
 		if (Stimulus.WasSuccessfullySensed())

@@ -20,9 +20,6 @@ public:
 
 private:
 
-	UPROPERTY(EditAnywhere, Category = "Blackboard Keys", meta=(AllowPrivateAccess = true))
-	FBlackboardKeySelector BBKeyTargetLocation;
-
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory) override;
 
 	/////////////////////////////
@@ -30,6 +27,9 @@ private:
 	/////////////////////////////
 
 private:
+
+	UPROPERTY(EditAnywhere, Category = "Blackboard Keys", meta=(AllowPrivateAccess = true))
+	FBlackboardKeySelector BBKeyTargetLocation;
 
 	UPROPERTY(EditAnywhere, Category = "Values", meta=(AllowPrivateAccess = true))
 	float ChargeDistanceBehindPlayer = 300.f;
