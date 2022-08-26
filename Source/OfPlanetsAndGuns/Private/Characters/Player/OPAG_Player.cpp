@@ -403,6 +403,8 @@ void AOPAG_Player::ReloadGun()
 	{
 		PrimaryGun->Reload();
 		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
+
+		EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
 	}
 }
 
@@ -436,6 +438,9 @@ void AOPAG_Player::Shoot()
 
 		EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
+
+		if (CurrentGun->AmmoCurrent == 0)
+			EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
 	}
 }
 
