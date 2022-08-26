@@ -11,6 +11,7 @@
 #include "OPAG_GameInstance.generated.h"
 
 class UOPAG_EventManagerSubsystem;
+class UOPAG_SoundManagerSubsystem;
 /**
  * 
  */
@@ -43,6 +44,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main Menu")
 		TSoftObjectPtr<UWorld> MainMenuLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* WeaponsAudioLibrary;
 
 private:
 	void BindEvents();
@@ -92,8 +96,14 @@ public:
 	UFUNCTION()
 		void OnResumeGame();
 
+	UFUNCTION()
+		void SetAudioLibraries();
+
 	UFUNCTION(BlueprintCallable, Category = "Event Manger")
 		UOPAG_EventManagerSubsystem* GetEventManager() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Sound Manager")
+		UOPAG_SoundManagerSubsystem* GetSoundManager() const;
 
 	UFUNCTION(BlueprintCallable)
 		float GetStageDifficulty();

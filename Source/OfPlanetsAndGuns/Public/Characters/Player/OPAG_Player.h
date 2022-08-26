@@ -22,6 +22,7 @@ class UChildActorComponent;
 class AOPAG_GunBase;
 class AOPAG_ModularGun;
 
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 {

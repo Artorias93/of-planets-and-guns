@@ -4,6 +4,7 @@
 #include "Managers/OPAG_GameInstance.h"
 
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Managers/OPAG_SaveGame.h"
 #include "Util/OPAG_UtilityFunctionLibrary.h"
@@ -122,6 +123,7 @@ void UOPAG_GameInstance::Init()
 	bNextStageIsSafe = false;
 
 	BindEvents();
+	SetAudioLibraries();
 
 	LoadPlanetTable();
 	CurrentPlanet = Planets[0];
@@ -251,7 +253,18 @@ UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager() const
 	return GetSubsystem<UOPAG_EventManagerSubsystem>();
 }
 
+UOPAG_SoundManagerSubsystem* UOPAG_GameInstance::GetSoundManager() const
+{
+	return GetSubsystem<UOPAG_SoundManagerSubsystem>();
+}
+
 float UOPAG_GameInstance::GetStageDifficulty()
 {
 	return CurrentDifficulty;
+}
+
+void UOPAG_GameInstance::SetAudioLibraries()
+{
+	UOPAG_SoundManagerSubsystem* SMS = GetSubsystem<UOPAG_SoundManagerSubsystem>();
+	SMS->WeaponsAudioLibrary = WeaponsAudioLibrary;
 }

@@ -12,6 +12,7 @@ class USkeletalMeshComponent;
 class UChildActorComponent;
 class UCameraComponent;
 class AOPAG_CharacterBase;
+class UOPAG_SoundManagerSubsystem;
 class UOPAG_EventManagerSubsystem;
 class UParticleSystem;
 class USoundBase;
@@ -92,6 +93,9 @@ protected:
 protected:
 	UPROPERTY()
 	UOPAG_EventManagerSubsystem* EMS;
+
+	UPROPERTY()
+	UOPAG_SoundManagerSubsystem* SMS;
 
 protected:
 	FTimerHandle ResetShootHandle;

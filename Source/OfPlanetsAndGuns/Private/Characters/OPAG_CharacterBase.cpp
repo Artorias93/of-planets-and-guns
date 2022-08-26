@@ -36,6 +36,7 @@ void AOPAG_CharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 	check(EMS);
 
 	if (AbilitySystemComp)

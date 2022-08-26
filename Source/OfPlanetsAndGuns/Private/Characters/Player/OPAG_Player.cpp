@@ -16,6 +16,7 @@
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "Weapons/Modules/OPAG_AccessoryBase.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Items/OPAG_Drop.h"
@@ -382,12 +383,14 @@ void AOPAG_Player::SwapGuns()
 			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
 			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
 			CurrentGun = SecondaryGun;
+			SMS->PlayWeaponSounds(CurrentGun, EWeaponSoundAction::Pickup);
 		}
 		else
 		{
 			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
 			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
 			CurrentGun = PrimaryGun;
+			SMS->PlayWeaponSounds(CurrentGun, EWeaponSoundAction::Pickup);
 		}
 
 		DebugCurretGunStats = CurrentGun->Stats;
@@ -403,6 +406,7 @@ void AOPAG_Player::ReloadGun()
 	if (bIsPrimaryGun && !CheckIsReloading && PrimaryGun->AmmoCurrent < PrimaryGun->Stats.ClipSize)
 	{
 		PrimaryGun->Reload();
+		SMS->PlayWeaponSounds(PrimaryGun, EWeaponSoundAction::Reload);
 		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 	}
 }
@@ -666,6 +670,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		PrimaryGun->SetAmmoParams(NewAmmoCurrent, NewAmmoMax);
 		PrimaryGun->CreateAndAttachAllModules(NewGunModules);
 		CurrentGun = PrimaryGun;
+		SMS->PlayWeaponSounds(CurrentGun, EWeaponSoundAction::Pickup);
 		DebugCurretGunStats = CurrentGun->Stats;
 	}
 

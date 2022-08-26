@@ -78,3 +78,14 @@ Content/KiteDemo/
 Content/ParagonKallari/
 Content/ParagonMuriel/
 *.user
+
+#FMOD
+FMOD/.user/
+FMOD/.unsaved/
+FMOD/.cache/
+FMOD/.restore/
+FMOD/user/
+FMOD/unsaved/
+FMOD/restore/
+FMOD/fmod.log
+FMOD/fmod_editor.log

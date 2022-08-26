@@ -13,6 +13,8 @@
 #include "Util/OPAG_UtilityFunctionLibrary.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
+
 #include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
@@ -48,6 +50,8 @@ void AOPAG_GunBase::BeginPlay()
 	Super::BeginPlay();
 
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+
 	check(EMS);
 }
 
@@ -90,7 +94,9 @@ void AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direct
 
 	const float Seconds = CalculateRateInSeconds(Stats.FireRate);
 	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
-	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+	//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+
+	SMS->PlayWeaponSounds( this , EWeaponSoundAction::Fire);
 }
 
 void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
