@@ -24,6 +24,9 @@ struct FOPAG_PlayerState : public FTableRowBase
 		float Health = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
+		float Shield;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
 		int DashCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Inventory)

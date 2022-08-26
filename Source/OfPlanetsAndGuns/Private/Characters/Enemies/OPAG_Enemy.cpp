@@ -12,11 +12,17 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_LootDropSystemComponent.h"
+#include "Components/SphereComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 
 AOPAG_Enemy::AOPAG_Enemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
+
+	HeadCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Head Collider"));
+	HeadCollider->SetupAttachment(GetMesh(), TEXT("HeadCenter"));
+	HeadCollider->SetRelativeScale3D(FVector::OneVector * 10.f);
+	HeadCollider->ComponentTags.Add(TEXT("Head"));
 
 	LootDropSystemComponent = CreateDefaultSubobject<UOPAG_LootDropSystemComponent>(TEXT("Loot Drop System Component"));
 

@@ -100,6 +100,8 @@ void AOPAG_Player::BeginPlay()
 	// Binds and broad all player's events
 	BindEvents();
 	BroadcastEvents();
+
+	InitDashValues();
 }
 
 void AOPAG_Player::Death()
@@ -237,14 +239,6 @@ void AOPAG_Player::BroadcastEvents()
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->AmmoMax);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->AmmoCurrent);
 	EMS->RequestPlayerState.Broadcast();
-
-	if (AttributeSetPlayer)
-	{
-		for (int i = 0; i < AttributeSetPlayer->GetDashMaxCount(); i++) 
-		{
-			EMS->DashAmountIncrement.Broadcast();
-		}
-	}
 }
 
 void AOPAG_Player::BindEvents()
@@ -346,6 +340,8 @@ void AOPAG_Player::InitDashValues()
 
 	bIsDashAlreadyInitialized = true;
 
+	if (!AttributeSetPlayer) return;
+
 	if (AttributeSetPlayer->GetDashCount() < AttributeSetPlayer->GetDashMaxCount() && bIsFirstDash)
 	{
 		bIsFirstDash = false;
@@ -355,8 +351,6 @@ void AOPAG_Player::InitDashValues()
 	for (int i = 0; i < AttributeSetPlayer->GetDashCount(); i++) {
 		EMS->DashAmountIncrement.Broadcast();
 	}
-
-	//EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
 }
 #pragma endregion Init
 
@@ -399,7 +393,8 @@ void AOPAG_Player::ActiveDash()
 		const bool bSuccess = AbilitySystemComp->TryActivateAbilityByClass(Dash, true);
 		if (bSuccess)
 		{
-			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), AttributeSetPlayer->GetDashCount() - 1);
+
+			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), AttributeSetPlayer->GetDashCount() - 1);
 
 			EMS->DashAmountDecrement.Broadcast();
 
@@ -927,8 +922,9 @@ void AOPAG_Player::ADSTimelineProgress(float Value)
 
 void AOPAG_Player::DashTimelineFinished()
 {
+
 	DashTimeline->SetTimelineLength(AttributeSetPlayer->GetDashRestoreTime());
-	AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), AttributeSetPlayer->GetDashCount() + 1);
+	AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), AttributeSetPlayer->GetDashCount() + 1);
 	
 	EMS->DashAmountIncrement.Broadcast();
 
@@ -964,6 +960,7 @@ void AOPAG_Player::SavePlayerState()
 
 	NewState.LoadType = PlayerStateLoadType::PREVIOUS_STAGE;
 	NewState.Health = GetHealth();
+	NewState.Shield = AttributeSetPlayer->GetShieldCapacity();
 	NewState.DashCount = AttributeSetPlayer->GetDashCount();
 	NewState.GoldAmount = InventorySystemComp->GoldAmount;
 	NewState.BoltsAmount = InventorySystemComp->BoltsAmount;
@@ -982,8 +979,9 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 	if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
 	{
 		SetHealth(StateToApply.Health);
-		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), StateToApply.DashCount);
-		//EMS->DashAmountChanged.Broadcast(AttributeSetPlayer->GetDashCount());
+		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), StateToApply.Shield);
+		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), StateToApply.DashCount);
+
 		bIsDashAlreadyInitialized = false;
 		InitDashValues();	
 	

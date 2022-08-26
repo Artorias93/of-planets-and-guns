@@ -134,7 +134,9 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 				//If the hit component is the shield, damage is not applied
 				if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
 				{
-					Character->ReceiveDamage(Stats.Damage);
+					//Check for headshot
+					const bool IsHeadshot = OutHit.GetComponent()->ComponentHasTag("Head");
+					Character->ReceiveDamage(CalculateDamage(IsHeadshot));
 				}
 			}
 		}
@@ -160,6 +162,25 @@ void AOPAG_GunBase::ResetShootTimer()
 #pragma endregion Shooting Behavior
 
 #pragma region Shooting Utility
+
+
+
+float AOPAG_GunBase::CalculateDamage(const bool IsHeadshot) const
+{
+	const float DamageRandomnessAmount = Stats.Damage * 0.01f * DamageRandomnessPercentage;
+	float AdjustedDamage = Stats.Damage + FMath::RandRange(-DamageRandomnessAmount, DamageRandomnessAmount);
+	if (IsHeadshot || FMath::RandRange(0.f, 100.f) < BaseCritChance)
+	{
+		AddCritToDamage(AdjustedDamage);
+	}
+	return AdjustedDamage;
+}
+
+void AOPAG_GunBase::AddCritToDamage(float& Damage) const
+{
+	Damage *= CritDamageMultiplier;
+}
+
 float AOPAG_GunBase::CalculateSpread() const
 {
 	static constexpr float InternalRange = MaxInternalAccuracy - MinInternalAccuracy;

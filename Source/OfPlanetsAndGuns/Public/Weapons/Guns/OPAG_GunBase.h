@@ -55,6 +55,15 @@ public:
 	UPROPERTY(Category = "Gun", VisibleAnywhere, BlueprintReadWrite)
 	bool bIsShoot = false;
 
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite, meta = (UIMin = 0.f, UIMax = 100.f))
+	float DamageRandomnessPercentage = 20.f;
+
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	float CritDamageMultiplier = 3.f;
+
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite, meta = (UIMin = 0.f, UIMax = 100.f))
+	float BaseCritChance = 15.f;
+
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	float SpreadMultiplier = 1.f;
 
@@ -126,6 +135,8 @@ protected:
 	void ResetShootTimer();
 
 	// Subsystem for shooting
+	float CalculateDamage(const bool IsHeadshot) const;
+	void AddCritToDamage(float& Damage) const;
 	float CalculateSpread() const;
 	FVector2D CalculateRandPointInCircle() const;
 	FVector ApplyNoise(const FVector Direction) const;

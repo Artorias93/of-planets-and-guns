@@ -5,6 +5,7 @@
 #include "Components/TimelineComponent.h"
 #include "OPAG_Enemy.generated.h"
 
+class USphereComponent;
 class UBehaviorTree;
 class AOPAG_PatrolPath;
 
@@ -43,6 +44,10 @@ protected:
 
 	void InitSpawnFX();
 
+	void AddRandomnessToDamage(float& Damage);
+
+	void AddCritToDamage(float& Damage);
+
 	UFUNCTION() void SpawnFXProgress(FVector Value);
 
 	UFUNCTION() void SpawnFXFinished();
@@ -68,6 +73,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float RagdollDurationSeconds = 2.f;
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta = (AllowPrivateAccess = true))
+	USphereComponent* HeadCollider;
 
 	UPROPERTY(EditAnywhere, Category = "OPAG Loot Drop System", meta = (AllowPrivateAccess = true))
 	class UOPAG_LootDropSystemComponent* LootDropSystemComponent;
