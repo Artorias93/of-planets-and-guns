@@ -123,6 +123,8 @@ public:
 	void DetachAllModules(const FVector Force);
 	void DetachModule(UChildActorComponent* ChildModule, const FVector Force);
 
+	static FString GetFireTypeName(EFireTypes FireType);
+
 protected:
 	// Shoot behavior
 	UFUNCTION(BlueprintCallable) void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
