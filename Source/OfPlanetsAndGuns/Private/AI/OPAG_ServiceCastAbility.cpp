@@ -5,6 +5,7 @@
 #include "Characters/Enemies/MageEnemy/OPAG_MageEnemy.h"
 #include "Characters/Enemies/OPAG_AICBase.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "Kismet/KismetMathLibrary.h"
 
 UOPAG_ServiceCastAbility::UOPAG_ServiceCastAbility(FObjectInitializer const& ObjectInitializer)
 {
@@ -24,7 +25,11 @@ void UOPAG_ServiceCastAbility::TickNode(UBehaviorTreeComponent& OwnerBTComponent
 			{
 				if (AOPAG_MageEnemy* const Enemy = Cast<AOPAG_MageEnemy>(AIController->GetPawn()))
 				{
-					Enemy->CastAbilityRequest(AbilityType, Enemy, FocusActor, AbilitySpawnPattern);
+					FOPAG_ServiceAbilityElement AbilityDefinitionElement = GetRandomAbilityDefinitionElement();
+
+					float randomIndex = FMath::RandRange(0, AbilityDefinitionElement.AvailableAbilitySpawnPattern.Num() - 1);
+
+					Enemy->CastAbilityRequest(AbilityDefinitionElement.AbilityType, Enemy, FocusActor, AbilityDefinitionElement.AvailableAbilitySpawnPattern[randomIndex]);
 				}
 			}
 		}
@@ -34,4 +39,27 @@ void UOPAG_ServiceCastAbility::TickNode(UBehaviorTreeComponent& OwnerBTComponent
 void UOPAG_ServiceCastAbility::OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
 	
+}
+ 
+FOPAG_ServiceAbilityElement UOPAG_ServiceCastAbility::GetRandomAbilityDefinitionElement()
+{
+	FOPAG_ServiceAbilityElement EmptyElement;
+
+	int WeightsSum = 0;
+	for (auto Element : AbilitiesDefinitions)
+	{
+		WeightsSum += Element.Weight;
+	}
+
+	int RandomNumber = FMath::RandRange(0, WeightsSum);
+
+	for (auto Element : AbilitiesDefinitions)
+	{
+		if (RandomNumber < Element.Weight)
+			return Element;
+
+		RandomNumber -= Element.Weight;
+	}
+
+	return EmptyElement;
 }

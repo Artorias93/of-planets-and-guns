@@ -7,9 +7,19 @@
 #include "Abilities/OPAG_AbilityTypes.h"
 #include "OPAG_ServiceCastAbility.generated.h"
 
-/**
- * 
- */
+USTRUCT(BlueprintType)
+struct OFPLANETSANDGUNS_API FOPAG_ServiceAbilityElement : public FTableRowBase
+{
+	GENERATED_BODY();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EAbilityTypes AbilityType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<EAbilitySpawnPattern> AvailableAbilitySpawnPattern;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Weight;
+};
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_ServiceCastAbility : public UOPAG_ServiceBase
 {
@@ -22,9 +32,8 @@ public:
 
 	virtual void OnBecomeRelevant(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
-		EAbilityTypes AbilityType;
+	FOPAG_ServiceAbilityElement GetRandomAbilityDefinitionElement();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
-		EAbilitySpawnPattern AbilitySpawnPattern;
+		TArray<FOPAG_ServiceAbilityElement> AbilitiesDefinitions;
 };

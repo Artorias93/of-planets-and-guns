@@ -72,21 +72,13 @@ void AOPAG_MageEnemy::OnBrokenForceField()
 	GetMesh()->SetCollisionProfileName(TEXT("BlockAll"));
 	this->SetActorEnableCollision(true);
 
-	FVector GroundedPosition = GetActorLocation();
-	GroundedPosition.Z = GetGroundHeight();
-	
-	//CastAbilityRequest(EAbilityTypes::Crack, this, GroundedPosition, FRotator::ZeroRotator, GetFocusedActor(), EAbilitySpawnPattern::GroundedLineFrontThree);
-	//CastAbilityRequest(EAbilityTypes::Tornado, this, GroundedPosition, FRotator::ZeroRotator, GetFocusedActor(), EAbilitySpawnPattern::GroundedLineFrontThree);
+	// change Blackboard value in order to change BT selection
 
-	//CastAbilityRequest(EAbilityTypes::Tornado, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineFrontThree);
-	//CastAbilityRequest(EAbilityTypes::Fireball, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredUpSequenceStar);
-	//CastAbilityRequest(EAbilityTypes::Ray, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredStarFour);
+	if (AOPAG_AICBase* AIController = Cast<AOPAG_AICBase>(GetController()))
+	{
+		AIController->SetBlackboardEntryAsBool("bSecondStage", true);
+	}
 
-	//CastAbilityRequest(EAbilityTypes::Spawn_DashingEnemy, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineFrontTwo);
-	//CastAbilityRequest(EAbilityTypes::Spawn_RangedEnemy, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineBackThree);
-	//CastAbilityRequest(EAbilityTypes::Spawn_ShieldEnemy, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineFrontThree);
-
-	//CastAbilityRequest(EAbilityTypes::Fireball, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredUpSequenceStar);
 }
 
 FVector AOPAG_MageEnemy::GetRandomPointInRadius()

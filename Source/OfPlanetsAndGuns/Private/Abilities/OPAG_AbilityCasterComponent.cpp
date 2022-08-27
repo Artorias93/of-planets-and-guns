@@ -168,7 +168,7 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::CenteredUpSingle:
 		
-		Position1.Z += 250;
+		Position1.Z += 500;
 		Transform1.SetLocation(Position1);
 		
 		Transforms.Add(Transform1);
@@ -200,11 +200,11 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::CenteredUpSequenceStar:
 		
-		Position1.Z += 400;
-		Position2.Z += 250;
-		Position3.Z += 250;
-		Position4.Z += 100;
-		Position5.Z += 100;
+		Position1.Z += 650;
+		Position2.Z += 500;
+		Position3.Z += 500;
+		Position4.Z += 350;
+		Position5.Z += 350;
 
 		Position2.Y += 150;
 		Position3.Y -= 150;
