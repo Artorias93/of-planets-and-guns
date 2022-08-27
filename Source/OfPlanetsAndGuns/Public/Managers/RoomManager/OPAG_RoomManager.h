@@ -69,6 +69,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Room Manager", AdvancedDisplay)
 		int AssignedRoomID;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager", AdvancedDisplay)
+		float OverriddenDifficulty = 0.f;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -88,6 +91,9 @@ public:
 
 	UFUNCTION(Category = "Room Manager")
 		void OnStageDifficultyUpdated();
+
+	UFUNCTION(BlueprintCallable, Category = "Room Manager")
+		float GetCurrentRoomDifficulty() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Door Manager")
 		void EnterRoom();

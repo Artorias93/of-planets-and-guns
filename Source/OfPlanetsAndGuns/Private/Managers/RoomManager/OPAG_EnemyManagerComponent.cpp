@@ -101,10 +101,10 @@ void UOPAG_EnemyManagerComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 void UOPAG_EnemyManagerComponent::SpawnWave()
 {
-	UOPAG_GameInstance* GI = Cast<UOPAG_GameInstance>(
-		UGameplayStatics::GetGameInstance(GetWorld()));
-	checkf(GI, TEXT("Couldn't find GameInstace"));
-	const float Difficulty = GI->GetStageDifficulty();
+	const AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
+	checkf(RoomManager, TEXT("Bad Room Manager Owner"));
+
+	const float Difficulty = RoomManager->GetCurrentRoomDifficulty();
 
 	if (TotalEnemyAmount == 0)
 	{

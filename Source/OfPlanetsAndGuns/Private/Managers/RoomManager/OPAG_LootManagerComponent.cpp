@@ -31,10 +31,14 @@ void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 }
 
-void UOPAG_LootManagerComponent::GenerateLoot(const float DifficultyValue)
+void UOPAG_LootManagerComponent::GenerateLoot()
 {
-	GenerateIndividualLoot(LootBoxA.Key, LootBoxA.Value, DifficultyValue);
-	GenerateIndividualLoot(LootBoxB.Key, LootBoxB.Value, DifficultyValue);
+	const AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
+	checkf(RoomManager, TEXT("Bad Room Manager Owner"));
+
+	const float Difficulty = RoomManager->GetCurrentRoomDifficulty();
+	GenerateIndividualLoot(LootBoxA.Key, LootBoxA.Value, Difficulty);
+	GenerateIndividualLoot(LootBoxB.Key, LootBoxB.Value, Difficulty);
 }
 
 void UOPAG_LootManagerComponent::Unlock() const
@@ -53,12 +57,10 @@ void UOPAG_LootManagerComponent::SpawnLootContainers()
 			EMessageSeverity::Warning);
 		return;
 	}
-	int RoomWeight = 0;
-	AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
-	if (RoomManager)
-	{
-		RoomWeight = RoomManager->Weight;
-	}
+
+	const AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
+	checkf(RoomManager, TEXT("Bad Room Manager Owner"));
+	const int RoomWeight = RoomManager->Weight;
 
 
 	if (RoomWeight < 2) // 0 or 1 weight

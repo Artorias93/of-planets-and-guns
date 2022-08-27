@@ -61,7 +61,7 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void GenerateLoot(const float DifficultyValue);
+	void GenerateLoot();
 	void Unlock() const;
 	static TSubclassOf<AActor> SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask);
 	static TSubclassOf<AActor> SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes);

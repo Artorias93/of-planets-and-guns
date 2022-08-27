@@ -178,11 +178,9 @@ void AOPAG_RoomManager::OnStageDifficultyUpdated()
 {
 	if (!bIsAwaitingDifficultyUpdate) return;
 	bIsAwaitingDifficultyUpdate = false;
+	
 
-	UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
-	checkf(GI, TEXT("Couldn't find Game Instance!"));
-
-	LootManager->GenerateLoot(GI->GetStageDifficulty());
+	LootManager->GenerateLoot();
 
 	if (EnemyManager->GetSpawnerCount() == 0)
 	{
@@ -191,4 +189,17 @@ void AOPAG_RoomManager::OnStageDifficultyUpdated()
 	}
 
 	EnemyManager->SpawnWave();
+}
+
+float AOPAG_RoomManager::GetCurrentRoomDifficulty() const
+{
+	float Difficulty = OverriddenDifficulty;
+	if (Difficulty == 0.f)
+	{
+		UOPAG_GameInstance* GI = GetGameInstance<UOPAG_GameInstance>();
+		checkf(GI, TEXT("Couldn't find Game Instance!"));
+
+		Difficulty = GI->GetStageDifficulty();
+	}
+	return Difficulty;
 }
