@@ -10,7 +10,7 @@
 
 AOPAG_ShieldEnemy::AOPAG_ShieldEnemy()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	//When the melee walks it doesn't have to look at the player, or it slides on the ground
 	GetCharacterMovement()->bOrientRotationToMovement = true;

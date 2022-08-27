@@ -70,6 +70,8 @@ protected:
 
 	UFUNCTION() void SpawnFXFinished();
 
+	UFUNCTION() void ResetHealthBarHidden();
+
 	//virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */) override;
 	
 	/////////////////////////////
@@ -137,6 +139,4 @@ private:
 	FOnTimelineEventStatic OnSpawnFXTimelineFinished;
 	FTimerHandle UnseenByPlayerHandle;
 
-	UFUNCTION()
-	void ResetHealthBarHidden();
 };

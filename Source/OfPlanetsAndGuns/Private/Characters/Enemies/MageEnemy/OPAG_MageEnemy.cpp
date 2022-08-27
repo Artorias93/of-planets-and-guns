@@ -11,7 +11,7 @@
 
 AOPAG_MageEnemy::AOPAG_MageEnemy()
 {
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 }
 

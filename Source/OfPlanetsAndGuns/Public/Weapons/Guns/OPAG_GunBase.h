@@ -62,7 +62,7 @@ public:
 	float CritDamageMultiplier = 3.f;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite, meta = (UIMin = 0.f, UIMax = 100.f))
-	float BaseCritChance = 15.f;
+	float BaseCritChance = 5.f;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	float SpreadMultiplier = 1.f;

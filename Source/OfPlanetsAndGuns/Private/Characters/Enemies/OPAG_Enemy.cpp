@@ -89,6 +89,14 @@ void AOPAG_Enemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Gets bUsingPatrolPath from the instance
+	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	{
+		AIController->GetBlackboardComponent()->SetValueAsBool("bUsingPatrolPath", bUsingPatrolPath);
+	}
+
+	InitSpawnFX();
+
 	if (EnemyHealthBarComponent != nullptr) {
 		if (EnemyHealthBarComponent->GetWidgetClass() == nullptr)
 			EnemyHealthBarComponent->SetWidgetClass(EnemyHealthBarClass);
@@ -99,17 +107,7 @@ void AOPAG_Enemy::BeginPlay()
 		EnemyHealthBarComponent->SetHiddenInGame(true);
 		//UE_LOG(LogTemp, Warning, TEXT("Health enemy: %f "), HealthPercent);
 	}
-		
 
-
-
-	//Gets bUsingPatrolPath from the instance
-	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
-	{
-		AIController->GetBlackboardComponent()->SetValueAsBool("bUsingPatrolPath", bUsingPatrolPath);
-	}
-
-	InitSpawnFX();
 }
 
 void AOPAG_Enemy::Tick(float DeltaTime)
