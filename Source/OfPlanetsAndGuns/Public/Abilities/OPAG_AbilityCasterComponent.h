@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OPAG_AbilityTypes.h"
 #include "Components/ActorComponent.h"
 #include "OPAG_AbilityCasterComponent.generated.h"
 
@@ -12,9 +13,11 @@ class OFPLANETSANDGUNS_API UOPAG_AbilityCasterComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+	bool bSequenced = false;
+	
 public:
 	UOPAG_AbilityCasterComponent();
-
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 		TSubclassOf<class AOPAG_ForceField> ForceFieldAbilityClass;
@@ -34,11 +37,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 		TSubclassOf<class AOPAG_SupernovaAbility> SupernovaAbilityClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+		TSubclassOf<class AOPAG_FireballAbility> FireballAbilityClass;
+	
 	UPROPERTY()
 		class UOPAG_EventManagerSubsystem* EMS;
 
 	virtual void BeginPlay() override;
 
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
-		void CastAbility(enum EAbilityTypes AbilityEnum, AActor* Caller, FVector Position, FRotator Rotation, const AActor* Target);
+		void CastAbility(enum EAbilityTypes AbilityEnum, AActor* Caller, const AActor* Target, enum EAbilitySpawnPattern AbilitySpawnPattern);
+
+	UFUNCTION(CallInEditor, Category = "Ability Caster")
+		UClass* GetAbilityClass(EAbilityTypes AbilityType) const;
+	
+	UFUNCTION(CallInEditor, Category = "Ability Caster")
+		TArray<FVector> GetAbilitySpawnPositions(EAbilitySpawnPattern AbilitySpawnPattern, FVector Origin);
+	
 };

@@ -16,17 +16,29 @@ class OFPLANETSANDGUNS_API AOPAG_AbilityBase : public AActor
 public:	
 	AOPAG_AbilityBase();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
-	float Duration;
-
 public:
 	void SetCaller(AActor* Caller);
 	void SetTarget(const AActor* Target);
-	virtual void Init(EAbilityTypes AbilityType);
+	virtual void Init(EAbilityTypes AbilityType, float Delay = 0);
 
 protected:
 	virtual void BeginPlay() override;	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		class USceneComponent* Pivot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+	class USceneComponent* Parent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float AbilityDuration;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float AbilityDamage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float AbilityDelay = 0;
+	
 	UPROPERTY()
 		UOPAG_EventManagerSubsystem* EMS;
 

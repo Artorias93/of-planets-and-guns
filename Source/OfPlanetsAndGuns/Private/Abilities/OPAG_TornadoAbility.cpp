@@ -12,7 +12,7 @@ AOPAG_TornadoAbility::AOPAG_TornadoAbility()
 	PrimaryActorTick.bCanEverTick = true;
 
 	AbilityCollider = CreateDefaultSubobject<UBoxComponent>("Collider");
-	AbilityCollider->SetupAttachment(RootComponent);
+	AbilityCollider->SetupAttachment(Pivot);
 
 	AbilityParticle = CreateDefaultSubobject<UParticleSystemComponent>("Particle");
 	AbilityParticle->SetupAttachment(AbilityCollider);
@@ -41,13 +41,13 @@ void AOPAG_TornadoAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 {
 	if (AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OtherActor))
 	{
-		Character->ReceiveDamage(50);
+		Character->ReceiveDamage(AbilityDamage);
 	}
 }
 
-void AOPAG_TornadoAbility::Init(EAbilityTypes AbilityType)
+void AOPAG_TornadoAbility::Init(EAbilityTypes AbilityType, float Delay)
 {
-	
+	Super::Init(AbilityType, Delay);
 }
 
 void AOPAG_TornadoAbility::DestroyAbility()

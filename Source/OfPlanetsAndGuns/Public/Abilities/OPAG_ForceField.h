@@ -13,7 +13,7 @@ class OFPLANETSANDGUNS_API AOPAG_ForceField : public AOPAG_AbilityBase
 	
 public:	
 	AOPAG_ForceField();	
-	virtual void Init(EAbilityTypes AbilityType) override;
+	virtual void Init(EAbilityTypes AbilityType, float Delay) override;
 
 protected:
 	virtual void BeginPlay() override;		

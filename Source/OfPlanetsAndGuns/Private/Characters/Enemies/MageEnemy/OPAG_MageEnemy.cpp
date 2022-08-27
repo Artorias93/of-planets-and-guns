@@ -2,7 +2,6 @@
 
 
 #include "Characters/Enemies/MageEnemy/OPAG_MageEnemy.h"
-#include "Components/ChildActorComponent.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Abilities/OPAG_AbilityCasterComponent.h"
@@ -37,28 +36,16 @@ void AOPAG_MageEnemy::BeginPlay()
 
 		// the check is mandatory even if we don't use it directly, since the Ability Caster will receive the event
 		if (AbilityCaster != nullptr)
-		{			
-			FVector UpRightCorner = GetActorLocation();
-			UpRightCorner.X += 750;
-			UpRightCorner.Y += 750;
-			FVector UpLeftCorner = GetActorLocation();
-			UpLeftCorner.X += 750;
-			UpLeftCorner.Y -= 750;
-			FVector DownRightCorner = GetActorLocation();
-			DownRightCorner.X -= 750;
-			DownRightCorner.Y += 750;
-			FVector DownLeftCorner = GetActorLocation();
-			DownLeftCorner.X -= 750;
-			DownLeftCorner.Y -= 750;
-
-			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, UpRightCorner, GetActorRotation(), nullptr);
-			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, UpLeftCorner, GetActorRotation(), nullptr);
-			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, DownRightCorner, GetActorRotation(), nullptr);
-			EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_PillarEnemy, this, DownLeftCorner, GetActorRotation(), nullptr);
-
-			EMS->CastAbility.Broadcast(EAbilityTypes::ForceField, this, GetActorLocation(), GetActorRotation(), nullptr);
+		{
+			// Spawn pillars and force field
+			Init();
 		}
 	}	
+}
+
+void AOPAG_MageEnemy::CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, const AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern) const
+{
+	EMS->CastAbility.Broadcast(AbilityType, Caller, Target, AbilitySpawnPattern);
 }
 
 void AOPAG_MageEnemy::Attack()
@@ -85,26 +72,15 @@ void AOPAG_MageEnemy::OnBrokenForceField()
 	GetMesh()->SetCollisionProfileName(TEXT("BlockAll"));
 	this->SetActorEnableCollision(true);
 
-	FVector TornadoPosition1 = GetRandomPointInRadius();
-	TornadoPosition1.Z += 250;
-
-	FVector TornadoPosition2 = GetRandomPointInRadius();
-	TornadoPosition2.Z += 250;
-
-	FVector TornadoPosition3 = GetRandomPointInRadius();
-	TornadoPosition3.Z += 250;
-
-	FVector SupernovaPosition = GetActorLocation();
-	SupernovaPosition.Z += 500;
-
+	FVector GroundedPosition = GetActorLocation();
+	GroundedPosition.Z = GetGroundHeight();
 	
-	//EMS->CastAbility.Broadcast(EAbilityTypes::Spawn_ShieldEnemy, this, SupernovaPosition, GetActorRotation(), GetFocusedActor());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition1, GetActorRotation(), GetFocusedActor());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition2, GetActorRotation(), GetFocusedActor());
-	EMS->CastAbility.Broadcast(EAbilityTypes::Tornado, this, TornadoPosition3, GetActorRotation(), GetFocusedActor());
-	//EMS->CastAbility.Broadcast(EAbilityTypes::Crack, this, GetRandomPointInRadius(), GetActorRotation(), GetFocusedActor());
-	//EMS->CastAbility.Broadcast(EAbilityTypes::Ray, this, GetRandomPointInRadius(), GetActorRotation(), GetFocusedActor());
-	//EMS->CastAbility.Broadcast(EAbilityTypes::Supernova, this, SupernovaPosition, GetActorRotation(), GetFocusedActor());
+	//CastAbilityRequest(EAbilityTypes::Crack, this, GroundedPosition, FRotator::ZeroRotator, GetFocusedActor(), EAbilitySpawnPattern::GroundedLineFrontThree);
+	//CastAbilityRequest(EAbilityTypes::Tornado, this, GroundedPosition, FRotator::ZeroRotator, GetFocusedActor(), EAbilitySpawnPattern::GroundedLineFrontThree);
+
+	//CastAbilityRequest(EAbilityTypes::Tornado, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineFrontThree);
+	CastAbilityRequest(EAbilityTypes::Fireball, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredUpSequenceStar);
+	//CastAbilityRequest(EAbilityTypes::Ray, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredStarFour);
 }
 
 FVector AOPAG_MageEnemy::GetRandomPointInRadius()
@@ -136,4 +112,19 @@ AActor* AOPAG_MageEnemy::GetFocusedActor() const
 	}
 
 	return nullptr;
+}
+
+void AOPAG_MageEnemy::Init()
+{
+	CastAbilityRequest(EAbilityTypes::Spawn_PillarEnemy, this, nullptr, EAbilitySpawnPattern::SingleBackLeftCorner);
+	CastAbilityRequest(EAbilityTypes::Spawn_PillarEnemy, this, nullptr,EAbilitySpawnPattern::SingleBackRightCorner);
+	CastAbilityRequest(EAbilityTypes::Spawn_PillarEnemy, this, nullptr, EAbilitySpawnPattern::SingleFrontLeftCorner);
+	CastAbilityRequest(EAbilityTypes::Spawn_PillarEnemy, this, nullptr,EAbilitySpawnPattern::SingleFrontRightCorner);
+
+	CastAbilityRequest(EAbilityTypes::ForceField, this, nullptr, EAbilitySpawnPattern::Simple);
+}
+
+float AOPAG_MageEnemy::GetGroundHeight()
+{
+	return GetRandomPointInRadius().Z;
 }

@@ -18,7 +18,7 @@ class OFPLANETSANDGUNS_API AOPAG_SupernovaAbility : public AOPAG_AbilityBase
 	FVector TargetLocation; 
 public:
 	AOPAG_SupernovaAbility();
-	virtual void Init(EAbilityTypes AbilityType) override;	
+	virtual void Init(EAbilityTypes AbilityType, float Delay) override;	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
 		float Speed;

@@ -12,6 +12,7 @@ enum class EAbilityTypes : uint8
 	Crack,
 	Ray,
 	Supernova,
+	Fireball,
 	Spawn_ShieldEnemy,
 	Spawn_RangedEnemy,
 	Spawn_MachineGunEnemy,
@@ -19,6 +20,28 @@ enum class EAbilityTypes : uint8
 	Spawn_MeleeEnemy,
 	Spawn_PillarEnemy,
 	Spawn_DashingEnemy
+};
+
+UENUM()
+enum class EAbilitySpawnPattern : uint8
+{
+	Simple,
+	SingleFrontLeftCorner,
+	SingleFrontRightCorner,
+	SingleBackLeftCorner,
+	SingleBackRightCorner,
+	GroundedFrontSingle,
+	GroundedLineFrontTwo,
+	GroundedLineFrontThree,
+	GroundedLineBackSingle,
+	GroundedLineBackTwo,
+	GroundedLineBackThree,
+	GroundedTridentBackThree,
+	GroundedTridentFrontThree,
+	CenteredStarFour,
+	CenteredFrontSingle,
+	CenteredUpSingle,
+	CenteredUpSequenceStar,
 };
 
 USTRUCT(BlueprintType)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
+#include "Abilities/OPAG_AbilityTypes.h"
 #include "OPAG_MageEnemy.generated.h"
 
 UENUM()
@@ -28,6 +29,8 @@ public:
 
 	virtual void BeginPlay() override;	
 
+	void CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, const AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern) const;
+	
 protected:
 
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
@@ -45,6 +48,7 @@ protected:
 		class UOPAG_AbilityCasterComponent* AbilityCaster;
 
 private:
-
+		void Init();
+		float GetGroundHeight();
 		EFightStatus FightStatus = EFightStatus::FirstPhase;
 };

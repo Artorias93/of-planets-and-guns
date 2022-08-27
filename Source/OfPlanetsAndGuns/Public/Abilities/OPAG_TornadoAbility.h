@@ -16,7 +16,7 @@ class OFPLANETSANDGUNS_API AOPAG_TornadoAbility : public AOPAG_AbilityBase
 
 public:
 	AOPAG_TornadoAbility();
-	virtual void Init(EAbilityTypes AbilityType) override;	
+	virtual void Init(EAbilityTypes AbilityType, float Delay) override;	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
 		float Speed;

@@ -12,7 +12,7 @@ AOPAG_SupernovaAbility::AOPAG_SupernovaAbility()
 	PrimaryActorTick.bCanEverTick = true;
 
 	AbilityCollider = CreateDefaultSubobject<UBoxComponent>("Collider");
-	AbilityCollider->SetupAttachment(RootComponent);
+	AbilityCollider->SetupAttachment(Pivot);
 
 	AbilityParticleMuzzle = CreateDefaultSubobject<UNiagaraComponent>("Particle Muzzle");
 	AbilityParticleMuzzle->SetupAttachment(AbilityCollider);
@@ -26,7 +26,7 @@ void AOPAG_SupernovaAbility::BeginPlay()
 	AbilityCollider->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_SupernovaAbility::OnOverlapBegin);
 
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_SupernovaAbility::ShootProjectile, 2, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_SupernovaAbility::ShootProjectile, 2 + AbilityDelay, false);
 
 }
 
@@ -49,7 +49,7 @@ void AOPAG_SupernovaAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp,
 {
 	if (AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OtherActor))
 	{
-		Character->ReceiveDamage(50);
+		Character->ReceiveDamage(AbilityDamage);
 	}
 
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AbilityParticleHit, OtherActor->GetActorLocation(), GetActorRotation());
@@ -65,9 +65,9 @@ void AOPAG_SupernovaAbility::ShootProjectile()
 	UNiagaraFunctionLibrary::SpawnSystemAttached(AbilityParticleProjectile, AbilityCollider, "", GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false);
 }
 
-void AOPAG_SupernovaAbility::Init(EAbilityTypes AbilityType)
+void AOPAG_SupernovaAbility::Init(EAbilityTypes AbilityType, float Delay)
 {
-
+	Super::Init(AbilityType, Delay);
 }
 
 void AOPAG_SupernovaAbility::DestroyAbility()

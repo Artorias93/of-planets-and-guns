@@ -9,7 +9,7 @@
 AOPAG_CrackAbility::AOPAG_CrackAbility()
 {
 	AbilityCollider = CreateDefaultSubobject<UBoxComponent>("Collider");
-	AbilityCollider->SetupAttachment(RootComponent);
+	AbilityCollider->SetupAttachment(Pivot);
 
 	AbilityParticle = CreateDefaultSubobject<UNiagaraComponent>("Particle");
 	AbilityParticle->SetupAttachment(AbilityCollider);
@@ -27,7 +27,7 @@ void AOPAG_CrackAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAc
 {
 	if (AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OtherActor))
 	{
-		Character->ReceiveDamage(50);
+		Character->ReceiveDamage(AbilityDamage);
 	}
 }
 
@@ -39,9 +39,9 @@ void AOPAG_CrackAbility::DestroyAbility()
 	Super::DestroyAbility();
 }
 
-void AOPAG_CrackAbility::Init(EAbilityTypes AbilityType)
+void AOPAG_CrackAbility::Init(EAbilityTypes AbilityType, float Delay)
 {
-
+	Super::Init(AbilityType, Delay);
 }
 
 

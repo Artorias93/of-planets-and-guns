@@ -16,7 +16,7 @@ class OFPLANETSANDGUNS_API AOPAG_CrackAbility : public AOPAG_AbilityBase
 
 public:
 	AOPAG_CrackAbility();
-	virtual void Init(EAbilityTypes AbilityType) override;
+	virtual void Init(EAbilityTypes AbilityType, float Delay) override;
 
 protected:
 	virtual void BeginPlay() override;

@@ -12,7 +12,7 @@ class OFPLANETSANDGUNS_API AOPAG_SpawnEnemy : public AOPAG_AbilityBase
 	GENERATED_BODY()
 
 public:
-	virtual void Init(EAbilityTypes AbilityType) override;
+	virtual void Init(EAbilityTypes AbilityType, float Delay) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UDataTable* SpawnableEnemiesTable;

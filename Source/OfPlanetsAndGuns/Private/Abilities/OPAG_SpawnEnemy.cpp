@@ -6,8 +6,10 @@
 #include "Characters/Enemies/OPAG_Enemy.h"
 
 
-void AOPAG_SpawnEnemy::Init(EAbilityTypes AbilityType)
+void AOPAG_SpawnEnemy::Init(EAbilityTypes AbilityType, float Delay)
 {
+	Super::Init(AbilityType, Delay);
+	
 	TSubclassOf<AOPAG_Enemy> EnemyClass;
 
 	for (auto AbilityTypeToEnemy : SpawnableEnemiesList)

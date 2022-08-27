@@ -3,11 +3,18 @@
 
 #include "Abilities/OPAG_AbilityBase.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Components/SceneComponent.h"
 
 // Sets default values
 AOPAG_AbilityBase::AOPAG_AbilityBase()
 { 	
-	PrimaryActorTick.bCanEverTick = false;	
+	PrimaryActorTick.bCanEverTick = false;
+	
+	Parent = CreateDefaultSubobject<USceneComponent>("Parent");
+	Parent->SetupAttachment(RootComponent);
+
+	Pivot = CreateDefaultSubobject<USceneComponent>("Pivot");
+	Pivot->SetupAttachment(Parent);
 }
 
 void AOPAG_AbilityBase::SetCaller(AActor* AbilityCaller)
@@ -35,7 +42,7 @@ void AOPAG_AbilityBase::BeginPlay()
 	}
 
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_AbilityBase::DestroyAbility, Duration, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_AbilityBase::DestroyAbility, AbilityDuration, false);
 }
 
 void AOPAG_AbilityBase::DestroyAbility()
@@ -43,4 +50,7 @@ void AOPAG_AbilityBase::DestroyAbility()
 	Destroy();
 }
 
-void AOPAG_AbilityBase::Init(EAbilityTypes AbilityType) {}
+void AOPAG_AbilityBase::Init(EAbilityTypes AbilityType, float Delay)
+{
+	this->AbilityDelay = Delay;
+}

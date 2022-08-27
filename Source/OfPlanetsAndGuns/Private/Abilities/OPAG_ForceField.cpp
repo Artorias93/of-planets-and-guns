@@ -11,7 +11,7 @@
 AOPAG_ForceField::AOPAG_ForceField()
 {
 	AbilityMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	AbilityMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	AbilityMesh->SetupAttachment(Pivot);
 }
 
 void AOPAG_ForceField::BeginPlay()
@@ -29,8 +29,10 @@ void AOPAG_ForceField::BeginPlay()
 	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%s"),  AvailablePillarsAmount));
 }
 
-void AOPAG_ForceField::Init(EAbilityTypes AbilityType)
+void AOPAG_ForceField::Init(EAbilityTypes AbilityType, float Delay)
 {
+	Super::Init(AbilityType, Delay);
+	
 	if (Caller != nullptr)
 	{		
 		Caller->SetActorLocation(this->GetActorLocation(), false, nullptr, ETeleportType::TeleportPhysics);

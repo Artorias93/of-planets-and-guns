@@ -9,7 +9,7 @@
 AOPAG_RayAbility::AOPAG_RayAbility()
 {
 	AbilityCollider = CreateDefaultSubobject<UBoxComponent>("Collider");
-	AbilityCollider->SetupAttachment(RootComponent);
+	AbilityCollider->SetupAttachment(Pivot);
 
 	AbilityParticleMuzzle = CreateDefaultSubobject<UNiagaraComponent>("Particle Muzzle");
 	AbilityParticleMuzzle->SetupAttachment(AbilityCollider);
@@ -35,13 +35,13 @@ void AOPAG_RayAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 {
 	if (AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OtherActor))
 	{
-		Character->ReceiveDamage(50);
+		Character->ReceiveDamage(AbilityDamage);
 	}
 }
 
-void AOPAG_RayAbility::Init(EAbilityTypes AbilityType)
+void AOPAG_RayAbility::Init(EAbilityTypes AbilityType, float Delay)
 {
-
+	Super::Init(AbilityType, Delay);
 }
 
 void AOPAG_RayAbility::DestroyAbility()
