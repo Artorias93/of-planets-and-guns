@@ -34,6 +34,17 @@ enum class EWeaponSoundAction : uint8
 };
 ENUM_CLASS_FLAGS(EWeaponSoundAction);
 
+UENUM(BlueprintType, meta = (Bitflags))
+enum class EAbilitySoundAction : uint8
+{
+	GL_Fire = 0x00,
+	GL_Explosion = 0x01,
+	GL_Reload = 0x02,
+	Ability_Ready = 0x03,
+	Shield_Bullets = 0x04,
+};
+ENUM_CLASS_FLAGS(EAbilitySoundAction);
+
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_SoundManagerSubsystem : public UGameInstanceSubsystem
@@ -43,15 +54,27 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
 		UDataTable* WeaponsAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* AbilitiesAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* EnviromentAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* CharacterAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* UIAudioLibrary;
 
 	UPROPERTY(EditAnywhere, Category = "FMOD")
 		class UFMODAudioComponent* AudioComponent;
+	UPROPERTY(EditAnywhere, Category = "FMOD")
+		class UFMODAudioComponent* AudioAbilityComponent;
 
 	FFMODEventInstance InstanceWrapper;
 
 public: 
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponSounds(AOPAG_GunBase* weapon, EWeaponSoundAction action);
+	UFUNCTION(BlueprintCallable)
+		void PlayAbiltySounds(AActor* actor , EAbilitySoundAction ability);
 	UFUNCTION(BlueprintCallable)
 		void StopSound();
 private:

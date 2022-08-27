@@ -28,6 +28,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* Projectile;
 
+	UPROPERTY()
+		class UOPAG_SoundManagerSubsystem* SMS;
+
+
 public:
 	UPROPERTY(Category = "Grenade", EditDefaultsOnly, BlueprintReadOnly)
 		UParticleSystem* EmitterTemplate;

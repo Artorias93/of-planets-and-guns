@@ -47,6 +47,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
 		UDataTable* WeaponsAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* EnviromentAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* AbilitiesAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* CharacterAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* UIAudioLibrary;
 
 private:
 	void BindEvents();

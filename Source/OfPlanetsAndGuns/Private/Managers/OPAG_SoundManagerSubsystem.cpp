@@ -20,7 +20,37 @@ void UOPAG_SoundManagerSubsystem::PlayWeaponSounds(AOPAG_GunBase* weapon, EWeapo
 
 }
 
-// TYPE PER LA PISTOL??
+void UOPAG_SoundManagerSubsystem::PlayAbiltySounds(AActor* actor, EAbilitySoundAction ability) {
+	FVector position = actor->GetActorLocation();
+	if (AbilitiesAudioLibrary) {
+		FAudioEvent* libraryRow;
+		switch (ability)
+		{
+		case EAbilitySoundAction::GL_Fire:
+			libraryRow = AbilitiesAudioLibrary->FindRow<FAudioEvent>(*FString("Ability_GL_Fire"), "", false);
+			break;
+		case EAbilitySoundAction::GL_Explosion:
+			libraryRow = AbilitiesAudioLibrary->FindRow<FAudioEvent>(*FString("Ability_GL_Explosion"), "", false);
+			break;
+		case EAbilitySoundAction::GL_Reload:
+			libraryRow = AbilitiesAudioLibrary->FindRow<FAudioEvent>(*FString("Ability_GL_Reload"), "", false);
+			break;
+		case EAbilitySoundAction::Ability_Ready:
+			libraryRow = AbilitiesAudioLibrary->FindRow<FAudioEvent>(*FString("Ability_Ready"), "", false);
+			break;
+		case EAbilitySoundAction::Shield_Bullets:
+			libraryRow = AbilitiesAudioLibrary->FindRow<FAudioEvent>(*FString("Ability_Shield_Bullet"), "", false);
+			break;
+		default:
+			libraryRow = nullptr;
+			break;
+		}
+		if (libraryRow) {
+			UFMODEvent* currentEvent = libraryRow->AudioContent;
+			AudioAbilityComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, false, true, true);
+		}
+	}
+}
 // Sbatti quando è empty
 void UOPAG_SoundManagerSubsystem::PlayWeaponsFireSound(AOPAG_GunBase* weapon) {
 	FVector position = weapon->GetActorLocation();

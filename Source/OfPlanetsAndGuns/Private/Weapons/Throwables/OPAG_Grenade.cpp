@@ -2,6 +2,8 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
 
@@ -30,6 +32,7 @@ AOPAG_Grenade::AOPAG_Grenade()
 void AOPAG_Grenade::BeginPlay()
 {
 	Super::BeginPlay();
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 	
 }
 
@@ -42,6 +45,7 @@ void AOPAG_Grenade::Tick(float DeltaTime)
 void AOPAG_Grenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, Hit.Location, FRotator::ZeroRotator, FVector(10.f, 10.f, 10.f), true, EPSCPoolMethod::None, true);
-	UGameplayStatics::PlaySound2D(GetWorld(), ExplosionSound);
+	//UGameplayStatics::PlaySound2D(GetWorld(), ExplosionSound);
+	SMS->PlayAbiltySounds( this , EAbilitySoundAction::GL_Explosion);
 	Destroy();
 }

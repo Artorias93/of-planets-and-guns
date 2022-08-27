@@ -267,4 +267,8 @@ void UOPAG_GameInstance::SetAudioLibraries()
 {
 	UOPAG_SoundManagerSubsystem* SMS = GetSubsystem<UOPAG_SoundManagerSubsystem>();
 	SMS->WeaponsAudioLibrary = WeaponsAudioLibrary;
+	SMS->AbilitiesAudioLibrary = AbilitiesAudioLibrary;
+	SMS->EnviromentAudioLibrary = EnviromentAudioLibrary;
+	SMS->CharacterAudioLibrary = CharacterAudioLibrary;
+	SMS->UIAudioLibrary = UIAudioLibrary;
 }
