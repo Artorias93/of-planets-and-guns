@@ -19,8 +19,6 @@ void AOPAG_SpawnEnemy::Init(EAbilityTypes AbilityType, float Delay)
 			EnemyClass = AbilityTypeToEnemy->EnemyClass;
 			SpawnEnemy(EnemyClass);
 
-			Destroy();
-
 			break;
 		}
 	}	

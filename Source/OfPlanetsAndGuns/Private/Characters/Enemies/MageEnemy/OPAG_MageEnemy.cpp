@@ -79,8 +79,14 @@ void AOPAG_MageEnemy::OnBrokenForceField()
 	//CastAbilityRequest(EAbilityTypes::Tornado, this, GroundedPosition, FRotator::ZeroRotator, GetFocusedActor(), EAbilitySpawnPattern::GroundedLineFrontThree);
 
 	//CastAbilityRequest(EAbilityTypes::Tornado, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineFrontThree);
-	CastAbilityRequest(EAbilityTypes::Fireball, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredUpSequenceStar);
+	//CastAbilityRequest(EAbilityTypes::Fireball, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredUpSequenceStar);
 	//CastAbilityRequest(EAbilityTypes::Ray, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredStarFour);
+
+	//CastAbilityRequest(EAbilityTypes::Spawn_DashingEnemy, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineFrontTwo);
+	//CastAbilityRequest(EAbilityTypes::Spawn_RangedEnemy, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineBackThree);
+	//CastAbilityRequest(EAbilityTypes::Spawn_ShieldEnemy, this, GetFocusedActor(),  EAbilitySpawnPattern::GroundedLineFrontThree);
+
+	//CastAbilityRequest(EAbilityTypes::Fireball, this, GetFocusedActor(),  EAbilitySpawnPattern::CenteredUpSequenceStar);
 }
 
 FVector AOPAG_MageEnemy::GetRandomPointInRadius()

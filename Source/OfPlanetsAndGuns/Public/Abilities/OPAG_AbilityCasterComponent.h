@@ -7,7 +7,6 @@
 #include "Components/ActorComponent.h"
 #include "OPAG_AbilityCasterComponent.generated.h"
 
-
 UCLASS(BlueprintType)
 class OFPLANETSANDGUNS_API UOPAG_AbilityCasterComponent : public UActorComponent
 {
@@ -52,6 +51,6 @@ protected:
 		UClass* GetAbilityClass(EAbilityTypes AbilityType) const;
 	
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
-		TArray<FVector> GetAbilitySpawnPositions(EAbilitySpawnPattern AbilitySpawnPattern, FVector Origin);
+		TArray<FTransform> GetAbilitySpawnTransforms(EAbilitySpawnPattern AbilitySpawnPattern, FTransform Origin);
 	
 };

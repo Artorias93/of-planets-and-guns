@@ -63,12 +63,12 @@ void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor
 	
 	if (UClass* AbilityClass = GetAbilityClass(AbilityType))
 	{
-		TArray<FVector> Positions = GetAbilitySpawnPositions(AbilitySpawnPattern, Caller->GetActorLocation());
+		TArray<FTransform> Transforms = GetAbilitySpawnTransforms(AbilitySpawnPattern, Caller->GetTransform());
 
 		float IncreasingDelay = 0;
-		for (auto AbilityPosition : Positions)
+		for (auto AbilityTranfrom : Transforms)
 		{
-			AOPAG_AbilityBase* Ability = GetWorld()->SpawnActor<AOPAG_AbilityBase>(AbilityClass, AbilityPosition, FRotator::ZeroRotator, SpawnInfo);
+			AOPAG_AbilityBase* Ability = GetWorld()->SpawnActor<AOPAG_AbilityBase>(AbilityClass, AbilityTranfrom.GetLocation(), AbilityTranfrom.GetRotation().Rotator(), SpawnInfo);
 
 			if (bSequenced)
 				IncreasingDelay += 1.5;
@@ -98,6 +98,21 @@ UClass* UOPAG_AbilityCasterComponent::GetAbilityClass(EAbilityTypes AbilityType)
 	case EAbilityTypes::Spawn_ShieldEnemy:
 		return SpawnEnemyAbilityClass;
 
+	case EAbilityTypes::Spawn_DashingEnemy:
+		return SpawnEnemyAbilityClass;
+
+	case EAbilityTypes::Spawn_MachineGunEnemy:
+		return SpawnEnemyAbilityClass;
+
+	case EAbilityTypes::Spawn_MeleeEnemy:
+		return SpawnEnemyAbilityClass;
+
+	case EAbilityTypes::Spawn_RangedEnemy:
+		return SpawnEnemyAbilityClass;
+
+	case EAbilityTypes::Spawn_SniperEnemy:
+		return SpawnEnemyAbilityClass;
+
 	case EAbilityTypes::Tornado:
 		return TornadoAbilityClass;
 		
@@ -118,48 +133,68 @@ UClass* UOPAG_AbilityCasterComponent::GetAbilityClass(EAbilityTypes AbilityType)
 	}
 }
 
-TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilitySpawnPattern AbilitySpawnPattern, FVector Origin)
+TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbilitySpawnPattern AbilitySpawnPattern, FTransform Origin)
 {
-	TArray<FVector> Positions;
+	TArray<FTransform> Transforms;
 
-	FVector Position1 = Origin;
-	FVector Position2 = Origin;
-	FVector Position3 = Origin;
-	FVector Position4 = Origin;
-	FVector Position5 = Origin;
+
+	/* Re-usable variables */
+
+	FTransform Transform1 = Origin;
+	FTransform Transform2 = Origin;
+	FTransform Transform3 = Origin;
+	FTransform Transform4 = Origin;
+	FTransform Transform5 = Origin;
+
+	FVector Position1 = Transform1.GetLocation();
+	FVector Position2 = Transform1.GetLocation();
+	FVector Position3 = Transform1.GetLocation();
+	FVector Position4 = Transform1.GetLocation();
+	FVector Position5 = Transform1.GetLocation();
+
+	FRotator Rotation1 = Transform1.GetRotation().Rotator();
+	FRotator Rotation2 = Transform1.GetRotation().Rotator();
+	FRotator Rotation3 = Transform1.GetRotation().Rotator();
+	FRotator Rotation4 = Transform1.GetRotation().Rotator();
+	FRotator Rotation5 = Transform1.GetRotation().Rotator();
 	
 	switch (AbilitySpawnPattern)
 	{
 	case EAbilitySpawnPattern::Simple:
 
-		Positions.Add(Position1);
+		Transforms.Add(Transform1);
 		
 		break;
 
 	case EAbilitySpawnPattern::CenteredUpSingle:
 		
 		Position1.Z += 250;
+		Transform1.SetLocation(Position1);
 		
-		Positions.Add(Position1);
+		Transforms.Add(Transform1);
 		
 		break;
 
 	case EAbilitySpawnPattern::CenteredFrontSingle:
 		
-		Positions.Add(Position1);
+		Transforms.Add(Transform1);
 		
 		break;
 
 	case EAbilitySpawnPattern::CenteredStarFour:
 		
-		Position2 = Position2.RotateAngleAxis(90, FVector(0, 0, 1));
-		Position3 = Position3.RotateAngleAxis(180, FVector(0, 0, 1));
-		Position4 = Position4.RotateAngleAxis(270, FVector(0, 0, 1));
+		Rotation2 += FRotator(0, 90, 0);
+		Rotation3 += FRotator(0, 180, 0);
+		Rotation4 += FRotator(0, 270, 0);
+
+		Transform2.SetRotation(Rotation2.Quaternion());
+		Transform3.SetRotation(Rotation3.Quaternion());
+		Transform4.SetRotation(Rotation4.Quaternion());
 		
-		Positions.Add(Position1);
-		Positions.Add(Position2);
-		Positions.Add(Position3);
-		Positions.Add(Position4);
+		Transforms.Add(Transform1);
+		Transforms.Add(Transform2);
+		Transforms.Add(Transform3);
+		Transforms.Add(Transform4);
 		
 		break;
 
@@ -176,12 +211,18 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		
 		Position4.Y -= 75;
 		Position5.Y += 75;
+
+		Transform1.SetLocation(Position1);
+		Transform2.SetLocation(Position2);
+		Transform3.SetLocation(Position3);
+		Transform4.SetLocation(Position4);
+		Transform5.SetLocation(Position5);
 		
-		Positions.Add(Position1);
-		Positions.Add(Position2);
-		Positions.Add(Position3);
-		Positions.Add(Position4);
-		Positions.Add(Position5);
+		Transforms.Add(Transform1);
+		Transforms.Add(Transform2);
+		Transforms.Add(Transform3);
+		Transforms.Add(Transform4);
+		Transforms.Add(Transform5);
 
 		bSequenced = true;
 		
@@ -192,7 +233,9 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position1.Z = 0;
 		Position1.X += 100;
 		
-		Positions.Add(Position1);
+		Transform1.SetLocation(Position1);
+
+		Transforms.Add(Transform1);
 		
 		break;
 
@@ -201,7 +244,9 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position1.Z = 0;
 		Position1.X -= 300;
 		
-		Positions.Add(Position1);
+		Transform1.SetLocation(Position1);
+
+		Transforms.Add(Transform1);
 		
 		break;
 
@@ -217,9 +262,13 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position3 = Position1;
 		Position3.Y -= 500;
 		
-		Positions.Add(Position1);
-		Positions.Add(Position2);
-		Positions.Add(Position3);
+		Transform1.SetLocation(Position1);
+		Transform2.SetLocation(Position2);
+		Transform3.SetLocation(Position3);
+
+		Transforms.Add(Transform1);
+		Transforms.Add(Transform2);
+		Transforms.Add(Transform3);
 		
 		break;
 
@@ -235,8 +284,11 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position3 = Position1;
 		Position3.Y -= 300;
 		
-		Positions.Add(Position2);
-		Positions.Add(Position3);
+		Transform2.SetLocation(Position2);
+		Transform3.SetLocation(Position3);
+
+		Transforms.Add(Transform2);
+		Transforms.Add(Transform3);
 		
 		break;
 
@@ -252,8 +304,11 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position3 = Position1;
 		Position3.Y -= 300;
 		
-		Positions.Add(Position2);
-		Positions.Add(Position3);
+		Transform2.SetLocation(Position2);
+		Transform3.SetLocation(Position3);
+
+		Transforms.Add(Transform2);
+		Transforms.Add(Transform3);
 		
 		break;
 
@@ -272,8 +327,14 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position3.Y -= 300;
 		
 		Position1.X += 100;
-		Positions.Add(Position2);
-		Positions.Add(Position3);
+
+		Transform1.SetLocation(Position1);
+		Transform2.SetLocation(Position2);
+		Transform3.SetLocation(Position3);
+
+		Transforms.Add(Transform1);
+		Transforms.Add(Transform2);
+		Transforms.Add(Transform3);
 		
 		break;
 
@@ -291,9 +352,13 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position3.X -= 300;
 		Position3.Y -= 300;
 
-		Positions.Add(Position1);
-		Positions.Add(Position2);
-		Positions.Add(Position3);
+		Transform1.SetLocation(Position1);
+		Transform2.SetLocation(Position2);
+		Transform3.SetLocation(Position3);
+
+		Transforms.Add(Transform1);
+		Transforms.Add(Transform2);
+		Transforms.Add(Transform3);
 		
 		break;
 
@@ -302,7 +367,9 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position1.X -= 750;
 		Position1.Y -= 750;
 
-		Positions.Add(Position1);
+		Transform1.SetLocation(Position1);
+
+		Transforms.Add(Transform1);
 		
 		break;
 
@@ -311,7 +378,9 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position1.X -= 750;
 		Position1.Y += 750;
 
-		Positions.Add(Position1);
+		Transform1.SetLocation(Position1);
+
+		Transforms.Add(Transform1);
 		
 		break;
 
@@ -320,7 +389,9 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position1.X += 750;
 		Position1.Y -= 750;
 
-		Positions.Add(Position1);
+		Transform1.SetLocation(Position1);
+
+		Transforms.Add(Transform1);
 		
 		break;
 
@@ -329,7 +400,9 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position1.X += 750;
 		Position1.Y += 750;
 
-		Positions.Add(Position1);
+		Transform1.SetLocation(Position1);
+
+		Transforms.Add(Transform1);
 		
 		break;
 	
@@ -345,16 +418,20 @@ TArray<FVector> UOPAG_AbilityCasterComponent::GetAbilitySpawnPositions(EAbilityS
 		Position3 = Position1;
 		Position3.Y -= 500;
 		
-		Positions.Add(Position1);
-		Positions.Add(Position2);
-		Positions.Add(Position3);
+		Transform1.SetLocation(Position1);
+		Transform2.SetLocation(Position2);
+		Transform3.SetLocation(Position3);
+
+		Transforms.Add(Transform1);
+		Transforms.Add(Transform2);
+		Transforms.Add(Transform3);
 		
 		break;
 		
 	default:
-		return Positions;
+		return Transforms;
 	}
 
-	return Positions;
+	return Transforms;
 }
 

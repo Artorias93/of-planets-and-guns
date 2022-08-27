@@ -39,7 +39,8 @@ void AOPAG_FireballAbility::Tick(float DeltaTime)
 	{
 		FVector CurrentLocation = GetActorLocation();
 		FVector MovementVector = TargetLocation - CurrentLocation;
-		FVector Velocity{ MovementVector.Normalize() * Speed * DeltaTime };
+		MovementVector.Normalize();
+		FVector Velocity = MovementVector * Speed * DeltaTime;
 		FVector NewLocation = CurrentLocation + Velocity;
 
 		SetActorLocation(NewLocation);

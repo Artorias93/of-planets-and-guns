@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "NiagaraFunctionLibrary.h"
+#include "DrawDebugHelpers.h"
 
 AOPAG_SupernovaAbility::AOPAG_SupernovaAbility()
 {	
@@ -21,7 +22,7 @@ AOPAG_SupernovaAbility::AOPAG_SupernovaAbility()
 
 void AOPAG_SupernovaAbility::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
 
 	AbilityCollider->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_SupernovaAbility::OnOverlapBegin);
 
@@ -32,13 +33,14 @@ void AOPAG_SupernovaAbility::BeginPlay()
 
 void AOPAG_SupernovaAbility::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime);	
 
 	if (bShoot && Target != nullptr)
 	{
 		FVector CurrentLocation = GetActorLocation();
-		FVector MovementVector = TargetLocation - CurrentLocation;
-		FVector Velocity{ MovementVector.Normalize() * Speed * DeltaTime };
+		FVector MovementVector = TargetLocation - CurrentLocation;		
+		MovementVector.Normalize();
+		FVector Velocity = MovementVector * Speed * DeltaTime;
 		FVector NewLocation = CurrentLocation + Velocity;
 
 		SetActorLocation(NewLocation);
@@ -60,7 +62,7 @@ void AOPAG_SupernovaAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp,
 void AOPAG_SupernovaAbility::ShootProjectile()
 {
 	bShoot = true;
-	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AbilityParticleProjectile, GetActorLocation(), GetActorRotation());
+
 	TargetLocation = Target->GetActorLocation();
 	UNiagaraFunctionLibrary::SpawnSystemAttached(AbilityParticleProjectile, AbilityCollider, "", GetActorLocation(), GetActorRotation(), EAttachLocation::KeepWorldPosition, false);
 }
