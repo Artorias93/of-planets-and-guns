@@ -47,6 +47,12 @@ void AOPAG_CharacterBase::BeginPlay()
 	}
 }
 
+void AOPAG_CharacterBase::FellOutOfWorld(const UDamageType& dmgType)
+{
+	if (GetHealth() > 0.f)
+		ReceiveDamage(GetHealth() + 1.f); //+1 just to make sure it overkills
+}
+
 float AOPAG_CharacterBase::GetHealth() const
 {
 	if(AbilitySystemComp)

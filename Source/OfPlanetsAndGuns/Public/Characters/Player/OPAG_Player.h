@@ -27,6 +27,9 @@ UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, Category = "GameplayAbility System")
+	const class UOPAG_AttributeSetPlayer* AttributeSetPlayer;
 	
 public:
 	AOPAG_Player();
@@ -92,23 +95,17 @@ public:
 	bool bIsFirstDash = true;
 
 	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
-	int DashCount = 5;
-
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
-	int DashMaxCount = 5;
-
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
 	float DashSpeed = 10000.f;
 
 	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
 	float DashLenght = 500.f;
 
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
-	float DashRestoreTime = 5.f;
-
 public:
 	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
 	float LookUpMaxDistance = 100.f;
+
+	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
+	float LookAtMaxEnemyDistance = 9000.f;
 
 	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
 	float LookUpCapsuleRadius = 20.f;
@@ -117,6 +114,9 @@ public:
 	TArray<TEnumAsByte<EObjectTypeQuery>> InteractableTypesQuery;
 
 public: 
+	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<UGameplayAbility> PlayerShieldAbility;
+
 	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UGameplayAbility> Stamina;
 
@@ -142,17 +142,23 @@ public:
 	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "With this variable is possible to modify the primary gun's type."))
 	TSubclassOf<AOPAG_ModularGun> DebugCurrentPrimaryGun;
 
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the current player's life."))
-	int CurrentHealth = 0;
-
 	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the max player's life."))
-	int CurrentHealthMax = 0;
+	int DebugHealthMax = 0;
+
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the max player's dash count."))
+	int DebugDashMaxCount = 0;
+
+	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the restore timer player's dash."))
+	float DebugDashRestoreTime = 0.f;
 
 private:
 	const FName GripSocketName = "GripPoint";
 	const float LookUpDistanceToPlayer = 150.f;
+	bool bIsDashAlreadyInitialized;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
+	bool bHasAlreadyLooked = false;
+	bool bIsShieldBroken = false;
 	float GunPreADSRoll = 0;
 	AActor* InteractableObject = nullptr;
 	AActor* PreviousLookedAtModule = nullptr;
@@ -163,10 +169,13 @@ private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
+private:
+	FTimerHandle RestartShieldPlayerHandle;
+	FTimerHandle ShieldPlayerCooldownHandle;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Death() override;
-	virtual void FellOutOfWorld(const UDamageType& dmgType) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -174,6 +183,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	virtual void ReceiveDamage(const float Damage) override;
 
 private:
 	// Events system
@@ -185,9 +195,9 @@ private:
 	void InitADSTimeline();
 	void InitDashTimeline();
 	void InitRecoilTimeline();
+	void InitDashValues();
 
-	UFUNCTION()
-	void TeleportPlayerToStart(FTransform StartLocation);
+	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);
 
 	// Mathematics utility
 	const FVector CalculateThrowForce() const;
@@ -207,10 +217,15 @@ private:
 	virtual void GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance = 0) override;
 
 	// LookAt intractable items
-	void CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection); 
+	void CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection, float MaxDistance);
 	AActor* CheckLookAtInteractableItems();
 	const FVector CalculateModuleSpawnLocation() const;
+
+	void UpdateInteractableMessage();
 	void UpdateComparison();
+
+	// Lookat Enemy distance
+	void LookAtEnemy();
 
 	// Interact with items
 	void InteractWithModule(AOPAG_ModuleBase* Module);
@@ -218,6 +233,10 @@ private:
 
 	// Interact with guns
 	void PickupGun(AOPAG_ModularGun* Gun);
+
+	// Timer
+	void ResetShieldTimer();
+	void ShieldCooldownTimer();
 
 public:
 	UFUNCTION() void MoveForward(const FInputActionValue& Value);

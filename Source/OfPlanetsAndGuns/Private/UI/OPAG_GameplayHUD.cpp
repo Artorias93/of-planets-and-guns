@@ -9,6 +9,7 @@
 #include "UI/OPAG_UWLoadingScreenView.h"
 #include "UI/OPAG_UWModuleView.h"
 #include "UI/OPAG_UWGunCompareView.h"
+#include "UI/OPAG_UWInteractView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "UI/OPAG_UWGameOverView.h"
@@ -31,6 +32,8 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->LookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::ShowGunCompareView);
 		EMS->UnlookedAtGun.AddDynamic(this, &AOPAG_GameplayHUD::HideGunCompareView);
 		EMS->PlayerDied.AddDynamic(this, &AOPAG_GameplayHUD::ShowGameOverView);
+		EMS->LookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::ShowInteractView);
+		EMS->UnlookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::HideInteractView);
 	}
 }
 
@@ -95,6 +98,11 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		GameOverViewWidget = CreateWidget<UOPAG_UWGameOverView>(GetWorld(), GameOverViewWidgetClass);
 	}
+
+	if (InteractViewWidgetClass)
+	{
+		InteractViewWidget = CreateWidget<UOPAG_UWInteractView>(GetWorld(), InteractViewWidgetClass);
+	}
 }
 
 void AOPAG_GameplayHUD::ShowPauseView() {
@@ -149,11 +157,12 @@ void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 }
 
 void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, 
-	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity)
+	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
+	const int EquippableTypes, const bool CanBeEquipped)
 {
 	if (ModuleViewWidget) {
 		ModuleViewWidget->AddToViewport(3);
-		ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity);
+		ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
 	}
 }
 
@@ -164,11 +173,12 @@ void AOPAG_GameplayHUD::HideModuleCompareView()
 	}
 }
 
-void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName)
+void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName, 
+	const FString OtherGunType)
 {
 	if (GunCompareViewWidget) {
 		GunCompareViewWidget->AddToViewport(3);
-		GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName);
+		GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
 	}
 }
 
@@ -190,5 +200,20 @@ void AOPAG_GameplayHUD::ShowGameOverView()
 
 	if (GameOverViewWidget) {
 		GameOverViewWidget->AddToViewport(3);
+	}
+}
+
+void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, const FString InteractText)
+{
+	if (InteractViewWidget) {
+		InteractViewWidget->AddToViewport(3);
+		InteractViewWidget->UpdateInteractText(bCanInteract, InteractText);
+	}
+}
+
+void AOPAG_GameplayHUD::HideInteractView()
+{
+	if (InteractViewWidget) {
+		InteractViewWidget->RemoveFromViewport();
 	}
 }

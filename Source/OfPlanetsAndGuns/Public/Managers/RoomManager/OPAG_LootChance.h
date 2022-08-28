@@ -15,8 +15,9 @@ enum class ELootType : uint8
 	Gold,
 	Ammo,
 	Bolts,
+	Potion,
 	Module,
-	Gun,
+	Gun
 };
 
 USTRUCT(BlueprintType)
@@ -53,9 +54,6 @@ struct OFPLANETSANDGUNS_API FOPAG_ModuleList : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AOPAG_ModuleBase> ModuleClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ModuleLevel;
 };
 
 USTRUCT(BlueprintType)

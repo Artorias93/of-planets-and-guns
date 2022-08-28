@@ -94,9 +94,14 @@ void AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direct
 
 	const float Seconds = CalculateRateInSeconds(Stats.FireRate);
 	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
-	//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 
+	//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 	SMS->PlayWeaponSounds( this , EWeaponSoundAction::Fire);
+	
+	if(AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
+	{
+		MakeNoise(1.f, CharacterOwner, CharacterOwner->GetActorLocation(), 0);
+	}	
 }
 
 void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
@@ -140,7 +145,9 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 				//If the hit component is the shield, damage is not applied
 				if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
 				{
-					Character->ReceiveDamage(Stats.Damage);
+					//Check for headshot
+					const bool IsHeadshot = OutHit.GetComponent()->ComponentHasTag("Head");
+					Character->ReceiveDamage(CalculateDamage(IsHeadshot));
 				}
 			}
 		}
@@ -166,16 +173,40 @@ void AOPAG_GunBase::ResetShootTimer()
 #pragma endregion Shooting Behavior
 
 #pragma region Shooting Utility
+
+
+
+float AOPAG_GunBase::CalculateDamage(const bool IsHeadshot) const
+{
+	const float DamageRandomnessAmount = Stats.Damage * 0.01f * DamageRandomnessPercentage;
+	float AdjustedDamage = Stats.Damage + FMath::RandRange(-DamageRandomnessAmount, DamageRandomnessAmount);
+	if (IsHeadshot || FMath::RandRange(0.f, 100.f) < BaseCritChance)
+	{
+		AddCritToDamage(AdjustedDamage);
+	}
+	return AdjustedDamage;
+}
+
+void AOPAG_GunBase::AddCritToDamage(float& Damage) const
+{
+	Damage *= CritDamageMultiplier;
+}
+
 float AOPAG_GunBase::CalculateSpread() const
 {
-	const float Spread = (SpreadMax * (ShootConeLenght - Stats.Accuracy)) / 100;
+	static constexpr float InternalRange = MaxInternalAccuracy - MinInternalAccuracy;
+
+	const float InternalAccuracy = ((Stats.Accuracy * InternalRange) / 100.f) + MinInternalAccuracy;
+
+	const float ClampedAccuracy = FMath::Clamp(InternalAccuracy, MinInternalAccuracy, MaxInternalAccuracy);
+	const float Spread = (SpreadMax * (ShootConeLength - ClampedAccuracy)) / 100;
 	return Spread;
 }
 
 float AOPAG_GunBase::CalculateSpreadRadius() const
 {
 	const float Spread = CalculateSpread();
-	const float SpreadRadius = FMath::Tan(Spread / 2) * ShootConeLenght;
+	const float SpreadRadius = FMath::Tan(Spread / 2) * ShootConeLength;
 	
 	const AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(GetParentActor());
 	if (Character)
@@ -204,7 +235,7 @@ FVector AOPAG_GunBase::ApplyNoise(const FVector Direction) const
 {
 	const FRotator Rotation = Direction.Rotation();
 	const FVector2D Point = CalculateRandPointInCircle();
-	const FVector SpreadVector = FVector(0, Point.X * SpreadMultiplier, Point.Y * SpreadMultiplier) + FVector::ForwardVector * ShootConeLenght;
+	const FVector SpreadVector = FVector(0, Point.X * SpreadMultiplier, Point.Y * SpreadMultiplier) + FVector::ForwardVector * ShootConeLength;
 	const FVector NewDirection = Rotation.RotateVector(SpreadVector);
 	return NewDirection;
 }

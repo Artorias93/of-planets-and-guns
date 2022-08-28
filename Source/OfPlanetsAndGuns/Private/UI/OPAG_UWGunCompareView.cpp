@@ -12,13 +12,33 @@ void UOPAG_UWGunCompareView::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-void UOPAG_UWGunCompareView::UpdateGunValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& OtherGunStats, const FString OtherGunName)
+void UOPAG_UWGunCompareView::UpdateGunValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& OtherGunStats, 
+	const FString OtherGunName, const FString OtherGunFireType)
 {
 	GunName->SetText(FText::FromString(OtherGunName));
+	GunType->SetText(FText::FromString(OtherGunFireType));
 
+	/*
+	switch (OtherGunType) {
+		case EFireTypes::FullyAutomatic:
+			GunType->SetText(FText::FromString("Fully Automatic"));
+			break;
+		case EFireTypes::Burst3:
+			GunType->SetText(FText::FromString("Burst3"));
+			break;
+		case EFireTypes::Shotgun:
+			GunType->SetText(FText::FromString("Shotgun"));
+			break;
+		case EFireTypes::SingleShot:
+			GunType->SetText(FText::FromString("Single Shot"));
+			break;
+		default:
+			break;
+	}
+	*/
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, OtherGunStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, OtherGunStats.FireRate);
-	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, GunStats.Accuracy, OtherGunStats.Accuracy, true);
+	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, GunStats.Accuracy, OtherGunStats.Accuracy);
 	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, GunStats.RecoilRate, OtherGunStats.RecoilRate);
 	UpdateSingleStat(ReloadingText, ReloadingAmount, ReloadingDelta, GunStats.ReloadingTime, OtherGunStats.ReloadingTime, true);
 	UpdateSingleStat(ClipSizeText, ClipSizeAmount, ClipSizeDelta, GunStats.ClipSize, OtherGunStats.ClipSize);

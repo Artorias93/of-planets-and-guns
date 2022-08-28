@@ -25,6 +25,7 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->LoadMainMenu.AddDynamic(this, &UOPAG_GameInstance::LoadMainMenu);
 	EMS->StartPlanet.AddDynamic(this, &UOPAG_GameInstance::LoadPlanet);
 
+	EMS->PlayerDied.AddDynamic(this, &UOPAG_GameInstance::OnPlayerDeath);
 
 	EMS->RequestPlayerState.AddDynamic(this, &UOPAG_GameInstance::SendPlayerState);
 	EMS->SavePlayerState.AddDynamic(this, &UOPAG_GameInstance::SavePlayerState);
@@ -271,4 +272,9 @@ void UOPAG_GameInstance::SetAudioLibraries()
 	SMS->EnviromentAudioLibrary = EnviromentAudioLibrary;
 	SMS->CharacterAudioLibrary = CharacterAudioLibrary;
 	SMS->UIAudioLibrary = UIAudioLibrary;
+}
+
+void UOPAG_GameInstance::OnPlayerDeath()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 }

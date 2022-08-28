@@ -12,6 +12,9 @@
 class AOPAG_RoomStreamingVolume;
 class AOPAG_RoomManager;
 class AOPAG_Enemy;
+class AOPAG_ModularGun;
+class AOPAG_ModuleBase;
+class AOPAG_AbilityBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStartPlanet, int, PlanetIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadMainMenu);
@@ -42,24 +45,34 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FColorAmmoChanged, const FLinearColor, ColorParam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDashAmountChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChargeChanged, float, CurrentValue, float, MaxValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountDecrement);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FLookedAtModule, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, CurrentModule, const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountIncrement);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountDecrement);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountIncrement);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountDecrement);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLookedAtInteractable, bool, IsInteractable, FString, InteractText);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtInteractable);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_EightParams(FLookedAtModule, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, CurrentModule, 
+const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
+const int, EquippableTypes, const bool, CanBeEquipped);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FLookedAtGun, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, OtherGunStats, const FString, OtherGunName);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FLookedAtGun, const FOPAG_GunStats, GunStats, 
+const FOPAG_GunStats, OtherGunStats, const FString, OtherGunName, const FString, OtherGunFireType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPotionsChanged, int, CurrentValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
 
@@ -80,11 +93,19 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUsePotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, TSubclassOf<AOPAG_AbilityBase>, AbilityClass, const AActor*, Caller, FVector, Position, AOPAG_AbilityBase*, CastedAbility);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableGunTextInVendor, AOPAG_ModularGun*, Gun);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableModuleTextInVendor, AOPAG_ModuleBase*, Module);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 public:
+
+	FVector C;
+
 	UPROPERTY(BlueprintAssignable, Category = Game)
 		FStartPlanet StartPlanet;
 	UPROPERTY(BlueprintAssignable, Category = Game)
@@ -142,19 +163,21 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FAmmoChanged CurrentAmmoChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FDashAmountChanged DashAmountChanged;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FDashChargeChanged DashChargeChanged;
+		FColorAmmoChanged ColorAmmoChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FGoldChanged GoldChanged;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FBoltsChanged BoltsChanged;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FPotionsChanged PotionsChanged; 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountIncrement DashAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountDecrement DashAmountDecrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FPotionsAmountIncrement PotionsAmountIncrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FPotionsAmountDecrement PotionsAmountDecrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FBoltsAmountIncrement BoltsAmountIncrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FBoltsAmountDecrement BoltsAmountDecrement;
 
 	//Gun stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
@@ -167,6 +190,10 @@ public:
 		FLookedAtGun LookedAtGun;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
 		FUnlookedAtGun UnlookedAtGun;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FLookedAtInteractable LookedAtInteractable;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FUnlookedAtInteractable UnlookedAtInteractable;
 
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
@@ -228,4 +255,13 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FActiveGunAbility ActiveGunAbility;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+		FCastAbility CastAbility;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Vendor")
+	FDisableGunTextInVendor DisableGunTextInVendor;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Vendor")
+	FDisableModuleTextInVendor DisableModuleTextInVendor;
 };

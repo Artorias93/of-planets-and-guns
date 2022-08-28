@@ -56,6 +56,15 @@ public:
 	UPROPERTY(Category = "Gun", VisibleAnywhere, BlueprintReadWrite)
 	bool bIsShoot = false;
 
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite, meta = (UIMin = 0.f, UIMax = 100.f))
+	float DamageRandomnessPercentage = 20.f;
+
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	float CritDamageMultiplier = 3.f;
+
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite, meta = (UIMin = 0.f, UIMax = 100.f))
+	float BaseCritChance = 5.f;
+
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	float SpreadMultiplier = 1.f;
 
@@ -66,7 +75,7 @@ public:
 	float ProjectileRange = 2000.f;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
-	float ShootConeLenght = 100.f;
+	float ShootConeLength = 100.f;
 
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	int ReductionSpreadRadius = 10;
@@ -89,6 +98,9 @@ public:
 
 protected:
 	float ReductionSpreadRadiusShooting = 1.f;
+
+	static constexpr float MinInternalAccuracy = 97.f;
+	static constexpr float MaxInternalAccuracy = 100.f;
 
 protected:
 	UPROPERTY()
@@ -119,6 +131,7 @@ public:
 	// Camera behavior
 	UCameraComponent* GetADSCamera() const;
 	void ResetReductionSpreadRadiusShooting();
+
 protected:
 	// Main system for shooting
 	virtual void ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
@@ -126,6 +139,8 @@ protected:
 	void ResetShootTimer();
 
 	// Subsystem for shooting
+	float CalculateDamage(const bool IsHeadshot) const;
+	void AddCritToDamage(float& Damage) const;
 	float CalculateSpread() const;
 	FVector2D CalculateRandPointInCircle() const;
 	FVector ApplyNoise(const FVector Direction) const;

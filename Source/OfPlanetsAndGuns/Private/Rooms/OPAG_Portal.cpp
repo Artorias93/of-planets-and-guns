@@ -62,3 +62,8 @@ bool AOPAG_Portal::CanInteract_Implementation()
 	return bIsOpen;
 }
 
+FString AOPAG_Portal::InteractString_Implementation()
+{
+	return "Enter the portal [E]";
+}
+

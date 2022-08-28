@@ -23,28 +23,19 @@ class OFPLANETSANDGUNS_API UOPAG_UWPlayerStatsView : public UUserWidget
 	void BindEvents();
 
 	UPROPERTY(meta = (BindWidget))
-		UImage* DashIconOld;
-	UPROPERTY(meta = (BindWidget))
-		UTextBlock* DashAmountText;
-	UPROPERTY(meta = (BindWidget))
-		UProgressBar* DashChargeBar;
-
-	UPROPERTY(meta =(BindWidget))
-		UHorizontalBox* DashBox;
-	UPROPERTY(meta = (BindWidget))
 		UProgressBar* HealthBar;
 	UPROPERTY(meta = (BindWidget))
-		UProgressBar* ShieldBar;
+		UProgressBar* ShieldBar; 
+
+	UPROPERTY(meta = (BindWidget))
+		UHorizontalBox* DashBox; 
 
 public:
 	UFUNCTION()
 	void UpdateHealthBar(const float CurrentValue, const float MaxValue);
 	UFUNCTION()
 	void UpdateShieldBar(const float CurrentValue, const float MaxValue);
-	UFUNCTION()
-	void UpdateDashAmountText(const int CurrentValue);
-	UFUNCTION()
-	void UpdateDashChargeBar(const float CurrentValue, const float MaxValue);
+
 	UFUNCTION()
 	void IncrementDashAmount();
 	UFUNCTION()
@@ -54,10 +45,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 		UTexture2D* DashIconTexture;
-
-	UFUNCTION()
-	void InitDashIcons(const int DashAmount);
-
-private:
-	int LastDashIconIndex = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		UTexture2D* PotionsIconTexture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		UTexture2D* BoltsIconTexture;
 };

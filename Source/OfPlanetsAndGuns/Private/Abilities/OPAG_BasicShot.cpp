@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Abilities/OPAG_BasicShot.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/OPAG_BasicHitDamage.h"
@@ -14,11 +11,8 @@ UOPAG_BasicShot::UOPAG_BasicShot(const FObjectInitializer& ObjectInitializer) : 
 
 void UOPAG_BasicShot::EventReceived(FGameplayEventData Payload)
 {
-	/*
-	
-	This method works, but it's heavy. We keep it only for backup
-
-	AActor* TargetActor = nullptr;
+	//This method works, but it's heavy. We keep it only for backup
+	/*AActor* TargetActor = nullptr;
 	TArray<AActor*> Actors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), Payload.Target->GetClass(), Actors);
 

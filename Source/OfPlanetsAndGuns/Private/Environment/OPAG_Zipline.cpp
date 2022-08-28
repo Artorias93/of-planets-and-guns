@@ -124,3 +124,8 @@ void AOPAG_Zipline::OverlapReset(UPrimitiveComponent* OverlappedComponent, AActo
 	}
 }
 
+FString AOPAG_Zipline::InteractString_Implementation()
+{
+	return "Ride the zipline [E]";
+}
+

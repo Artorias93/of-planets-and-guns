@@ -48,7 +48,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* Accessory;
 
+
 public:
+	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	float PriceBase = .0f;
+
 	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
 	FOPAG_GunStats BaseStats;
 
@@ -72,6 +76,7 @@ public:
 		TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
 
 private:
+	FTimerHandle FlyRotationHandle;
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
 
 protected:
@@ -81,6 +86,10 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	void ApplyForce_Implementation(const FVector Force) override;
+	void ApplyFly_Implementation() override;
+	void FlyRotationTimer_Implementation() override;
+	bool CanBuy_Implementation() override;
+	const float GetPriceTotal_Implementation() override;
 
 	// Setter and Getter
 	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
@@ -116,10 +125,13 @@ public:
 	// Interactable methods
 	virtual void Interact_Implementation() override;
 	virtual bool CanInteract_Implementation() override;
+	FString InteractString_Implementation() override;
 
 	// Detach all modules
 	void DetachAllModules(const FVector Force);
 	void DetachModule(UChildActorComponent* ChildModule, const FVector Force);
+
+	static FString GetFireTypeName(EFireTypes FireType);
 
 protected:
 	// Shoot behavior

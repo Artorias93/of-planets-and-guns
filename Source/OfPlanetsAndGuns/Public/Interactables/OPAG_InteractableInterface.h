@@ -26,5 +26,20 @@ public:
 		bool CanInteract();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		FString InteractString();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		void ApplyForce(const FVector Force);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void ApplyFly();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void FlyRotationTimer();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool CanBuy();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	const float GetPriceTotal();
 };

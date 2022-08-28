@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Managers/RoomManager/OPAG_LootChance.h"
 #include "OPAG_LootDropSystemComponent.generated.h"
 
 class AOPAG_Drop;
@@ -31,13 +32,21 @@ public:
 
 	void DropLoot() const;
 
-public:
-	UPROPERTY(EditAnywhere, Category = ArrayExample)
-		TArray<FOPAG_Loot> LootArray;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UDataTable* LootChanceTable;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UDataTable* DropListTable;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UDataTable* LootModuleTable;
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
 	AOPAG_Enemy* Owner;
+	TArray<FOPAG_LootChance*> LootChances;
+	TArray<FOPAG_DropList*> DropList;
+	TArray<FOPAG_ModuleList*> ModuleList;
+
+	void PopulateLootChanceArray();
 };

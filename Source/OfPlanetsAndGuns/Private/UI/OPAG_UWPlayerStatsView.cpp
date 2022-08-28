@@ -12,6 +12,7 @@
 #include "Blueprint/WidgetTree.h"
 
 void UOPAG_UWPlayerStatsView::NativeConstruct() {
+	Super::NativeConstruct();
 	BindEvents();
 }
 
@@ -22,8 +23,6 @@ void UOPAG_UWPlayerStatsView::BindEvents()
 	if (EMS) {
 		EMS->HealthChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateHealthBar);
 		EMS->ShieldChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateShieldBar);
-		EMS->DashAmountChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashAmountText);
-		EMS->DashChargeChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashChargeBar);
 
 		EMS->DashAmountIncrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::IncrementDashAmount);
 		EMS->DashAmountDecrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::DecrementDashAmount);
@@ -45,22 +44,6 @@ void UOPAG_UWPlayerStatsView::UpdateShieldBar(const float CurrentValue, const fl
 
 	if (ShieldBar && (Percentage >= 0.0f && Percentage <= 1.0f)) {
 		ShieldBar->SetPercent(Percentage);
-	}
-}
-
-void UOPAG_UWPlayerStatsView::UpdateDashAmountText(const int CurrentValue)
-{
-	if (DashAmountText && CurrentValue >= 0) {
-		DashAmountText->SetText(FText::FromString(FString::FromInt(CurrentValue)));
-	}
-}
-
-void UOPAG_UWPlayerStatsView::UpdateDashChargeBar(const float CurrentValue, const float MaxValue)
-{
-	float Percentage = CurrentValue / MaxValue;
-
-	if (DashChargeBar && (Percentage >= 0.0f && Percentage <= 1.0f)) {
-		DashChargeBar->SetPercent(Percentage);
 	}
 }
 
@@ -86,12 +69,5 @@ void UOPAG_UWPlayerStatsView::DecrementDashAmount()
 {
 	if (DashBox->GetChildrenCount() > 0) {
 		DashBox->RemoveChildAt((DashBox->GetChildrenCount() - 1));
-	}
-}
-
-void UOPAG_UWPlayerStatsView::InitDashIcons(const int DashAmount)
-{
-	for (int i = 0; i < DashAmount; i++) {
-		IncrementDashAmount();
 	}
 }

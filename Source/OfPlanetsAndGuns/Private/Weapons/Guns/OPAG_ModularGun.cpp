@@ -16,6 +16,8 @@
 #include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
 #include <Kismet/GameplayStatics.h>
+#include "Interactables/OPAG_Vendor.h"
+#include "Characters/Player/OPAG_InventorySystemComponent.h"
 
 AOPAG_ModularGun::AOPAG_ModularGun()
 {
@@ -27,6 +29,58 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	Magazine = CreateDefaultSubobject<UChildActorComponent>(TEXT("Magazine"));
 	Sight = CreateDefaultSubobject<UChildActorComponent>(TEXT("Sight"));
 	Accessory = CreateDefaultSubobject<UChildActorComponent>(TEXT("Accessory"));
+}
+
+const float AOPAG_ModularGun::GetPriceTotal_Implementation()
+{
+	float PriceTotal = .0f;
+
+	PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Barrel));
+	PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Stock));
+	PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Grip));
+	PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Magazine));
+
+	if(GetModule(Sight) != nullptr)
+		PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Sight));
+	if(GetModule(Accessory) != nullptr)
+		PriceTotal += IOPAG_InteractableInterface::Execute_GetPriceTotal(GetModule(Accessory));
+
+	return PriceTotal;
+}
+
+bool AOPAG_ModularGun::CanBuy_Implementation()
+{
+	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (Player == nullptr)
+	{
+		return false;
+	}
+
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	if (Vendor != nullptr && Player->InventorySystemComp->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
+	{
+		return true;
+	}
+	return false;
+}
+
+void AOPAG_ModularGun::FlyRotationTimer_Implementation()
+{
+	// on every frame change rotationg for a smooth rotating actor
+	FRotator NewRotation = FRotator(0, 1, 0);
+	FQuat QuatRotation = FQuat(NewRotation);
+	Receiver->AddWorldRotation(QuatRotation, false, 0, ETeleportType::None);
+}
+
+void AOPAG_ModularGun::ApplyFly_Implementation()
+{
+	Receiver->SetSimulatePhysics(false);
+	GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModularGun::FlyRotationTimer_Implementation, .01f, true);
+}
+
+FString AOPAG_ModularGun::InteractString_Implementation()
+{
+	return "Swap gun [E]";
 }
 
 void AOPAG_ModularGun::ApplyForce_Implementation(const FVector Force)
@@ -219,30 +273,30 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 	AOPAG_ModuleBase* CurrentChildModule = GetModule(ChildModule);
 	switch (CurrentChildModule->Type)
 	{
-	case EModuleTypes::Barrel:
-		if (CurrentChildModule->GetClass() == StandardBarrel)
-		{
-			return;
-		}
-		break;
-	case EModuleTypes::Stock:
-		if (CurrentChildModule->GetClass() == StandardStock)
-		{
-			return;
-		}
-		break;
-	case EModuleTypes::Grip:
-		if (CurrentChildModule->GetClass() == StandardGrip)
-		{
-			return;
-		}
-		break;
-	case EModuleTypes::Magazine:
-		if (CurrentChildModule->GetClass() == StandardMagazine)
-		{
-			return;
-		}
-		break;
+		case EModuleTypes::Barrel:
+			if (CurrentChildModule->GetClass() == StandardBarrel)
+			{
+				return;
+			}
+			break;
+		case EModuleTypes::Stock:
+			if (CurrentChildModule->GetClass() == StandardStock)
+			{
+				return;
+			}
+			break;
+		case EModuleTypes::Grip:
+			if (CurrentChildModule->GetClass() == StandardGrip)
+			{
+				return;
+			}
+			break;
+		case EModuleTypes::Magazine:
+			if (CurrentChildModule->GetClass() == StandardMagazine)
+			{
+				return;
+			}
+			break;
 	}
 
 	const TSubclassOf<AOPAG_ModuleBase> TempModuleClass = CurrentChildModule->GetClass();
@@ -252,6 +306,7 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 
 	// Destroy ChildActor
 	ChildModule->DestroyChildActor();
+	ChildModule->SetChildActorClass(nullptr);
 
 	// Spawn new module
 	const FVector SpawnLocation = Player->GetActorLocation();
@@ -276,6 +331,14 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 		CreateModule(ChildModule, StandardMagazine);
 		break;
 	}
+}
+
+FString AOPAG_ModularGun::GetFireTypeName(EFireTypes FireType)
+{
+	FString FireTypeName;
+	UEnum::GetValueAsString(FireType, FireTypeName);
+	FireTypeName.RemoveAt(0, 12, true);
+	return FireTypeName;
 }
 
 UCameraComponent* AOPAG_ModularGun::GetSightCamera() const

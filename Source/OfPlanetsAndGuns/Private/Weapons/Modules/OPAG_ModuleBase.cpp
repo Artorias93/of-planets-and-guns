@@ -1,25 +1,34 @@
 #include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Interactables/OPAG_Vendor.h"
+#include "Characters/Player/OPAG_Player.h"
+#include <Kismet/GameplayStatics.h>
+#include "Characters/Player/OPAG_InventorySystemComponent.h"
 
 AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	ModuleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
+	if (ModuleMesh)
+	{
+		ModuleMesh->SetCollisionProfileName(TEXT("Weapon"));
+		RootComponent = ModuleMesh;
+	}
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	if (Sphere)
 	{
 		Sphere->SetSphereRadius(32.f);
 		Sphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-		RootComponent = Sphere;
+		Sphere->SetupAttachment(ModuleMesh);
 	}
+}
 
-	ModuleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
-	if (ModuleMesh)
-	{
-		ModuleMesh->SetCollisionProfileName(TEXT("Weapon"));
-		ModuleMesh->SetupAttachment(Sphere);
-	}
+FString AOPAG_ModuleBase::InteractString_Implementation()
+{
+	return "Pick up module [E]";
 }
 
 void AOPAG_ModuleBase::BeginPlay()
@@ -52,6 +61,14 @@ FString AOPAG_ModuleBase::GetRarityName(EModuleRarity ModuleRarity)
 	return RarityName;
 }
 
+FString AOPAG_ModuleBase::GetTypeName(EModuleTypes ModuleType)
+{
+	FString TypeName;
+	UEnum::GetValueAsString(ModuleType, TypeName);
+	TypeName.RemoveAt(0, 14, true);
+	return TypeName;
+}
+
 UPrimitiveComponent* AOPAG_ModuleBase::GetSphereComponent() const
 {
 	return Sphere;
@@ -78,6 +95,44 @@ void AOPAG_ModuleBase::ApplyForce_Implementation(const FVector Force)
 	ModuleMesh->SetSimulatePhysics(true);
 	ModuleMesh->AddForce(Force, NAME_None, true);
 }
+
+void AOPAG_ModuleBase::ApplyFly_Implementation()
+{
+	ModuleMesh->SetSimulatePhysics(false);
+	GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModuleBase::FlyRotationTimer_Implementation, .01f, true);
+}
+
+void AOPAG_ModuleBase::FlyRotationTimer_Implementation()
+{
+	// on every frame change rotationg for a smooth rotating actor
+	FRotator NewRotation = FRotator(0, 1, 0);
+	FQuat QuatRotation = FQuat(NewRotation);
+	ModuleMesh->AddWorldRotation(QuatRotation, false, 0, ETeleportType::None);
+}
+
+const float AOPAG_ModuleBase::GetPriceTotal_Implementation()
+{
+	return PriceBase * (1 + (Level - 1));
+}
+
+bool AOPAG_ModuleBase::CanBuy_Implementation()
+{
+	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (Player == nullptr)
+	{
+		return false;
+	}
+
+	// Equippable fire type check
+	const int FireMask = 1 << (int)Player->PrimaryGun->FireType;
+
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	if (Vendor != nullptr && FireMask & EquippableFireTypes && Player->InventorySystemComp->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
+	{
+		return true;
+	}
+	return false;
+}
 #pragma endregion Interface
 
 void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, 
@@ -88,8 +143,10 @@ void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunSt
 
 void AOPAG_ModuleBase::CheckIfPhysical() const
 {
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+
 	// Control if module has parent gun -> is attached
-	if (GetParentActor() == nullptr)
+	if (GetParentActor() == nullptr || Vendor != nullptr)
 	{
 		ModuleMesh->SetSimulatePhysics(true);
 	}

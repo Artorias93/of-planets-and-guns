@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Weapons/Guns/OPAG_GunStats.h"
+//#include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_UWGunCompareView.generated.h"
 
@@ -23,6 +23,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunCompareView : public UUserWidget
 		UImage* GunBackground;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* GunName;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* GunType;
 
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* DamageText;
@@ -72,7 +74,7 @@ public:
 
 public:
 	UFUNCTION()
-	void UpdateGunValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& OtherGunStats, const FString OtherGunName);
+	void UpdateGunValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& OtherGunStats, const FString OtherGunName, const FString OtherGunFireType);
 
 	void NativeConstruct();
 

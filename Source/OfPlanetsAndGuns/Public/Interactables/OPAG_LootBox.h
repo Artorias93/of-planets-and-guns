@@ -11,6 +11,7 @@ class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_Interacta
 {
 	GENERATED_BODY()
 
+	bool bHasBeenOpened = false;
 	bool bIsInteractable = false;
 
 public:	
@@ -44,6 +45,8 @@ public:
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	int NumberOfModulesToSpawn = 1;
 
+
+
 private:
 	TArray<TSubclassOf<AActor>> Items;   
 	FOPAG_GunModules Modules;
@@ -65,6 +68,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
+
+	FString InteractString_Implementation() override;
 
 	UFUNCTION() void SpawnItem();
 };

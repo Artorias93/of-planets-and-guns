@@ -103,6 +103,8 @@ public:
 		void OnPauseGame();
 	UFUNCTION()
 		void OnResumeGame();
+	UFUNCTION()
+		void OnPlayerDeath();
 
 	UFUNCTION()
 		void SetAudioLibraries();

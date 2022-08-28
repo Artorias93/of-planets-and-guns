@@ -22,6 +22,16 @@ AOPAG_LootBox::AOPAG_LootBox()
 		LootSpawnPoint->SetupAttachment(RootComponent);
 }
 
+FString AOPAG_LootBox::InteractString_Implementation()
+{
+	if (bHasBeenOpened)
+		return "";
+	else if(!bIsInteractable)
+		return "Locked";
+	else 
+		return "Open Lootbox [E]";
+}
+
 void AOPAG_LootBox::BeginPlay()
 {
 	Super::BeginPlay();
@@ -54,14 +64,23 @@ void AOPAG_LootBox::Interact_Implementation()
 {
 	// Explosion behavior with half parabolic method
 	Lid->SetSimulatePhysics(true);
-	const FVector Force = Lid->GetUpVector() * ThrowItems + Lid->GetForwardVector() * ThrowItems;
-	Lid->AddForce(Force, NAME_None, true);
+	FVector RandomDir = Lid->GetUpVector();
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDir.X = FMath::Sin(RandomAngle);
+	RandomDir.Y = FMath::Cos(RandomAngle);
 
+	const FVector Force = RandomDir * ThrowLid;
+	Lid->AddForce(Force, NAME_None, true);
+	Lid->AddTorqueInRadians(RandomDir * 100, NAME_None, true);
 	// Set can interact to false after player interact with box
 	bIsInteractable = false;
 
+	bHasBeenOpened = true;
+
+
 	if(SMS)
 		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Chest_Open);
+
 	// Active Timer for spawn items
 	SpawnItem();
 }
@@ -93,10 +112,10 @@ void AOPAG_LootBox::SpawnItem()
 
 	// Apply force for any items
 	IOPAG_InteractableInterface* TheInterface = Cast<IOPAG_InteractableInterface>(Item);
-	if (TheInterface)
+	if (Item->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
 	{
-		const FVector Force = Item->GetActorUpVector() * ThrowLid + Item->GetActorForwardVector() * ThrowLid;
-		TheInterface->ApplyForce_Implementation(Force);
+		const FVector Force = Item->GetActorUpVector() * ThrowItems + Item->GetActorForwardVector() * ThrowItems;
+		IOPAG_InteractableInterface::Execute_ApplyForce(Item, Force);
 	}
 
 	// Re-call this method for any items

@@ -1,4 +1,6 @@
 #include "Weapons/Throwables/OPAG_Grenade.h"
+
+#include "Characters/Enemies/OPAG_Enemy.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -29,6 +31,30 @@ AOPAG_Grenade::AOPAG_Grenade()
 	Projectile->Velocity = FVector(3000.f, 0, 0);
 }
 
+void AOPAG_Grenade::DamageAllTargetsInRange()
+{
+	TArray<FHitResult> OutHits;
+	TArray<AActor*> ActorsToIgnore;
+	auto PC = GetWorld()->GetFirstPlayerController();
+	if (PC) ActorsToIgnore.Add(PC->GetPawn());
+	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMultiByProfile(GetWorld(), GetActorLocation(),
+		GetActorForwardVector() + GetActorLocation(), Radius, 0.f, TEXT("Pawn"), false, ActorsToIgnore,
+		EDrawDebugTrace::Persistent, OutHits, true);
+	if (bHasHit)
+	{
+		TArray<AOPAG_Enemy*> HitEnemies;
+		for (FHitResult OutHit : OutHits)
+		{
+			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHit.Actor);
+			if (Enemy) HitEnemies.AddUnique(Enemy);
+		}
+		for (AOPAG_Enemy* Enemy : HitEnemies)
+		{
+			Enemy->ReceiveDamage(Damage);
+		}
+	}
+}
+
 void AOPAG_Grenade::BeginPlay()
 {
 	Super::BeginPlay();
@@ -42,10 +68,18 @@ void AOPAG_Grenade::Tick(float DeltaTime)
 
 }
 
-void AOPAG_Grenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AOPAG_Grenade::Detonate()
 {
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, Hit.Location, FRotator::ZeroRotator, FVector(10.f, 10.f, 10.f), true, EPSCPoolMethod::None, true);
+	DamageAllTargetsInRange();
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, GetActorLocation(), FRotator::ZeroRotator, FVector(10.f, 10.f, 10.f), true, EPSCPoolMethod::None, true);
 	//UGameplayStatics::PlaySound2D(GetWorld(), ExplosionSound);
 	SMS->PlayAbiltySounds( this , EAbilitySoundAction::GL_Explosion);
+
 	Destroy();
+}
+
+void AOPAG_Grenade::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Detonate();
 }
