@@ -45,6 +45,17 @@ enum class EAbilitySoundAction : uint8
 };
 ENUM_CLASS_FLAGS(EAbilitySoundAction);
 
+UENUM(BlueprintType, meta = (Bitflags))
+enum class EEnviromentSoundAction : uint8
+{
+	Chest_Open = 0x00,
+	Doors_Open = 0x01,
+	Doors_Close = 0x02,
+	Zipline_On = 0x03,
+	Zipline_Out = 0x04,
+};
+ENUM_CLASS_FLAGS(EEnviromentSoundAction);
+
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_SoundManagerSubsystem : public UGameInstanceSubsystem
@@ -65,8 +76,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "FMOD")
 		class UFMODAudioComponent* AudioComponent;
-	UPROPERTY(EditAnywhere, Category = "FMOD")
-		class UFMODAudioComponent* AudioAbilityComponent;
 
 	FFMODEventInstance InstanceWrapper;
 
@@ -75,6 +84,8 @@ public:
 		void PlayWeaponSounds(AOPAG_GunBase* weapon, EWeaponSoundAction action);
 	UFUNCTION(BlueprintCallable)
 		void PlayAbiltySounds(AActor* actor , EAbilitySoundAction ability);
+	UFUNCTION(BlueprintCallable)
+		void PlayEnviromentSounds(AActor* actor, EEnviromentSoundAction event);
 	UFUNCTION(BlueprintCallable)
 		void StopSound();
 private:

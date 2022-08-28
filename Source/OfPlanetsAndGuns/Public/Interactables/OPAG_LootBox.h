@@ -48,6 +48,8 @@ private:
 	TArray<TSubclassOf<AActor>> Items;   
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
+
+	class UOPAG_SoundManagerSubsystem* SMS = nullptr;
 	
 protected:
 	virtual void BeginPlay() override;

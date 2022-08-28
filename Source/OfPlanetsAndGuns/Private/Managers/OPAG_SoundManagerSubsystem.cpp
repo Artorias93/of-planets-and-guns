@@ -47,10 +47,43 @@ void UOPAG_SoundManagerSubsystem::PlayAbiltySounds(AActor* actor, EAbilitySoundA
 		}
 		if (libraryRow) {
 			UFMODEvent* currentEvent = libraryRow->AudioContent;
-			AudioAbilityComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, false, true, true);
+			AudioComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, false, true, true);
 		}
 	}
 }
+
+void UOPAG_SoundManagerSubsystem::PlayEnviromentSounds(AActor* actor, EEnviromentSoundAction event){
+	FVector position = actor->GetActorLocation();
+	if (EnviromentAudioLibrary) {
+		FAudioEvent* libraryRow;
+		switch (event)
+		{
+		case EEnviromentSoundAction::Chest_Open:
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Chest_Open"), "", false);
+			break;
+		case EEnviromentSoundAction::Doors_Open:
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Doors_Open"), "", false);
+			break;
+		case EEnviromentSoundAction::Doors_Close:
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Doors_Close"), "", false);
+			break;
+		case EEnviromentSoundAction::Zipline_On:
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Zipline_On"), "", false);
+			break;
+		case EEnviromentSoundAction::Zipline_Out:
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Zipline_Out"), "", false);
+			break;
+		default:
+			libraryRow = nullptr;
+			break;
+		}
+		if (libraryRow) {
+			UFMODEvent* currentEvent = libraryRow->AudioContent;
+			AudioComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, false, true, true);
+		}
+	}
+}
+
 // Sbatti quando è empty
 void UOPAG_SoundManagerSubsystem::PlayWeaponsFireSound(AOPAG_GunBase* weapon) {
 	FVector position = weapon->GetActorLocation();
