@@ -45,7 +45,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
-		void CastAbility(enum EAbilityTypes AbilityEnum, AActor* Caller, const AActor* Target, enum EAbilitySpawnPattern AbilitySpawnPattern);
+		void CastAbility(enum EAbilityTypes AbilityEnum, AActor* Caller, AActor* Target, enum EAbilitySpawnPattern AbilitySpawnPattern);
 
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
 		UClass* GetAbilityClass(EAbilityTypes AbilityType) const;

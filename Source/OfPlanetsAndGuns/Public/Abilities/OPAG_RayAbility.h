@@ -11,14 +11,25 @@ class OFPLANETSANDGUNS_API AOPAG_RayAbility : public AOPAG_AbilityBase
 {
 	GENERATED_BODY()
 	
+	float DamageTimer = 0;
+	bool bDealDamage = true;
+	class AOPAG_Player* OverlappingTarget = nullptr;
+
 public:
 	AOPAG_RayAbility();
 	virtual void Init(EAbilityTypes AbilityType, float Delay) override;	
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float DamageOverTimeFrequency;
+
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaTime) override;
+
 	virtual void DestroyAbility() override;
+
+	void DealDamage(AActor* TargetActor);
 
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 		class UStaticMeshComponent* AbilityMesh;
@@ -37,4 +48,7 @@ protected:
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		virtual void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

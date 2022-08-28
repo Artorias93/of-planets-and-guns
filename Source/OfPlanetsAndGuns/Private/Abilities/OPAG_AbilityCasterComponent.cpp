@@ -56,7 +56,7 @@ void UOPAG_AbilityCasterComponent::BeginPlay()
 	}
 }
 
-void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor* Caller, const AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern)
+void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor* Caller, AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern)
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -231,7 +231,7 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 	case EAbilitySpawnPattern::GroundedFrontSingle:
 		
 		Position1.Z = 0;
-		Position1.X += 100;
+		Position1.X += 300;
 		
 		Transform1.SetLocation(Position1);
 
@@ -298,7 +298,7 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 		Position2.Z = 0;
 		Position3.Z = 0;
 		
-		Position1.X += 100;
+		Position1.X += 300;
 		Position2 = Position1;
 		Position2.Y += 300;
 		Position3 = Position1;
@@ -412,7 +412,7 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 		Position2.Z = 0;
 		Position3.Z = 0;
 		
-		Position1.X += 100;
+		Position1.X += 300;
 		Position2 = Position1;
 		Position2.Y += 500;
 		Position3 = Position1;

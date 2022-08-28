@@ -4,7 +4,7 @@
 #include "Abilities/OPAG_TornadoAbility.h"
 #include "Components/BoxComponent.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "Characters/OPAG_CharacterBase.h"
+#include "Characters/Player/OPAG_Player.h"
 #include "Math/UnrealMathUtility.h"
 
 AOPAG_TornadoAbility::AOPAG_TornadoAbility()
@@ -24,6 +24,7 @@ void AOPAG_TornadoAbility::BeginPlay()
 	Super::BeginPlay();
 
 	AbilityCollider->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_TornadoAbility::OnOverlapBegin);
+	AbilityCollider->OnComponentEndOverlap.AddDynamic(this, &AOPAG_TornadoAbility::OnOverlapEnd);
 }
 
 void AOPAG_TornadoAbility::Tick(float DeltaTime)
@@ -35,13 +36,30 @@ void AOPAG_TornadoAbility::Tick(float DeltaTime)
 	CurrentLocation.Y += FMath::FRandRange(-150, 150) * Speed * DeltaTime;
 
 	SetActorLocation(CurrentLocation);
+
+	if (OverlappingTarget)
+	{
+		if (DamageTimer <= 0)
+			DealDamage(OverlappingTarget);
+		else
+			DamageTimer -= DeltaTime;
+	}
 }
 
 void AOPAG_TornadoAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OtherActor))
+	if (AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor))
 	{
-		Character->ReceiveDamage(AbilityDamage);
+		OverlappingTarget = Player;
+	}	
+}
+
+void AOPAG_TornadoAbility::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor))
+	{
+		DamageTimer = 0;
+		OverlappingTarget = nullptr;
 	}
 }
 
@@ -56,4 +74,13 @@ void AOPAG_TornadoAbility::DestroyAbility()
 	this->SetActorEnableCollision(false);
 
 	Super::DestroyAbility();
+}
+
+void AOPAG_TornadoAbility::DealDamage(AActor* TargetActor)
+{
+	DamageTimer = DamageOverTimeFrequency;
+	if (AOPAG_Player* Player = Cast<AOPAG_Player>(TargetActor))
+	{
+		Player->ReceiveDamage(AbilityDamage);
+	}
 }

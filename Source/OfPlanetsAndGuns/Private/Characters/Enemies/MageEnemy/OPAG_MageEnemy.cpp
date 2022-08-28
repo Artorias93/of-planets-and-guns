@@ -43,7 +43,7 @@ void AOPAG_MageEnemy::BeginPlay()
 	}	
 }
 
-void AOPAG_MageEnemy::CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, const AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern) const
+void AOPAG_MageEnemy::CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern)
 {
 	EMS->CastAbility.Broadcast(AbilityType, Caller, Target, AbilitySpawnPattern);
 }

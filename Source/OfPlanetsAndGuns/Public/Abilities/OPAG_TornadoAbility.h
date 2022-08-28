@@ -14,12 +14,19 @@ class OFPLANETSANDGUNS_API AOPAG_TornadoAbility : public AOPAG_AbilityBase
 {
 	GENERATED_BODY()
 
+	float DamageTimer = 0;
+	bool bDealDamage = true;
+	class AOPAG_Player* OverlappingTarget = nullptr;
+
 public:
 	AOPAG_TornadoAbility();
 	virtual void Init(EAbilityTypes AbilityType, float Delay) override;	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
 		float Speed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float DamageOverTimeFrequency;
 
 protected:
 	virtual void BeginPlay() override;
@@ -38,4 +45,9 @@ protected:
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		virtual void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	void DealDamage(AActor* TargetActor);
 };

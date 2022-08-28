@@ -3,7 +3,7 @@
 
 #include "Abilities/OPAG_FireballAbility.h"
 #include "Components/BoxComponent.h"
-#include "Characters/OPAG_CharacterBase.h"
+#include "Characters/Player/OPAG_Player.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
@@ -17,7 +17,7 @@ AOPAG_FireballAbility::AOPAG_FireballAbility()
 
 	AbilityParticleMuzzle = CreateDefaultSubobject<UParticleSystemComponent>("Particle Muzzle");
 	AbilityParticleMuzzle->SetupAttachment(AbilityCollider);
-	AbilityParticleMuzzle->bAutoActivate = true;
+	AbilityParticleMuzzle->bAutoActivate = true;	
 }
 
 void AOPAG_FireballAbility::BeginPlay()
@@ -28,7 +28,6 @@ void AOPAG_FireballAbility::BeginPlay()
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_FireballAbility::ShootProjectile, 2 + AbilityDelay, false);
-
 }
 
 void AOPAG_FireballAbility::Tick(float DeltaTime)
@@ -36,12 +35,9 @@ void AOPAG_FireballAbility::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (bShoot && Target != nullptr)
-	{
-		FVector CurrentLocation = GetActorLocation();
-		FVector MovementVector = TargetLocation - CurrentLocation;
-		MovementVector.Normalize();
-		FVector Velocity = MovementVector * Speed * DeltaTime;
-		FVector NewLocation = CurrentLocation + Velocity;
+	{		
+		FVector Velocity = MovementDirection * Speed * DeltaTime;
+		FVector NewLocation = GetActorLocation() + Velocity;
 
 		SetActorLocation(NewLocation);
 	}
@@ -49,9 +45,9 @@ void AOPAG_FireballAbility::Tick(float DeltaTime)
 
 void AOPAG_FireballAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OtherActor))
+	if (AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor))
 	{
-		Character->ReceiveDamage(AbilityDamage);
+		Player->ReceiveDamage(AbilityDamage);
 	}
 
 	UGameplayStatics::SpawnEmitterAttached(
@@ -68,6 +64,10 @@ void AOPAG_FireballAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, 
 	
 	AbilityCollider->SetCollisionProfileName(TEXT("NoCollision"));
 	this->SetActorEnableCollision(false);
+
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_FireballAbility::DestroyAbility, 0.5, false);
 }
 
 void AOPAG_FireballAbility::ShootProjectile()
@@ -75,6 +75,8 @@ void AOPAG_FireballAbility::ShootProjectile()
 	bShoot = true;
 	//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AbilityParticleProjectile, GetActorLocation(), GetActorRotation());
 	TargetLocation = Target->GetActorLocation();
+	MovementDirection = Target->GetActorLocation() - this->GetActorLocation();
+	MovementDirection.Normalize();
 	
 	UGameplayStatics::SpawnEmitterAttached(
 		AbilityParticleProjectile,

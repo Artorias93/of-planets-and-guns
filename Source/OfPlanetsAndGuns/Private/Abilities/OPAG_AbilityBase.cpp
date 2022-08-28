@@ -22,7 +22,7 @@ void AOPAG_AbilityBase::SetCaller(AActor* AbilityCaller)
 	this->Caller = AbilityCaller;
 }
 
-void AOPAG_AbilityBase::SetTarget(const AActor* AbilityTarget)
+void AOPAG_AbilityBase::SetTarget(AActor* AbilityTarget)
 {
 	this->Target = AbilityTarget;
 }

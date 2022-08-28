@@ -14,7 +14,8 @@ class OFPLANETSANDGUNS_API AOPAG_FireballAbility : public AOPAG_AbilityBase
 {
 	GENERATED_BODY()
 	bool bShoot = false;
-	FVector TargetLocation; 
+	FVector TargetLocation = FVector::ZeroVector;
+	FVector MovementDirection = FVector::ZeroVector;
 public:
 	AOPAG_FireballAbility();
 	virtual void Init(EAbilityTypes AbilityType, float Delay) override;	

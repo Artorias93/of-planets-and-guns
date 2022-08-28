@@ -21,15 +21,18 @@ void UOPAG_ServiceCastAbility::TickNode(UBehaviorTreeComponent& OwnerBTComponent
 
 		if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 		{
-			if (const AOPAG_Player* const FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
+			if (AOPAG_Player* FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
 				if (AOPAG_MageEnemy* const Enemy = Cast<AOPAG_MageEnemy>(AIController->GetPawn()))
 				{
 					FOPAG_ServiceAbilityElement AbilityDefinitionElement = GetRandomAbilityDefinitionElement();
 
-					float randomIndex = FMath::RandRange(0, AbilityDefinitionElement.AvailableAbilitySpawnPattern.Num() - 1);
+					if (AbilityDefinitionElement.AvailableAbilitySpawnPattern.Num() > 0)
+					{
+						float randomIndex = FMath::RandRange(0, AbilityDefinitionElement.AvailableAbilitySpawnPattern.Num() - 1);
 
-					Enemy->CastAbilityRequest(AbilityDefinitionElement.AbilityType, Enemy, FocusActor, AbilityDefinitionElement.AvailableAbilitySpawnPattern[randomIndex]);
+						Enemy->CastAbilityRequest(AbilityDefinitionElement.AbilityType, Enemy, FocusActor, AbilityDefinitionElement.AvailableAbilitySpawnPattern[randomIndex]);
+					}
 				}
 			}
 		}

@@ -16,6 +16,7 @@ class OFPLANETSANDGUNS_API AOPAG_SupernovaAbility : public AOPAG_AbilityBase
 
 	bool bShoot = false;
 	FVector TargetLocation = FVector::ZeroVector;
+	FVector MovementDirection = FVector::ZeroVector;
 public:
 	AOPAG_SupernovaAbility();
 	virtual void Init(EAbilityTypes AbilityType, float Delay) override;	

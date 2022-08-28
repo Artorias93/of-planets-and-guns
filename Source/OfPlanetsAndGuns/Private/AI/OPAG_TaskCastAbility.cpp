@@ -17,7 +17,7 @@ EBTNodeResult::Type UOPAG_TaskCastAbility::ExecuteTask(UBehaviorTreeComponent& O
 {
 	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
-		if (const AOPAG_Player* const FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
+		if (AOPAG_Player* FocusActor = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 		{
 			if (AOPAG_MageEnemy* const Enemy = Cast<AOPAG_MageEnemy>(AIController->GetPawn()))
 			{

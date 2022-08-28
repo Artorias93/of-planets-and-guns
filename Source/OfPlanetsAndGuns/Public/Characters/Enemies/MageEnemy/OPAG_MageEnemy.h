@@ -29,7 +29,7 @@ public:
 
 	virtual void BeginPlay() override;	
 
-	void CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, const AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern) const;
+	void CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern);
 	
 protected:
 

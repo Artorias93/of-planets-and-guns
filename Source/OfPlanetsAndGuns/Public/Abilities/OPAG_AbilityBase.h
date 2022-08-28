@@ -18,7 +18,7 @@ public:
 
 public:
 	void SetCaller(AActor* Caller);
-	void SetTarget(const AActor* Target);
+	void SetTarget(AActor* Target);
 	virtual void Init(EAbilityTypes AbilityType, float Delay = 0);
 
 protected:
@@ -46,7 +46,7 @@ protected:
 		AActor* Caller;	
 
 	UPROPERTY()
-		const AActor* Target;
+		AActor* Target;
 
 	virtual void DestroyAbility();
 };
