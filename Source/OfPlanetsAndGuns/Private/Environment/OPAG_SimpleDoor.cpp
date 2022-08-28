@@ -2,7 +2,8 @@
 
 
 #include "Environment/OPAG_SimpleDoor.h"
-
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Components/BoxComponent.h"
 #include "Components/TimelineComponent.h"
 
@@ -46,7 +47,7 @@ void AOPAG_SimpleDoor::BeginPlay()
 void AOPAG_SimpleDoor::OpenDoor_Implementation()
 {
 	CollisionVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Open);
 	if (Timeline != nullptr && !bIsOpen)
 	{
 		Timeline->PlayFromStart();
@@ -58,6 +59,7 @@ void AOPAG_SimpleDoor::OpenDoor_Implementation()
 void AOPAG_SimpleDoor::CloseDoor_Implementation()
 {
 	CollisionVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Close);
 	if (Timeline != nullptr && bIsOpen)
 	{
 		Timeline->ReverseFromEnd();

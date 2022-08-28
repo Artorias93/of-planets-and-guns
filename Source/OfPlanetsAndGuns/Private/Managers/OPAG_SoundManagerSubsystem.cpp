@@ -62,10 +62,10 @@ void UOPAG_SoundManagerSubsystem::PlayEnviromentSounds(AActor* actor, EEnviromen
 			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Chest_Open"), "", false);
 			break;
 		case EEnviromentSoundAction::Doors_Open:
-			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Doors_Open"), "", false);
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Door_Open"), "", false);
 			break;
 		case EEnviromentSoundAction::Doors_Close:
-			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Doors_Close"), "", false);
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Door_Close"), "", false);
 			break;
 		case EEnviromentSoundAction::Zipline_On:
 			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Zipline_On"), "", false);
