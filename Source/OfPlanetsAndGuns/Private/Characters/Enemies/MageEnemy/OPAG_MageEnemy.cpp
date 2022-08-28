@@ -102,16 +102,6 @@ FVector AOPAG_MageEnemy::GetRandomPointInRadius()
 	return GetActorLocation();
 }
 
-AActor* AOPAG_MageEnemy::GetFocusedActor() const
-{
-	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
-	{
-		return AIController->GetFocusActor();
-	}
-
-	return nullptr;
-}
-
 void AOPAG_MageEnemy::Init()
 {
 	CastAbilityRequest(EAbilityTypes::Spawn_PillarEnemy, this, nullptr, EAbilitySpawnPattern::SingleBackLeftCorner);

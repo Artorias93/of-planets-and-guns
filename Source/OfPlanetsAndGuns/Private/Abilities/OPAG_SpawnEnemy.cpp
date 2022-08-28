@@ -9,19 +9,6 @@
 void AOPAG_SpawnEnemy::Init(EAbilityTypes AbilityType, float Delay)
 {
 	Super::Init(AbilityType, Delay);
-	
-	TSubclassOf<AOPAG_Enemy> EnemyClass;
-
-	for (auto AbilityTypeToEnemy : SpawnableEnemiesList)
-	{
-		if (AbilityTypeToEnemy->AbilityType == AbilityType)
-		{
-			EnemyClass = AbilityTypeToEnemy->EnemyClass;
-			SpawnEnemy(EnemyClass);
-
-			break;
-		}
-	}	
 }
 
 void AOPAG_SpawnEnemy::BeginPlay()
@@ -32,6 +19,19 @@ void AOPAG_SpawnEnemy::BeginPlay()
 	{
 		FString Context;
 		SpawnableEnemiesTable->GetAllRows(Context, SpawnableEnemiesList);
+
+		TSubclassOf<AOPAG_Enemy> EnemyClass;
+
+		for (auto AbilityTypeToEnemy : SpawnableEnemiesList)
+		{
+			if (AbilityTypeToEnemy->AbilityType == this->CastedAbilityType)
+			{
+				EnemyClass = AbilityTypeToEnemy->EnemyClass;
+				SpawnEnemy(EnemyClass);
+
+				break;
+			}
+		}
 	}
 }
 

@@ -11,8 +11,8 @@
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_AbilityBase : public AActor
 {
-	GENERATED_BODY()
-	
+	GENERATED_BODY()		
+
 public:	
 	AOPAG_AbilityBase();
 
@@ -38,6 +38,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
 		float AbilityDelay = 0;
+
+	UPROPERTY()
+		EAbilityTypes CastedAbilityType;
 	
 	UPROPERTY()
 		UOPAG_EventManagerSubsystem* EMS;

@@ -17,6 +17,7 @@ class OFPLANETSANDGUNS_API AOPAG_TornadoAbility : public AOPAG_AbilityBase
 	float DamageTimer = 0;
 	bool bDealDamage = true;
 	class AOPAG_Player* OverlappingTarget = nullptr;
+	FVector MovementDirection = FVector::ZeroVector;
 
 public:
 	AOPAG_TornadoAbility();

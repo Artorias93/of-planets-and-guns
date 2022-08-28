@@ -41,9 +41,6 @@ protected:
 
 	FVector GetRandomPointInRadius();
 
-	AActor* GetFocusedActor() const;
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Caster")
 		class UOPAG_AbilityCasterComponent* AbilityCaster;
 

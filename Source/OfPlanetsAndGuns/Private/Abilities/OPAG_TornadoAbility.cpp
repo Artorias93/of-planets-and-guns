@@ -31,11 +31,16 @@ void AOPAG_TornadoAbility::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector CurrentLocation = GetActorLocation();
-	CurrentLocation.X += FMath::FRandRange(0, 150) * Speed * DeltaTime;
-	CurrentLocation.Y += FMath::FRandRange(-150, 150) * Speed * DeltaTime;
+	if (Target != nullptr)
+	{
+		MovementDirection = Target->GetActorLocation() - this->GetActorLocation();
+		MovementDirection.Normalize();
+	}
 
-	SetActorLocation(CurrentLocation);
+	FVector Velocity = MovementDirection * Speed * DeltaTime;
+	FVector NewLocation = GetActorLocation() + Velocity;
+
+	SetActorLocation(NewLocation);
 
 	if (OverlappingTarget)
 	{

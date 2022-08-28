@@ -27,7 +27,7 @@ void AOPAG_FireballAbility::BeginPlay()
 	AbilityCollider->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_FireballAbility::OnOverlapBegin);
 
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_FireballAbility::ShootProjectile, 2 + AbilityDelay, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_FireballAbility::ShootProjectile, 0.5 + AbilityDelay, false);
 }
 
 void AOPAG_FireballAbility::Tick(float DeltaTime)

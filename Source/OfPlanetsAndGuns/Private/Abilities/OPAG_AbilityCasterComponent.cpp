@@ -12,6 +12,7 @@
 #include "Abilities/OPAG_RayAbility.h"
 #include "Abilities/OPAG_FireballAbility.h"
 #include "Abilities/OPAG_SupernovaAbility.h"
+#include "Kismet/GameplayStatics.h"
 
 UOPAG_AbilityCasterComponent::UOPAG_AbilityCasterComponent()
 {
@@ -68,16 +69,19 @@ void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor
 		float IncreasingDelay = 0;
 		for (auto AbilityTranfrom : Transforms)
 		{
-			AOPAG_AbilityBase* Ability = GetWorld()->SpawnActor<AOPAG_AbilityBase>(AbilityClass, AbilityTranfrom.GetLocation(), AbilityTranfrom.GetRotation().Rotator(), SpawnInfo);
+			FTransform SpawnTransform = AbilityTranfrom;
+			AOPAG_AbilityBase* Ability = GetWorld()->SpawnActorDeferred<AOPAG_AbilityBase>(AbilityClass, SpawnTransform);
 
 			if (bSequenced)
-				IncreasingDelay += 1.5;
+				IncreasingDelay += 0.5;
 			
 			if (Ability != nullptr)
 			{
 				Ability->SetCaller(Caller);
 				Ability->SetTarget(Target);
 				Ability->Init(AbilityType, IncreasingDelay);
+
+				UGameplayStatics::FinishSpawningActor(Ability, AbilityTranfrom);
 			}
 		}
 

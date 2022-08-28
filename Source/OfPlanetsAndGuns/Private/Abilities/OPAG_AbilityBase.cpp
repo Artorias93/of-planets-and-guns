@@ -50,7 +50,8 @@ void AOPAG_AbilityBase::DestroyAbility()
 	Destroy();
 }
 
-void AOPAG_AbilityBase::Init(EAbilityTypes AbilityType, float Delay)
+void AOPAG_AbilityBase::Init(EAbilityTypes Type, float Delay)
 {
+	this->CastedAbilityType = Type;
 	this->AbilityDelay = Delay;
 }
