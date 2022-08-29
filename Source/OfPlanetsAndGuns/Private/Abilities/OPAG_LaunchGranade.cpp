@@ -16,7 +16,7 @@ void UOPAG_LaunchGranade::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	AOPAG_Player* Player = GetPlayer();
 	if (Player)
 	{
-		const FRotator CameraRotation = Player->GetCurrentCamera()->GetComponentRotation();
-		Player->PrimaryGun->ShootThrowable(CameraRotation);
+		const FRotator CameraRotation = Player->GetCurrentPlayerCamera()->GetComponentRotation();
+		Player->GetPrimaryGun()->ShootThrowable(CameraRotation);
 	}
 }

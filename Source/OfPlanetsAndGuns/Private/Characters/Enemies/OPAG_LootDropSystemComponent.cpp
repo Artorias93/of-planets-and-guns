@@ -72,7 +72,7 @@ void UOPAG_LootDropSystemComponent::DropLoot() const
 				TMap<TSubclassOf<AOPAG_ModuleBase>, float> ModuleMap;
 				for (FOPAG_ModuleList* Module : ModuleList)
 				{
-					ModuleMap.Add(Module->ModuleClass, Module->ModuleClass.GetDefaultObject()->Level);
+					ModuleMap.Add(Module->ModuleClass, Module->ModuleClass.GetDefaultObject()->GetLevel());
 				}
 				if (ModuleMap.Num() > 0)
 				{
@@ -92,7 +92,7 @@ void UOPAG_LootDropSystemComponent::DropLoot() const
 
 						if (ModuleObj)
 						{
-							ModuleObj->Sphere->SetSimulatePhysics(true);
+							ModuleObj->GetModuleSphereComponent()->SetSimulatePhysics(true);
 						}
 					}
 				}

@@ -40,7 +40,7 @@ void UOPAG_DashAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, cons
 void UOPAG_DashAbility::StopDash()
 {
 	const float LocationLenght = (Player->GetActorLocation() - InitialLocation).Size();
-	if (LocationLenght > Player->DashLenght)
+	if (LocationLenght > Player->GetDashLenght())
 	{
 		ApplicateFriction();
 	}
@@ -60,7 +60,7 @@ void UOPAG_DashAbility::ApplicateFriction()
 const FVector UOPAG_DashAbility::CalculateForce() const
 {
 	const FVector Direction = CalculateDirection();
-	const FVector Force = Direction * Player->DashSpeed;
+	const FVector Force = Direction * Player->GetDashSpeed();
 	return Force;
 }
 

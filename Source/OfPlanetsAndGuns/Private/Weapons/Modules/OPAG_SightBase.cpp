@@ -3,12 +3,12 @@
 
 AOPAG_SightBase::AOPAG_SightBase()
 {
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SightCamera"));
-	CameraComponent->SetRelativeLocation(FVector(-0.000095f, -18.851955f, 6.571584f));
-	CameraComponent->SetRelativeRotation(FRotator(0, 90.f, 0));
-	CameraComponent->SetRelativeScale3D(FVector(.2f, .2f, .2f));
-	CameraComponent->SetFieldOfView(50.f);
-	CameraComponent->SetupAttachment(RootComponent);
+	SightCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SightCamera"));
+	SightCameraComponent->SetRelativeLocation(FVector(-0.000095f, -18.851955f, 6.571584f));
+	SightCameraComponent->SetRelativeRotation(FRotator(0, 90.f, 0));
+	SightCameraComponent->SetRelativeScale3D(FVector(.2f, .2f, .2f));
+	SightCameraComponent->SetFieldOfView(50.f);
+	SightCameraComponent->SetupAttachment(RootComponent);
 
 	// Initialize Parameters
 	Rarity = EModuleRarity::Common;
@@ -19,7 +19,7 @@ void AOPAG_SightBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CameraComponent->SetComponentTickEnabled(false);
+	SightCameraComponent->SetComponentTickEnabled(false);
 }
 
 void AOPAG_SightBase::Tick(float DeltaTime)
@@ -33,10 +33,5 @@ void AOPAG_SightBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunSta
 {
 	Super::OnAttach(NewRarity, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
 
-	CameraComponent->SetComponentTickEnabled(true);
-}
-
-UCameraComponent* AOPAG_SightBase::GetCamera() const
-{
-	return CameraComponent;
+	SightCameraComponent->SetComponentTickEnabled(true);
 }

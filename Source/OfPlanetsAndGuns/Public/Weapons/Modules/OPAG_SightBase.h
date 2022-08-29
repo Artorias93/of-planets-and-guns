@@ -11,18 +11,20 @@ class OFPLANETSANDGUNS_API AOPAG_SightBase : public AOPAG_ModuleBase
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(Category = Camera, VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* CameraComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* SightCameraComponent;
 
 public:
 	AOPAG_SightBase();
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats,
-		const int NewEquippableFireTypes, const bool bIsAttachedToPlayer) override;
+	virtual void OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes, const bool bIsAttachedToPlayer) override;
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	UCameraComponent* GetCamera() const;
+
+public:
+	FORCEINLINE UCameraComponent* GetSightCameraComponent() const { return SightCameraComponent; }
+
 };

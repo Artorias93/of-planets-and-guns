@@ -80,7 +80,7 @@ void AOPAG_RangedEnemy::Attack()
 {
 	if(EquippedWeapon)
 	{
-		if(EquippedWeapon->bCanShoot && !GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
+		if(EquippedWeapon->CanShoot() && !GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
 		{
 			//The first 2 params are multiple "return values" passed by reference.
 			GetShootingDirection(StartLocation, Direction, ShootAccuracyTolerance);

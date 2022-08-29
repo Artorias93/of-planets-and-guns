@@ -7,6 +7,13 @@ AOPAG_Burst3::AOPAG_Burst3()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
+void AOPAG_Burst3::BeginPlay()
+{
+	Super::BeginPlay();
+
+	BurstProjectileCountMax = BurstProjectileCount;
+}
+
 void AOPAG_Burst3::Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
 	bCanShoot = false;
@@ -44,7 +51,7 @@ void AOPAG_Burst3::ShootBurst()
 	else
 	{
 		BurstProjectileCount = BurstProjectileCountMax;
-		const float Seconds = CalculateRateInSeconds(Stats.FireRate);
+		const float Seconds = CalculateRateInSeconds(StatsBase.FireRate);
 		GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_Burst3::ResetShootTimer, Seconds, false);
 	}
 }

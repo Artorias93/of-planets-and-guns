@@ -17,7 +17,6 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include <Kismet/GameplayStatics.h>
-
 #include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 
@@ -34,6 +33,7 @@ AOPAG_GunBase::AOPAG_GunBase()
 	if (IronSight != nullptr)
 	{
 		IronSight->SetWorldLocation(FVector(0.f, 15.f, 7.f));
+		IronSight->SetCollisionProfileName(TEXT("NoCollision"));
 		IronSight->SetupAttachment(RootComponent);
 	}
 
@@ -56,6 +56,8 @@ void AOPAG_GunBase::BeginPlay()
 
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	check(EMS);
+
+	AmmoCurrent = GetStatsTotal().ClipSize;
 }
 
 void AOPAG_GunBase::Tick(float DeltaTime)
@@ -63,7 +65,7 @@ void AOPAG_GunBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-#pragma region GET
+#pragma region Get
 UCameraComponent* AOPAG_GunBase::GetADSCamera() const
 {
 	return ADSCamera;
@@ -74,7 +76,48 @@ void AOPAG_GunBase::ResetReductionSpreadRadiusShooting()
 	ReductionSpreadRadiusShooting = 1.f;
 }
 
-#pragma endregion GET
+FName AOPAG_GunBase::GetGunName() const
+{
+	return Name;
+}
+
+EFireTypes AOPAG_GunBase::GetFireType() const
+{
+	return FireType;
+}
+
+FOPAG_GunStats AOPAG_GunBase::GetStatsTotal() const
+{
+	return StatsBase;
+}
+
+int AOPAG_GunBase::GetAmmoCurrent() const
+{
+	return AmmoCurrent;
+}
+
+int AOPAG_GunBase::GetAmmoMax() const
+{
+	return AmmoMax;
+}
+#pragma endregion Get
+
+#pragma region Set
+void AOPAG_GunBase::SetStatsTotal(const FOPAG_GunStats NewStats)
+{
+	StatsBase = NewStats;
+}
+
+void AOPAG_GunBase::SetAmmoCurrent(const int Value)
+{
+	AmmoCurrent = Value;
+}
+
+void AOPAG_GunBase::SetAmmoMax(const int Value)
+{
+	AmmoMax = Value;
+}
+#pragma endregion Set
 
 #pragma region Mathematic Utility
 float AOPAG_GunBase::CalculateRateInSeconds(const float FireRate)
@@ -95,7 +138,7 @@ void AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direct
 
 	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
 
-	const float Seconds = CalculateRateInSeconds(Stats.FireRate);
+	const float Seconds = CalculateRateInSeconds(GetStatsTotal().FireRate);
 	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
 	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 	if(AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
@@ -175,8 +218,8 @@ void AOPAG_GunBase::ResetShootTimer()
 #pragma region Shooting Utility
 float AOPAG_GunBase::CalculateDamage(const bool IsHeadshot) const
 {
-	const float DamageRandomnessAmount = Stats.Damage * 0.01f * DamageRandomnessPercentage;
-	float AdjustedDamage = Stats.Damage + FMath::RandRange(-DamageRandomnessAmount, DamageRandomnessAmount);
+	const float DamageRandomnessAmount = GetStatsTotal().Damage * 0.01f * DamageRandomnessPercentage;
+	float AdjustedDamage = GetStatsTotal().Damage + FMath::RandRange(-DamageRandomnessAmount, DamageRandomnessAmount);
 	if (IsHeadshot || FMath::RandRange(0.f, 100.f) < BaseCritChance)
 	{
 		AddCritToDamage(AdjustedDamage);
@@ -195,7 +238,7 @@ float AOPAG_GunBase::CalculateSpread() const
 	AOPAG_Player* Player = Cast<AOPAG_Player>(GetParentActor());
 
 	static constexpr float InternalRange = MaxInternalAccuracy - MinInternalAccuracy;
-	const float InternalAccuracy = ((Stats.Accuracy * InternalRange) / 100.f) + MinInternalAccuracy;
+	const float InternalAccuracy = ((GetStatsTotal().Accuracy * InternalRange) / 100.f) + MinInternalAccuracy;
 	const float ClampedAccuracy = FMath::Clamp(InternalAccuracy, MinInternalAccuracy, MaxInternalAccuracy);
 	float Spread = .0f;
 
@@ -269,3 +312,38 @@ TArray<AActor*> AOPAG_GunBase::CheckWhatActorsIgnoreLinetrace()
 	return Objects;
 }
 #pragma endregion Shooting Utility
+
+#pragma region Reload
+void AOPAG_GunBase::Reload()
+{
+	bIsReloading = true;
+	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_GunBase::WaitReloadingTimer, GetStatsTotal().ReloadingTime, false);
+	UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
+}
+
+void AOPAG_GunBase::WaitReloadingTimer()
+{
+	// Check the bool when interrupter the reloading
+	bIsReloading = false;
+
+	AmmoCurrent = GetStatsTotal().ClipSize;
+	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+}
+#pragma endregion Reload
+
+#pragma region Checking
+bool AOPAG_GunBase::CanShoot() const
+{
+	return bCanShoot && !bIsReloading && AmmoCurrent > 0;
+}
+
+bool AOPAG_GunBase::CanReloading() const
+{
+	return !bIsReloading && AmmoCurrent < GetStatsTotal().ClipSize && AmmoMax > 0;
+}
+
+bool AOPAG_GunBase::CanAim() const
+{
+	return !bIsReloading;
+}
+#pragma endregion Checking

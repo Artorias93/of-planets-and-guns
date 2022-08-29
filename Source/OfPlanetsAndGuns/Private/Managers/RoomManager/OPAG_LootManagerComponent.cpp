@@ -152,7 +152,7 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 			{
 				// Init gun's fire type (util for pick random modules)
 				AOPAG_ModularGun* DefaultGun = Gun->GunClass->GetDefaultObject<AOPAG_ModularGun>();
-				const int FireMask = 1 << (int)DefaultGun->FireType;
+				const int FireMask = 1 << (int)DefaultGun->GetFireType();
 				const int RandomNumberOfModules = FMath::RandRange(LootBox->MinModules, LootBox->MaxModules);
 
 				// Create array of modules type
@@ -222,7 +222,7 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 			int Count = 0;
 			while (Count < LootBox->NumberOfModulesToSpawn && Count < Modules.Num())
 			{
-				const int FireMask = 1 << (int)Player->PrimaryGun->FireType;
+				const int FireMask = 1 << (int)Player->GetPrimaryGun()->GetFireType();
 				Item = SelectRandomModules(Modules, DifficultyValue, FireMask);
 				if (!Items.Contains(Item))
 				{
@@ -271,11 +271,11 @@ TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG
 		AOPAG_ModuleBase* DefaultModule = Module->ModuleClass->GetDefaultObject<AOPAG_ModuleBase>();
 		if (DefaultModule)
 		{
-			const int EquippableType = DefaultModule->EquippableFireTypes;
+			const int EquippableType = DefaultModule->GetEquippableFireTypes();
 			if (FireMask & EquippableType)
 			{
 				TSubclassOf<AOPAG_ModuleBase> ModuleClass = Module->ModuleClass;
-				ModuleMap.Add(ModuleClass, DefaultModule->Level);
+				ModuleMap.Add(ModuleClass, DefaultModule->GetLevel());
 			}
 		}
 	}
@@ -296,11 +296,11 @@ TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG
 		AOPAG_ModuleBase* DefaultModule = Module->ModuleClass->GetDefaultObject<AOPAG_ModuleBase>();
 		if (DefaultModule)
 		{
-			const int EquippableType = DefaultModule->EquippableFireTypes;
-			if (FireMask & EquippableType && DefaultModule->Type == ModuleTypes)
+			const int EquippableType = DefaultModule->GetEquippableFireTypes();
+			if (FireMask & EquippableType && DefaultModule->GetType() == ModuleTypes)
 			{
 				TSubclassOf<AOPAG_ModuleBase> ModuleClass = Module->ModuleClass;
-				ModuleMap.Add(ModuleClass, DefaultModule->Level);
+				ModuleMap.Add(ModuleClass, DefaultModule->GetLevel());
 			}
 		}
 	}
