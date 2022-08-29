@@ -18,44 +18,40 @@ class OFPLANETSANDGUNS_API AOPAG_ModuleBase : public AActor, public IOPAG_Intera
 public:	
 	AOPAG_ModuleBase();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	FString Name;
-
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USphereComponent* Sphere;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ModuleMesh;
 
-public:
-	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
-	EModuleTypes Type;
+protected:
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FString Name;
 
-	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
-	EModuleRarity Rarity;
-
-	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
-	FOPAG_GunStats Stats;
-
-	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = "EFireTypes"))
-	int EquippableFireTypes;
-
-	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	int Level = 0;
 
-	UPROPERTY(Category = "Module", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float PriceBase = .0f;
 
-public:
-	void ApplyForce_Implementation(const FVector Force) override;
-	void ApplyFly_Implementation() override;
-	void FlyRotationTimer_Implementation() override;
-	bool CanBuy_Implementation() override;
-	const float GetPriceTotal_Implementation() override;
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EModuleTypes Type;
 
-private:
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EModuleRarity Rarity;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FOPAG_GunStats Stats;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int EquippableFireTypes;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float PriceMuliplierPercentage = 1.f;
+
+protected:
 	FTimerHandle FlyRotationHandle;
-
 
 protected:
 	virtual void BeginPlay() override;
@@ -63,27 +59,39 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, 
-		const int NewEquippableFireTypes, const bool bIsAttachedToPlayer);
-	void SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
-
-	static FString GetRarityName(EModuleRarity ModuleRarity);
-	static FString GetTypeName(EModuleTypes ModuleType);
-
-	UPrimitiveComponent* GetSphereComponent() const;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		void Interact();
+	// Interface implementations
 	virtual void Interact_Implementation() override;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		bool CanInteract();
+	bool CanInteract();
 	virtual bool CanInteract_Implementation() override;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-		FString InteractString();
+	void ApplyForce_Implementation(const FVector Force) override;
+	void ApplyFly_Implementation() override;
+	void FlyRotationTimer_Implementation() override;
+	bool CanBuy_Implementation() override;
+	const float GetPriceTotal_Implementation() override;
 	FString InteractString_Implementation() override;
+
+	// Attach module to gun
+	virtual void OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes, const bool bIsAttachedToPlayer);
 
 private:
 	void CheckIfPhysical() const;
+
+public:
+	// Getter
+	static FString GetRarityName(EModuleRarity ModuleRarity);
+	static FString GetTypeName(EModuleTypes ModuleType);
+
+	FString GetModuleName() const;
+	int GetLevel() const;
+	EModuleTypes GetType() const;
+	EModuleRarity GetRarity() const;
+	FOPAG_GunStats GetStats() const;
+	int GetEquippableFireTypes() const;
+
+	//Setter
+	void SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
+
+public:
+	FORCEINLINE USphereComponent* GetModuleSphereComponent() { return Sphere; }
+
 };

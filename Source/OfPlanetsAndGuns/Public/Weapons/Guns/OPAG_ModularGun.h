@@ -22,6 +22,8 @@ class UOPAG_EventManagerSubsystem;
 class UKismetSystemLibrary;
 class UDataTable;
 
+class UGameplayAbility;
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_ModularGun : public AOPAG_GunBase, public IOPAG_InteractableInterface
 {
@@ -30,78 +32,80 @@ class OFPLANETSANDGUNS_API AOPAG_ModularGun : public AOPAG_GunBase, public IOPAG
 public:
 	AOPAG_ModularGun();
 
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* Barrel;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* Stock;
+	UChildActorComponent* Barrel;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* Grip;
+	UChildActorComponent* Stock;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* Magazine;
+	UChildActorComponent* Grip;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* Sight;
+	UChildActorComponent* Magazine;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UChildActorComponent* Accessory;
+	UChildActorComponent* Sight;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UChildActorComponent* Accessory;
 
-public:
-	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
-	float PriceBase = .0f;
+protected:
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float PriceBase = .0f;	
 
-	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
-	FOPAG_GunStats BaseStats;
-
-	UPROPERTY(Category = "Gun", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Gun | Ammo", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
     UDataTable* AmmoReloadingMultipliersTable;
 
-	UPROPERTY(Category = "Sound", EditDefaultsOnly, BlueprintReadWrite)
-	USoundBase* ReloadSound;
+protected:
+	UPROPERTY(Category = "OPAG | Gun | Standard Modules", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
 
-public:
-	UPROPERTY(Category = StandardModules, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<AOPAG_ModuleBase> StandardBarrel;
+	UPROPERTY(Category = "OPAG | Gun | Standard Modules", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AOPAG_ModuleBase> StandardStock;
 
-	UPROPERTY(Category = StandardModules, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<AOPAG_ModuleBase> StandardStock;
+	UPROPERTY(Category = "OPAG | Gun | Standard Modules", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AOPAG_ModuleBase> StandardGrip;
 
-	UPROPERTY(Category = StandardModules, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<AOPAG_ModuleBase> StandardGrip;
+	UPROPERTY(Category = "OPAG | Gun | Standard Modules", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
 
-	UPROPERTY(Category = StandardModules, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
-
-private:
+protected:
 	FTimerHandle FlyRotationHandle;
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
+	FOPAG_GunStats StatsTotal;
 
 protected:
 	virtual void BeginPlay() override;
+
+	// Muzzle with different getter method
 	virtual USceneComponent* GetMuzzle() const override;
+
+	// Update Stats
+	void UpdateStatsTotal();
+
+	// Create and Attach module behavior
+	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const;
+	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
+
+	// Ammo behavior
+	void UpdateAmmoWhenPickTheMagazine();
+	virtual void WaitReloadingTimer() override;
+	void PopulateAmmoTable();
+
+	// Physics
+	void CheckIfPhysical() const;
 
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	// Interface implements
 	void ApplyForce_Implementation(const FVector Force) override;
 	void ApplyFly_Implementation() override;
 	void FlyRotationTimer_Implementation() override;
 	bool CanBuy_Implementation() override;
-	const float GetPriceTotal_Implementation() override;
-
-	// Setter and Getter
-	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
-	FOPAG_GunModules GetModulesStruct() const;
-	FOPAG_GunModules GetStandardModulesStruct() const;
-
-	// Utility for link modules and sockets
-	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;
-	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
-
-	// Reload system
-	void Reload();
+	const float GetPriceTotal_Implementation() override;	
 
 	// Increment ammo system
 	void IncrementAmmo();
@@ -110,17 +114,10 @@ public:
 	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules);
 	bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
 
-	// Camera behavior
-	UCameraComponent* GetSightCamera() const;
-
 	void GetCurrentState(FOPAG_GunState& GunState) const;
 
 	// Shooting with throwable
 	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
-
-	// Get for modules
-	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
-	FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 
 	// Interactable methods
 	virtual void Interact_Implementation() override;
@@ -131,22 +128,37 @@ public:
 	void DetachAllModules(const FVector Force);
 	void DetachModule(UChildActorComponent* ChildModule, const FVector Force);
 
-	static FString GetFireTypeName(EFireTypes FireType);
-
 protected:
 	// Shoot behavior
 	UFUNCTION(BlueprintCallable) void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
 
-	// Create and Attach module behavior
-	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const;
-	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule,
-		const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
-	void UpdateStats();
+public:
+	// Checks
+	bool HasAccessory() const;
+	bool HasSight() const;
 
-	// Ammo behavior
-	void UpdateAmmo();
-	void WaitReloadingTimer();
-	void PopulateAmmoTable();
+public:
+	// Generic getter
+	static FString GetFireTypeName(EFireTypes FireType);
+	virtual FOPAG_GunStats GetStatsTotal() const override;
 
-	void CheckIfPhysical() const;
+	// Ability system getter
+	TSubclassOf<UGameplayAbility> GetAbility() const;
+
+	// Modules struct getter
+	FOPAG_GunModules GetModulesStruct() const;
+	FOPAG_GunModules GetStandardModulesStruct() const;
+
+	// Modules getter
+	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;
+	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
+	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
+	FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
+
+	// Camera sight getter
+	UCameraComponent* GetSightCamera() const;
+
+	//Setter
+	virtual void SetStatsTotal(const FOPAG_GunStats GunStats);
+	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
 };

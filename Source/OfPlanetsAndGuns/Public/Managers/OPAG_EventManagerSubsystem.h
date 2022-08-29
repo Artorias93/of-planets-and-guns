@@ -92,6 +92,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetFPSCamera);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUsePotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInspectGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, TSubclassOf<AOPAG_AbilityBase>, AbilityClass, const AActor*, Caller, FVector, Position, AOPAG_AbilityBase*, CastedAbility);
 
@@ -258,6 +259,9 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
 		FCastAbility CastAbility;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+	FInspectGun InspectGun;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Vendor")
 	FDisableGunTextInVendor DisableGunTextInVendor;

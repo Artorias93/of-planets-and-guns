@@ -226,7 +226,7 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 	if (Player == nullptr)	return;
 
 	// Init fire type
-	const int FireMask = 1 << (int)Player->PrimaryGun->FireType;
+	const int FireMask = 1 << (int)Player->GetPrimaryGun()->GetFireType();
 
 	// Spawn two modules
 	for (int i = 0; i < 2; i++)
@@ -251,7 +251,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 	int MaxModules = IsPowerful ? 6 : 3;
 
 	// Init gun's fire type (util for pick random modules)
-	const int FireMask = 1 << (int)Gun.FireType;
+	const int FireMask = 1 << (int)Gun.GetFireType();
 	const int RandomNumberOfModules = FMath::RandRange(MinModules, MaxModules);
 
 	// Create array of modules type

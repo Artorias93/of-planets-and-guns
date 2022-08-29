@@ -51,6 +51,7 @@ void AOPAG_PlayerController::SetupInputComponent()
 	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::Shoot);
 	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Shoot);
 	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Completed, this, &AOPAG_PlayerController::StopShoot);
+	EIC->BindAction(InputActions[11]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::InspectGun);
 
 	// Binding event for interact with objects
 	EIC->BindAction(InputActions[4]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::InteractWithItem);
@@ -120,6 +121,11 @@ void AOPAG_PlayerController::SwapGuns()
 void AOPAG_PlayerController::ReloadGun()
 {
 	EMS->ReloadGun.Broadcast();
+}
+
+void AOPAG_PlayerController::InspectGun()
+{
+	EMS->InspectGun.Broadcast();
 }
 
 void AOPAG_PlayerController::InteractWithItem()

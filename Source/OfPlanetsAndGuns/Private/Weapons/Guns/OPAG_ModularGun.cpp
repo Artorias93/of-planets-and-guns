@@ -57,7 +57,7 @@ bool AOPAG_ModularGun::CanBuy_Implementation()
 	}
 
 	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
-	if (Vendor != nullptr && Player->InventorySystemComp->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
+	if (Vendor != nullptr && Player->GetInventorySystemComponent()->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
 	{
 		return true;
 	}
@@ -66,10 +66,10 @@ bool AOPAG_ModularGun::CanBuy_Implementation()
 
 void AOPAG_ModularGun::FlyRotationTimer_Implementation()
 {
-	// on every frame change rotationg for a smooth rotating actor
+	// on every frame change rotating for a smooth rotating actor
 	FRotator NewRotation = FRotator(0, 1, 0);
 	FQuat QuatRotation = FQuat(NewRotation);
-	Receiver->AddWorldRotation(QuatRotation, false, 0, ETeleportType::None);
+	GetReceiverMesh()->AddWorldRotation(QuatRotation, false, 0, ETeleportType::None);
 }
 
 void AOPAG_ModularGun::ApplyFly_Implementation()
@@ -111,7 +111,7 @@ void AOPAG_ModularGun::BeginPlay()
 	PopulateAmmoTable();
 	CheckIfPhysical();
 
-	AmmoCurrent = Stats.ClipSize;
+	AmmoCurrent = GetStatsTotal().ClipSize;
 }
 
 void AOPAG_ModularGun::Tick(float DeltaTime)
@@ -144,9 +144,19 @@ void AOPAG_ModularGun::SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax)
 	AmmoCurrent = NewAmmoCurrent;
 	AmmoMax = NewAmmoMax;
 }
+
+void AOPAG_ModularGun::SetStatsTotal(const FOPAG_GunStats NewStats)
+{
+	StatsTotal = NewStats;
+}
 #pragma endregion Setter
 
 #pragma region GET
+FOPAG_GunStats AOPAG_ModularGun::GetStatsTotal() const
+{
+	return StatsTotal;
+}
+
 FOPAG_GunModules AOPAG_ModularGun::GetModulesStruct() const
 {
 	FOPAG_GunModules GunModules;
@@ -271,7 +281,7 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 
 	// Control check for don't consider the standard module
 	AOPAG_ModuleBase* CurrentChildModule = GetModule(ChildModule);
-	switch (CurrentChildModule->Type)
+	switch (CurrentChildModule->GetType())
 	{
 		case EModuleTypes::Barrel:
 			if (CurrentChildModule->GetClass() == StandardBarrel)
@@ -300,9 +310,9 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 	}
 
 	const TSubclassOf<AOPAG_ModuleBase> TempModuleClass = CurrentChildModule->GetClass();
-	const FOPAG_GunStats TempModuleStats = CurrentChildModule->Stats;
-	const EModuleRarity TempModuleRarity = CurrentChildModule->Rarity;
-	const int TempModuleEquippableFireTypes = CurrentChildModule->EquippableFireTypes;
+	const FOPAG_GunStats TempModuleStats = CurrentChildModule->GetStats();
+	const EModuleRarity TempModuleRarity = CurrentChildModule->GetRarity();
+	const int TempModuleEquippableFireTypes = CurrentChildModule->GetEquippableFireTypes();
 
 	// Destroy ChildActor
 	ChildModule->DestroyChildActor();
@@ -316,7 +326,7 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 	TempModule->ApplyForce_Implementation(Force);
 
 	// If the module isn't the standard, so is important attach the standard 
-	switch (TempModule->Type)
+	switch (TempModule->GetType())
 	{
 	case EModuleTypes::Barrel:
 		CreateModule(ChildModule, StandardBarrel);
@@ -343,10 +353,10 @@ FString AOPAG_ModularGun::GetFireTypeName(EFireTypes FireType)
 
 UCameraComponent* AOPAG_ModularGun::GetSightCamera() const
 {
-	if (Sight->GetChildActor())
+	if (HasSight())
 	{
 		const AOPAG_SightBase* const Module = Cast<AOPAG_SightBase>(Sight->GetChildActor());
-		return Module->GetCamera();
+		return Module->GetSightCameraComponent();
 	}
 	return nullptr;
 }
@@ -363,6 +373,12 @@ void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState) const
 
 	GunState.AmmoCurrent = AmmoCurrent;
 	GunState.AmmoMax = AmmoMax;
+}
+
+TSubclassOf<UGameplayAbility> AOPAG_ModularGun::GetAbility() const
+{
+	AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(Accessory->GetChildActor());
+	return Module->Ability;
 }
 #pragma endregion GET
 
@@ -383,7 +399,7 @@ void AOPAG_ModularGun::ShootThrowable(const FRotator SpawnRotation)
 
 void AOPAG_ModularGun::SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation)
 {
-	if (Accessory->GetChildActor())
+	if (HasAccessory())
 	{
 		const AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(Accessory->GetChildActor());
 		const TSubclassOf<AOPAG_Grenade> GrenadeClass = Module->Grenade;
@@ -415,7 +431,7 @@ void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules
 	if (Modules.Accessory) CreateModule(Accessory, Modules.Accessory);
 
 	// Update Stats
-	UpdateStats();
+	UpdateStatsTotal();
 }
 
 // Is important when generate the basic gun 
@@ -426,9 +442,9 @@ void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSub
 		const AOPAG_ModuleBase* const Base = Module->GetDefaultObject<AOPAG_ModuleBase>();
 		if (Base)
 		{
-			const EModuleRarity ModuleRarity = Base->Rarity;
-			const FOPAG_GunStats ModuleStats = Base->Stats;
-			const int ModuleEquippableFireTypes = Base->EquippableFireTypes;
+			const EModuleRarity ModuleRarity = Base->GetRarity();
+			const FOPAG_GunStats ModuleStats = Base->GetStats();
+			const int ModuleEquippableFireTypes = Base->GetEquippableFireTypes();
 
 			AttachModule(ModuleSlot, Module, ModuleRarity, ModuleStats, ModuleEquippableFireTypes);
 		}
@@ -448,14 +464,14 @@ bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSub
 		Module->OnAttach(NewModuleRarity, NewModuleStats, NewModuleEquippableFireTypes, 
 			GetParentActor() == GetWorld()->GetFirstPlayerController()->GetPawn());
 
-		const FName SocketName = GetSocketNameByModuleType(Module->Type);
+		const FName SocketName = GetSocketNameByModuleType(Module->GetType());
 		Module->AttachToComponent(Receiver, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 		return true;
 	}
 	return false;
 }
 
-void AOPAG_ModularGun::UpdateStats()
+void AOPAG_ModularGun::UpdateStatsTotal()
 {
 	// Create module's array
 	TArray<AOPAG_ModuleBase*> Modules;
@@ -469,28 +485,28 @@ void AOPAG_ModularGun::UpdateStats()
 	AOPAG_ModuleBase* ModuleMagazine = GetModule(Magazine);
 	Modules.Add(ModuleMagazine);
 
-	if (Sight->GetChildActor())
+	if (HasSight())
 	{
 		AOPAG_ModuleBase* ModuleSight = GetModule(Sight);
 		Modules.Add(ModuleSight);
 	}
-	if (Accessory->GetChildActor())
+	if (HasAccessory())
 	{
 		AOPAG_ModuleBase* ModuleAccessory = GetModule(Accessory);
 		Modules.Add(ModuleAccessory);
 	}
 
-	Stats = BaseStats;
+	StatsTotal = StatsBase;
 
 	// Update stats
 	for (int i = 0; i < Modules.Num(); i++)
 	{
-		Stats.Damage += Modules[i]->Stats.Damage;
-		Stats.FireRate += Modules[i]->Stats.FireRate;
-		Stats.Accuracy += Modules[i]->Stats.Accuracy;
-		Stats.RecoilRate += Modules[i]->Stats.RecoilRate;
-		Stats.ReloadingTime += Modules[i]->Stats.ReloadingTime;
-		Stats.ClipSize += Modules[i]->Stats.ClipSize;
+		StatsTotal.Damage += Modules[i]->GetStats().Damage;
+		StatsTotal.FireRate += Modules[i]->GetStats().FireRate;
+		StatsTotal.Accuracy += Modules[i]->GetStats().Accuracy;
+		StatsTotal.RecoilRate += Modules[i]->GetStats().RecoilRate;
+		StatsTotal.ReloadingTime += Modules[i]->GetStats().ReloadingTime;
+		StatsTotal.ClipSize += Modules[i]->GetStats().ClipSize;
 	}
 }
 
@@ -501,16 +517,16 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 	{
 		// Initialize Base (CDO of NewModule for default params of class) and ModuleSlot (the module of main socket ex. Barrel)
 		const AOPAG_ModuleBase* const Base = NewModule->GetDefaultObject<AOPAG_ModuleBase>();
-		UChildActorComponent* const ModuleSlot = GetSocketByModuleType(Base->Type);
-		const AOPAG_ModuleBase* const OldModule = GetModuleBySocketType(Base->Type);
+		UChildActorComponent* const ModuleSlot = GetSocketByModuleType(Base->GetType());
+		const AOPAG_ModuleBase* const OldModule = GetModuleBySocketType(Base->GetType());
 
 		// Set current value of ModuleSlot -> is important when re-spawn the module in scene 
 		if (OldModule)
 		{
 			OldModuleClass = OldModule->GetClass();
-			OldModuleRarity = OldModule->Rarity;
-			OldModuleStats = OldModule->Stats;
-			OldModuleEquippableFireTypes = OldModule->EquippableFireTypes;
+			OldModuleRarity = OldModule->GetRarity();
+			OldModuleStats = OldModule->GetStats();
+			OldModuleEquippableFireTypes = OldModule->GetEquippableFireTypes();
 		}
 
 		// Call the attach module method for set child actor with socket
@@ -518,13 +534,13 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 		{
 			const bool Result = AttachModule(ModuleSlot, NewModule, NewModuleRarity, NewModuleStats, NewModuleEquippableFireTypes);
 
-			if (Base->Type == EModuleTypes::Magazine)
-			{
-				UpdateAmmo();
-			}
-
 			// Update Stats
-			UpdateStats();
+			UpdateStatsTotal();
+
+			if (Base->GetType() == EModuleTypes::Magazine)
+			{
+				UpdateAmmoWhenPickTheMagazine();
+			}
 
 			return Result;
 		}
@@ -534,20 +550,17 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 #pragma endregion Create and Attach Modules
 
 #pragma region Ammo System
-void AOPAG_ModularGun::UpdateAmmo()
+void AOPAG_ModularGun::UpdateAmmoWhenPickTheMagazine()
 {
-	const int ClipSize = Stats.ClipSize;
+	const int ClipSize = GetStatsTotal().ClipSize;
 	if (ClipSize < AmmoCurrent)
 	{
 		AmmoMax += AmmoCurrent - ClipSize;
-	}
-}
+		AmmoCurrent = ClipSize;
 
-void AOPAG_ModularGun::Reload()
-{
-	bIsReloading = true;
-	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_ModularGun::WaitReloadingTimer, Stats.ReloadingTime, false);
-	UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
+		EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+		EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+	}
 }
 
 void AOPAG_ModularGun::IncrementAmmo()
@@ -560,38 +573,39 @@ void AOPAG_ModularGun::IncrementAmmo()
 			break;
 		}
 	}
-
 	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
-
 }
 
 // When player reload the gun is impossible to shoot and reload, because of this player will have to wait this timer
 void AOPAG_ModularGun::WaitReloadingTimer()
 {
+	// Check the bool when interrupter the reloading
 	bIsReloading = false;
 
-	const AOPAG_Player* const Player = Cast<AOPAG_Player>(this->GetParentActor());
-
-	const int BulletDifference = Stats.ClipSize - AmmoCurrent;
-	if (BulletDifference < AmmoMax)
+	if (AmmoMax < GetStatsTotal().ClipSize)
 	{
-		AmmoCurrent += BulletDifference;
-		AmmoMax -= BulletDifference;
-
-		if (Player) {
-			Player->EMS->TotalAmmoChanged.Broadcast(AmmoMax);
-			Player->EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
-		}
+		AmmoCurrent = AmmoMax;
+		AmmoMax = 0;
 	}
 	else
 	{
-		AmmoCurrent += AmmoMax;
-		AmmoMax = 0;
-
-		if (Player) {
-			Player->EMS->TotalAmmoChanged.Broadcast(AmmoMax);
-			Player->EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
-		}
+		const int AmmoDifference = GetStatsTotal().ClipSize - AmmoCurrent;
+		AmmoCurrent += AmmoDifference;
+		AmmoMax -= AmmoDifference;
 	}
+	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
 }
 #pragma endregion Ammo System
+
+#pragma region Checks
+bool AOPAG_ModularGun::HasAccessory() const
+{
+	return Accessory->GetChildActor() != nullptr;
+}
+
+bool AOPAG_ModularGun::HasSight() const
+{
+	return Sight->GetChildActor() != nullptr;
+}
+#pragma endregion Checks
