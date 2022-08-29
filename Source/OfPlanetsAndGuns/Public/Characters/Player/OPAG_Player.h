@@ -15,26 +15,50 @@
 
 class UOPAG_AttributeSetBase;
 class UTimelineComponent;
+class UAnimInstance;
 class UCurveFloat;
 class AOPAG_ModuleBase;
 class UCameraComponent;
+class USpringArmComponent;
 class UChildActorComponent;
 class AOPAG_GunBase;
 class AOPAG_ModularGun;
+class UAnimBlueprintGeneratedClass;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, Category = "GameplayAbility System")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	const class UOPAG_AttributeSetPlayer* AttributeSetPlayer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UTimelineComponent* DashTimeline;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UTimelineComponent* RecoilTimeline;
+
+	UPROPERTY(Category = "OPAG | Character | Camera", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* CurrentCamera;
+
+	UPROPERTY(Category = "OPAG | Character | Timeline", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* ADSCurveFloat;
+
+	UPROPERTY(Category = "OPAG | Character | Timeline", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* RecoilCurveFloat;
+
+	UPROPERTY(Category = "OPAG | Character | Widgets", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> CrosshairClass;
 	
 public:
 	AOPAG_Player();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
 	class UOPAG_InventorySystemComponent* InventorySystemComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
@@ -49,38 +73,37 @@ public:
 	UChildActorComponent* SecondaryGunComponent;
 
 public:
-	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
-	AOPAG_ModularGun* PrimaryGun;
+	UPROPERTY(Category = "OPAG | Character | View", EditAnywhere, BlueprintReadWrite)
+	FVector ViewOffset = FVector(.0f, .0f, -35.f);
 
-	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
-	AOPAG_GunBase* CurrentGun;
+public:
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UAnimBlueprintGeneratedClass* RifleAnimClass;
 
-	UPROPERTY(Category = "Camera", VisibleAnywhere, BlueprintReadWrite)
-	UCameraComponent* CurrentCamera;
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UAnimBlueprintGeneratedClass* HandgunAnimClass;
 
-	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite)
 	UAnimMontage* FireMontageToPlay;
 
-	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite)
 	UAnimMontage* ReloadMontageToPlay;
 
-	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
-	UTimelineComponent* ADSTimeline;
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* SwapRifleMontageToPlay;
 
-	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
-	UTimelineComponent* DashTimeline;
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* SwapHandgunMontageToPlay;
 
-	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
-	UTimelineComponent* RecoilTimeline;
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite)
+	UAnimMontage* InspectGunMontageToPlay;
 
-	UPROPERTY(Category = "Timeline", EditAnywhere, BlueprintReadWrite)
-	UCurveFloat* ADSCurveFloat;
+public:
+	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite)
+	AOPAG_ModularGun* PrimaryGun;
 
-	UPROPERTY(Category = "Timeline", EditAnywhere, BlueprintReadWrite)
-	UCurveFloat* RecoilCurveFloat;
-
-	UPROPERTY(Category = "Widgets", EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> CrosshairClass;
+	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite)
+	AOPAG_GunBase* CurrentGun;
 
 public:
 	UPROPERTY(Category = "Player", EditAnywhere, BlueprintReadWrite)
@@ -151,9 +174,12 @@ public:
 	float DebugDashRestoreTime = 0.f;
 
 private:
-	const FName GripSocketName = "GripPoint";
+	const FName SocketRifleName = "SOCKET_Rifle";
+	const FName SocketHandgunName = "SOCKET_Handgun";
+	const FName SocketHandLeft = "SOCKET_Hand_L";
 	const float LookUpDistanceToPlayer = 150.f;
 	bool bIsDashAlreadyInitialized;
+	bool bRunning = false;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
 	bool bHasAlreadyLooked = false;
@@ -164,7 +190,6 @@ private:
 	AActor* Shield = nullptr;
 
 private:
-	FOnTimelineFloat OnADSTimelineProgress;
 	FOnTimelineFloat OnRecoilTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
@@ -191,7 +216,6 @@ private:
 
 	// Init standard values
 	void InitDefaultValues();
-	void InitADSTimeline();
 	void InitDashTimeline();
 	void InitRecoilTimeline();
 	void InitDashValues();
@@ -238,43 +262,35 @@ private:
 	void ShieldCooldownTimer();
 
 public:
+	// Movement player input
 	UFUNCTION() void MoveForward(const FInputActionValue& Value);
-
 	UFUNCTION() void MoveRight(const FInputActionValue& Value);
-
 	UFUNCTION() void Lookup(const FInputActionValue& Value);
-
 	UFUNCTION() void Turn(const FInputActionValue& Value);
-
 	UFUNCTION() void Jumping();
 
+	// Gun input
 	UFUNCTION() void Shoot();
-
 	UFUNCTION() void StopShoot();
-
 	UFUNCTION() void SwapGuns();
-
 	UFUNCTION() void ReloadGun();
+	UFUNCTION() void IncrementPrimaryGunAmmo();
+	UFUNCTION() void InspectGun();
 
+	// Interact with items
 	UFUNCTION() void InteractWithItem();
-
-	UFUNCTION() void SwitchToADSCamera();
-
-	UFUNCTION() void ResetFPSCamera();
-
 	UFUNCTION() void UsePotion();
 
-	UFUNCTION() void ActiveDash();
+	// Aim input
+	UFUNCTION() void SwitchToADSCamera();
+	UFUNCTION() void ResetFPSCamera();
 
+	// Active ability input
+	UFUNCTION() void ActiveDash();
 	UFUNCTION() void ActiveGunAbility();
 
-	UFUNCTION() void IncrementPrimaryGunAmmo();
-
 public:
-	UFUNCTION() void ADSTimelineProgress(float Value);
-
 	UFUNCTION() void DashTimelineFinished();
-
 	UFUNCTION() void RecoilTimelineProgress(float Value);
 
 public:
@@ -282,15 +298,24 @@ public:
 			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION() void SavePlayerState();
-
 	UFUNCTION() void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
 
 public:
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
+	UFUNCTION(BlueprintCallable) const bool GetIsRunning() const;
+	UFUNCTION(BlueprintCallable) void AttachMagazineToHandNotify();
+	UFUNCTION(BlueprintCallable) void AttachMagazineToGunNotify();
 
 	void HealthChanged(const FOnAttributeChangeData& Data);
 
 	// Getter and setter for shield element
 	void SetShield(AActor* NewShield);
 	AActor* GetShield() const;
+
+public:
+	void RelocateComponets();
+	FVector GetViewLocation() const;
+
+public:
+	FORCEINLINE UCameraComponent* GetCurrentCamera() const { return CurrentCamera; }
 };

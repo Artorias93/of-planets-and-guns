@@ -30,6 +30,13 @@ AOPAG_GunBase::AOPAG_GunBase()
 	Receiver->SetCollisionProfileName("Weapon");
 	RootComponent = Receiver;
 
+	IronSight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("IronSightComponent"));
+	if (IronSight != nullptr)
+	{
+		IronSight->SetWorldLocation(FVector(0.f, 15.f, 7.f));
+		IronSight->SetupAttachment(RootComponent);
+	}
+
 	ADSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ADSCamera"));
 	if (ADSCamera)
 	{
@@ -166,9 +173,6 @@ void AOPAG_GunBase::ResetShootTimer()
 #pragma endregion Shooting Behavior
 
 #pragma region Shooting Utility
-
-
-
 float AOPAG_GunBase::CalculateDamage(const bool IsHeadshot) const
 {
 	const float DamageRandomnessAmount = Stats.Damage * 0.01f * DamageRandomnessPercentage;
@@ -187,12 +191,18 @@ void AOPAG_GunBase::AddCritToDamage(float& Damage) const
 
 float AOPAG_GunBase::CalculateSpread() const
 {
+	// Only use for aiming behavior
+	AOPAG_Player* Player = Cast<AOPAG_Player>(GetParentActor());
+
 	static constexpr float InternalRange = MaxInternalAccuracy - MinInternalAccuracy;
-
 	const float InternalAccuracy = ((Stats.Accuracy * InternalRange) / 100.f) + MinInternalAccuracy;
-
 	const float ClampedAccuracy = FMath::Clamp(InternalAccuracy, MinInternalAccuracy, MaxInternalAccuracy);
-	const float Spread = (SpreadMax * (ShootConeLength - ClampedAccuracy)) / 100;
+	float Spread = .0f;
+
+	if (Player != nullptr && Player->GetIsADS())
+		Spread = (SpreadMax * (ShootConeLength - 100.f)) / 100;
+	else
+		Spread = (SpreadMax * (ShootConeLength - ClampedAccuracy)) / 100;
 	return Spread;
 }
 

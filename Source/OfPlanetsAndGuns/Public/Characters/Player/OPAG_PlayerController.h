@@ -52,35 +52,31 @@ private:
 
 
 public:
+	// Movement player input
 	UFUNCTION() void MoveForward(const FInputActionValue& Value);
-
 	UFUNCTION() void MoveRight(const FInputActionValue& Value);
-
 	UFUNCTION() void Lookup(const FInputActionValue& Value);
-
 	UFUNCTION() void Turn(const FInputActionValue& Value);
-
 	UFUNCTION() void Jumping();
-
 	UFUNCTION() void StopJumping();
 
+	// Gun input
 	UFUNCTION() void Shoot();
-
 	UFUNCTION() void StopShoot();
-
 	UFUNCTION() void SwapGuns();
-
 	UFUNCTION() void ReloadGun();
+	UFUNCTION() void InspectGun();
 
+	// Interact with item input
 	UFUNCTION() void InteractWithItem();
-
-	UFUNCTION() void SwitchToADSCamera();
-
-	UFUNCTION() void ResetFPSCamera();
-
 	UFUNCTION() void UsePotion();
 
-	UFUNCTION() void ActiveDash();
+	// Aim input
+	UFUNCTION() void SwitchToADSCamera();
+	UFUNCTION() void ResetFPSCamera();
 
+	// Ability input
+	UFUNCTION() void ActiveDash();
 	UFUNCTION() void ActiveGunAbility();
+
 };

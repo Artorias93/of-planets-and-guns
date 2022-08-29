@@ -9,6 +9,7 @@
 #include "OPAG_GunBase.generated.h"
 
 class USkeletalMeshComponent;
+class UStaticMeshComponent;
 class UChildActorComponent;
 class UCameraComponent;
 class AOPAG_CharacterBase;
@@ -20,6 +21,9 @@ UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_GunBase : public AActor
 {
 	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* IronSight;
 	
 public:	
 	AOPAG_GunBase();
