@@ -215,20 +215,24 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 	}
 	if (Item == nullptr)
 	{
-		AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		const AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 		if (Player != nullptr)
 		{
-			UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
-			int Count = 0;
-			while (Count < LootBox->NumberOfModulesToSpawn && Count < Modules.Num())
+			const AOPAG_ModularGun* PrimaryGun = Player->GetPrimaryGun();
+			if (PrimaryGun != nullptr)
 			{
-				const int FireMask = 1 << (int)Player->GetPrimaryGun()->GetFireType();
-				Item = SelectRandomModules(Modules, DifficultyValue, FireMask);
-				if (!Items.Contains(Item))
+				UOPAG_UtilityFunctionLibrary::ShuffleArray(Modules);
+				int Count = 0;
+				while (Count < LootBox->NumberOfModulesToSpawn && Count < Modules.Num())
 				{
-					Items.Add(Item);
+					const int FireMask = 1 << static_cast<int>(PrimaryGun->GetFireType());
+					Item = SelectRandomModules(Modules, DifficultyValue, FireMask);
+					if (!Items.Contains(Item))
+					{
+						Items.Add(Item);
+					}
+					Count++;
 				}
-				Count++;
 			}
 		}
 	}
