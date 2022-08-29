@@ -44,7 +44,7 @@ protected:
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FOPAG_GunStats Stats;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", Bitmask, BitmaskEnum = "EFireTypes"))
 	int EquippableFireTypes;
 
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))

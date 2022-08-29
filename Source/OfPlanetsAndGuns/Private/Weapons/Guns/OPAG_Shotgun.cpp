@@ -40,7 +40,7 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 					//If the hit component is the shield, damage is not applied
 					if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
 					{
-						const float Damage = StatsBase.Damage / ConsecutiveProjectile;
+						const float Damage = GetStatsTotal().Damage / ConsecutiveProjectile;
 						Character->ReceiveDamage(Damage);
 					}
 				}

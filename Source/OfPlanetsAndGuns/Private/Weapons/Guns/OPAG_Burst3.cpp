@@ -51,7 +51,7 @@ void AOPAG_Burst3::ShootBurst()
 	else
 	{
 		BurstProjectileCount = BurstProjectileCountMax;
-		const float Seconds = CalculateRateInSeconds(StatsBase.FireRate);
+		const float Seconds = CalculateRateInSeconds(GetStatsTotal().FireRate);
 		GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_Burst3::ResetShootTimer, Seconds, false);
 	}
 }
