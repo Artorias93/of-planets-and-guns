@@ -82,6 +82,6 @@ void AOPAG_RayAbility::DealDamage(AActor* TargetActor)
 	DamageTimer = DamageOverTimeFrequency;
 	if (AOPAG_Player* Player = Cast<AOPAG_Player>(TargetActor))
 	{
-		Player->ReceiveDamage(AbilityDamage);
+		Player->ReceiveDamage(AbilityDamage, this);
 	}
 }

@@ -598,7 +598,7 @@ void AOPAG_Player::Shoot()
 	GetShootingDirection(StartLocation, Direction);
 
 	// Invoke shoot
-	CurrentGun->Shoot(StartLocation, Direction, this);
+	const int AmmoConsumate = CurrentGun->Shoot(StartLocation, Direction, this);
 
 	// Active montage 
 	Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
@@ -608,6 +608,11 @@ void AOPAG_Player::Shoot()
 
 	// Update last fire time
 	LastFireTime = GetGameTimeSinceCreation();
+
+	// Update Ammo
+	CurrentGun->DecrementAmmoCurrent(AmmoConsumate);
+	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
+	if (CurrentGun->GetAmmoCurrent() == 0)	EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
 }
 
 // Override the default method GetShootingDirection 
@@ -827,6 +832,10 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		PrimaryGun->CreateAndAttachAllModules(NewGunModules);
 		CurrentGun = PrimaryGun;
 		DebugCurretGunStats = CurrentGun->GetStatsTotal();
+
+		// Update ammo
+		PrimaryGun->SetAmmoCurrent(PrimaryGun->GetStatsTotal().ClipSize);
+		EMS->CurrentAmmoChanged.Broadcast(PrimaryGun->GetAmmoCurrent());
 	}
 
 	// Spawn the old primary gun in scene
