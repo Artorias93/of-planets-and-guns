@@ -71,6 +71,9 @@ protected:
 	UPROPERTY(Category = "OPAG | Gun | Standard Modules", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AOPAG_ModuleBase> StandardMagazine;
 
+	UPROPERTY(Category = "OPAG | Gun | Standard Modules", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AOPAG_ModuleBase> StandardSight;
+
 protected:
 	FTimerHandle FlyRotationHandle;
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;

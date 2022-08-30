@@ -178,6 +178,7 @@ FOPAG_GunModules AOPAG_ModularGun::GetStandardModulesStruct() const
 	StandardModules.Stock = StandardStock;
 	StandardModules.Grip = StandardGrip;
 	StandardModules.Magazine = StandardMagazine;
+	StandardModules.Sight = StandardSight;
 
 	return StandardModules;
 }
@@ -308,6 +309,12 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 				return;
 			}
 			break;
+		case EModuleTypes::Sight:
+			if (CurrentChildModule->GetClass() == StandardSight)
+			{
+				return;
+			}
+			break;
 	}
 
 	const TSubclassOf<AOPAG_ModuleBase> TempModuleClass = CurrentChildModule->GetClass();
@@ -340,6 +347,9 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 		break;
 	case EModuleTypes::Magazine:
 		CreateModule(ChildModule, StandardMagazine);
+		break;
+	case EModuleTypes::Sight:
+		CreateModule(ChildModule, StandardSight);
 		break;
 	}
 }

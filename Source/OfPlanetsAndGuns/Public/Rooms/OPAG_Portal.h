@@ -51,6 +51,11 @@ public:
 
 	virtual bool CanInteract_Implementation() override;
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		bool WillChangeInteractStateDynamically();
+
+	virtual bool WillChangeInteractStateDynamically_Implementation() override;
+
 	FString InteractString_Implementation() override;
 
 };

@@ -29,14 +29,6 @@ AOPAG_GunBase::AOPAG_GunBase()
 	Receiver->SetCollisionProfileName("Weapon");
 	RootComponent = Receiver;
 
-	IronSight = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("IronSightComponent"));
-	if (IronSight != nullptr)
-	{
-		IronSight->SetWorldLocation(FVector(0.f, 15.f, 7.f));
-		IronSight->SetCollisionProfileName(TEXT("NoCollision"));
-		IronSight->SetupAttachment(RootComponent);
-	}
-
 	ADSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ADSCamera"));
 	if (ADSCamera)
 	{

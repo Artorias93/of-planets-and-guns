@@ -894,15 +894,22 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 }
 
 void AOPAG_Player::UpdateInteractableMessage() {
+	bool bShouldUpdateMessage = false;
+	if (InteractableObject)
+		if (IOPAG_InteractableInterface::Execute_WillChangeInteractStateDynamically(InteractableObject))
+		{
+			bShouldUpdateMessage = true;
+		}
 
-	if (bHasAlreadyLooked) {
+	if (!bShouldUpdateMessage && bHasAlreadyLooked) {
 		bHasAlreadyLooked = InteractableObject != nullptr;
 		if (!bHasAlreadyLooked) {
 			EMS->UnlookedAtInteractable.Broadcast();
 		}
+		else bShouldUpdateMessage = true;
 	}
 
-	if (!bHasAlreadyLooked && InteractableObject) {
+	if (bShouldUpdateMessage && InteractableObject) {
 		//IOPAG_InteractableInterface* Int = Cast<IOPAG_InteractableInterface>(InteractableObject);
 
 		AOPAG_ModularGun* const Gun = Cast<AOPAG_ModularGun>(InteractableObject);

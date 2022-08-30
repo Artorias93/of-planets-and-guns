@@ -20,6 +20,11 @@ AOPAG_LootBox::AOPAG_LootBox()
 		LootSpawnPoint->SetupAttachment(RootComponent);
 }
 
+bool AOPAG_LootBox::WillChangeInteractStateDynamically_Implementation()
+{
+	return true;
+}
+
 FString AOPAG_LootBox::InteractString_Implementation()
 {
 	if (bHasBeenOpened)

@@ -225,7 +225,10 @@ void AOPAG_GameplayHUD::ShowGameOverView()
 void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, const FString InteractText)
 {
 	if (InteractViewWidget) {
-		InteractViewWidget->AddToViewport(3);
+		if (!InteractViewWidget->IsInViewport())
+		{
+			InteractViewWidget->AddToViewport(3);
+		}
 		InteractViewWidget->UpdateInteractText(bCanInteract, InteractText);
 	}
 }
