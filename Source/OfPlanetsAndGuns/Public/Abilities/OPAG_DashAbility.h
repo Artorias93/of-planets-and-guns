@@ -35,10 +35,11 @@ protected:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 private:
-	UFUNCTION() void StopDash();
 	UFUNCTION() void LaunchUpAndThenStrong();
 	UFUNCTION() void LaunchStrong();
-	UFUNCTION() void ApplicateFriction();
 	UFUNCTION() const FVector CalculateDirection() const;
 	UFUNCTION() const FVector CalculateForce() const;
+	// OLD
+	//UFUNCTION() void StopDash();
+	//UFUNCTION() void ApplicateFriction();
 };
