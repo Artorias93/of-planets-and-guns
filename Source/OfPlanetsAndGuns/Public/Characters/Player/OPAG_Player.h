@@ -226,7 +226,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void ReceiveDamage(const float Damage) override;
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
 	void HealthChanged(const FOnAttributeChangeData& Data);
 
 private:

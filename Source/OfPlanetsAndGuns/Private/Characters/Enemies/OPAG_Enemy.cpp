@@ -131,13 +131,13 @@ void AOPAG_Enemy::UpdateAcceleration(float const NewAcceleration) const
 	GetCharacterMovement()->MaxAcceleration = NewAcceleration;
 }
 
-void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
+void AOPAG_Enemy::ReceiveDamage(const float Damage, AActor* const Causer)
 {
-	Super::ReceiveDamage(DamageAmount);
+	Super::ReceiveDamage(Damage, this);
 	
 	//Triggers the damage sense on the AI controlled pawn
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this,
-		UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount,
+		UGameplayStatics::GetPlayerPawn(GetWorld(), 0), Damage,
 		UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(),
 		GetActorLocation(), NAME_None);
 	//TODO: Remove the print to screen

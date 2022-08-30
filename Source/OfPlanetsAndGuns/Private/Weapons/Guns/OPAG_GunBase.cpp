@@ -190,7 +190,7 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 				{
 					//Check for headshot
 					const bool IsHeadshot = OutHit.GetComponent()->ComponentHasTag("Head");
-					Character->ReceiveDamage(CalculateDamage(IsHeadshot));
+					Character->ReceiveDamage(CalculateDamage(IsHeadshot), GetParentActor());
 				}
 			}
 		}

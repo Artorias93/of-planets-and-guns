@@ -163,13 +163,15 @@ void AOPAG_Player::Tick(float DeltaTime)
 	LookAtEnemy();
 }
 
-void AOPAG_Player::ReceiveDamage(const float Damage)
+void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 {
 	check(AttributeSetPlayer);
 
 	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
 	{
-		Super::ReceiveDamage(Damage);
+		Super::ReceiveDamage(Damage, Causer);
+
+		EMS->DamagedBy.Broadcast(Causer);
 
 		// Restart Shield
 		GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);

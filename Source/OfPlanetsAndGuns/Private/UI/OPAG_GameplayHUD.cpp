@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_GameplayHUD.h"
 #include "UI/OPAG_UWGunView.h"
 #include "UI/OPAG_UWCurrencyView.h"
@@ -10,9 +7,10 @@
 #include "UI/OPAG_UWModuleView.h"
 #include "UI/OPAG_UWGunCompareView.h"
 #include "UI/OPAG_UWInteractView.h"
+#include "UI/OPAG_UWDamageIndicatorView.h"
+#include "UI/OPAG_UWGameOverView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
-#include "UI/OPAG_UWGameOverView.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 
 
@@ -34,6 +32,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->PlayerDied.AddDynamic(this, &AOPAG_GameplayHUD::ShowGameOverView);
 		EMS->LookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::ShowInteractView);
 		EMS->UnlookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::HideInteractView);
+		EMS->DamagedBy.AddDynamic(this, &AOPAG_GameplayHUD::ShowDamageIndicatorView);
 	}
 }
 
@@ -231,3 +230,28 @@ void AOPAG_GameplayHUD::HideInteractView()
 		InteractViewWidget->RemoveFromViewport();
 	}
 }
+
+void AOPAG_GameplayHUD::ShowDamageIndicatorView(AActor* const CurrentThreatActor)
+{
+	if (DamageIndicatorViewWidgetClass)
+	{
+		DamageIndicatorViewWidget = CreateWidget<UOPAG_UWDamageIndicatorView>(GetWorld(), DamageIndicatorViewWidgetClass);
+	}
+	
+	if(DamageIndicatorViewWidget)
+	{
+		if(!DamageIndicatorViewWidget->IsVisible())
+		{
+			DamageIndicatorViewWidget->AddToViewport(1);
+		}
+		DamageIndicatorViewWidget->SetCurrentThreatActor(CurrentThreatActor);
+	}
+}
+
+void AOPAG_GameplayHUD::HideDamageIndicatorView()
+{
+	if (DamageIndicatorViewWidget) {
+		DamageIndicatorViewWidget->RemoveFromViewport();
+	}
+}
+

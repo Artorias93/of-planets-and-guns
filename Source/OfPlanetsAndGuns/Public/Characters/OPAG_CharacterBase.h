@@ -28,7 +28,7 @@ public:
 	UPROPERTY()
 	class UOPAG_EventManagerSubsystem* EMS;
 	
-	virtual void ReceiveDamage(const float Damage);
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer);
 	virtual void ReceiveDamage(AActor* Throwable);
 
 	// Ability system
