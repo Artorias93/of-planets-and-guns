@@ -12,7 +12,22 @@ class OFPLANETSANDGUNS_API AOPAG_ForceField : public AOPAG_AbilityBase
 	GENERATED_BODY()
 	
 public:	
-	AOPAG_ForceField();
+	AOPAG_ForceField();	
+	virtual void Init(EAbilityTypes AbilityType, float Delay) override;
 
-protected:	
+protected:
+	virtual void BeginPlay() override;		
+
+	UPROPERTY(EditAnywhere, Category = "Mesh")
+		class UStaticMeshComponent* AbilityMesh;
+
+	UFUNCTION()
+	void OnPillarDestroyed();
+
+	UFUNCTION()
+	virtual void DestroyAbility() override;
+
+	int AvailablePillarsAmount = 0;
+
+	TArray<AActor*> Pillars;
 };

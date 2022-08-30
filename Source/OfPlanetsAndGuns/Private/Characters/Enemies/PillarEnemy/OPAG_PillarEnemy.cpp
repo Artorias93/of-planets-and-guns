@@ -3,6 +3,8 @@
 
 #include "Characters/Enemies/PillarEnemy/OPAG_PillarEnemy.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
 
 AOPAG_PillarEnemy::AOPAG_PillarEnemy()
 {
@@ -12,12 +14,12 @@ AOPAG_PillarEnemy::AOPAG_PillarEnemy()
 
 void AOPAG_PillarEnemy::Death()
 {
-	if (PillarMesh)
+
+	if (EMS != nullptr)
 	{
-		PillarMesh->K2_DetachFromComponent(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld);
-		PillarMesh->SetSimulatePhysics(true);
-		PillarMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Destroyed Pillar"));
+		EMS->DestroyedPillar.Broadcast();
 	}
-	
+
 	Super::Death();
 }
