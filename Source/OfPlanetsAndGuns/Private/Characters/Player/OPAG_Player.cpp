@@ -167,6 +167,16 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 {
 	check(AttributeSetPlayer);
 
+	if (AttributeSetPlayer->GetShieldCapacity() < AttributeSetPlayer->GetShieldCapacityMax())
+	{
+		// Restart Shield
+		GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
+		GetWorld()->GetTimerManager().ClearTimer(ShieldPlayerCooldownHandle);
+		GetWorld()->GetTimerManager().SetTimer(ShieldPlayerCooldownHandle, this, &AOPAG_Player::ShieldCooldownTimer, AttributeSetPlayer->GetShieldCooldown(), false);
+		//bIsShieldBroken = true;
+		UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
+	}
+
 	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
 	{
 		Super::ReceiveDamage(Damage, Causer);
@@ -174,19 +184,19 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		EMS->DamagedBy.Broadcast(Causer);
 
 		// Restart Shield
+		/*
 		GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
 		GetWorld()->GetTimerManager().ClearTimer(ShieldPlayerCooldownHandle);
 		GetWorld()->GetTimerManager().SetTimer(ShieldPlayerCooldownHandle, this, &AOPAG_Player::ShieldCooldownTimer, AttributeSetPlayer->GetShieldCooldown(), false);
+		*/
 		bIsShieldBroken = true;
-		UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
+		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 		return;
 	}
 	if (AbilitySystemComp && BaseAttributeSet)
 	{
 		AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
 
-		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
-		
 		//TODO: Rename BasicShot in AbilityTakeDamage
 		AbilitySystemComp->TryActivateAbilityByClass(PlayerShieldAbility);
 
@@ -196,6 +206,8 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
 		UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
+
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
 	}
 }
 
@@ -1142,6 +1154,7 @@ void AOPAG_Player::ResetShieldTimer()
 		const float NewShieldCapicityValue = FMath::Clamp(AttributeSetPlayer->GetShieldCapacity() + AttributeSetPlayer->GetShieldRechargeRate(), 0.f, AttributeSetPlayer->GetShieldCapacityMax());
 		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), NewShieldCapicityValue);
 		UE_LOG(LogTemp, Warning, TEXT("Current Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
 	}
 }
 
