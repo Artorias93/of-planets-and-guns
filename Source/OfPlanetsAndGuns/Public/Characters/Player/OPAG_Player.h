@@ -203,6 +203,7 @@ private:
 private:
 	// Boolean checks
 	bool bIsDashAlreadyInitialized;
+	bool bInspecting = false;
 	bool bRunning = false;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
@@ -217,11 +218,15 @@ private:
 	AActor* PreviousLookedAtModule = nullptr;
 	AActor* Shield = nullptr;
 
+	// Fire timers
+	float LastFireTime = .0f;
+
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
 private:
+	FTimerHandle ShootingHanlde;
 	FTimerHandle RestartShieldPlayerHandle;
 	FTimerHandle ShieldPlayerCooldownHandle;
 
@@ -300,10 +305,16 @@ private:
 	UFUNCTION() void Turn(const FInputActionValue& Value);
 	UFUNCTION() void Jumping();
 
-	// Gun input
+	// Shooting input
+	UFUNCTION() void StartShooting();
+	UFUNCTION() void KeepShooting();
+	UFUNCTION() void StopShooting();
 	UFUNCTION() void Shoot();
-	UFUNCTION() void StopShoot();
+
+	// Swap guns
 	UFUNCTION() void SwapGuns();
+
+	// Reload guns
 	UFUNCTION() void ReloadGun();
 	UFUNCTION() void IncrementPrimaryGunAmmo();
 	UFUNCTION() void InspectGun();
@@ -336,6 +347,7 @@ public:
 	UFUNCTION(BlueprintCallable) const bool GetIsRunning() const;
 	UFUNCTION(BlueprintCallable) void AttachMagazineToHandNotify();
 	UFUNCTION(BlueprintCallable) void AttachMagazineToGunNotify();
+	UFUNCTION(BlueprintCosmetic) void CompleteInspectNotify();
 
 public:
 	// Getter and setter for shield element

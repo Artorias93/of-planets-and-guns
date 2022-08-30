@@ -16,11 +16,8 @@ void AOPAG_Burst3::BeginPlay()
 
 void AOPAG_Burst3::Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
-	bCanShoot = false;
 
 	ShootBurst();
-
-	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
 }
 
 void AOPAG_Burst3::ShootBurst()
@@ -35,23 +32,25 @@ void AOPAG_Burst3::ShootBurst()
 			FVector Direction;
 			Character->GetShootingDirection(StartShootLocation, Direction);
 
-			// Shoot single line trace
 			ShootLineTrace(StartShootLocation, Direction, Character);
 
-			// Decrement number of consecutive projectiles
+			ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
+
+			UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+			if (AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
+			{
+				MakeNoise(1.f, CharacterOwner, CharacterOwner->GetActorLocation(), 0);
+			}
+
+			// Update number of consecutive projectiles
 			BurstProjectileCount--;
 
-			// Play sound
-			UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
-
-			// Re-call this method
+			// Wait time to next projectile
 			GetWorld()->GetTimerManager().SetTimer(ShootBurstHandle, this, &AOPAG_Burst3::ShootBurst, TimeForAnyNextProjectile, false);
 		}
 	}
 	else
 	{
 		BurstProjectileCount = BurstProjectileCountMax;
-		const float Seconds = CalculateRateInSeconds(GetStatsTotal().FireRate);
-		GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_Burst3::ResetShootTimer, Seconds, false);
 	}
 }
