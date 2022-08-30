@@ -36,6 +36,8 @@ protected:
 
 private:
 	UFUNCTION() void StopDash();
+	UFUNCTION() void LaunchUpAndThenStrong();
+	UFUNCTION() void LaunchStrong();
 	UFUNCTION() void ApplicateFriction();
 	UFUNCTION() const FVector CalculateDirection() const;
 	UFUNCTION() const FVector CalculateForce() const;
