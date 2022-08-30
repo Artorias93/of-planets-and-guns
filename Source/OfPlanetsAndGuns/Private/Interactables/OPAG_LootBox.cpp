@@ -92,7 +92,7 @@ void AOPAG_LootBox::SpawnItem()
 	}
 
 	// Spawn Item
-	const FVector SpawnLocation = RootComponent->GetComponentLocation();
+	const FVector SpawnLocation = LootSpawnPoint->GetComponentLocation();//RootComponent->GetComponentLocation();
 	const FRotator SpawnRotator = FRotator::ZeroRotator;
 	AActor* Item = GetWorld()->SpawnActor(Items[0], &SpawnLocation, &SpawnRotator);
 	Items.RemoveAt(0);
