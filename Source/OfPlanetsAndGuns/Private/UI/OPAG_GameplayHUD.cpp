@@ -161,8 +161,15 @@ void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats GunStats, con
 	const int EquippableTypes, const bool CanBeEquipped)
 {
 	if (ModuleViewWidget) {
-		ModuleViewWidget->AddToViewport(3);
-		ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
+		if (ModuleViewWidget->IsInViewport()) {
+			ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName,
+				OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
+		}
+		else {
+			ModuleViewWidget->AddToViewport(3);
+			ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName, 
+				OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
+		}
 	}
 }
 
@@ -177,8 +184,15 @@ void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const 
 	const FString OtherGunType)
 {
 	if (GunCompareViewWidget) {
-		GunCompareViewWidget->AddToViewport(3);
-		GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
+		if (GunCompareViewWidget->IsInViewport()) 
+		{
+			GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
+		}
+		else 
+		{
+			GunCompareViewWidget->AddToViewport(3);
+			GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
+		}
 	}
 }
 
