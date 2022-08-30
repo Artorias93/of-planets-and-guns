@@ -437,6 +437,7 @@ void AOPAG_Player::ActiveGunAbility()
 		if (AbilitySystemComp->TryActivateAbilityByClass(Ability, true))
 		{
 			InventorySystemComp->BoltsAmount--;
+			EMS->BoltsAmountDecrement.Broadcast();
 		}
 	}
 }
