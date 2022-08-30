@@ -120,10 +120,9 @@ void AOPAG_GunBase::SetAmmoMax(const int Value)
 #pragma endregion Set
 
 #pragma region Mathematic Utility
-float AOPAG_GunBase::CalculateRateInSeconds(const float FireRate)
+float AOPAG_GunBase::CalculateFirePeriod(const float FireRate)
 {
-	const float Seconds = 1 / (FireRate / 60);
-	return Seconds;
+	return SecondsInOneMinute / FireRate;
 }
 #pragma endregion Mathematic Utility
 
@@ -132,14 +131,14 @@ float AOPAG_GunBase::CalculateRateInSeconds(const float FireRate)
 // Call line trace method and set fire rate of gun with timer manager
 void AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
-	bCanShoot = false;
+	//bCanShoot = false;
 
 	ShootLineTrace(StartShootLocation, Direction, ShooterCharacter);
 
 	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
 
-	const float Seconds = CalculateRateInSeconds(GetStatsTotal().FireRate);
-	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);
+	/*const float Seconds = CalculateRateInSeconds(GetStatsTotal().FireRate);
+	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);*/
 	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 	if(AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
 	{
@@ -202,6 +201,12 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 
 	// Decrement Ammo
 	AmmoCurrent--;
+
+	// Update Ammo ui
+	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+	if (AmmoCurrent == 0)
+		EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
 }
 
 USceneComponent* AOPAG_GunBase::GetMuzzle() const

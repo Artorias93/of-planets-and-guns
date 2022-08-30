@@ -118,6 +118,9 @@ protected:
 	bool bIsReloading = false;
 	bool bIsShoot = false;
 
+	// Shoot math calculation
+	static constexpr float SecondsInOneMinute = 60.f;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -125,7 +128,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Maths Utility
-	static float CalculateRateInSeconds(const float FireRate);
+	static float CalculateFirePeriod(const float FireRate);
 
 	// Main system for shooting
 	virtual void Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);

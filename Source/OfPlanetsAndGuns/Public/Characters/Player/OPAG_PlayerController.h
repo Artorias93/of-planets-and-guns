@@ -61,7 +61,8 @@ public:
 	UFUNCTION() void StopJumping();
 
 	// Gun input
-	UFUNCTION() void Shoot();
+	UFUNCTION() void StartShoot();
+	UFUNCTION() void KeepShoot();
 	UFUNCTION() void StopShoot();
 	UFUNCTION() void SwapGuns();
 	UFUNCTION() void ReloadGun();
