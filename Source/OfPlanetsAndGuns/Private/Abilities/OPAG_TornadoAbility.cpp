@@ -40,6 +40,9 @@ void AOPAG_TornadoAbility::Tick(float DeltaTime)
 	FVector Velocity = MovementDirection * Speed * DeltaTime;
 	FVector NewLocation = GetActorLocation() + Velocity;
 
+	// keep always the same Z, in order to avoid that the tornado start flying to reach the center of the Target
+	NewLocation.Z = GetActorLocation().Z;
+
 	SetActorLocation(NewLocation);
 
 	if (OverlappingTarget)

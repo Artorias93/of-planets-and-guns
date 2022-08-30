@@ -19,10 +19,6 @@ void AOPAG_MageEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// disable collision in order to let the enemy be positioned inside the force field that he will cast at run time
-	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
-	this->SetActorEnableCollision(false);
-
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -49,8 +45,6 @@ void AOPAG_MageEnemy::BeginPlay()
 void AOPAG_MageEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, FString::SanitizeFloat((GetHealth() * 100 / GetHealthMax())));
 
 	if (!bHealth50 && (GetHealth() * 100 / GetHealthMax() <= 50.f))
 	{
@@ -90,7 +84,6 @@ void AOPAG_MageEnemy::Death()
 
 void AOPAG_MageEnemy::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 {
-
 	// when an enemy is killed, check if it's one of those casted by the mage, and if yes, untrack it by removing him from th array
 	if (CastedEnemiesList.Contains(Enemy))
 	{
@@ -121,7 +114,6 @@ void AOPAG_MageEnemy::OnSpawnedEnemy(AOPAG_Enemy* Enemy, AActor* Caller)
 void AOPAG_MageEnemy::OnBrokenForceField()
 {
 	FightStatus = EFightStatus::SecondPhase;
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Second Stage started"));	
 
 	// since the force field has been broken, enable again the collisions
 	GetMesh()->SetCollisionProfileName(TEXT("BlockAll"));

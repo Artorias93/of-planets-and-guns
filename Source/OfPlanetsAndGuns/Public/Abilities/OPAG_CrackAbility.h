@@ -45,6 +45,8 @@ protected:
 	UFUNCTION()
 		virtual void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	void EnableCollision();
+
 	virtual void DestroyAbility() override;
 
 	void DealDamage(AActor* TargetActor);

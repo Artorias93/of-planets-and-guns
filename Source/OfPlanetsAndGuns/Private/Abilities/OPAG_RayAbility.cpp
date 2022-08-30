@@ -30,6 +30,18 @@ void AOPAG_RayAbility::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (EnableCollisionAfterSeconds > 0)
+	{
+		AbilityCollider->SetCollisionProfileName(TEXT("NoCollision"));
+		SetActorScale3D(FVector(1, 0.05f, 0.05f));
+
+		AbilityParticleMuzzle->bAutoActivate = false;
+		AbilityParticleHit->bAutoActivate = false;
+	}	
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_RayAbility::EnableCollision, EnableCollisionAfterSeconds, false);
+
 	AbilityCollider->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_RayAbility::OnOverlapBegin);
 	AbilityCollider->OnComponentEndOverlap.AddDynamic(this, &AOPAG_RayAbility::OnOverlapEnd);
 }
@@ -84,4 +96,14 @@ void AOPAG_RayAbility::DealDamage(AActor* TargetActor)
 	{
 		Player->ReceiveDamage(AbilityDamage, this);
 	}
+}
+
+
+void AOPAG_RayAbility::EnableCollision()
+{
+	AbilityCollider->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+	SetActorScale3D(FVector(1, 1, 1));
+
+	AbilityParticleMuzzle->Activate();
+	AbilityParticleHit->Activate();
 }
