@@ -560,7 +560,10 @@ void AOPAG_ModularGun::UpdateAmmoWhenPickTheMagazine()
 
 		EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
 		EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+		return;
 	}
+	AmmoCurrent = ClipSize;
+	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
 }
 
 void AOPAG_ModularGun::IncrementAmmo()

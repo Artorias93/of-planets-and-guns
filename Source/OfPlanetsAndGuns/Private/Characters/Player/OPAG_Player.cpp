@@ -290,8 +290,9 @@ void AOPAG_Player::BindEvents()
 	EMS->Turn.AddDynamic(this, &AOPAG_Player::Turn);
 	EMS->Jumping.AddDynamic(this, &AOPAG_Player::Jumping);
 	EMS->StopJumping.AddDynamic(this, &AOPAG_Player::StopJumping);
-	EMS->Shoot.AddDynamic(this, &AOPAG_Player::Shoot);
-	EMS->StopShoot.AddDynamic(this, &AOPAG_Player::StopShoot);
+	EMS->StartShoot.AddDynamic(this, &AOPAG_Player::StartShooting);
+	EMS->KeepShoot.AddDynamic(this, &AOPAG_Player::KeepShooting);
+	EMS->StopShoot.AddDynamic(this, &AOPAG_Player::StopShooting);
 	EMS->SwapGuns.AddDynamic(this, &AOPAG_Player::SwapGuns);
 	EMS->ReloadGun.AddDynamic(this, &AOPAG_Player::ReloadGun);
 	EMS->InteractWithItem.AddDynamic(this, &AOPAG_Player::InteractWithItem);
@@ -468,6 +469,8 @@ void AOPAG_Player::AttachDefaultGuns()
 
 void AOPAG_Player::SwapGuns()
 {
+	if(bInspecting)	return;
+
 	if (PrimaryGunComponent->GetChildActor() && SecondaryGunComponent->GetChildActor())
 	{
 		SecondaryGun = Cast<AOPAG_GunBase>(SecondaryGunComponent->GetChildActor());
@@ -515,6 +518,9 @@ void AOPAG_Player::ReloadGun()
 		
 		// Update gun ui color
 		EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
+
+		// Update last fire time
+		LastFireTime = GetGameTimeSinceCreation() + ReloadTime;
 	}
 }
 
@@ -533,37 +539,63 @@ const bool AOPAG_Player::IsPrimaryGunActive() const
 
 void AOPAG_Player::InspectGun()
 {
+	//bInspecting = true;
 	Mesh1P->GetAnimInstance()->Montage_Play(InspectGunMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 }
 #pragma endregion Guns
 
 #pragma region Shooting Behavior
+void AOPAG_Player::StartShooting()
+{
+	if (CurrentGun->CanShoot() && !bInspecting)
+	{
+		const float FirePeriod = CurrentGun->CalculateFirePeriod(CurrentGun->GetStatsTotal().FireRate);
+		if (GetGameTimeSinceCreation() - LastFireTime > FirePeriod)
+		{
+			Shoot();
+		}
+	}
+}
+
+void AOPAG_Player::KeepShooting()
+{
+	if (CurrentGun->CanShoot() && !bInspecting)
+	{
+		const float FirePeriod = CurrentGun->CalculateFirePeriod(CurrentGun->GetStatsTotal().FireRate);
+		float ElapsedTime = GetGameTimeSinceCreation() - LastFireTime;
+		while (ElapsedTime > FirePeriod)
+		{
+			Shoot();
+			ElapsedTime -= FirePeriod;
+		}
+	}
+}
+
+void AOPAG_Player::StopShooting()
+{
+
+}
+
 // This method is link with input fire 
 // Calculate standard direction for shoot and invoke shoot behavior with gun and star fire's animation
 void AOPAG_Player::Shoot()
 {
-	if (CurrentGun->CanShoot())
-	{
-		FVector StartLocation;
-		FVector Direction;
-		GetShootingDirection(StartLocation, Direction);
-		CurrentGun->Shoot(StartLocation, Direction, this);
-		//TODO: Should this be on the gun?
-		//MakeNoise(1, this);
-		Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
-		RecoilTimeline->PlayFromStart();
+	// Calculate shoot direction
+	FVector StartLocation;
+	FVector Direction;
+	GetShootingDirection(StartLocation, Direction);
 
-		EMS->TotalAmmoChanged.Broadcast(CurrentGun->GetAmmoMax());
-		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
+	// Invoke shoot
+	CurrentGun->Shoot(StartLocation, Direction, this);
 
-		if (CurrentGun->GetAmmoCurrent() == 0)
-			EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
-	}
-}
+	// Active montage 
+	Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 
-void AOPAG_Player::StopShoot()
-{
-	CurrentGun->ResetReductionSpreadRadiusShooting();
+	// Active recoil
+	RecoilTimeline->PlayFromStart();
+
+	// Update last fire time
+	LastFireTime = GetGameTimeSinceCreation();
 }
 
 // Override the default method GetShootingDirection 
@@ -628,7 +660,7 @@ void AOPAG_Player::MakingAimCameraRotate()
 
 void AOPAG_Player::SwitchToADSCamera()
 {
-	if(!CurrentGun->CanAim())	return;
+	if(!CurrentGun->CanAim() || bInspecting)	return;
 
 	// Set ADS and initialize new camera view
 	AActor* NewViewTarget = nullptr;
@@ -995,7 +1027,7 @@ void AOPAG_Player::DashTimelineFinished()
 
 void AOPAG_Player::RecoilTimelineProgress(float Value)
 {
-	const float GunRecoilInSeconds = CurrentGun->CalculateRateInSeconds(CurrentGun->GetStatsTotal().RecoilRate);
+	const float GunRecoilInSeconds = CurrentGun->CalculateFirePeriod(CurrentGun->GetStatsTotal().RecoilRate);
 	const float RecoilPitch = GunRecoilInSeconds * Value;
 	AddControllerPitchInput(RecoilPitch);
 }
@@ -1154,4 +1186,9 @@ void AOPAG_Player::AttachMagazineToGunNotify()
 
 	//PrimaryGun->Magazine->GetChildActor()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	PrimaryGun->GetModuleBySocketType(EModuleTypes::Magazine)->AttachToComponent(PrimaryGun->GetReceiverMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "Magazine");
+}
+
+void AOPAG_Player::CompleteInspectNotify()
+{
+	bInspecting = false;
 }
