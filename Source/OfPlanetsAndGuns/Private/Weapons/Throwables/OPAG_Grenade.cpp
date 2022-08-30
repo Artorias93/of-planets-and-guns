@@ -48,7 +48,7 @@ void AOPAG_Grenade::DamageAllTargetsInRange()
 		}
 		for (AOPAG_Enemy* Enemy : HitEnemies)
 		{
-			Enemy->ReceiveDamage(Damage);
+			Enemy->ReceiveDamage(Damage, this);
 		}
 	}
 }
