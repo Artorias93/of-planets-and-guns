@@ -21,6 +21,7 @@ void AOPAG_ForceField::BeginPlay()
 	if (EMS != nullptr)
 	{
 		EMS->DestroyedPillar.AddDynamic(this, &AOPAG_ForceField::OnPillarDestroyed);
+		EMS->CastedEnemyWaveCleared.AddDynamic(this, &AOPAG_ForceField::DestroyAbility);
 	}
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_PillarEnemy::StaticClass(), Pillars);

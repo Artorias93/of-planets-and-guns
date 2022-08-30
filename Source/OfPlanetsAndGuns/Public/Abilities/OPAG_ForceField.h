@@ -22,10 +22,10 @@ protected:
 		class UStaticMeshComponent* AbilityMesh;
 
 	UFUNCTION()
-	void OnPillarDestroyed();
+		void OnPillarDestroyed();
 
 	UFUNCTION()
-	virtual void DestroyAbility() override;
+		virtual void DestroyAbility() override;
 
 	int AvailablePillarsAmount = 0;
 

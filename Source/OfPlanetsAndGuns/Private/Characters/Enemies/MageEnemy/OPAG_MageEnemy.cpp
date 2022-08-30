@@ -31,6 +31,9 @@ void AOPAG_MageEnemy::BeginPlay()
 		EMS->EnemyKilled.AddDynamic(this,
 			&AOPAG_MageEnemy::OnEnemyDeath);
 
+		EMS->SpawnedEnemy.AddDynamic(this,
+			&AOPAG_MageEnemy::OnSpawnedEnemy);
+
 		EMS->BrokenForceField.AddDynamic(this,
 			&AOPAG_MageEnemy::OnBrokenForceField);
 
@@ -41,6 +44,33 @@ void AOPAG_MageEnemy::BeginPlay()
 			Init();
 		}
 	}	
+}
+
+void AOPAG_MageEnemy::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, FString::SanitizeFloat((GetHealth() * 100 / GetHealthMax())));
+
+	if (!bHealth50 && (GetHealth() * 100 / GetHealthMax() <= 50.f))
+	{
+		bHealth50 = true;
+
+		if (AOPAG_AICBase* AIController = Cast<AOPAG_AICBase>(GetController()))
+		{
+			AIController->SetBlackboardEntryAsBool("bHealth50", true);
+		}
+	}
+
+	if (!bHealth25 && (GetHealth() * 100 / GetHealthMax() <= 25.f))
+	{
+		bHealth25 = true;
+
+		if (AOPAG_AICBase* AIController = Cast<AOPAG_AICBase>(GetController()))
+		{
+			AIController->SetBlackboardEntryAsBool("bHealth25", true);
+		}
+	}
 }
 
 void AOPAG_MageEnemy::CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern)
@@ -61,6 +91,31 @@ void AOPAG_MageEnemy::Death()
 void AOPAG_MageEnemy::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 {
 
+	// when an enemy is killed, check if it's one of those casted by the mage, and if yes, untrack it by removing him from th array
+	if (CastedEnemiesList.Contains(Enemy))
+	{
+		CastedEnemiesList.Remove(Enemy);
+
+		if (CastedEnemiesList.Num() == 0)
+		{
+			if (AOPAG_AICBase* AIController = Cast<AOPAG_AICBase>(GetController()))
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, TEXT("Enemy wave has been cleared"));
+
+				AIController->SetBlackboardEntryAsBool("bNewWave", true);
+				EMS->CastedEnemyWaveCleared.Broadcast();
+			}
+		}
+	}	
+}
+
+void AOPAG_MageEnemy::OnSpawnedEnemy(AOPAG_Enemy* Enemy, AActor* Caller)
+{
+	// check if the Spawned Enemy ability was invoked by himself
+	if (Caller == this)
+	{
+		CastedEnemiesList.Add(Enemy);
+	}
 }
 
 void AOPAG_MageEnemy::OnBrokenForceField()

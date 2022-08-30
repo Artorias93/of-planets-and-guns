@@ -42,6 +42,11 @@ void AOPAG_SpawnEnemy::SpawnEnemy(T EnemyClass)
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	AOPAG_Enemy* Enemy = GetWorld()->SpawnActor<AOPAG_Enemy>(EnemyClass, GetActorLocation(), GetActorLocation().ToOrientationRotator(), SpawnInfo);
+
+	if (EMS != nullptr)
+	{
+		EMS->SpawnedEnemy.Broadcast(Enemy, Caller);
+	}
 }
 
 void AOPAG_SpawnEnemy::DestroyAbility()
