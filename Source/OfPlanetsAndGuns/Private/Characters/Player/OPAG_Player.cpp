@@ -133,7 +133,7 @@ void AOPAG_Player::Tick(float DeltaTime)
 	const float FieldOfViewCurveFloat = Mesh1P->GetAnimInstance()->GetCurveValue("Field Of View");
 	Camera->SetFieldOfView(FieldOfViewCurveFloat);
 
-	const FTransform SocketTransform = Mesh1P->GetSocketTransform("SOCKET_Camera", RTS_Component);
+	const FTransform SocketTransform = Mesh1P->GetSocketTransform(SocketCameraName, RTS_Component);
 	Camera->SetRelativeRotation(FRotator(-SocketTransform.Rotator().Roll, SocketTransform.Rotator().Pitch, SocketTransform.Rotator().Yaw));
 
 	const FVector NewLocationSpring = UKismetMathLibrary::VInterpTo(SpringArm->GetRelativeLocation(), GetViewLocation(), DeltaTime, 15.f);
@@ -321,6 +321,9 @@ void AOPAG_Player::InitDefaultValues()
 	{
 		CurrentCamera = Camera;
 	}
+	HipSensitivity = DefaultHipSensitivity;
+	ADSSensitivity = DefaultADSSensitivity;
+
 	if (AttributeSetPlayer != nullptr)
 	{
 		DebugHealthMax = AttributeSetPlayer->GetMaxHealth();
@@ -473,7 +476,7 @@ void AOPAG_Player::SwapGuns()
 
 			// Post animation change
 			Mesh1P->SetAnimInstanceClass(HandgunAnimClass);
-			Mesh1P->SetRelativeLocation(MeshHandOffset);
+			//Mesh1P->SetRelativeLocation(MeshHandOffset);
 			Mesh1P->GetAnimInstance()->Montage_Play(SwapHandgunMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 		}
 		else
@@ -484,7 +487,7 @@ void AOPAG_Player::SwapGuns()
 			
 			// Post animation change
 			Mesh1P->SetAnimInstanceClass(RifleAnimClass);
-			Mesh1P->SetRelativeLocation(MeshRifleOffset);
+			//Mesh1P->SetRelativeLocation(MeshRifleOffset);
 			Mesh1P->GetAnimInstance()->Montage_Play(SwapRifleMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 		}
 
@@ -587,7 +590,7 @@ void AOPAG_Player::Lookup(const FInputActionValue& Value)
 	const float LookupScale = Value[1];
 	if (LookupScale != 0.0f)
 	{
-		AddControllerPitchInput(LookupScale);
+		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
 	}
 }
 
@@ -596,7 +599,7 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 	const float TurnScale = Value[0];
 	if (TurnScale != 0.0f)
 	{
-		AddControllerYawInput(TurnScale);
+		AddControllerYawInput(TurnScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
 	}
 }
 
@@ -612,8 +615,11 @@ void AOPAG_Player::Jumping()
 #pragma region Camera
 void AOPAG_Player::MakingAimCameraRotate()
 {
-	const FQuat ControlRotation = GetControlRotation().Quaternion();
-	Camera->SetWorldRotation(ControlRotation, false, nullptr, ETeleportType::None);
+	if (CurrentCamera != Camera)
+	{
+		const FQuat ControlRotation = Camera->GetComponentRotation().Quaternion();
+		CurrentCamera->SetWorldRotation(ControlRotation, false, nullptr, ETeleportType::None);
+	}
 }
 
 void AOPAG_Player::SwitchToADSCamera()
@@ -631,14 +637,15 @@ void AOPAG_Player::SwitchToADSCamera()
 		{
 			NewViewTarget = PrimaryGun->GetModuleBySocketType(EModuleTypes::Sight);
 			CurrentCamera = PrimaryGun->GetSightCamera();
+
+			APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+			PlayerController->SetViewTargetWithBlend(NewViewTarget, .2f, EViewTargetBlendFunction::VTBlend_Linear, 0, false);
 		}
 		else
 		{
 			NewViewTarget = PrimaryGun;
 			CurrentCamera = PrimaryGun->GetADSCamera();
 		}
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		PlayerController->SetViewTargetWithBlend(NewViewTarget, .2f, EViewTargetBlendFunction::VTBlend_Linear, 0, false);
 	}
 }
 
@@ -893,7 +900,7 @@ void AOPAG_Player::UpdateComparison() {
 				CurrentModuleStats = CurrentModule->GetStats();
 			}
 
-			EMS->LookedAtModule.Broadcast(PrimaryGun->GetStatsTotal(), CurrentModuleStats, Module->GetStats(),
+			EMS->LookedAtModule.Broadcast(CurrentModuleStats, Module->GetStats(),
 				Module->GetModuleName(), Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
 
 			PreviousLookedAtModule = InteractableObject;
