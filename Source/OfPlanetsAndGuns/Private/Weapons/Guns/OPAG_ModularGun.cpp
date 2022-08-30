@@ -96,9 +96,10 @@ void AOPAG_ModularGun::Interact_Implementation()
 bool AOPAG_ModularGun::CanInteract_Implementation()
 {
 	if (GetParentActor() == nullptr)
-	{
 		return true;
-	}
+
+	if (AOPAG_Vendor* vendor = Cast<AOPAG_Vendor>(GetParentActor()))
+		return true;
 
 	return false;
 }
