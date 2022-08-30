@@ -17,9 +17,28 @@ struct OFPLANETSANDGUNS_API FOPAG_EnemyLevel : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<AOPAG_Enemy> Enemy;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Level;
 
 };
+
+
+USTRUCT(BlueprintType)
+struct OFPLANETSANDGUNS_API FOPAG_EnemySpawnsPerLevel : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Level;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 SmallRoomSpawns;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 MediumRoomSpawns;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int32 LargeRoomSpawns;
+
+};
+
+

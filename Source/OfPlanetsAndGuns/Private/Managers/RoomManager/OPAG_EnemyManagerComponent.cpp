@@ -27,22 +27,43 @@ void UOPAG_EnemyManagerComponent::LoadEnemyLevelData()
 {
 	const FString Context;
 	if (EnemyTypes && BaseEnemyLevels.Num() == 0) EnemyTypes->GetAllRows(Context, BaseEnemyLevels);
+	if (EnemySpawnsPerLevelTable && EnemySpawnsPerLevel.Num() == 0)
+		EnemySpawnsPerLevelTable->GetAllRows(Context, EnemySpawnsPerLevel);
 
 }
 
 int32 UOPAG_EnemyManagerComponent::GetSpawnerCount() const
 {
-	int32 SpawnCount = 0;
+	int32 SpawnerCount = 0;
 	for (const TSoftObjectPtr<AOPAG_EnemySpawnPoint> Spawner : Spawners)
 	{
-		SpawnCount += Spawner->GetSpawnerCount();
+		SpawnerCount += Spawner->GetSpawnerCount();
 	}
-	return SpawnCount;
+	return SpawnerCount;
+}
+
+int32 UOPAG_EnemyManagerComponent::GetEnemyCountToSpawn(const float Difficulty, const AOPAG_RoomManager* RoomManager) const
+{
+	if (EnemySpawnsPerLevel.Num() == 0) return GetSpawnerCount()* FMath::RoundToInt(Difficulty * 2.f);
+
+	const FOPAG_EnemySpawnsPerLevel* ClosestMatch = EnemySpawnsPerLevel[0];
+	for (const FOPAG_EnemySpawnsPerLevel* SpawnsPerLevel : EnemySpawnsPerLevel)
+	{
+		if (FMath::Abs(Difficulty - SpawnsPerLevel->Level) < FMath::Abs(Difficulty - ClosestMatch->Level))
+			ClosestMatch = SpawnsPerLevel;
+	}
+
+	const int RoomSize = RoomManager->Weight;
+	switch (RoomSize)
+	{
+	case 3: return ClosestMatch->LargeRoomSpawns;
+	case 2: return ClosestMatch->MediumRoomSpawns;
+	default: return ClosestMatch->SmallRoomSpawns;
+	}
 }
 
 void UOPAG_EnemyManagerComponent::GetBaseMappedEnemies(TMap<TSubclassOf<AOPAG_Enemy>, float>& EnemyProbabilityMap)
 {
-	LoadEnemyLevelData();
 	for (const FOPAG_EnemyLevel* BaseEnemyLevel : BaseEnemyLevels)
 	{
 		EnemyProbabilityMap.Add(BaseEnemyLevel->Enemy, BaseEnemyLevel->Level);
@@ -101,6 +122,8 @@ void UOPAG_EnemyManagerComponent::TickComponent(float DeltaTime, ELevelTick Tick
 
 void UOPAG_EnemyManagerComponent::SpawnWave()
 {
+	LoadEnemyLevelData();
+
 	const AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
 	checkf(RoomManager, TEXT("Bad Room Manager Owner"));
 
@@ -108,8 +131,7 @@ void UOPAG_EnemyManagerComponent::SpawnWave()
 
 	if (TotalEnemyAmount == 0)
 	{
-		
-		TotalEnemyAmount = GetSpawnerCount() * FMath::RoundToInt(Difficulty * 2.f);
+		TotalEnemyAmount = GetEnemyCountToSpawn(Difficulty, RoomManager);
 	}
 	if (EnemiesInRoom.Num() == 0)
 	{
