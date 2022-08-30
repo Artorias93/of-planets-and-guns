@@ -185,6 +185,8 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 	{
 		AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
 
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
+		
 		//TODO: Rename BasicShot in AbilityTakeDamage
 		AbilitySystemComp->TryActivateAbilityByClass(PlayerShieldAbility);
 
