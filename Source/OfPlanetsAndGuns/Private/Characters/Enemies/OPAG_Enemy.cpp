@@ -222,6 +222,16 @@ void AOPAG_Enemy::TurnOffBoosters() const
 	}
 }
 
+AActor* AOPAG_Enemy::GetFocusedActor() const
+{
+	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	{
+		return AIController->GetFocusActor();
+	}
+	else
+		return nullptr;
+}
+
 void AOPAG_Enemy::InitSpawnFX()
 {
 	if (SpawnFXCurve)

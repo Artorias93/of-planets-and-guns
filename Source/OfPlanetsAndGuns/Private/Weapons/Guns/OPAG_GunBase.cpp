@@ -117,6 +117,11 @@ void AOPAG_GunBase::SetAmmoMax(const int Value)
 {
 	AmmoMax = Value;
 }
+
+void AOPAG_GunBase::DecrementAmmoCurrent(const int Value)
+{
+	AmmoCurrent -= Value;
+}
 #pragma endregion Set
 
 #pragma region Mathematic Utility
@@ -129,21 +134,19 @@ float AOPAG_GunBase::CalculateFirePeriod(const float FireRate)
 #pragma region Shooting Behavior
 // Main method to to call when a shooting event is triggered
 // Call line trace method and set fire rate of gun with timer manager
-void AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
+int AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
-	//bCanShoot = false;
-
 	ShootLineTrace(StartShootLocation, Direction, ShooterCharacter);
 
 	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
 
-	/*const float Seconds = CalculateRateInSeconds(GetStatsTotal().FireRate);
-	GetWorld()->GetTimerManager().SetTimer(ResetShootHandle, this, &AOPAG_GunBase::ResetShootTimer, Seconds, false);*/
 	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 	if(AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
 	{
 		MakeNoise(1.f, CharacterOwner, CharacterOwner->GetActorLocation(), 0);
 	}	
+
+	return 1;
 }
 
 void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
@@ -198,15 +201,6 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 	// Spawn emitter
 	// const FVector MuzzleLocation = GetMuzzle()->GetActorLocation();
 	UGameplayStatics::SpawnEmitterAttached(MuzzlePartile, GetMuzzle(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None, true);
-
-	// Decrement Ammo
-	AmmoCurrent--;
-
-	// Update Ammo ui
-	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
-	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
-	if (AmmoCurrent == 0)
-		EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
 }
 
 USceneComponent* AOPAG_GunBase::GetMuzzle() const

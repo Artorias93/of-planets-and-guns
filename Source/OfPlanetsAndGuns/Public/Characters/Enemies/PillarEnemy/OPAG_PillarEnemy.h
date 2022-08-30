@@ -16,8 +16,8 @@ class OFPLANETSANDGUNS_API AOPAG_PillarEnemy : public AOPAG_Enemy
 	
 public:
 	AOPAG_PillarEnemy();
-	UFUNCTION(CallInEditor, Category = "OPAG AI")
-		virtual void Death() override;
+
+	virtual void Death() override;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Mesh")

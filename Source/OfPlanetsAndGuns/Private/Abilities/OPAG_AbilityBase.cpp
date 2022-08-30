@@ -2,17 +2,31 @@
 
 
 #include "Abilities/OPAG_AbilityBase.h"
-#include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Components/SceneComponent.h"
 
 // Sets default values
 AOPAG_AbilityBase::AOPAG_AbilityBase()
 { 	
 	PrimaryActorTick.bCanEverTick = false;
+	
+	Parent = CreateDefaultSubobject<USceneComponent>("Parent");
+	Parent->SetupAttachment(RootComponent);
 
-	AbilityMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	AbilityMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	Pivot = CreateDefaultSubobject<USceneComponent>("Pivot");
+	Pivot->SetupAttachment(Parent);
 }
+
+void AOPAG_AbilityBase::SetCaller(AActor* AbilityCaller)
+{
+	this->Caller = AbilityCaller;
+}
+
+void AOPAG_AbilityBase::SetTarget(AActor* AbilityTarget)
+{
+	this->Target = AbilityTarget;
+}
+
 
 // Called when the game starts or when spawned
 void AOPAG_AbilityBase::BeginPlay()
@@ -26,4 +40,18 @@ void AOPAG_AbilityBase::BeginPlay()
 	{
 
 	}
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_AbilityBase::DestroyAbility, AbilityDuration, false);
+}
+
+void AOPAG_AbilityBase::DestroyAbility()
+{
+	Destroy();
+}
+
+void AOPAG_AbilityBase::Init(EAbilityTypes Type, float Delay)
+{
+	this->CastedAbilityType = Type;
+	this->AbilityDelay = Delay;
 }

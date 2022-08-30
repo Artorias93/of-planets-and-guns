@@ -14,10 +14,10 @@ void AOPAG_Burst3::BeginPlay()
 	BurstProjectileCountMax = BurstProjectileCount;
 }
 
-void AOPAG_Burst3::Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
+int AOPAG_Burst3::Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
 {
-
 	ShootBurst();
+	return BurstProjectileCountMax;
 }
 
 void AOPAG_Burst3::ShootBurst()

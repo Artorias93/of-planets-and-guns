@@ -226,9 +226,10 @@ void UOPAG_GameInstance::OnStageCleared(const EStageType NextStageType)
 
 void UOPAG_GameInstance::OnRoomEntered()
 {
-	CurrentDifficulty += (CurrentPlanet->PlanetDLTarget - StageDLStart) / CurrentStageRoomCount;
-	if (CurrentDifficulty > CurrentPlanet->PlanetDLTarget)
-		CurrentDifficulty = CurrentPlanet->PlanetDLTarget;
+	const float CurrentTargetDifficulty = CurrentPlanet->PlanetDLTarget + CurrentPlanet->STIncrement * CurrentStage;
+	CurrentDifficulty += (CurrentTargetDifficulty - StageDLStart) / CurrentStageRoomCount;
+	if (CurrentDifficulty > CurrentTargetDifficulty)
+		CurrentDifficulty = CurrentTargetDifficulty;
 	UE_LOG(LogTemp, Warning, TEXT("New Difficulty: %f"), CurrentDifficulty);
 	GetEventManager()->StageDifficultyUpdated.Broadcast();
 }

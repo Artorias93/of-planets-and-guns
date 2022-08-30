@@ -27,7 +27,7 @@ private:
 
 public:
 	// Main system for shooting
-	virtual void Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter) override;
+	virtual int Shoot(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter) override;
 
 protected:
 	virtual void BeginPlay() override;

@@ -131,7 +131,7 @@ public:
 	static float CalculateFirePeriod(const float FireRate);
 
 	// Main system for shooting
-	virtual void Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
+	virtual int Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
 
 	// Reload system
 	virtual void Reload();
@@ -178,6 +178,7 @@ public:
 	virtual void SetStatsTotal(const FOPAG_GunStats GunStats);
 	void SetAmmoCurrent(const int Value);
 	void SetAmmoMax(const int Value);
+	void DecrementAmmoCurrent(const int Value);
 
 public:
 	FORCEINLINE USkeletalMeshComponent* GetReceiverMesh() { return Receiver; }

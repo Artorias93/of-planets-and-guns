@@ -63,6 +63,9 @@ struct FOPAG_PlanetData : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Difficulty)
 		float SSIncrement;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Difficulty)
+		float STIncrement;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Planet)
 		TSoftObjectPtr<UWorld> PlanetPersistentLevel;
 

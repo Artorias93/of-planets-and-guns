@@ -14,6 +14,8 @@ class OFPLANETSANDGUNS_API AOPAG_CharacterBase : public ACharacter, public IAbil
 {
 	GENERATED_BODY()
 
+		bool bDead = false;
+
 public:
 
 	AOPAG_CharacterBase();

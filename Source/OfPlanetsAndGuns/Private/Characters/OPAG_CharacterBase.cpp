@@ -107,8 +107,9 @@ void AOPAG_CharacterBase::ReceiveDamage(const float Damage, AActor* const Causer
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
 
-		if(GetHealth()<=0)
+		if(!bDead && GetHealth() <= 0)
 		{
+			bDead = true;
 			Death();
 		}	
 	}

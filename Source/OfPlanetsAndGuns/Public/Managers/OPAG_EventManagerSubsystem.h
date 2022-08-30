@@ -7,6 +7,8 @@
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "Characters/Player/OPAG_PlayerState.h"
+#include "Characters/Player/OPAG_PlayerState.h"
+#include "Abilities/OPAG_AbilityTypes.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
 class AOPAG_RoomStreamingVolume;
@@ -96,7 +98,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInspectGun);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, TSubclassOf<AOPAG_AbilityBase>, AbilityClass, const AActor*, Caller, FVector, Position, AOPAG_AbilityBase*, CastedAbility);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, EAbilityTypes, AbilityType, AActor*, Caller, AActor*, Target, EAbilitySpawnPattern, AbilitySpawnPattern);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBrokenForceField);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyedPillar);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableGunTextInVendor, AOPAG_ModularGun*, Gun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableModuleTextInVendor, AOPAG_ModuleBase*, Module);
@@ -105,6 +109,7 @@ UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
+
 public:
 
 	FVector C;
@@ -264,6 +269,12 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FActiveGunAbility ActiveGunAbility;
 
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Force Field Ability")
+		FDestroyedPillar DestroyedPillar;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Force Field Ability")
+		FBrokenForceField BrokenForceField;
+	
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
 		FCastAbility CastAbility;
 

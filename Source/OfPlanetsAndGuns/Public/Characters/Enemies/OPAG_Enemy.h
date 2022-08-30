@@ -52,6 +52,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TurnOffBoosters() const;
 
+	UFUNCTION(BlueprintCallable)
+	AActor* GetFocusedActor() const;
+
 protected:
 
 	virtual void BeginPlay() override;
