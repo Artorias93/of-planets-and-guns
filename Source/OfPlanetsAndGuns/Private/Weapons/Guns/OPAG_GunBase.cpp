@@ -134,7 +134,7 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 				//If the hit component is the shield, damage is not applied
 				if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
 				{
-					Character->ReceiveDamage(Stats.Damage);
+					Character->ReceiveDamage(Stats.Damage, GetParentActor());
 				}
 			}
 		}

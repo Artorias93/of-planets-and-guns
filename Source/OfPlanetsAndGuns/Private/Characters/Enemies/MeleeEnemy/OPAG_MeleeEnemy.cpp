@@ -69,7 +69,7 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 			
 			if(AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
-				Player->ReceiveDamage(MeleeWeaponDamage);
+				Player->ReceiveDamage(MeleeWeaponDamage, this);
 			}
 		}
 		else

@@ -72,6 +72,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtGun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDamagedBy, AActor* const, Causer);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveForward, const FInputActionValue&, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveRight, const FInputActionValue&, Value);
@@ -187,6 +188,8 @@ public:
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
 		FEnemyKilled EnemyKilled;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Enemy)
+		FDamagedBy DamagedBy;
 
 	//Game stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)

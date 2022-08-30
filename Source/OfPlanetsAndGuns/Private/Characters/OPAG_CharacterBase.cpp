@@ -86,7 +86,7 @@ void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> Abilit
 	}
 }
 
-void AOPAG_CharacterBase::ReceiveDamage(const float Damage)
+void AOPAG_CharacterBase::ReceiveDamage(const float Damage, AActor* const Causer)
 {
 	if(AbilitySystemComp && BaseAttributeSet)
 	{

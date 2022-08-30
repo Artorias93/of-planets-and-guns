@@ -100,6 +100,13 @@ void AOPAG_Player::BeginPlay()
 
 }
 
+void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
+{
+	EMS->DamagedBy.Broadcast(Causer);
+	
+	Super::ReceiveDamage(Damage, Causer);
+}
+
 void AOPAG_Player::Death()
 {
 	Super::Death();
@@ -110,7 +117,7 @@ void AOPAG_Player::Death()
 void AOPAG_Player::FellOutOfWorld(const UDamageType& dmgType)
 {
 	if (GetHealth() > 0.f)
-		ReceiveDamage(GetHealth() + 1.f); //+1 just to make sure it overkills
+		ReceiveDamage(GetHealth() + 1.f, this); //+1 just to make sure it overkills
 }
 
 void AOPAG_Player::Tick(float DeltaTime)

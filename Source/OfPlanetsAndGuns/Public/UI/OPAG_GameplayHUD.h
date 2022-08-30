@@ -1,14 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_GameplayHUD.generated.h"
-
-/**
- * 
- */
 
 enum class EModuleRarity : uint8;
 struct FOPAG_GunStats;
@@ -59,6 +54,10 @@ private:
 		class UOPAG_UWInteractView* InteractViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWInteractView> InteractViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWDamageIndicatorView* DamageIndicatorViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWDamageIndicatorView> DamageIndicatorViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
@@ -95,4 +94,9 @@ public:
 	void ShowInteractView(bool bCanInteract, const FString InteractText);
 	UFUNCTION()
 	void HideInteractView();
+
+	UFUNCTION()
+	void ShowDamageIndicatorView(AActor* const CurrentThreatActor);
+	UFUNCTION()
+	void HideDamageIndicatorView();
 };

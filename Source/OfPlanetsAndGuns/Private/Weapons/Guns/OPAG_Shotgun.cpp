@@ -41,7 +41,7 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 					if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
 					{
 						const float Damage = Stats.Damage / ConsecutiveProjectile;
-						Character->ReceiveDamage(Damage);
+						Character->ReceiveDamage(Damage, GetParentActor());
 					}
 				}
 			}

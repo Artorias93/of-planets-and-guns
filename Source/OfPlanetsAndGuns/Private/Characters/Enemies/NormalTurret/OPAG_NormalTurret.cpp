@@ -132,7 +132,7 @@ void AOPAG_NormalTurret::ShootLineTrace(FVector StartShootLocation, FVector Dire
 		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 		if (Character)
 		{
-			Character->ReceiveDamage(Damage);
+			Character->ReceiveDamage(Damage, this);
 		}
 	}
 }

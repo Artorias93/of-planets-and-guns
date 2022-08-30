@@ -25,7 +25,7 @@ public:
 
 	void UpdateAcceleration(float const NewAcceleration) const;
 	
-	virtual void ReceiveDamage(float DamageAmount) override;
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
 
 	virtual void Attack();
 
