@@ -145,8 +145,11 @@ void AOPAG_Enemy::ReceiveDamage(const float Damage, AActor* const Causer)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
 
 	// Update health bar
-	const float HealthPercent = BaseAttributeSet->GetHealth() / BaseAttributeSet->GetMaxHealth();
-	EnemyHealthBar->GetProgressBar()->SetPercent(HealthPercent);
+	if (BaseAttributeSet)
+	{
+		const float HealthPercent = BaseAttributeSet->GetHealth() / BaseAttributeSet->GetMaxHealth();
+		EnemyHealthBar->GetProgressBar()->SetPercent(HealthPercent);
+	}
 }
 
 void AOPAG_Enemy::Attack()

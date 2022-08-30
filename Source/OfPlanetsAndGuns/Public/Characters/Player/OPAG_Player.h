@@ -161,6 +161,11 @@ private:
 	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float LookUpDistanceToPlayer = 150.f;
 
+	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float DefaultHipSensitivity = 1.f;
+	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float DefaultADSSensitivity = 0.5f;
+
 private:
 	UPROPERTY(Category = "OPAG | Character | Timeline", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UTimelineComponent* DashTimeline;
@@ -190,6 +195,7 @@ private:
 
 private:
 	// All socket names
+	const FName SocketCameraName = "SOCKET_Camera";
 	const FName SocketRifleName = "SOCKET_Rifle";
 	const FName SocketHandgunName = "SOCKET_Handgun";
 	const FName SocketHandLeft = "SOCKET_Hand_L";
@@ -202,6 +208,9 @@ private:
 	bool bIsPreADS = false;
 	bool bHasAlreadyLooked = false;
 	bool bIsShieldBroken = false;
+
+	float HipSensitivity;
+	float ADSSensitivity;
 
 	// Other objects
 	AActor* InteractableObject = nullptr;

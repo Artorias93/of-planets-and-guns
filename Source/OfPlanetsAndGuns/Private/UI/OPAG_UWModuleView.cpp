@@ -13,7 +13,7 @@ void UOPAG_UWModuleView::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& GunStats, const FOPAG_GunStats& CurrentModuleStats,
+void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& CurrentModuleStats,
 	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType, 
 	const int EquippableTypes, const bool CanBeEquipped)
 {
@@ -46,18 +46,16 @@ void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& GunStats, cons
 	if (Shg)
 		ShotgunIcon->SetBrushTintColor(FLinearColor::Blue);
 
-	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, CurrentModuleStats.Damage, OtherModuleStats.Damage);
-	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);
-	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, GunStats.Accuracy, CurrentModuleStats.Accuracy, OtherModuleStats.Accuracy, true);
-	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, GunStats.RecoilRate, CurrentModuleStats.RecoilRate, OtherModuleStats.RecoilRate);
-	UpdateSingleStat(ReloadingText, ReloadingAmount, ReloadingDelta, GunStats.ReloadingTime, CurrentModuleStats.ReloadingTime, OtherModuleStats.ReloadingTime, true);
-	UpdateSingleStat(ClipSizeText, ClipSizeAmount, ClipSizeDelta, GunStats.ClipSize, CurrentModuleStats.ClipSize, OtherModuleStats.ClipSize);
+	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, CurrentModuleStats.Damage, OtherModuleStats.Damage);
+	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);
+	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, CurrentModuleStats.Accuracy, OtherModuleStats.Accuracy, true);
+	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, CurrentModuleStats.RecoilRate, OtherModuleStats.RecoilRate);
+	UpdateSingleStat(ReloadingText, ReloadingAmount, ReloadingDelta, CurrentModuleStats.ReloadingTime, OtherModuleStats.ReloadingTime, true);
+	UpdateSingleStat(ClipSizeText, ClipSizeAmount, ClipSizeDelta, CurrentModuleStats.ClipSize, OtherModuleStats.ClipSize);
 }
 
-void UOPAG_UWModuleView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float BaseAmount, float OldValue, 
-	float NewValue, bool bIsInverted) {
-	float NewStat = BaseAmount + NewValue;
-	float OldStat = BaseAmount + OldValue;
+void UOPAG_UWModuleView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float OldStat, 
+	float NewStat, bool bIsInverted) {
 	float Delta = NewStat - OldStat;
 
 	FString DeltaString;
