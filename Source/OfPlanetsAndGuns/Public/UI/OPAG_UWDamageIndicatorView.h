@@ -22,7 +22,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 	UImage* DamageIndicatorImage;
 
-	void NativeConstruct();
+	virtual void NativeConstruct() override;
 
 	UFUNCTION(BlueprintCallable)
 	AActor* GetCurrentThreatActor() const;

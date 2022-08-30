@@ -102,11 +102,6 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		InteractViewWidget = CreateWidget<UOPAG_UWInteractView>(GetWorld(), InteractViewWidgetClass);
 	}
-
-	if (DamageIndicatorViewWidgetClass)
-	{
-		DamageIndicatorViewWidget = CreateWidget<UOPAG_UWDamageIndicatorView>(GetWorld(), DamageIndicatorViewWidgetClass);
-	}
 }
 
 void AOPAG_GameplayHUD::ShowPauseView() {
@@ -224,6 +219,11 @@ void AOPAG_GameplayHUD::HideInteractView()
 
 void AOPAG_GameplayHUD::ShowDamageIndicatorView(AActor* const CurrentThreatActor)
 {
+	if (DamageIndicatorViewWidgetClass)
+	{
+		DamageIndicatorViewWidget = CreateWidget<UOPAG_UWDamageIndicatorView>(GetWorld(), DamageIndicatorViewWidgetClass);
+	}
+	
 	if(DamageIndicatorViewWidget)
 	{
 		if(!DamageIndicatorViewWidget->IsVisible())
