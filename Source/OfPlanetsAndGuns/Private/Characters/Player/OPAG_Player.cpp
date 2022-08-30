@@ -14,6 +14,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Characters/OPAG_AttributeSetBase.h"
 #include "Interactables/OPAG_InteractableInterface.h"
+#include "Environment/OPAG_Zipline.h"
 #include "Weapons/Modules/OPAG_AccessoryBase.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
@@ -897,16 +898,27 @@ void AOPAG_Player::UpdateInteractableMessage() {
 
 		AOPAG_ModularGun* const Gun = Cast<AOPAG_ModularGun>(InteractableObject);
 
-
-		//if (Int) {
-			if (Gun && !(IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject)))
+		if (Gun && !(IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject)))
 				return;
 
-			bool bCanInteract = IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject);
-			FString str = IOPAG_InteractableInterface::Execute_InteractString(InteractableObject);
-			EMS->LookedAtInteractable.Broadcast(bCanInteract, str);
-			bHasAlreadyLooked = true;
-		//}
+		bool bCanInteract = IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject);
+		FString str = IOPAG_InteractableInterface::Execute_InteractString(InteractableObject);
+
+		AOPAG_ModuleBase* const Module = Cast<AOPAG_ModuleBase>(InteractableObject);
+		if (Module) {
+			int otherModule = Module->GetEquippableFireTypes();
+			int myModule = 1 << (int)PrimaryGun->GetFireType();
+			bool canEquip = otherModule & myModule;
+			bCanInteract = canEquip;
+		}
+
+		AOPAG_Zipline* const Zipline = Cast<AOPAG_Zipline>(InteractableObject);
+		if (Zipline) {
+			bCanInteract = true;
+		}
+
+		EMS->LookedAtInteractable.Broadcast(bCanInteract, str);
+		bHasAlreadyLooked = true;
 	}
 }
 
