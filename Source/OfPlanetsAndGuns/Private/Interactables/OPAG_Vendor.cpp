@@ -78,6 +78,7 @@ AOPAG_Vendor::AOPAG_Vendor()
 		ChildActor_Module2->SetupAttachment(RootComponent);
 }
 
+
 void AOPAG_Vendor::PopulateGunAndModuleArray()
 {
 	const FString Context;
@@ -101,6 +102,12 @@ void AOPAG_Vendor::BeginPlay()
 	
 	EMS->DisableGunTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableGunTextInVendor);
 	EMS->DisableModuleTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableModuleTextInVendor);
+
+}
+
+void AOPAG_Vendor::Unlock() {
+	PopulateGunAndModuleArray();
+	SpawnItem(666);
 }
 
 // Called every frame
@@ -108,27 +115,6 @@ void AOPAG_Vendor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void AOPAG_Vendor::Unlock()
-{
-	bIsInteractable = true;
-}
-
-void AOPAG_Vendor::Interact_Implementation()
-{
-	// Interacting with Vendor spawns merch. Set to false to avoid respawn.
-	bIsInteractable = bIsInfinitelyInteractable;
-
-	PopulateGunAndModuleArray();
-
-	// Active Timer for spawn items
-	SpawnItem(666);
-}
-
-bool AOPAG_Vendor::CanInteract_Implementation()
-{
-	return bIsInteractable;
 }
 
 // Call method for spawning all guns

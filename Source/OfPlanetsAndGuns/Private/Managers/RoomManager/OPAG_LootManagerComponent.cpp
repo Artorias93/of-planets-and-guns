@@ -48,6 +48,7 @@ void UOPAG_LootManagerComponent::Unlock() const
 {
 	if (LootBoxA.Key) LootBoxA.Key->Unlock();
 	if (LootBoxB.Key) LootBoxB.Key->Unlock();
+	if (Vendor) Vendor->Unlock();
 }
 
 void UOPAG_LootManagerComponent::SpawnLootContainers()

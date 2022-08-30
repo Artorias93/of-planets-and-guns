@@ -159,6 +159,9 @@ void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule
 	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
 	const int EquippableTypes, const bool CanBeEquipped)
 {
+	if (GunCompareViewWidget->IsInViewport())
+		HideGunCompareView();
+
 	if (ModuleViewWidget) {
 		if (ModuleViewWidget->IsInViewport()) {
 			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity,
@@ -182,6 +185,9 @@ void AOPAG_GameplayHUD::HideModuleCompareView()
 void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName, 
 	const FString OtherGunType)
 {
+	if (ModuleViewWidget->IsInViewport())
+		HideModuleCompareView();
+
 	if (GunCompareViewWidget) {
 		if (GunCompareViewWidget->IsInViewport()) 
 		{
