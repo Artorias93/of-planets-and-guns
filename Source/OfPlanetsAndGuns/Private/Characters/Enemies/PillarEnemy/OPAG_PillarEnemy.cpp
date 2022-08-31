@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 AOPAG_PillarEnemy::AOPAG_PillarEnemy()
 {
@@ -14,12 +15,22 @@ AOPAG_PillarEnemy::AOPAG_PillarEnemy()
 
 void AOPAG_PillarEnemy::Death()
 {
-
 	if (EMS != nullptr)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Destroyed Pillar"));
 		EMS->DestroyedPillar.Broadcast();
 	}
+
+	UGameplayStatics::SpawnEmitterAttached(
+		DeathParticle,
+		this->GetDefaultAttachComponent(),
+		NAME_None,
+		FVector::ZeroVector,
+		FRotator::ZeroRotator,
+		EAttachLocation::KeepRelativeOffset,
+		true,
+		EPSCPoolMethod::None,
+		true
+	);
 
 	Super::Death();
 }

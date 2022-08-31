@@ -22,4 +22,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Mesh")
 		class UStaticMeshComponent* PillarMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
+		class UParticleSystem* DeathParticle;
 };

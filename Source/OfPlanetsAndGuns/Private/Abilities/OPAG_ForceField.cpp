@@ -78,3 +78,11 @@ void AOPAG_ForceField::ResetMaterial()
 {
 	AbilityMesh->SetMaterial(0, ForceFieldMaterial);
 }
+
+void AOPAG_ForceField::GetHit()
+{
+	AbilityMesh->SetMaterial(0, ForceFieldHitMaterial);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_ForceField::ResetMaterial, 0.25f, false); 
+}
