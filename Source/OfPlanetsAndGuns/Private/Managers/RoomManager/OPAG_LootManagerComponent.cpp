@@ -171,7 +171,7 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 				while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 				{
 					const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
-					TSubclassOf<AActor> Module = SelectRandomModules(Modules, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+					TSubclassOf<AActor> Module = SelectRandomModule(Modules, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
 					if (Module != nullptr)
 					{
 						switch (ModuleTypes[RandomModuleIndex])
@@ -227,7 +227,7 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 				while (Count < LootBox->NumberOfModulesToSpawn && Count < Modules.Num())
 				{
 					const int FireMask = 1 << static_cast<int>(PrimaryGun->GetFireType());
-					Item = SelectRandomModules(Modules, DifficultyValue, FireMask);
+					Item = SelectRandomModule(Modules, DifficultyValue, FireMask);
 					if (!Items.Contains(Item))
 					{
 						Items.Add(Item);
@@ -267,7 +267,7 @@ void UOPAG_LootManagerComponent::PopulateLootLists()
 	}
 }
 
-TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask)
+TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModule(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask)
 {
 	TMap<TSubclassOf<AOPAG_ModuleBase>, float> ModuleMap;
 	UOPAG_UtilityFunctionLibrary::ShuffleArray(ModulesList);
@@ -292,7 +292,7 @@ TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG
 	return nullptr;
 }
 
-TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes)
+TSubclassOf<AActor> UOPAG_LootManagerComponent::SelectRandomModule(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes)
 {
 	TMap<TSubclassOf<AOPAG_ModuleBase>, float> ModuleMap;
 	UOPAG_UtilityFunctionLibrary::ShuffleArray(ModulesList);
