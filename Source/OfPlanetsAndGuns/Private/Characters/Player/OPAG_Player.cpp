@@ -892,6 +892,14 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 		CameraDirection, LookUpCapsuleRadius, 0, InteractableTypesQuery,
 		false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true, 
 		FLinearColor::Red, FLinearColor::Green, 5.f);
+	OutHits.Sort([](FHitResult Lhs, FHitResult Rhs)
+	{
+		auto LeftModule = Cast<AOPAG_ModuleBase>(Lhs.Actor);
+		if (LeftModule) return true;
+		auto LeftWeapon = Cast<AOPAG_ModularGun>(Lhs.Actor);
+		if (LeftModule) return true;
+		return false;
+	});
 	if (bHasHit && OutHits.Num() > 0)
 	{
 		for (int i = 0; i < OutHits.Num(); ++i) {

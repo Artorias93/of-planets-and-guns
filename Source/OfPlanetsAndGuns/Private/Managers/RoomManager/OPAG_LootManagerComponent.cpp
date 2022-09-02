@@ -55,10 +55,6 @@ void UOPAG_LootManagerComponent::SpawnLootContainers()
 {
 	if (Spawners.Num() == 0)
 	{
-		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(
-			this,
-			"No loot spawners found for " + GetOwner<AOPAG_RoomManager>()->Level.GetAssetName(), 
-			EMessageSeverity::Warning);
 		return;
 	}
 
