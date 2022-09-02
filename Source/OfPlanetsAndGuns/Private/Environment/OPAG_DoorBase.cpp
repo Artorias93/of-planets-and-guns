@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
+#include "Environment/OPAG_DoorBase.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_SoundManagerSubsystem.h"
-#include "Environment/OPAG_DoorBase.h"
+
 
 // Sets default values
 AOPAG_DoorBase::AOPAG_DoorBase()

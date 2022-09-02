@@ -56,6 +56,22 @@ enum class EEnviromentSoundAction : uint8
 };
 ENUM_CLASS_FLAGS(EEnviromentSoundAction);
 
+UENUM(BlueprintType, meta = (Bitflags))
+enum class ECharacterSoundAction : uint8
+{
+	Player_Damage = 0x00,
+	Player_Death = 0x01,
+	Player_Health_Gain = 0x02,
+	Player_Health_Low = 0x03,
+	Movement_Dash = 0x04,
+	Movement_Jump = 0x05,
+	Movement_Step = 0x06,
+	Player_Shield_Broken = 0x07,
+	Player_Shield_Charged = 0x08,
+	Player_Shield_Hit = 0x09,
+};
+ENUM_CLASS_FLAGS(ECharacterSoundAction);
+
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_SoundManagerSubsystem : public UGameInstanceSubsystem
@@ -83,9 +99,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponSounds(AOPAG_GunBase* weapon, EWeaponSoundAction action);
 	UFUNCTION(BlueprintCallable)
-		void PlayAbiltySounds(AActor* actor , EAbilitySoundAction ability);
+		void PlayAbiltySounds(const AActor* actor , EAbilitySoundAction ability);
 	UFUNCTION(BlueprintCallable)
 		void PlayEnviromentSounds(AActor* actor, EEnviromentSoundAction event);
+	UFUNCTION(BlueprintCallable)
+		void PlayCharacterSounds(AActor* actor, ECharacterSoundAction event);
 	UFUNCTION(BlueprintCallable)
 		void StopSound();
 private:

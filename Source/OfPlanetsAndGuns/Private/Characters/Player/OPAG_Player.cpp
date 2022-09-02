@@ -121,7 +121,7 @@ void AOPAG_Player::BeginPlay()
 void AOPAG_Player::Death()
 {
 	Super::Death();
-
+	SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Death);
 	SavePlayerState();
 	EMS->PlayerDied.Broadcast();
 }
@@ -187,8 +187,11 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		Super::ReceiveDamage(Damage, Causer);
 
 		EMS->DamagedBy.Broadcast(Causer);
-		bIsShieldBroken = true;
-
+		if (!bIsShieldBroken) {
+			bIsShieldBroken = true;
+			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
+		}
+		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Damage);
 		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 		return;
 	}
@@ -205,7 +208,7 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
 		//UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
-
+		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Hit);
 		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
 	}
 }
@@ -428,7 +431,7 @@ void AOPAG_Player::ActiveDash()
 		const bool bSuccess = AbilitySystemComp->TryActivateAbilityByClass(Dash, true);
 		if (bSuccess)
 		{
-
+			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Movement_Dash);
 			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), AttributeSetPlayer->GetDashCount() - 1);
 
 			EMS->DashAmountDecrement.Broadcast();
@@ -675,6 +678,7 @@ void AOPAG_Player::Jumping()
 {
 	if (JumpCurrentCount < JumpMaxCount)
 	{
+		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Movement_Jump);
 		ACharacter::Jump();
 	}
 }
