@@ -221,7 +221,7 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 		UOPAG_UtilityFunctionLibrary::ShuffleArray(ModulesList);
 
 		// Select random module
-		TSubclassOf<AActor> NewModuleClass = UOPAG_LootManagerComponent::SelectRandomModules(ModulesList, RoomDifficulty, FireMask);
+		TSubclassOf<AActor> NewModuleClass = UOPAG_LootManagerComponent::SelectRandomModule(ModulesList, RoomDifficulty, FireMask);
 		ChildActorModules[i]->SetChildActorClass(NewModuleClass);
 
 		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(ChildActorModules[i]->GetChildActor());
@@ -255,7 +255,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 	while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 	{
 		const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
-		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModules(ModulesList, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModule(ModulesList, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
 		if (Module != nullptr)
 		{
 			switch (ModuleTypes[RandomModuleIndex])

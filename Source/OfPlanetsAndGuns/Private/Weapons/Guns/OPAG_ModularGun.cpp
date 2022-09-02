@@ -383,6 +383,7 @@ void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState) const
 	GunState.AttachedModules.Barrel = Barrel->GetChildActorClass();
 	GunState.AttachedModules.Stock = Stock->GetChildActorClass();
 	GunState.AttachedModules.Grip = Grip->GetChildActorClass();
+	GunState.AttachedModules.Magazine = Magazine->GetChildActorClass();
 	GunState.AttachedModules.Sight = Sight->GetChildActorClass();
 	GunState.AttachedModules.Accessory = Accessory->GetChildActorClass();
 

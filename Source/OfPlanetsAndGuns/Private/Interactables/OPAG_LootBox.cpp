@@ -109,7 +109,6 @@ void AOPAG_LootBox::SpawnItem()
 	}
 
 	// Apply force for any items
-	IOPAG_InteractableInterface* TheInterface = Cast<IOPAG_InteractableInterface>(Item);
 	if (Item->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
 	{
 		const FVector Force = Item->GetActorUpVector() * ThrowItems + Item->GetActorForwardVector() * ThrowItems;

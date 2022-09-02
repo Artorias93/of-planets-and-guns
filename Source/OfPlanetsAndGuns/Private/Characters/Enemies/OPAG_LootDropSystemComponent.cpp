@@ -5,9 +5,13 @@
 #include "Items/OPAG_Drop.h"
 #include "Math/UnrealMathUtility.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
+#include "Characters/Player/OPAG_Player.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Managers/RoomManager/OPAG_LootManagerComponent.h"
 #include "Util/OPAG_UtilityFunctionLibrary.h"
+#include "Weapons/Guns/OPAG_ModularGun.h"
 #include "Weapons/Modules/OPAG_ModuleBase.h"
 
 UOPAG_LootDropSystemComponent::UOPAG_LootDropSystemComponent()
@@ -38,7 +42,7 @@ void UOPAG_LootDropSystemComponent::PopulateLootChanceArray()
 		LootModuleTable->GetAllRows(Context, ModuleList);
 }
 
-void UOPAG_LootDropSystemComponent::DropLoot() const
+void UOPAG_LootDropSystemComponent::DropLoot()
 {
 	float Chance = FMath::RandRange(0.f, 100.f);
 
@@ -69,30 +73,28 @@ void UOPAG_LootDropSystemComponent::DropLoot() const
 
 			if (Item->LootType == ELootType::Module)
 			{
-				TMap<TSubclassOf<AOPAG_ModuleBase>, float> ModuleMap;
-				for (FOPAG_ModuleList* Module : ModuleList)
+				const AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+				if (Player != nullptr)
 				{
-					ModuleMap.Add(Module->ModuleClass, Module->ModuleClass.GetDefaultObject()->GetLevel());
-				}
-				if (ModuleMap.Num() > 0)
-				{
-					UOPAG_GameInstance* GI = GetWorld()->GetGameInstance<UOPAG_GameInstance>();
-					checkf(GI, TEXT("Couldn't find GameInstance"));
 
-					UOPAG_UtilityFunctionLibrary::MapBaseItemsWithDifficulty(ModuleMap,
-						GI->GetStageDifficulty());
-
-					TSubclassOf<AOPAG_ModuleBase> ModuleType =
-						UOPAG_UtilityFunctionLibrary::GetRandomItem(ModuleMap);
-
-					if (ModuleType)
+					const AOPAG_ModularGun* PrimaryGun = Player->GetPrimaryGun();
+					if (PrimaryGun != nullptr)
 					{
-						AOPAG_ModuleBase* ModuleObj = GetWorld()->SpawnActor<AOPAG_ModuleBase>(ModuleType,
-							SpawnLocation, FRotator::ZeroRotator);
+						const int FireMask = 1 << static_cast<int>(PrimaryGun->GetFireType());
+						UOPAG_GameInstance* GI = GetWorld()->GetGameInstance<UOPAG_GameInstance>();
+						checkf(GI, TEXT("Couldn't find GameInstance"));
+						TSubclassOf<AOPAG_ModuleBase> ModuleType {UOPAG_LootManagerComponent::SelectRandomModule(
+							ModuleList, GI->GetStageDifficulty(), FireMask)};
 
-						if (ModuleObj)
+						if (ModuleType)
 						{
-							ModuleObj->GetModuleSphereComponent()->SetSimulatePhysics(true);
+							AOPAG_ModuleBase* ModuleObj = GetWorld()->SpawnActor<AOPAG_ModuleBase>(ModuleType,
+								SpawnLocation, FRotator::ZeroRotator);
+
+							if (ModuleObj)
+							{
+								ModuleObj->GetModuleSphereComponent()->SetSimulatePhysics(true);
+							}
 						}
 					}
 				}
