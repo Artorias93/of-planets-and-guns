@@ -30,7 +30,7 @@ class OFPLANETSANDGUNS_API UOPAG_LootDropSystemComponent : public UActorComponen
 public:	
 	UOPAG_LootDropSystemComponent();
 
-	void DropLoot() const;
+	void DropLoot();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UDataTable* LootChanceTable;	
