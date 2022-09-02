@@ -928,11 +928,6 @@ void AOPAG_Player::UpdateInteractableMessage() {
 			bCanInteract = canEquip;
 		}
 
-		AOPAG_Zipline* const Zipline = Cast<AOPAG_Zipline>(InteractableObject);
-		if (Zipline) {
-			bCanInteract = true;
-		}
-
 		EMS->LookedAtInteractable.Broadcast(bCanInteract, str);
 		bHasAlreadyLooked = true;
 	}
