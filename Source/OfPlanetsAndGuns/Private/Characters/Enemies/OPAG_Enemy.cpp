@@ -298,7 +298,9 @@ void AOPAG_Enemy::SetHealthBarVisible()
 
 void AOPAG_Enemy::ResetHealthBarHidden()
 {
-	EnemyHealthBarComponent->SetHiddenInGame(true);
+	if (EnemyHealthBarComponent != nullptr) {
+		EnemyHealthBarComponent->SetHiddenInGame(true);
+	}
 }
 
 
