@@ -28,6 +28,7 @@ void AOPAG_ForceField::BeginPlay()
 	{
 		EMS->DestroyedPillar.AddDynamic(this, &AOPAG_ForceField::OnPillarDestroyed);
 		EMS->CastedEnemyWaveCleared.AddDynamic(this, &AOPAG_ForceField::DestroyAbility);
+		EMS->ForceFieldHit.AddDynamic(this, &AOPAG_ForceField::GetHit);
 	}
 
 	AbilityCollider->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_ForceField::OnOverlapBegin);
@@ -79,10 +80,13 @@ void AOPAG_ForceField::ResetMaterial()
 	AbilityMesh->SetMaterial(0, ForceFieldMaterial);
 }
 
-void AOPAG_ForceField::GetHit()
+void AOPAG_ForceField::GetHit(AActor* OwnerInstance)
 {
-	AbilityMesh->SetMaterial(0, ForceFieldHitMaterial);
+	if (OwnerInstance == this)
+	{
+		AbilityMesh->SetMaterial(0, ForceFieldHitMaterial);
 
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_ForceField::ResetMaterial, 0.25f, false); 
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_ForceField::ResetMaterial, 0.25f, false);
+	}
 }
