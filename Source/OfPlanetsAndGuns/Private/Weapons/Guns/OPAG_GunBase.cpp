@@ -170,9 +170,11 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 		// Spawn trace in the space
 	    GetWorld()->SpawnActor(TracerClass, TracerTransform);*/
 
+
+		// It should be implemented by a "Hittable interface, were the gun just check if the hitted actor has this interface, if yes, send the an hit event with the hitted actor as param"
 		if (AOPAG_ForceField* ForceField = Cast<AOPAG_ForceField>(OutHit.GetActor()))
 		{
-			ForceField->GetHit();
+			EMS->ForceFieldHit.Broadcast(ForceField);
 		}
 
 

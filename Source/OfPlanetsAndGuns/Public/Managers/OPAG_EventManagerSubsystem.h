@@ -101,6 +101,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInspectGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, EAbilityTypes, AbilityType, AActor*, Caller, AActor*, Target, EAbilitySpawnPattern, AbilitySpawnPattern);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBrokenForceField);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FForceFieldHit, AActor*, OwnerInstance);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCastedEnemyWaveCleared);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyedPillar);
 
@@ -290,6 +291,9 @@ public:
 	FCastedEnemyWaveCleared CastedEnemyWaveCleared;
 	
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+		FForceFieldHit ForceFieldHit;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
 	FActivePassiveAbilityEffect ActivePassiveAbilityEffect;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
@@ -302,5 +306,5 @@ public:
 	FDisableGunTextInVendor DisableGunTextInVendor;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Vendor")
-	FDisableModuleTextInVendor DisableModuleTextInVendor;
+	FDisableModuleTextInVendor DisableModuleTextInVendor;	
 };
