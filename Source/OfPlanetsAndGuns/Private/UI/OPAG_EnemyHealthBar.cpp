@@ -11,7 +11,7 @@ UProgressBar* UOPAG_EnemyHealthBar::GetProgressBar()
 	return EnemyProgressBar;
 }
 
-void UOPAG_EnemyHealthBar::SetHelthPercent(const float Value)
+void UOPAG_EnemyHealthBar::SetHealthPercent(const float Value)
 {
 	EnemyProgressBar->SetPercent(Value);
 }

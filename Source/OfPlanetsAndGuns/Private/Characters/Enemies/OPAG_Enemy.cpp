@@ -67,6 +67,7 @@ AOPAG_Enemy::AOPAG_Enemy()
 		EnemyHealthBarComponent->SetWidgetSpace(EWidgetSpace::World);
 		EnemyHealthBarComponent->SetDrawSize(FVector2D(100.f, 10.f));
 		EnemyHealthBarComponent->SetupAttachment(RootComponent);
+		EnemyHealthBarComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 
@@ -165,8 +166,8 @@ void AOPAG_Enemy::Death()
 		AIController->GetBrainComponent()->StopLogic("Death");
 	}
 
-	// Set HealthBar hidden
-	EnemyHealthBarComponent->SetHiddenInGame(true);
+	// Destroy health bar
+	EnemyHealthBarComponent->DestroyComponent(true);
 
 	//Mesh ragdoll functions
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
