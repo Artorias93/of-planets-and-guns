@@ -42,8 +42,9 @@ void UOPAG_UWGunView::UpdateTotalAmmoText(const int CurrentValue)
 
 void UOPAG_UWGunView::UpdateAmmoColor(const FLinearColor ColorParam)
 {
-	if (TotalAmmoText && CurrentAmmoText) {
+	if (TotalAmmoText && CurrentAmmoText && AmmoSeparatorText) {
 		CurrentAmmoText->SetColorAndOpacity(ColorParam);
 		TotalAmmoText->SetColorAndOpacity(ColorParam);
+		AmmoSeparatorText->SetColorAndOpacity(ColorParam);
 	}
 }
