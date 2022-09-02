@@ -38,10 +38,20 @@ private:
 		class UOPAG_UWLoadingScreenView* LoadingScreenViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWLoadingScreenView> LoadingScreenViewWidgetClass;
+	//OLD VERSION 
+	/*
 	UPROPERTY()
 		class UOPAG_UWModuleView* ModuleViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWModuleView> ModuleViewWidgetClass;
+	*/
+
+	//NEW VERSION
+	UPROPERTY()
+		class UOPAG_UWNewModuleView* ModuleViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWNewModuleView> ModuleViewWidgetClass;
+
 	UPROPERTY()
 		class UOPAG_UWGunCompareView* GunCompareViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
