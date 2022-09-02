@@ -15,7 +15,7 @@ class AOPAG_AccessoryBase;
 class AOPAG_SightBase;
 
 class AOPAG_CharacterBase;
-class AOPAG_Grenade;
+class AOPAG_Throwable;
 
 class UOPAG_EventManagerSubsystem;
 
@@ -120,7 +120,7 @@ public:
 	void GetCurrentState(FOPAG_GunState& GunState) const;
 
 	// Shooting with throwable
-	UFUNCTION(BlueprintCallable) void ShootThrowable(const FRotator SpawnRotation);
+	UFUNCTION(BlueprintCallable) void ShootThrowable(const TSubclassOf<AOPAG_Throwable> ThrowableClass, const FRotator SpawnRotation);
 
 	// Interactable methods
 	virtual void Interact_Implementation() override;
@@ -133,7 +133,7 @@ public:
 
 protected:
 	// Shoot behavior
-	UFUNCTION(BlueprintCallable) void SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation);
+	UFUNCTION(BlueprintCallable) void SpawnThrowable(const TSubclassOf<AOPAG_Throwable> ThrowableClass, const FVector SpawnLocation, const FRotator SpawnRotation);
 
 public:
 	// Checks
@@ -146,7 +146,7 @@ public:
 	virtual FOPAG_GunStats GetStatsTotal() const override;
 
 	// Ability system getter
-	TSubclassOf<UGameplayAbility> GetAbility() const;
+	const TSubclassOf<UGameplayAbility> GetActiveAbility() const;
 
 	// Modules struct getter
 	FOPAG_GunModules GetModulesStruct() const;

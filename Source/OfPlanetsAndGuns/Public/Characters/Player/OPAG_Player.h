@@ -112,9 +112,6 @@ private:
 	TSubclassOf<UGameplayAbility> PlayerShieldAbility;
 
 	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UGameplayAbility> Stamina;
-
-	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameplayAbility> Grenade;
 
 	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -122,9 +119,6 @@ private:
 
 	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameplayAbility> Dash;
-
-	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UGameplayAbility> ShieldAbility;
 
 private:
 	UPROPERTY(Category = "OPAG | Character | Debug", EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "With this variable is possible to modify the main stats of current gun."))
@@ -220,7 +214,6 @@ private:
 
 	// Fire timers
 	float LastFireTime = .0f;
-
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
@@ -277,7 +270,7 @@ private:
 	void UpdateInteractableMessage();
 	void UpdateComparison();
 
-	// Lookat Enemy distance
+	// Look-at Enemy distance
 	void LookAtEnemy();
 
 	// Interact with items
@@ -331,6 +324,9 @@ private:
 	UFUNCTION() void ActiveDash();
 	UFUNCTION() void ActiveGunAbility();
 
+	// Active and remove passive ability 
+	UFUNCTION() void ActivePassiveGunAbility(TSubclassOf<UGameplayAbility> PassiveAbility);
+	UFUNCTION() void RemovePassiveGunAbility(FGameplayTagContainer PassiveAbilityTagContainer);
 private:
 	// Timeline behavior | finished and progress
 	UFUNCTION() void DashTimelineFinished();

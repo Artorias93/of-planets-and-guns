@@ -105,6 +105,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyedPillar);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableGunTextInVendor, AOPAG_ModularGun*, Gun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableModuleTextInVendor, AOPAG_ModuleBase*, Module);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivePassiveAbilityEffect, TSubclassOf<UGameplayAbility>, PassiveAbilityClass);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemovePassiveAbilityEffect, FGameplayTagContainer, PassiveAbilityTagContainer);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
@@ -277,6 +280,12 @@ public:
 	
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
 		FCastAbility CastAbility;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+	FActivePassiveAbilityEffect ActivePassiveAbilityEffect;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+	FRemovePassiveAbilityEffect RemoveAbilityEffect;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 	FInspectGun InspectGun;

@@ -73,6 +73,8 @@ public:
 	// Attach module to gun
 	virtual void OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes, const bool bIsAttachedToPlayer);
 
+	// Detach module to gun
+	virtual void OnDetach();
 private:
 	void CheckIfPhysical() const;
 

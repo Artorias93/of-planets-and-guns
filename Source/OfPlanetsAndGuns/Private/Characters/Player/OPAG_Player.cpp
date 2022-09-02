@@ -29,6 +29,8 @@
 #include <AbilitySystemBlueprintLibrary.h>
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include <Animation/AnimBlueprintGeneratedClass.h>
+#include "Abilities/OPAG_HealthBuffAbility.h"
+#include "Characters/OPAG_CharacterBase.h"
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -49,7 +51,6 @@ AOPAG_Player::AOPAG_Player()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	if (Camera)
 	{
-		//Camera->SetRelativeLocation(FVector(0, 0, 64.f));
 		Camera->bUsePawnControlRotation = true;
 		Camera->SetupAttachment(SpringArm);
 	}
@@ -60,8 +61,6 @@ AOPAG_Player::AOPAG_Player()
 		Mesh1P->SetOnlyOwnerSee(true);
 		Mesh1P->bCastDynamicShadow = false;
 		Mesh1P->CastShadow = false;
-		//Mesh1P->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
-		//Mesh1P->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
 		Mesh1P->SetupAttachment(Camera);
 	}
 
@@ -114,12 +113,14 @@ void AOPAG_Player::BeginPlay()
 	BindEvents();
 	BroadcastEvents();
 
+	// 
 	InitDashValues();
 }
 
 void AOPAG_Player::Death()
 {
 	Super::Death();
+
 	SavePlayerState();
 	EMS->PlayerDied.Broadcast();
 }
@@ -128,6 +129,7 @@ void AOPAG_Player::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Is important for reset camera view
 	RelocateComponets();
 
 	// Update the field of view so we can do cool changes. We get this value from the Animation Blueprint transitions.
@@ -149,19 +151,20 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// Initialize the object seen by the player
 	InteractableObject = CheckLookAtInteractableItems();
 
+	// Module view
 	UpdateInteractableMessage();
-
 	UpdateComparison();
 
-	//UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractableObject->GetFullName());
-
+	/*
 	if (Shield != nullptr)
 	{
 		Shield->SetActorLocation(GetActorLocation());
-	}
+	}*/
 
 	// Check if player sees enemy (for health bar)
 	LookAtEnemy();
+
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractableObject->GetFullName());
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
@@ -174,8 +177,8 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
 		GetWorld()->GetTimerManager().ClearTimer(ShieldPlayerCooldownHandle);
 		GetWorld()->GetTimerManager().SetTimer(ShieldPlayerCooldownHandle, this, &AOPAG_Player::ShieldCooldownTimer, AttributeSetPlayer->GetShieldCooldown(), false);
-		//bIsShieldBroken = true;
-		UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
+
+		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 	}
 
 	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
@@ -183,14 +186,8 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		Super::ReceiveDamage(Damage, Causer);
 
 		EMS->DamagedBy.Broadcast(Causer);
-
-		// Restart Shield
-		/*
-		GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
-		GetWorld()->GetTimerManager().ClearTimer(ShieldPlayerCooldownHandle);
-		GetWorld()->GetTimerManager().SetTimer(ShieldPlayerCooldownHandle, this, &AOPAG_Player::ShieldCooldownTimer, AttributeSetPlayer->GetShieldCooldown(), false);
-		*/
 		bIsShieldBroken = true;
+
 		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 		return;
 	}
@@ -206,7 +203,7 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		HitEventData.Target = this;
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
-		UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
+		//UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
 
 		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
 	}
@@ -295,6 +292,10 @@ void AOPAG_Player::BindEvents()
 	EMS->ApplyPlayerState.AddDynamic(this, &AOPAG_Player::ApplyPlayerState);
 
 	EMS->PlacePlayerAtStart.AddDynamic(this, &AOPAG_Player::TeleportPlayerToStart);
+
+	// Buffer
+	EMS->ActivePassiveAbilityEffect.AddDynamic(this, &AOPAG_Player::ActivePassiveGunAbility);
+	EMS->RemoveAbilityEffect.AddDynamic(this, &AOPAG_Player::RemovePassiveGunAbility);
 
 	// Enhanced
 	EMS->MoveForward.AddDynamic(this, &AOPAG_Player::MoveForward);
@@ -409,10 +410,6 @@ void AOPAG_Player::InitializeAbilities()
 {
 	InitializeAbility(PlayerShieldAbility, 0);
 
-	// Initialize and active stamina ability for health behavior
-	InitializeAbility(Stamina, 0);
-	AbilitySystemComp->TryActivateAbilityByClass(Stamina, true);
-
 	// Initialize grenade ability (player launch the grenade with appropriate accessory)
 	InitializeAbility(Grenade, 0);
 
@@ -421,9 +418,6 @@ void AOPAG_Player::InitializeAbilities()
 
 	// This ability allow you to cure the player
 	InitializeAbility(HealthPotion, 0);
-
-	// This ability allow you to shield the player
-	InitializeAbility(ShieldAbility, 0);
 }
 
 void AOPAG_Player::ActiveDash()
@@ -452,15 +446,34 @@ void AOPAG_Player::ActiveGunAbility()
 	const bool bIsPrimaryGun = IsPrimaryGunActive();
 	if (AbilitySystemComp && bIsPrimaryGun && PrimaryGun->HasAccessory() && InventorySystemComp->BoltsAmount > 0)
 	{
-		TSubclassOf<UGameplayAbility> Ability = PrimaryGun->GetAbility();
+		TSubclassOf<UGameplayAbility> Ability = PrimaryGun->GetActiveAbility();
 		if(Ability == nullptr)	return;
 
-		if (AbilitySystemComp->TryActivateAbilityByClass(Ability, true))
+		// Initialize ability with ability system component
+		InitializeAbility(Ability, 0);
+
+		const bool bResult = AbilitySystemComp->TryActivateAbilityByClass(Ability, true);
+		if (bResult)
 		{
 			InventorySystemComp->BoltsAmount--;
 			EMS->BoltsAmountDecrement.Broadcast();
 		}
 	}
+}
+
+void AOPAG_Player::ActivePassiveGunAbility(TSubclassOf<UGameplayAbility> PassiveAbility)
+{
+	if (PassiveAbility == nullptr)	return;
+
+	InitializeAbility(PassiveAbility, 0);
+	AbilitySystemComp->TryActivateAbilityByClass(PassiveAbility, true);
+}
+
+void AOPAG_Player::RemovePassiveGunAbility(FGameplayTagContainer PassiveAbilityTagContainer)
+{
+	if(AbilitySystemComp == nullptr)	return;
+
+	AbilitySystemComp->RemoveActiveEffectsWithGrantedTags(PassiveAbilityTagContainer);
 }
 #pragma endregion Ability
 
@@ -1154,6 +1167,7 @@ void AOPAG_Player::HealthChanged(const FOnAttributeChangeData& Data)
 void AOPAG_Player::SetShield(AActor* NewShield)
 {
 	Shield = NewShield;
+	Shield->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 AActor* AOPAG_Player::GetShield() const
@@ -1176,8 +1190,10 @@ void AOPAG_Player::ResetShieldTimer()
 
 		const float NewShieldCapicityValue = FMath::Clamp(AttributeSetPlayer->GetShieldCapacity() + AttributeSetPlayer->GetShieldRechargeRate(), 0.f, AttributeSetPlayer->GetShieldCapacityMax());
 		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), NewShieldCapicityValue);
-		UE_LOG(LogTemp, Warning, TEXT("Current Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
+	
 		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
+
+		//UE_LOG(LogTemp, Warning, TEXT("Current Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
 	}
 }
 
@@ -1186,7 +1202,7 @@ void AOPAG_Player::ShieldCooldownTimer()
 	if (AttributeSetPlayer != nullptr)
 	{
 		GetWorld()->GetTimerManager().SetTimer(RestartShieldPlayerHandle, this, &AOPAG_Player::ResetShieldTimer, 1.f, true);
-		UE_LOG(LogTemp, Warning, TEXT("Complete Shield Recharge Cooldown"));
+		//UE_LOG(LogTemp, Warning, TEXT("Complete Shield Recharge Cooldown"));
 	}
 }
 #pragma endregion Timer
@@ -1212,7 +1228,6 @@ void AOPAG_Player::AttachMagazineToHandNotify()
 {
 	if(PrimaryGun == nullptr)	return;
 
-	//PrimaryGun->Magazine->GetChildActor()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	PrimaryGun->GetModuleBySocketType(EModuleTypes::Magazine)->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketHandLeft);
 }
 
@@ -1220,7 +1235,6 @@ void AOPAG_Player::AttachMagazineToGunNotify()
 {
 	if (PrimaryGun == nullptr)	return;
 
-	//PrimaryGun->Magazine->GetChildActor()->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	PrimaryGun->GetModuleBySocketType(EModuleTypes::Magazine)->AttachToComponent(PrimaryGun->GetReceiverMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "Magazine");
 }
 

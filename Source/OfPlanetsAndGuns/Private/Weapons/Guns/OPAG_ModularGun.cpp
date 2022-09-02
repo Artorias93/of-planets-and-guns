@@ -18,6 +18,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Interactables/OPAG_Vendor.h"
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
+#include "Weapons/Throwables/OPAG_Throwable.h"
 
 AOPAG_ModularGun::AOPAG_ModularGun()
 {
@@ -322,6 +323,9 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 	const EModuleRarity TempModuleRarity = CurrentChildModule->GetRarity();
 	const int TempModuleEquippableFireTypes = CurrentChildModule->GetEquippableFireTypes();
 
+	// Detach module behavior
+	CurrentChildModule->OnDetach();
+
 	// Destroy ChildActor
 	ChildModule->DestroyChildActor();
 	ChildModule->SetChildActorClass(nullptr);
@@ -386,15 +390,15 @@ void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState) const
 	GunState.AmmoMax = AmmoMax;
 }
 
-TSubclassOf<UGameplayAbility> AOPAG_ModularGun::GetAbility() const
+const TSubclassOf<UGameplayAbility> AOPAG_ModularGun::GetActiveAbility() const
 {
 	AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(Accessory->GetChildActor());
-	return Module->Ability;
+	return Module->GetActiveAbility();
 }
 #pragma endregion GET
 
 #pragma region Shoot Behavior
-void AOPAG_ModularGun::ShootThrowable(const FRotator SpawnRotation)
+void AOPAG_ModularGun::ShootThrowable(const TSubclassOf<AOPAG_Throwable> ThrowableClass, const FRotator SpawnRotation)
 {
 	const AOPAG_BarrelBase* const Module = Cast<AOPAG_BarrelBase>(Barrel->GetChildActor());
 	if (Module)
@@ -403,19 +407,18 @@ void AOPAG_ModularGun::ShootThrowable(const FRotator SpawnRotation)
 		if (Muzzle)
 		{
 			const FVector SpawnLocation = Muzzle->GetComponentLocation() + Muzzle->GetForwardVector()*20;
-			SpawnThrowable(SpawnLocation, SpawnRotation);
+			SpawnThrowable(ThrowableClass, SpawnLocation, SpawnRotation);
 		}
 	}
 }
 
-void AOPAG_ModularGun::SpawnThrowable(const FVector SpawnLocation, const FRotator SpawnRotation)
+void AOPAG_ModularGun::SpawnThrowable(const TSubclassOf<AOPAG_Throwable> ThrowableClass, const FVector SpawnLocation, const FRotator SpawnRotation)
 {
 	if (HasAccessory())
 	{
 		const AOPAG_AccessoryBase* Module = Cast<AOPAG_AccessoryBase>(Accessory->GetChildActor());
-		const TSubclassOf<AOPAG_Grenade> GrenadeClass = Module->Grenade;
 		const FActorSpawnParameters SpawnInfo;
-		GetWorld()->SpawnActor(GrenadeClass, &SpawnLocation, &SpawnRotation, SpawnInfo);
+		GetWorld()->SpawnActor(ThrowableClass, &SpawnLocation, &SpawnRotation, SpawnInfo);
 	}
 }
 
@@ -529,7 +532,7 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 		// Initialize Base (CDO of NewModule for default params of class) and ModuleSlot (the module of main socket ex. Barrel)
 		const AOPAG_ModuleBase* const Base = NewModule->GetDefaultObject<AOPAG_ModuleBase>();
 		UChildActorComponent* const ModuleSlot = GetSocketByModuleType(Base->GetType());
-		const AOPAG_ModuleBase* const OldModule = GetModuleBySocketType(Base->GetType());
+		AOPAG_ModuleBase* const OldModule = GetModuleBySocketType(Base->GetType());
 
 		// Set current value of ModuleSlot -> is important when re-spawn the module in scene 
 		if (OldModule)
@@ -538,6 +541,8 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 			OldModuleRarity = OldModule->GetRarity();
 			OldModuleStats = OldModule->GetStats();
 			OldModuleEquippableFireTypes = OldModule->GetEquippableFireTypes();
+
+			OldModule->OnDetach();
 		}
 
 		// Call the attach module method for set child actor with socket

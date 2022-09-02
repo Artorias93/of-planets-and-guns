@@ -170,6 +170,12 @@ void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunSt
 {
 	SetParameters(NewRarity, NewStats, NewEquippableFireTypes);
 }
+
+void AOPAG_ModuleBase::OnDetach()
+{
+
+}
+
 #pragma endregion Attachment
 
 #pragma region Physics
