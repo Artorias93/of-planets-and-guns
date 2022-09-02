@@ -175,16 +175,15 @@ void AOPAG_StageManager::FindRoomToSpawn(const int32 Previous, uint8& PreviousRo
 			AddRandomBridge(PathingItem);
 			if (RandomRoom->RoomOffset.ExitCount > 1)
 			{
-				//Not deleting any endbridges from this array. this means that this will be true only at the first entry.
-				if (SpecialRoomBridges.Num() == 0)
+				if (SafeRoom < 0) //can add more check for some rng
+				{
+					SafeRoom = RandomRoom->ID;
+				}
+				else if (SpecialRoomBridges.Num() == 0) //Not deleting any endbridges from this array. this means that this will be true only at the first entry.
 				{
 					SpecialRoomBridges.Add(AddRandomBridge(PathingItem, true));
 				}
 			}
-		}
-		else if (SafeRoom < 0) //can add more check for some rng
-		{
-			SafeRoom = RandomRoom->ID;
 		}
 	}
 }
@@ -328,9 +327,16 @@ bool AOPAG_StageManager::IsRoomDouble()
 
 	float Chance = 0.f;
 	FOPAG_DoubleExitChance* Item;
+	DoubleExitChances.Sort([](const FOPAG_DoubleExitChance Lhs, const FOPAG_DoubleExitChance Rhs)
+	{
+		return Lhs.MinCountForChance > Rhs.MinCountForChance;
+	});
 	for (int i = 0; i < DoubleExitChances.Num(); ++i)
 	{
 		Item = DoubleExitChances[i];
+
+		if (Item->MinCountForChance > DoubleExitRoomCounter)
+			continue;
 
 		//check if we are guaranteed a double room
 		if (Item->GuaranteedSpawnRoomIndex >= 0 && Item->GuaranteedSpawnRoomIndex <= RoomLoadingCounter)
@@ -339,10 +345,10 @@ bool AOPAG_StageManager::IsRoomDouble()
 			break;
 		}
 
-		if (Item->Chance > Chance && Item->MinCountForChance > DoubleExitRoomCounter)
-		{
-			Chance = Item->Chance;
-		}
+		Chance = Item->Chance;
+		break;
+
+		
 	}
 
 	return FMath::FRandRange(0.f, 100.f) <= Chance;
