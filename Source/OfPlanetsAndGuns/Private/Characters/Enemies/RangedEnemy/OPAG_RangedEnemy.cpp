@@ -144,7 +144,7 @@ void AOPAG_RangedEnemy::GetShootingDirection(FVector& Start, FVector& ShootDirec
 				Start = EquippedWeapon->GetActorLocation() + (GetActorForwardVector() * 50.f);
 
 				//Gets Vector from player to enemy
-				const FVector PlayerToSelfVector = Player->GetActorLocation() - GetActorLocation();
+				const FVector PlayerToSelfVector = Player->GetActorLocation() - Start;
 
 				//Gets not normalized vector with shooting accuracy computations applied
 				const float DirectionVectorX =
