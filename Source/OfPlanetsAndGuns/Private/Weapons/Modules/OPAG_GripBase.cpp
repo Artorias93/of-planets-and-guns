@@ -4,6 +4,7 @@ AOPAG_GripBase::AOPAG_GripBase()
 {
 	// Initialize Parameters
 	Rarity = EModuleRarity::Common;
+	Brand = EModuleBrand::Standard;
 	Type = EModuleTypes::Grip;
 }
 

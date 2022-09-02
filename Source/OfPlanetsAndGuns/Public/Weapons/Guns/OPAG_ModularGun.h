@@ -4,6 +4,7 @@
 #include "OPAG_GunState.h"
 #include "Weapons/Guns/OPAG_GunBase.h"
 #include "Interactables/OPAG_InteractableInterface.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_ModularGun.generated.h"
 
 class AOPAG_ModuleBase;
@@ -90,7 +91,8 @@ protected:
 
 	// Create and Attach module behavior
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const;
-	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
+	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const
+	                  EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
 
 	// Ammo behavior
 	void UpdateAmmoWhenPickTheMagazine();
@@ -115,7 +117,9 @@ public:
 
 	// Module
 	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules);
-	bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
+	bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const EModuleBrand NewModuleBrand, const
+	                  FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity
+	                  & OldModuleRarity, EModuleBrand& OldModuleBrand, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
 
 	void GetCurrentState(FOPAG_GunState& GunState) const;
 

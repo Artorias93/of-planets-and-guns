@@ -458,10 +458,12 @@ void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSub
 		if (Base)
 		{
 			const EModuleRarity ModuleRarity = Base->GetRarity();
+			const EModuleBrand ModuleBrand = Base->GetBrand();
 			const FOPAG_GunStats ModuleStats = Base->GetStats();
 			const int ModuleEquippableFireTypes = Base->GetEquippableFireTypes();
 
-			AttachModule(ModuleSlot, Module, ModuleRarity, ModuleStats, ModuleEquippableFireTypes);
+			AttachModule(ModuleSlot, Module, ModuleRarity, ModuleBrand, 
+				ModuleStats, ModuleEquippableFireTypes);
 		}
 	}
 }
@@ -469,15 +471,16 @@ void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSub
 // Set child create the object in scene and set the actor's child
 // After this is important set the specific params of module (when invoke set child... the module has the default params, not the values in scene)
 bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule,
-	const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const
+	const EModuleRarity NewModuleRarity, const EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, 
+	const int NewModuleEquippableFireTypes) const
 {
 	ModuleSlot->SetChildActorClass(NewModule);
 
 	AOPAG_ModuleBase* Module = GetModule(ModuleSlot);
 	if (Module)
 	{
-		Module->OnAttach(NewModuleRarity, NewModuleStats, NewModuleEquippableFireTypes, 
-			GetParentActor() == GetWorld()->GetFirstPlayerController()->GetPawn());
+		Module->OnAttach(NewModuleRarity, NewModuleBrand, NewModuleStats, 
+		                 NewModuleEquippableFireTypes, GetParentActor() == GetWorld()->GetFirstPlayerController()->GetPawn());
 
 		const FName SocketName = GetSocketNameByModuleType(Module->GetType());
 		Module->AttachToComponent(Receiver, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
@@ -526,7 +529,11 @@ void AOPAG_ModularGun::UpdateStatsTotal()
 }
 
 // When player pick new module in scene, the event call this method 
-bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes)
+bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, 
+	const EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, 
+	TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity& OldModuleRarity, EModuleBrand& OldModuleBrand, 
+	FOPAG_GunStats& OldModuleStats, 
+	int& OldModuleEquippableFireTypes)
 {
 	if (NewModule)
 	{
@@ -540,6 +547,7 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 		{
 			OldModuleClass = OldModule->GetClass();
 			OldModuleRarity = OldModule->GetRarity();
+			OldModuleBrand = OldModule->GetBrand();
 			OldModuleStats = OldModule->GetStats();
 			OldModuleEquippableFireTypes = OldModule->GetEquippableFireTypes();
 
@@ -549,7 +557,8 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 		// Call the attach module method for set child actor with socket
 		if (ModuleSlot)
 		{
-			const bool Result = AttachModule(ModuleSlot, NewModule, NewModuleRarity, NewModuleStats, NewModuleEquippableFireTypes);
+			const bool Result = AttachModule(ModuleSlot, NewModule, NewModuleRarity, NewModuleBrand, NewModuleStats, 
+				NewModuleEquippableFireTypes);
 
 			// Update Stats
 			UpdateStatsTotal();

@@ -77,6 +77,11 @@ EModuleRarity AOPAG_ModuleBase::GetRarity() const
 	return Rarity;
 }
 
+EModuleBrand AOPAG_ModuleBase::GetBrand() const
+{
+	return Brand;
+}
+
 FOPAG_GunStats AOPAG_ModuleBase::GetStats() const
 {
 	return Stats;
@@ -89,9 +94,10 @@ int AOPAG_ModuleBase::GetEquippableFireTypes() const
 #pragma endregion Get
 
 #pragma region Set
-void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
+void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
 {
 	Rarity = NewRarity;
+	Brand = NewBrand;
 	Stats = NewStats;
 	EquippableFireTypes = NewEquippableFireTypes;
 }
@@ -165,10 +171,10 @@ bool AOPAG_ModuleBase::CanBuy_Implementation()
 #pragma endregion Interface
 
 #pragma region Attachment
-void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats,
+void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand,const FOPAG_GunStats NewStats,
 	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
-	SetParameters(NewRarity, NewStats, NewEquippableFireTypes);
+	SetParameters(NewRarity, NewBrand, NewStats, NewEquippableFireTypes);
 }
 
 void AOPAG_ModuleBase::OnDetach()

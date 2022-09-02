@@ -42,6 +42,9 @@ protected:
 	EModuleRarity Rarity;
 
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EModuleBrand Brand;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FOPAG_GunStats Stats;
 
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", Bitmask, BitmaskEnum = "EFireTypes"))
@@ -71,7 +74,8 @@ public:
 	FString InteractString_Implementation() override;
 
 	// Attach module to gun
-	virtual void OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes, const bool bIsAttachedToPlayer);
+	virtual void OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
+	                      NewEquippableFireTypes, const bool bIsAttachedToPlayer);
 
 	// Detach module to gun
 	virtual void OnDetach();
@@ -87,11 +91,13 @@ public:
 	int GetLevel() const;
 	EModuleTypes GetType() const;
 	EModuleRarity GetRarity() const;
+	EModuleBrand GetBrand() const;
 	FOPAG_GunStats GetStats() const;
 	int GetEquippableFireTypes() const;
 
 	//Setter
-	void SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes);
+	void SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
+	                   NewEquippableFireTypes);
 
 public:
 	FORCEINLINE USphereComponent* GetModuleSphereComponent() { return Sphere; }

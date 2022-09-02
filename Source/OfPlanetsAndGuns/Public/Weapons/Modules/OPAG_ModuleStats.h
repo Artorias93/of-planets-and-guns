@@ -24,3 +24,13 @@ enum class EModuleRarity : uint8
 	Epic,
 	Legendary,
 };
+
+UENUM(BlueprintType)
+enum class EModuleBrand : uint8
+{
+	Standard = 0x00,
+	AAAAAA,
+	BBBBBB,
+	CCCCCC,
+	DDDDDD,
+};

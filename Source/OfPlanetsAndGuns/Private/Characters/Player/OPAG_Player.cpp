@@ -784,16 +784,20 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 		// Initialize new module params
 		const FOPAG_GunStats NewModuleStats = Module->GetStats();
 		const EModuleRarity NewModuleRarity = Module->GetRarity();
+		const EModuleBrand NewModuleBrand = Module->GetBrand();
 		const int NewModuleEquippable = Module->GetEquippableFireTypes();
 		const TSubclassOf<AOPAG_ModuleBase> NewModuleClass = Module->GetClass();
 
 		// Create old module params
 		FOPAG_GunStats OldModuleStats;
 		EModuleRarity OldModuleRarity;
+		EModuleBrand OldModuleBrand;
 		int OldModuleEquippable;
 		TSubclassOf<AOPAG_ModuleBase> OldModuleClass;
 		
-		const bool bResult = PrimaryGun->AddNewModule(NewModuleClass, NewModuleRarity, NewModuleStats, NewModuleEquippable, OldModuleClass, OldModuleRarity, OldModuleStats, OldModuleEquippable);
+		const bool bResult = PrimaryGun->AddNewModule(NewModuleClass, NewModuleRarity, NewModuleBrand, 
+			NewModuleStats, NewModuleEquippable, OldModuleClass, 
+			OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
 		if (bResult)
 		{
 			Module->Destroy();
@@ -805,7 +809,7 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 				const FVector ModuleSpawnLocation = CalculateModuleSpawnLocation();
 				FActorSpawnParameters SpawnParams;
 				AOPAG_ModuleBase* OldModule = GetWorld()->SpawnActor<AOPAG_ModuleBase>(OldModuleClass, ModuleSpawnLocation, FRotator::ZeroRotator, SpawnParams);
-				OldModule->SetParameters(OldModuleRarity, OldModuleStats, OldModuleEquippable);
+				OldModule->SetParameters(OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
 				OldModule->ApplyForce_Implementation(CalculateThrowForce());
 			}
 		}
