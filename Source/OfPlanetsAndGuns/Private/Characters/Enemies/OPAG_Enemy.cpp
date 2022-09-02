@@ -289,9 +289,11 @@ AOPAG_PatrolPath* AOPAG_Enemy::GetPatrolPath() const
 
 void AOPAG_Enemy::SetHealthBarVisible()
 {
-	EnemyHealthBarComponent->SetHiddenInGame(false);
-	GetWorld()->GetTimerManager().ClearTimer(UnseenByPlayerHandle);
-	GetWorld()->GetTimerManager().SetTimer(UnseenByPlayerHandle, this, &AOPAG_Enemy::ResetHealthBarHidden, 3.f, false);
+	if (EnemyHealthBarComponent != nullptr) {
+		EnemyHealthBarComponent->SetHiddenInGame(false);
+		GetWorld()->GetTimerManager().ClearTimer(UnseenByPlayerHandle);
+		GetWorld()->GetTimerManager().SetTimer(UnseenByPlayerHandle, this, &AOPAG_Enemy::ResetHealthBarHidden, 3.f, false);
+	}
 }
 
 void AOPAG_Enemy::ResetHealthBarHidden()
