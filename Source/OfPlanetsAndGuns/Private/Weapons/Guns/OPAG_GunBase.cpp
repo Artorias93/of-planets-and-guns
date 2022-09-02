@@ -17,6 +17,7 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include <Kismet/GameplayStatics.h>
+#include "Abilities/OPAG_ForceField.h"
 #include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 
@@ -168,6 +169,12 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 
 		// Spawn trace in the space
 	    GetWorld()->SpawnActor(TracerClass, TracerTransform);*/
+
+		if (AOPAG_ForceField* ForceField = Cast<AOPAG_ForceField>(OutHit.GetActor()))
+		{
+			ForceField->GetHit();
+		}
+
 
 		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 		if (Character)

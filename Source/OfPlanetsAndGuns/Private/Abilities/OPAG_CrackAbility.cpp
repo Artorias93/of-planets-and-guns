@@ -22,6 +22,14 @@ void AOPAG_CrackAbility::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (EnableCollisionAfterSeconds > 0)
+	{
+		AbilityCollider->SetCollisionProfileName(TEXT("NoCollision"));
+	}
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_CrackAbility::EnableCollision, EnableCollisionAfterSeconds, false);
+
 	AbilityCollider->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_CrackAbility::OnOverlapBegin);
 	AbilityCollider->OnComponentEndOverlap.AddDynamic(this, &AOPAG_CrackAbility::OnOverlapEnd);
 }
@@ -54,6 +62,11 @@ void AOPAG_CrackAbility::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActo
 		DamageTimer = 0;
 		OverlappingTarget = nullptr;
 	}
+}
+
+void AOPAG_CrackAbility::EnableCollision()
+{
+	AbilityCollider->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 }
 
 void AOPAG_CrackAbility::DestroyAbility()

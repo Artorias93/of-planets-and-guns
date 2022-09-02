@@ -14,6 +14,13 @@ enum EFightStatus
 	SecondPhase UMETA(DisplayName = "SECOND PHASE")
 };
 
+UENUM()
+enum EWaveLevel
+{
+	WaveLevel1,
+	WaveLevel2
+};
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_MageEnemy : public AOPAG_Enemy
 {
@@ -27,7 +34,9 @@ public:
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
 		virtual void Death() override;	
 
-	virtual void BeginPlay() override;	
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
 
 	void CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern);
 	
@@ -37,6 +46,9 @@ protected:
 		void OnEnemyDeath(const AOPAG_Enemy* const Enemy);
 
 	UFUNCTION(CallInEditor, Category = "OPAG AI")
+		void OnSpawnedEnemy(AOPAG_Enemy* Enemy, AActor* Caller);
+
+	UFUNCTION(CallInEditor, Category = "OPAG AI")
 		void OnBrokenForceField();
 
 	FVector GetRandomPointInRadius();
@@ -44,8 +56,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability Caster")
 		class UOPAG_AbilityCasterComponent* AbilityCaster;
 
+	UPROPERTY()
+		TArray<TSoftObjectPtr<AOPAG_Enemy>> CastedEnemiesList;
+
 private:
 		void Init();
 		float GetGroundHeight();
+		
 		EFightStatus FightStatus = EFightStatus::FirstPhase;
+
+		// vars to track if the enemy life is at or lower a specific value
+		bool bHealth25 = false;
+		bool bHealth50 = false;
 };

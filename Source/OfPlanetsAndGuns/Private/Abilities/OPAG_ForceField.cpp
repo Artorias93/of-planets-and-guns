@@ -6,12 +6,18 @@
 #include "DrawDebugHelpers.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include <Engine.h>
+#include "Components/SphereComponent.h"
 #include "Characters/Enemies/PillarEnemy/OPAG_PillarEnemy.h"
 
 AOPAG_ForceField::AOPAG_ForceField()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
+	AbilityCollider = CreateDefaultSubobject<USphereComponent>("Collider");
+	AbilityCollider->SetupAttachment(Pivot);
+
 	AbilityMesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	AbilityMesh->SetupAttachment(Pivot);
+	AbilityMesh->SetupAttachment(AbilityCollider);
 }
 
 void AOPAG_ForceField::BeginPlay()
@@ -21,12 +27,13 @@ void AOPAG_ForceField::BeginPlay()
 	if (EMS != nullptr)
 	{
 		EMS->DestroyedPillar.AddDynamic(this, &AOPAG_ForceField::OnPillarDestroyed);
+		EMS->CastedEnemyWaveCleared.AddDynamic(this, &AOPAG_ForceField::DestroyAbility);
 	}
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_PillarEnemy::StaticClass(), Pillars);
-	AvailablePillarsAmount = Pillars.Num();
+	AbilityCollider->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_ForceField::OnOverlapBegin);
 
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, FString::Printf(TEXT("%s"),  AvailablePillarsAmount));
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_PillarEnemy::StaticClass(), Pillars);
+	AvailablePillarsAmount = Pillars.Num();	
 }
 
 void AOPAG_ForceField::Init(EAbilityTypes AbilityType, float Delay)
@@ -57,4 +64,25 @@ void AOPAG_ForceField::DestroyAbility()
 	this->SetActorEnableCollision(false);
 
 	Super::DestroyAbility();
+}
+
+void AOPAG_ForceField::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	/*AbilityMesh->SetMaterial(0, ForceFieldHitMaterial);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_ForceField::ResetMaterial, 0.25f, false);*/
+}
+
+void AOPAG_ForceField::ResetMaterial()
+{
+	AbilityMesh->SetMaterial(0, ForceFieldMaterial);
+}
+
+void AOPAG_ForceField::GetHit()
+{
+	AbilityMesh->SetMaterial(0, ForceFieldHitMaterial);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_ForceField::ResetMaterial, 0.25f, false); 
 }

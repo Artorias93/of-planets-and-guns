@@ -39,6 +39,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
 		float AbilityDelay = 0;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float EnableCollisionAfterSeconds;
+
 	UPROPERTY()
 		EAbilityTypes CastedAbilityType;
 	
@@ -49,7 +52,7 @@ protected:
 		AActor* Caller;	
 
 	UPROPERTY()
-		AActor* Target;
+		AActor* Target;	
 
 	virtual void DestroyAbility();
 };

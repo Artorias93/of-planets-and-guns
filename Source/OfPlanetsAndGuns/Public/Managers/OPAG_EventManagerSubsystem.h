@@ -76,6 +76,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSpawnedEnemy, AOPAG_Enemy*, Enemy, AActor*, Caller);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDamagedBy, AActor* const, Causer);
 
@@ -100,6 +101,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInspectGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, EAbilityTypes, AbilityType, AActor*, Caller, AActor*, Target, EAbilitySpawnPattern, AbilitySpawnPattern);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBrokenForceField);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCastedEnemyWaveCleared);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyedPillar);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableGunTextInVendor, AOPAG_ModularGun*, Gun);
@@ -208,6 +210,9 @@ public:
 
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
+		FSpawnedEnemy SpawnedEnemy;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
 		FEnemyKilled EnemyKilled;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Enemy)
 		FDamagedBy DamagedBy;
@@ -281,6 +286,9 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
 		FCastAbility CastAbility;
 
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+	FCastedEnemyWaveCleared CastedEnemyWaveCleared;
+	
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
 	FActivePassiveAbilityEffect ActivePassiveAbilityEffect;
 

@@ -14,20 +14,35 @@ class OFPLANETSANDGUNS_API AOPAG_ForceField : public AOPAG_AbilityBase
 public:	
 	AOPAG_ForceField();	
 	virtual void Init(EAbilityTypes AbilityType, float Delay) override;
-
+	void GetHit();
 protected:
 	virtual void BeginPlay() override;		
 
-	UPROPERTY(EditAnywhere, Category = "Mesh")
+	UPROPERTY(EditAnywhere, Category = "Collider")
+		class USphereComponent* AbilityCollider;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
 		class UStaticMeshComponent* AbilityMesh;
 
-	UFUNCTION()
-	void OnPillarDestroyed();
+	UPROPERTY(EditAnywhere, Category = "Ability")
+		class UMaterial* ForceFieldMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Ability")
+		class UMaterial* ForceFieldHitMaterial;
 
 	UFUNCTION()
-	virtual void DestroyAbility() override;
+		void OnPillarDestroyed();
+
+	UFUNCTION()
+		virtual void DestroyAbility() override;
+
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 
 	int AvailablePillarsAmount = 0;
 
 	TArray<AActor*> Pillars;
+
+	void ResetMaterial();
 };

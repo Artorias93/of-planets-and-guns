@@ -29,6 +29,8 @@ protected:
 
 	virtual void DestroyAbility() override;
 
+	void EnableCollision();
+
 	void DealDamage(AActor* TargetActor);
 
 	UPROPERTY(EditAnywhere, Category = "Mesh")
