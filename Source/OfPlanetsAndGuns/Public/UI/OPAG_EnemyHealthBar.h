@@ -21,5 +21,5 @@ public:
 	void NativeConstruct();
 	UProgressBar* GetProgressBar();
 	UFUNCTION(BlueprintCallable) 
-		void SetHelthPercent(const float Value);
+		void SetHealthPercent(const float Value);
 };

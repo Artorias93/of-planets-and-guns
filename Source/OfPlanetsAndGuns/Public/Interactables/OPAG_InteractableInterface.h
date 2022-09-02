@@ -26,6 +26,9 @@ public:
 		bool CanInteract();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		bool WillChangeInteractStateDynamically();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		FString InteractString();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)

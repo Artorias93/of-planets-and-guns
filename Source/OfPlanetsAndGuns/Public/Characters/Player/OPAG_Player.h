@@ -15,12 +15,15 @@
 
 class UOPAG_AttributeSetBase;
 class UTimelineComponent;
+class UAnimInstance;
 class UCurveFloat;
 class AOPAG_ModuleBase;
 class UCameraComponent;
+class USpringArmComponent;
 class UChildActorComponent;
 class AOPAG_GunBase;
 class AOPAG_ModularGun;
+class UAnimBlueprintGeneratedClass;
 
 
 UCLASS()
@@ -28,14 +31,8 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, Category = "GameplayAbility System")
-	const class UOPAG_AttributeSetPlayer* AttributeSetPlayer;
-	
-public:
-	AOPAG_Player();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
-	class UOPAG_InventorySystemComponent* InventorySystemComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* SpringArm;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
@@ -49,127 +46,181 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UChildActorComponent* SecondaryGunComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UOPAG_InventorySystemComponent* InventorySystemComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	const class UOPAG_AttributeSetPlayer* AttributeSetPlayer;
+	
 public:
-	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
-	AOPAG_ModularGun* PrimaryGun;
+	AOPAG_Player();
 
-	UPROPERTY(Category = "Guns", VisibleAnywhere, BlueprintReadWrite)
-	AOPAG_GunBase* CurrentGun;
-
-	UPROPERTY(Category = "Camera", VisibleAnywhere, BlueprintReadWrite)
-	UCameraComponent* CurrentCamera;
-
-	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
-	UAnimMontage* FireMontageToPlay;
-
-	UPROPERTY(Category = "Animation", EditDefaultsOnly, BlueprintReadWrite)
-	UAnimMontage* ReloadMontageToPlay;
-
-	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
-	UTimelineComponent* ADSTimeline;
-
-	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
-	UTimelineComponent* DashTimeline;
-
-	UPROPERTY(Category = "Timeline", VisibleDefaultsOnly, BlueprintReadWrite)
-	UTimelineComponent* RecoilTimeline;
-
-	UPROPERTY(Category = "Timeline", EditAnywhere, BlueprintReadWrite)
-	UCurveFloat* ADSCurveFloat;
-
-	UPROPERTY(Category = "Timeline", EditAnywhere, BlueprintReadWrite)
-	UCurveFloat* RecoilCurveFloat;
-
-	UPROPERTY(Category = "Widgets", EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<UUserWidget> CrosshairClass;
-
-public:
-	UPROPERTY(Category = "Player", EditAnywhere, BlueprintReadWrite)
-	int PotionCount = 3;
-
-	UPROPERTY(Category = "Player", EditAnywhere, BlueprintReadWrite)
+private:
+	UPROPERTY(Category = "OPAG | Character | Physics", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float TossForce = 15000.f;
 
-public:
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
+private:
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAnimBlueprintGeneratedClass* RifleAnimClass;
+
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAnimBlueprintGeneratedClass* HandgunAnimClass;
+
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* FireMontageToPlay;
+
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* ReloadMontageToPlay;
+
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* SwapRifleMontageToPlay;
+
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* SwapHandgunMontageToPlay;
+
+	UPROPERTY(Category = "OPAG | Character | Animation", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* InspectGunMontageToPlay;
+
+private:
+	UPROPERTY(Category = "OPAG | Character | Potion", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	int PotionCount = 3;
+
+private:
+	UPROPERTY(Category = "OPAG | Character | Dash", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bIsFirstDash = true;
 
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | Dash", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float DashSpeed = 10000.f;
 
-	UPROPERTY(Category = "Dash", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | Dash", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float DashLenght = 500.f;
 
-public:
-	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
+private:
+	UPROPERTY(Category = "OPAG | Character | LookupInteractable", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float LookUpMaxDistance = 100.f;
 
-	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | LookupInteractable", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float LookAtMaxEnemyDistance = 9000.f;
 
-	UPROPERTY(Category = "LookupInteractable", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | LookupInteractable", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float LookUpCapsuleRadius = 20.f;
 
-	UPROPERTY(Category = "LookupInteractableTypes", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | LookupInteractable", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<TEnumAsByte<EObjectTypeQuery>> InteractableTypesQuery;
 
-public: 
-	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
+private: 
+	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameplayAbility> PlayerShieldAbility;
 
-	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<UGameplayAbility> Stamina;
-
-	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameplayAbility> Grenade;
 
-	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameplayAbility> HealthPotion;
 
-	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Character | Ability System", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameplayAbility> Dash;
 
-	UPROPERTY(Category = "Ability System", EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<UGameplayAbility> ShieldAbility;
-
-public:
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "With this variable is possible to modify the main stats of current gun."))
+private:
+	UPROPERTY(Category = "OPAG | Character | Debug", EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "With this variable is possible to modify the main stats of current gun."))
 	FOPAG_GunStats DebugCurretGunStats;
 
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "With this variable is possible to modify the modules of primary gun."))
+	UPROPERTY(Category = "OPAG | Character | Debug", EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "With this variable is possible to modify the modules of primary gun."))
 	FOPAG_GunModules DebugCurretGunModules;
 
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "With this variable is possible to modify the primary gun's type."))
+	UPROPERTY(Category = "OPAG | Character | Debug", EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "With this variable is possible to modify the primary gun's type."))
 	TSubclassOf<AOPAG_ModularGun> DebugCurrentPrimaryGun;
 
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the max player's life."))
+	UPROPERTY(Category = "OPAG | Character | Debug", EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "Modify the max player's life."))
 	int DebugHealthMax = 0;
 
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the max player's dash count."))
+	UPROPERTY(Category = "OPAG | Character | Debug", EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "Modify the max player's dash count."))
 	int DebugDashMaxCount = 0;
 
-	UPROPERTY(Category = "Debug", EditInstanceOnly, BlueprintReadWrite, meta = (ToolTip = "Modify the restore timer player's dash."))
+	UPROPERTY(Category = "OPAG | Character | Debug", EditInstanceOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "Modify the restore timer player's dash."))
 	float DebugDashRestoreTime = 0.f;
 
 private:
-	const FName GripSocketName = "GripPoint";
-	const float LookUpDistanceToPlayer = 150.f;
+	UPROPERTY(Category = "OPAG | Character | Camera", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* CurrentCamera;
+
+	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FVector ViewOffset = FVector(.0f, .0f, -35.f);
+
+	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FVector MeshRifleOffset = FVector(.0f, .0f, -10.f);
+
+	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	FVector MeshHandOffset = FVector(.0f, .0f, 0.f);
+
+	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float LookUpDistanceToPlayer = 150.f;
+
+	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float DefaultHipSensitivity = 1.f;
+	UPROPERTY(Category = "OPAG | Character | Camera", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float DefaultADSSensitivity = 0.5f;
+
+private:
+	UPROPERTY(Category = "OPAG | Character | Timeline", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UTimelineComponent* DashTimeline;
+
+	UPROPERTY(Category = "OPAG | Character | Timeline", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UTimelineComponent* RecoilTimeline;
+
+	UPROPERTY(Category = "OPAG | Character | Timeline", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* ADSCurveFloat;
+
+	UPROPERTY(Category = "OPAG | Character | Timeline", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* RecoilCurveFloat;
+
+private:
+	UPROPERTY(Category = "OPAG | Character | Widgets", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> CrosshairClass;
+
+private:
+	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	AOPAG_ModularGun* PrimaryGun;
+
+	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	AOPAG_GunBase* SecondaryGun;
+
+	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	AOPAG_GunBase* CurrentGun;
+
+private:
+	// All socket names
+	const FName SocketCameraName = "SOCKET_Camera";
+	const FName SocketRifleName = "SOCKET_Rifle";
+	const FName SocketHandgunName = "SOCKET_Handgun";
+	const FName SocketHandLeft = "SOCKET_Hand_L";
+
+private:
+	// Boolean checks
 	bool bIsDashAlreadyInitialized;
+	bool bInspecting = false;
+	bool bRunning = false;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
 	bool bHasAlreadyLooked = false;
 	bool bIsShieldBroken = false;
-	float GunPreADSRoll = 0;
+
+	float HipSensitivity;
+	float ADSSensitivity;
+
+	// Other objects
 	AActor* InteractableObject = nullptr;
 	AActor* PreviousLookedAtModule = nullptr;
 	AActor* Shield = nullptr;
 
+	// Fire timers
+	float LastFireTime = .0f;
 private:
-	FOnTimelineFloat OnADSTimelineProgress;
 	FOnTimelineFloat OnRecoilTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
 private:
+	FTimerHandle ShootingHanlde;
 	FTimerHandle RestartShieldPlayerHandle;
 	FTimerHandle ShieldPlayerCooldownHandle;
 
@@ -183,7 +234,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void ReceiveDamage(const float Damage) override;
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
+	void HealthChanged(const FOnAttributeChangeData& Data);
 
 private:
 	// Events system
@@ -192,12 +244,9 @@ private:
 
 	// Init standard values
 	void InitDefaultValues();
-	void InitADSTimeline();
 	void InitDashTimeline();
 	void InitRecoilTimeline();
 	void InitDashValues();
-
-	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);
 
 	// Mathematics utility
 	const FVector CalculateThrowForce() const;
@@ -213,18 +262,16 @@ private:
 	void MakingAimCameraRotate();
 
 	// Shooting
-	const bool CheckCanShoot() const;
 	virtual void GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance = 0) override;
 
 	// LookAt intractable items
 	void CalculateLookAtLocations(FVector& OutStartLocation, FVector& OutDirection, float MaxDistance);
 	AActor* CheckLookAtInteractableItems();
 	const FVector CalculateModuleSpawnLocation() const;
-
 	void UpdateInteractableMessage();
 	void UpdateComparison();
 
-	// Lookat Enemy distance
+	// Look-at Enemy distance
 	void LookAtEnemy();
 
 	// Interact with items
@@ -238,60 +285,80 @@ private:
 	void ResetShieldTimer();
 	void ShieldCooldownTimer();
 
-public:
+	// Animation corrections
+	void RelocateComponets();
+	FVector GetViewLocation() const;
+
+private:
+	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);
+
+	// Movement player input
 	UFUNCTION() void MoveForward(const FInputActionValue& Value);
-
 	UFUNCTION() void MoveRight(const FInputActionValue& Value);
-
 	UFUNCTION() void Lookup(const FInputActionValue& Value);
-
 	UFUNCTION() void Turn(const FInputActionValue& Value);
-
 	UFUNCTION() void Jumping();
 
+	// Shooting input
+	UFUNCTION() void StartShooting();
+	UFUNCTION() void KeepShooting();
+	UFUNCTION() void StopShooting();
 	UFUNCTION() void Shoot();
 
-	UFUNCTION() void StopShoot();
-
+	// Swap guns
 	UFUNCTION() void SwapGuns();
 
+	// Reload guns
 	UFUNCTION() void ReloadGun();
+	UFUNCTION() void IncrementPrimaryGunAmmo();
+	UFUNCTION() void InspectGun();
 
+	// Interact with items
 	UFUNCTION() void InteractWithItem();
-
-	UFUNCTION() void SwitchToADSCamera();
-
-	UFUNCTION() void ResetFPSCamera();
-
 	UFUNCTION() void UsePotion();
 
-	UFUNCTION() void ActiveDash();
+	// Aim input
+	UFUNCTION() void SwitchToADSCamera();
+	UFUNCTION() void ResetFPSCamera();
 
+	// Active ability input
+	UFUNCTION() void ActiveDash();
 	UFUNCTION() void ActiveGunAbility();
 
-	UFUNCTION() void IncrementPrimaryGunAmmo();
-
-public:
-	UFUNCTION() void ADSTimelineProgress(float Value);
-
+	// Active and remove passive ability 
+	UFUNCTION() void ActivePassiveGunAbility(TSubclassOf<UGameplayAbility> PassiveAbility);
+	UFUNCTION() void RemovePassiveGunAbility(FGameplayTagContainer PassiveAbilityTagContainer);
+private:
+	// Timeline behavior | finished and progress
 	UFUNCTION() void DashTimelineFinished();
-
 	UFUNCTION() void RecoilTimelineProgress(float Value);
 
 public:
-	UFUNCTION() void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
-			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	UFUNCTION() void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION() void SavePlayerState();
-
 	UFUNCTION() void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
 
 public:
+	// Callable in animation
 	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
+	UFUNCTION(BlueprintCallable) const bool GetIsRunning() const;
+	UFUNCTION(BlueprintCallable) void AttachMagazineToHandNotify();
+	UFUNCTION(BlueprintCallable) void AttachMagazineToGunNotify();
+	UFUNCTION(BlueprintCosmetic) void CompleteInspectNotify();
 
-	void HealthChanged(const FOnAttributeChangeData& Data);
-
+public:
 	// Getter and setter for shield element
 	void SetShield(AActor* NewShield);
 	AActor* GetShield() const;
+
+	// Getter dash
+	float GetDashLenght() const;
+	float GetDashSpeed() const;
+
+public:
+	FORCEINLINE UCameraComponent* GetCurrentPlayerCamera() const { return CurrentCamera; }
+	FORCEINLINE UOPAG_InventorySystemComponent* GetInventorySystemComponent() const { return InventorySystemComp; }
+	FORCEINLINE AOPAG_GunBase* GetCurrentGun() const { return CurrentGun; }
+	FORCEINLINE AOPAG_ModularGun* GetPrimaryGun() const { return PrimaryGun; }
+
 };

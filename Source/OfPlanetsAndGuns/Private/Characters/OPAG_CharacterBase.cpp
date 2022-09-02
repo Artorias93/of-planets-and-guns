@@ -50,7 +50,7 @@ void AOPAG_CharacterBase::BeginPlay()
 void AOPAG_CharacterBase::FellOutOfWorld(const UDamageType& dmgType)
 {
 	if (GetHealth() > 0.f)
-		ReceiveDamage(GetHealth() + 1.f); //+1 just to make sure it overkills
+		ReceiveDamage(GetHealth() + 1.f, this); //+1 just to make sure it overkills
 }
 
 float AOPAG_CharacterBase::GetHealth() const
@@ -93,7 +93,7 @@ void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> Abilit
 	}
 }
 
-void AOPAG_CharacterBase::ReceiveDamage(const float Damage)
+void AOPAG_CharacterBase::ReceiveDamage(const float Damage, AActor* const Causer)
 {
 	if(AbilitySystemComp && BaseAttributeSet)
 	{
@@ -108,8 +108,9 @@ void AOPAG_CharacterBase::ReceiveDamage(const float Damage)
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
 
-		if(GetHealth()<=0)
+		if(!bDead && GetHealth() <= 0)
 		{
+			bDead = true;
 			Death();
 		}	
 	}

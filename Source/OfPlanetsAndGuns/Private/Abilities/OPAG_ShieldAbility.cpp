@@ -35,9 +35,6 @@ void UOPAG_ShieldAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 		AActor* Item = GetWorld()->SpawnActor(ShieldClass, &PlayerLocation, &SpawnRotator);
 
 		GetPlayer()->SetShield(Item);
-
 	}
-
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
-
 }

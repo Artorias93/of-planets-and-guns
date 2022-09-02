@@ -69,16 +69,31 @@ void AOPAG_Zipline::Interact_Implementation()
 
 	float deltaDistance = FVector::Distance(StartingPoint, EndingPoint);
 	float deltaTime = deltaDistance / 1000;
-	FLatentActionInfo LatentInfo;
-	LatentInfo.CallbackTarget = this;
+	FLatentActionInfo LatentInfoStartingMove, LatentInfoEndingMove;
+	LatentInfoStartingMove.CallbackTarget = LatentInfoEndingMove.CallbackTarget = this;
+	LatentInfoStartingMove.UUID = 0;
+	LatentInfoEndingMove.UUID = 1;
+	LatentInfoEndingMove.ExecutionFunction = "OnZiplineEnded";
+	LatentInfoEndingMove.Linkage = 0;
+	bIsPlayerRidingZipline = true;
 
-	UKismetSystemLibrary::MoveComponentTo(PlayerRef->GetRootComponent(), StartingPoint, PlayerRef->GetRootComponent()->GetRelativeRotation(), false, false, 0.3, false, EMoveComponentAction::Type::Move, LatentInfo);
-	UKismetSystemLibrary::MoveComponentTo(PlayerRef->GetRootComponent(), EndingPoint, PlayerRef->GetRootComponent()->GetRelativeRotation(), false, true, deltaTime , false, EMoveComponentAction::Type::Move , LatentInfo);
-	
+	UKismetSystemLibrary::MoveComponentTo(PlayerRef->GetRootComponent(), StartingPoint,
+		PlayerRef->GetRootComponent()->GetRelativeRotation(),
+		false, false, 0.3, false,
+		EMoveComponentAction::Type::Move, LatentInfoStartingMove);
+	UKismetSystemLibrary::MoveComponentTo(PlayerRef->GetRootComponent(), EndingPoint, 
+		PlayerRef->GetRootComponent()->GetRelativeRotation(), false,
+		true, deltaTime , false, 
+		EMoveComponentAction::Type::Move , LatentInfoEndingMove);
 }
 
 bool AOPAG_Zipline::CanInteract_Implementation() {
-	return bCanPlayerInteract;
+	return bCanPlayerInteract && !bIsPlayerRidingZipline;
+}
+
+bool AOPAG_Zipline::WillChangeInteractStateDynamically_Implementation()
+{
+	return true;
 }
 
 
@@ -93,6 +108,10 @@ void AOPAG_Zipline::SetUpZipline() {
 	InteractableAreaB->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Zipline::OverlapReset);
 
 	PlayerRef = Cast<AOPAG_Player>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	bCanPlayerInteract = false;
+	bIsPlayerRidingZipline = false;
+
 }
 
 void AOPAG_Zipline::OverlapPointABegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -122,6 +141,11 @@ void AOPAG_Zipline::OverlapReset(UPrimitiveComponent* OverlappedComponent, AActo
 	if (PlayerController && OtherActor == PlayerController->GetPawn()) {
 		bCanPlayerInteract = false;
 	}
+}
+
+void AOPAG_Zipline::OnZiplineEnded()
+{
+	bIsPlayerRidingZipline = false;
 }
 
 FString AOPAG_Zipline::InteractString_Implementation()

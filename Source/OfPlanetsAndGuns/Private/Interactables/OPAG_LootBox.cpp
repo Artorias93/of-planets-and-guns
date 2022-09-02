@@ -22,6 +22,11 @@ AOPAG_LootBox::AOPAG_LootBox()
 		LootSpawnPoint->SetupAttachment(RootComponent);
 }
 
+bool AOPAG_LootBox::WillChangeInteractStateDynamically_Implementation()
+{
+	return true;
+}
+
 FString AOPAG_LootBox::InteractString_Implementation()
 {
 	if (bHasBeenOpened)
@@ -99,7 +104,7 @@ void AOPAG_LootBox::SpawnItem()
 	}
 
 	// Spawn Item
-	const FVector SpawnLocation = RootComponent->GetComponentLocation();
+	const FVector SpawnLocation = LootSpawnPoint->GetComponentLocation();//RootComponent->GetComponentLocation();
 	const FRotator SpawnRotator = FRotator::ZeroRotator;
 	AActor* Item = GetWorld()->SpawnActor(Items[0], &SpawnLocation, &SpawnRotator);
 	Items.RemoveAt(0);
@@ -111,7 +116,6 @@ void AOPAG_LootBox::SpawnItem()
 	}
 
 	// Apply force for any items
-	IOPAG_InteractableInterface* TheInterface = Cast<IOPAG_InteractableInterface>(Item);
 	if (Item->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
 	{
 		const FVector Force = Item->GetActorUpVector() * ThrowItems + Item->GetActorForwardVector() * ThrowItems;

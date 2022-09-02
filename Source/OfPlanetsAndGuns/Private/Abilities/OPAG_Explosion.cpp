@@ -38,7 +38,7 @@ void UOPAG_Explosion::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 			if (Character)
 			{
 				const float Damage = Grenade->Damage;
-				Character->ReceiveDamage(Damage);
+				Character->ReceiveDamage(Damage, Grenade);
 			}
 		}
 	}

@@ -78,6 +78,7 @@ AOPAG_Vendor::AOPAG_Vendor()
 		ChildActor_Module2->SetupAttachment(RootComponent);
 }
 
+
 void AOPAG_Vendor::PopulateGunAndModuleArray()
 {
 	const FString Context;
@@ -101,6 +102,12 @@ void AOPAG_Vendor::BeginPlay()
 	
 	EMS->DisableGunTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableGunTextInVendor);
 	EMS->DisableModuleTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableModuleTextInVendor);
+
+}
+
+void AOPAG_Vendor::Unlock() {
+	PopulateGunAndModuleArray();
+	SpawnItem(666);
 }
 
 // Called every frame
@@ -108,27 +115,6 @@ void AOPAG_Vendor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void AOPAG_Vendor::Unlock()
-{
-	bIsInteractable = true;
-}
-
-void AOPAG_Vendor::Interact_Implementation()
-{
-	// Interacting with Vendor spawns merch. Set to false to avoid respawn.
-	bIsInteractable = bIsInfinitelyInteractable;
-
-	PopulateGunAndModuleArray();
-
-	// Active Timer for spawn items
-	SpawnItem(666);
-}
-
-bool AOPAG_Vendor::CanInteract_Implementation()
-{
-	return bIsInteractable;
 }
 
 // Call method for spawning all guns
@@ -226,7 +212,7 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 	if (Player == nullptr)	return;
 
 	// Init fire type
-	const int FireMask = 1 << (int)Player->PrimaryGun->FireType;
+	const int FireMask = 1 << (int)Player->GetPrimaryGun()->GetFireType();
 
 	// Spawn two modules
 	for (int i = 0; i < 2; i++)
@@ -235,7 +221,7 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 		UOPAG_UtilityFunctionLibrary::ShuffleArray(ModulesList);
 
 		// Select random module
-		TSubclassOf<AActor> NewModuleClass = UOPAG_LootManagerComponent::SelectRandomModules(ModulesList, RoomDifficulty, FireMask);
+		TSubclassOf<AActor> NewModuleClass = UOPAG_LootManagerComponent::SelectRandomModule(ModulesList, RoomDifficulty, FireMask);
 		ChildActorModules[i]->SetChildActorClass(NewModuleClass);
 
 		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(ChildActorModules[i]->GetChildActor());
@@ -251,7 +237,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 	int MaxModules = IsPowerful ? 6 : 3;
 
 	// Init gun's fire type (util for pick random modules)
-	const int FireMask = 1 << (int)Gun.FireType;
+	const int FireMask = 1 << (int)Gun.GetFireType();
 	const int RandomNumberOfModules = FMath::RandRange(MinModules, MaxModules);
 
 	// Create array of modules type
@@ -269,7 +255,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 	while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 	{
 		const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
-		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModules(ModulesList, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModule(ModulesList, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
 		if (Module != nullptr)
 		{
 			switch (ModuleTypes[RandomModuleIndex])

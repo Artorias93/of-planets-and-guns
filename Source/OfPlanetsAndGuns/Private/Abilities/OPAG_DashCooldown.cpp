@@ -4,7 +4,7 @@ UOPAG_DashCooldown::UOPAG_DashCooldown()
 {
 	DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	FScalableFloat DashScalableFloat;
-	DashScalableFloat.SetValue(1.f);
+	DashScalableFloat.SetValue(0.7f);
 	FGameplayEffectModifierMagnitude DashMagnitude(DashScalableFloat);
 	DurationMagnitude = DashMagnitude;
 	FInheritedTagContainer DashGrantedTags;

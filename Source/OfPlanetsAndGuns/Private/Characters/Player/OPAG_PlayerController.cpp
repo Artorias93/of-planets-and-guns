@@ -48,9 +48,10 @@ void AOPAG_PlayerController::SetupInputComponent()
 	EIC->BindAction(InputActions[2]->InputAction, ETriggerEvent::Canceled, this, &AOPAG_PlayerController::StopJumping);
 
 	// All binding events for shoot
-	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::Shoot);
-	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::Shoot);
+	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::StartShoot);
+	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Triggered, this, &AOPAG_PlayerController::KeepShoot);
 	EIC->BindAction(InputActions[3]->InputAction, ETriggerEvent::Completed, this, &AOPAG_PlayerController::StopShoot);
+	EIC->BindAction(InputActions[11]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::InspectGun);
 
 	// Binding event for interact with objects
 	EIC->BindAction(InputActions[4]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::InteractWithItem);
@@ -102,9 +103,14 @@ void AOPAG_PlayerController::StopJumping()
 	EMS->StopJumping.Broadcast();
 }
 
-void AOPAG_PlayerController::Shoot()
+void AOPAG_PlayerController::StartShoot()
 {
-	EMS->Shoot.Broadcast();
+	EMS->StartShoot.Broadcast();
+}
+
+void AOPAG_PlayerController::KeepShoot()
+{
+	EMS->KeepShoot.Broadcast();
 }
 
 void AOPAG_PlayerController::StopShoot()
@@ -120,6 +126,11 @@ void AOPAG_PlayerController::SwapGuns()
 void AOPAG_PlayerController::ReloadGun()
 {
 	EMS->ReloadGun.Broadcast();
+}
+
+void AOPAG_PlayerController::InspectGun()
+{
+	EMS->InspectGun.Broadcast();
 }
 
 void AOPAG_PlayerController::InteractWithItem()

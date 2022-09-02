@@ -63,8 +63,8 @@ public:
 
 	void GenerateLoot();
 	void Unlock() const;
-	static TSubclassOf<AActor> SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask);
-	static TSubclassOf<AActor> SelectRandomModules(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes);
+	static TSubclassOf<AActor> SelectRandomModule(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask);
+	static TSubclassOf<AActor> SelectRandomModule(TArray<FOPAG_ModuleList*>& ModulesList, const float DifficultyValue, const int FireMask, const EModuleTypes ModuleTypes);
 
 private:
 	void SpawnLootContainers();

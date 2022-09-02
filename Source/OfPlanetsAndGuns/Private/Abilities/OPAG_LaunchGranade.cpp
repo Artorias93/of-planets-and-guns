@@ -5,6 +5,9 @@
 #include "Characters/Player/OPAG_Player.h"
 #include "Camera/CameraComponent.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
+#include "Weapons/Modules/SpecializedModules/Accessory/OPAG_AccessoryThrowable.h"
+#include "Weapons/Throwables/OPAG_Grenade.h"
+#include "Weapons/Throwables/OPAG_Throwable.h"
 
 UOPAG_LaunchGranade::UOPAG_LaunchGranade(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {
@@ -13,16 +16,30 @@ UOPAG_LaunchGranade::UOPAG_LaunchGranade(const FObjectInitializer& ObjectInitial
 
 void UOPAG_LaunchGranade::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	//ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	const bool bResult = CommitAbility(Handle, ActorInfo, ActivationInfo);
-	AOPAG_Player* Player = GetPlayer();
-	if (Player)
+	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
-		const FRotator CameraRotation = Player->CurrentCamera->GetComponentRotation();
-		Player->PrimaryGun->ShootThrowable(CameraRotation);
+		
+		const AOPAG_Player* const Player = GetPlayer();
+		const AOPAG_AccessoryThrowable* const Accessory = Cast<AOPAG_AccessoryThrowable>(Player->GetPrimaryGun()->GetModuleBySocketType(EModuleTypes::Accessory));
+		if (Player == nullptr || Accessory == nullptr)
+		{
+			EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
+			return;
+		}
+
+		const bool bResult = CommitAbility(Handle, ActorInfo, ActivationInfo);
+		if (!bResult || Player == nullptr || Accessory == nullptr)
+		{
+			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		}
+
+		const FRotator CameraRotation = Player->GetCurrentPlayerCamera()->GetComponentRotation();
+		const TSubclassOf<AOPAG_Throwable> ThrowableClass = Accessory->GetThrowable();
+		Player->GetPrimaryGun()->ShootThrowable(ThrowableClass, CameraRotation);
 		if(!SMS)
 			SMS = GetWorld()->GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 		if (SMS)
 			SMS->PlayAbiltySounds(Player, EAbilitySoundAction::GL_Fire);
 	}
+	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
 }

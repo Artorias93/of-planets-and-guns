@@ -88,3 +88,8 @@ void AOPAG_AICBase::LoseTarget()
 	GetBlackboardComponent()->SetValueAsObject("TargetActor", nullptr);
 	ClearFocus(EAIFocusPriority::Gameplay);
 }
+
+void AOPAG_AICBase::SetBlackboardEntryAsBool(FName EntryName, bool Value)
+{
+	BlackboardComponent->SetValueAsBool(EntryName, Value);
+}

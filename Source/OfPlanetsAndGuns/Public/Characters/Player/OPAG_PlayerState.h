@@ -11,7 +11,6 @@ enum class PlayerStateLoadType : uint8
 	PREVIOUS_STAGE
 };
 
-
 USTRUCT(BlueprintType)
 struct FOPAG_PlayerState : public FTableRowBase
 {
@@ -43,5 +42,4 @@ struct FOPAG_PlayerState : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 		uint8 bIsPrimaryActive : 1;
-
 };

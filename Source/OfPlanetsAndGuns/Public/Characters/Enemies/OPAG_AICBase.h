@@ -18,6 +18,10 @@ public:
 
 	AOPAG_AICBase();
 
+
+	UFUNCTION()
+		void SetBlackboardEntryAsBool(FName EntryName, bool Value);
+
 protected:
 
 	virtual void OnPossess(APawn* ControlledPawn) override;
@@ -26,7 +30,7 @@ protected:
 	void OnPerceptionUpdated(AActor* UpdatedActor, FAIStimulus Stimulus);
 
 	UFUNCTION()
-	void LoseTarget();
+		void LoseTarget();
 
 private:
 

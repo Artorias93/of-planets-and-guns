@@ -5,7 +5,7 @@
 #include "OPAG_SingleShot.generated.h"
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_SingleShot : public AOPAG_ModularGun
+class OFPLANETSANDGUNS_API AOPAG_SingleShot final : public AOPAG_ModularGun
 {
 	GENERATED_BODY()
 	

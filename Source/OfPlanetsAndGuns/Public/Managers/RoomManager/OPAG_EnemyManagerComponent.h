@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OPAG_RoomManager.h"
 #include "Components/ActorComponent.h"
 #include "OPAG_EnemyManagerComponent.generated.h"
 
 
+struct FOPAG_EnemySpawnsPerLevel;
 class UDataTable;
 struct FOPAG_EnemyLevel;
 class AOPAG_Enemy;
@@ -27,6 +29,7 @@ class OFPLANETSANDGUNS_API UOPAG_EnemyManagerComponent : public UActorComponent
 	TArray<TSoftObjectPtr<AOPAG_Enemy>> EnemiesInRoom;
 
 	TArray<FOPAG_EnemyLevel*> BaseEnemyLevels;
+	TArray<FOPAG_EnemySpawnsPerLevel*> EnemySpawnsPerLevel;
 	int32 EnemyDeathCount;
 
 	static constexpr int32 SpawnAttempts = 3;
@@ -48,6 +51,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager")
 		UDataTable* EnemyTypes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager")
+		UDataTable* EnemySpawnsPerLevelTable;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Manager")
 		float Spread;
@@ -80,5 +86,7 @@ public:
 		void SpawnWave();
 
 	int32 GetSpawnerCount() const;
+
+	int32 GetEnemyCountToSpawn(const float Difficulty, const AOPAG_RoomManager* RoomManager) const;
 
 };

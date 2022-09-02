@@ -2,7 +2,12 @@
 
 
 #include "Characters/Enemies/PillarEnemy/OPAG_PillarEnemy.h"
+
+#include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 AOPAG_PillarEnemy::AOPAG_PillarEnemy()
 {
@@ -12,12 +17,26 @@ AOPAG_PillarEnemy::AOPAG_PillarEnemy()
 
 void AOPAG_PillarEnemy::Death()
 {
-	if (PillarMesh)
+	if (EMS != nullptr)
 	{
-		PillarMesh->K2_DetachFromComponent(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld);
-		PillarMesh->SetSimulatePhysics(true);
-		PillarMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		EMS->DestroyedPillar.Broadcast();
 	}
-	
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PillarMesh->SetSimulatePhysics(true);
+	PillarMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	UGameplayStatics::SpawnEmitterAttached(
+		DeathParticle,
+		this->GetDefaultAttachComponent(),
+		NAME_None,
+		FVector::ZeroVector,
+		FRotator::ZeroRotator,
+		EAttachLocation::KeepRelativeOffset,
+		true,
+		EPSCPoolMethod::None,
+		true
+	);
+
 	Super::Death();
 }

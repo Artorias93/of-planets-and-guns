@@ -3,6 +3,9 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include <Kismet/GameplayStatics.h>
 #include "Characters/Enemies/OPAG_Enemy.h"
+#include "Weapons/Guns/OPAG_GunBase.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
 
 AOPAG_Shotgun::AOPAG_Shotgun()
 {
@@ -40,8 +43,8 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 					//If the hit component is the shield, damage is not applied
 					if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
 					{
-						const float Damage = Stats.Damage / ConsecutiveProjectile;
-						Character->ReceiveDamage(Damage);
+						const float Damage = GetStatsTotal().Damage / ConsecutiveProjectile;
+						Character->ReceiveDamage(Damage, GetParentActor());
 					}
 				}
 			}
@@ -53,4 +56,10 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 	UGameplayStatics::SpawnEmitterAttached(MuzzlePartile, GetMuzzle(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None, true);
 
 	AmmoCurrent--;
+
+	// Update Ammo ui
+	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+	if (AmmoCurrent == 0)
+		EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
 }

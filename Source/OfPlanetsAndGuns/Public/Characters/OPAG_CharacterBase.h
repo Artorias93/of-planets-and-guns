@@ -14,6 +14,8 @@ class OFPLANETSANDGUNS_API AOPAG_CharacterBase : public ACharacter, public IAbil
 {
 	GENERATED_BODY()
 
+		bool bDead = false;
+
 public:
 
 	AOPAG_CharacterBase();
@@ -31,7 +33,7 @@ public:
 	UPROPERTY()
 	class UOPAG_SoundManagerSubsystem* SMS;
 	
-	virtual void ReceiveDamage(const float Damage);
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer);
 	virtual void ReceiveDamage(AActor* Throwable);
 
 	// Ability system

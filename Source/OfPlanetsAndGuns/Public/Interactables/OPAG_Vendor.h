@@ -16,11 +16,9 @@ class UChildActorComponent;
 class UOPAG_EventManagerSubsystem;
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_Vendor : public AActor, public IOPAG_InteractableInterface
+class OFPLANETSANDGUNS_API AOPAG_Vendor : public AActor
 {
 	GENERATED_BODY()
-
-	bool bIsInteractable = true;
 	
 public:	
 
@@ -61,8 +59,6 @@ public:
 		UDataTable* DataTableModules;
 
 public:
-	UPROPERTY(Category = Debug, EditAnywhere, BlueprintReadWrite)
-	bool bIsInfinitelyInteractable = false;
 
 private:
 	UOPAG_EventManagerSubsystem* EMS;
@@ -79,12 +75,6 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	void Unlock();
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) void Interact();
-	virtual void Interact_Implementation() override;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) bool CanInteract();
-	virtual bool CanInteract_Implementation() override;
 
 	void SpawnItem(const float RoomDifficulty);
 	void AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue);

@@ -4,22 +4,55 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Abilities/OPAG_AbilityTypes.h"
 #include "OPAG_AbilityBase.generated.h"
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_AbilityBase : public AActor
 {
-	GENERATED_BODY()
-	
+	GENERATED_BODY()		
+
 public:	
 	AOPAG_AbilityBase();
 
+public:
+	void SetCaller(AActor* Caller);
+	void SetTarget(AActor* Target);
+	virtual void Init(EAbilityTypes AbilityType, float Delay = 0);
+
 protected:
-	virtual void BeginPlay() override;
+	virtual void BeginPlay() override;	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		class USceneComponent* Pivot;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+	class USceneComponent* Parent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float AbilityDuration;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float AbilityDamage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float AbilityDelay = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ability")
+		float EnableCollisionAfterSeconds;
 
 	UPROPERTY()
-		class UOPAG_EventManagerSubsystem* EMS;
+		EAbilityTypes CastedAbilityType;
+	
+	UPROPERTY()
+		UOPAG_EventManagerSubsystem* EMS;
 
-	UPROPERTY(EditAnywhere, Category = "Mesh")
-		class UStaticMeshComponent* AbilityMesh;
+	UPROPERTY()
+		AActor* Caller;	
+
+	UPROPERTY()
+		AActor* Target;	
+
+	virtual void DestroyAbility();
 };

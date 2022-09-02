@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_GameplayHUD.h"
 #include "UI/OPAG_UWGunView.h"
 #include "UI/OPAG_UWCurrencyView.h"
@@ -10,9 +7,10 @@
 #include "UI/OPAG_UWModuleView.h"
 #include "UI/OPAG_UWGunCompareView.h"
 #include "UI/OPAG_UWInteractView.h"
+#include "UI/OPAG_UWDamageIndicatorView.h"
+#include "UI/OPAG_UWGameOverView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
-#include "UI/OPAG_UWGameOverView.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 
 
@@ -34,6 +32,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->PlayerDied.AddDynamic(this, &AOPAG_GameplayHUD::ShowGameOverView);
 		EMS->LookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::ShowInteractView);
 		EMS->UnlookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::HideInteractView);
+		EMS->DamagedBy.AddDynamic(this, &AOPAG_GameplayHUD::ShowDamageIndicatorView);
 	}
 }
 
@@ -156,13 +155,23 @@ void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 	}
 }
 
-void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats CurrentModule, 
+void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule, 
 	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
 	const int EquippableTypes, const bool CanBeEquipped)
 {
+	if (GunCompareViewWidget->IsInViewport())
+		HideGunCompareView();
+
 	if (ModuleViewWidget) {
-		ModuleViewWidget->AddToViewport(3);
-		ModuleViewWidget->UpdateModuleValues(GunStats, CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
+		if (ModuleViewWidget->IsInViewport()) {
+			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity,
+			                                     OtherModuleType, EquippableTypes, CanBeEquipped);
+		}
+		else {
+			ModuleViewWidget->AddToViewport(3);
+			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity, 
+			                                     OtherModuleType, EquippableTypes, CanBeEquipped);
+		}
 	}
 }
 
@@ -176,9 +185,19 @@ void AOPAG_GameplayHUD::HideModuleCompareView()
 void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName, 
 	const FString OtherGunType)
 {
+	if (ModuleViewWidget->IsInViewport())
+		HideModuleCompareView();
+
 	if (GunCompareViewWidget) {
-		GunCompareViewWidget->AddToViewport(3);
-		GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
+		if (GunCompareViewWidget->IsInViewport()) 
+		{
+			GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
+		}
+		else 
+		{
+			GunCompareViewWidget->AddToViewport(3);
+			GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
+		}
 	}
 }
 
@@ -206,7 +225,10 @@ void AOPAG_GameplayHUD::ShowGameOverView()
 void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, const FString InteractText)
 {
 	if (InteractViewWidget) {
-		InteractViewWidget->AddToViewport(3);
+		if (!InteractViewWidget->IsInViewport())
+		{
+			InteractViewWidget->AddToViewport(3);
+		}
 		InteractViewWidget->UpdateInteractText(bCanInteract, InteractText);
 	}
 }
@@ -217,3 +239,28 @@ void AOPAG_GameplayHUD::HideInteractView()
 		InteractViewWidget->RemoveFromViewport();
 	}
 }
+
+void AOPAG_GameplayHUD::ShowDamageIndicatorView(AActor* const CurrentThreatActor)
+{
+	if (DamageIndicatorViewWidgetClass)
+	{
+		DamageIndicatorViewWidget = CreateWidget<UOPAG_UWDamageIndicatorView>(GetWorld(), DamageIndicatorViewWidgetClass);
+	}
+	
+	if(DamageIndicatorViewWidget)
+	{
+		if(!DamageIndicatorViewWidget->IsVisible())
+		{
+			DamageIndicatorViewWidget->AddToViewport(1);
+		}
+		DamageIndicatorViewWidget->SetCurrentThreatActor(CurrentThreatActor);
+	}
+}
+
+void AOPAG_GameplayHUD::HideDamageIndicatorView()
+{
+	if (DamageIndicatorViewWidget) {
+		DamageIndicatorViewWidget->RemoveFromViewport();
+	}
+}
+

@@ -1,32 +1,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Weapons/Throwables/OPAG_Throwable.h"
 #include "OPAG_Grenade.generated.h"
 
-class USphereComponent;
-class UStaticMeshComponent;
-class UProjectileMovementComponent;
 class UGameplayStatics;
 class UParticleSystem;
 class USoundBase;
 
 UCLASS()
-class OFPLANETSANDGUNS_API AOPAG_Grenade : public AActor
+class OFPLANETSANDGUNS_API AOPAG_Grenade : public AOPAG_Throwable
 {
 	GENERATED_BODY()
 	
 public:	
 	AOPAG_Grenade();
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	USphereComponent* SphereComponent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* Mesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UProjectileMovementComponent* Projectile;
 
 	UPROPERTY()
 		class UOPAG_SoundManagerSubsystem* SMS;
@@ -53,14 +41,11 @@ private:
 
 protected:
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	virtual	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	virtual	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		FVector NormalImpulse, const FHitResult& Hit) override;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION()
-	virtual void Detonate();
+	UFUNCTION()	virtual void Detonate();
 
 };

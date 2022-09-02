@@ -70,8 +70,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 		bool CanInteract();
-
 	virtual bool CanInteract_Implementation() override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+		bool WillChangeInteractStateDynamically();
+	virtual bool WillChangeInteractStateDynamically_Implementation() override;
 
 private: 
 	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline" , meta = (AllowPrivateAccess = "true"))
@@ -83,8 +86,9 @@ private:
 	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline" , meta = (AllowPrivateAccess = "true"))
 		AOPAG_Player* PlayerRef;
 
-	UPROPERTY(VisibleinstanceOnly, BlueprintReadOnly, Category = "Zipline", meta = (AllowPrivateAccess = "true"))
-		uint8 bCanPlayerInteract : 1;
+	uint8 bCanPlayerInteract : 1;
+
+	uint8 bIsPlayerRidingZipline : 1;
 
 	UFUNCTION(BlueprintCallable)
 		void SetUpZipline();
@@ -97,6 +101,9 @@ private:
 
 	UFUNCTION()
 		void OverlapReset(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+		void OnZiplineEnded();
 
 public:
 	FString InteractString_Implementation() override;

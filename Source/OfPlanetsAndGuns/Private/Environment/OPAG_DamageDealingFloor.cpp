@@ -31,7 +31,7 @@ void AOPAG_DamageDealingFloor::TimelineFinished()
 {
 	if (CharacterToDamage)
 	{
-		CharacterToDamage->ReceiveDamage(DamagePerTick);
+		CharacterToDamage->ReceiveDamage(DamagePerTick, this);
 		TickTimeline->PlayFromStart();
 	}
 }

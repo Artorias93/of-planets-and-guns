@@ -62,8 +62,17 @@ bool AOPAG_Portal::CanInteract_Implementation()
 	return bIsOpen;
 }
 
+bool AOPAG_Portal::WillChangeInteractStateDynamically_Implementation()
+{
+	return true;
+}
+
 FString AOPAG_Portal::InteractString_Implementation()
 {
-	return "Enter the portal [E]";
+	
+	if (bIsOpen) return FString("Enter the ") +
+		(PortalType == EStageType::SafeRoom ? "Safe Room " : "next Stage ") +
+		"[E]";
+	else return "Locked";
 }
 

@@ -28,7 +28,7 @@ public:
 
 	void UpdateAcceleration(float const NewAcceleration) const;
 	
-	virtual void ReceiveDamage(float DamageAmount) override;
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
 
 	virtual void Attack();
 
@@ -51,6 +51,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void TurnOffBoosters() const;
+
+	UFUNCTION(BlueprintCallable)
+	AActor* GetFocusedActor() const;
 
 protected:
 

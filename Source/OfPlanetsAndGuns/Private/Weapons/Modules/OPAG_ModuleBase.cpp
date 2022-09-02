@@ -26,11 +26,6 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 	}
 }
 
-FString AOPAG_ModuleBase::InteractString_Implementation()
-{
-	return "Pick up module [E]";
-}
-
 void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -45,14 +40,7 @@ void AOPAG_ModuleBase::Tick(float DeltaTime)
 
 }
 
-#pragma region GetAndSet
-void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
-{
-	Rarity = NewRarity;
-	Stats = NewStats;
-	EquippableFireTypes = NewEquippableFireTypes;
-}
-
+#pragma region Get
 FString AOPAG_ModuleBase::GetRarityName(EModuleRarity ModuleRarity)
 {
 	FString RarityName;
@@ -69,13 +57,52 @@ FString AOPAG_ModuleBase::GetTypeName(EModuleTypes ModuleType)
 	return TypeName;
 }
 
-UPrimitiveComponent* AOPAG_ModuleBase::GetSphereComponent() const
+FString AOPAG_ModuleBase::GetModuleName() const
 {
-	return Sphere;
+	return Name;
 }
-#pragma endregion GetAndSet
+
+int AOPAG_ModuleBase::GetLevel() const
+{
+	return Level;
+}
+
+EModuleTypes AOPAG_ModuleBase::GetType() const
+{
+	return Type;
+}
+
+EModuleRarity AOPAG_ModuleBase::GetRarity() const
+{
+	return Rarity;
+}
+
+FOPAG_GunStats AOPAG_ModuleBase::GetStats() const
+{
+	return Stats;
+}
+
+int AOPAG_ModuleBase::GetEquippableFireTypes() const
+{
+	return EquippableFireTypes;
+}
+#pragma endregion Get
+
+#pragma region Set
+void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
+{
+	Rarity = NewRarity;
+	Stats = NewStats;
+	EquippableFireTypes = NewEquippableFireTypes;
+}
+#pragma endregion Set
 
 #pragma region Interface
+FString AOPAG_ModuleBase::InteractString_Implementation()
+{
+	return "Pick up module [E]";
+}
+
 void AOPAG_ModuleBase::Interact_Implementation()
 {
 
@@ -84,9 +111,11 @@ void AOPAG_ModuleBase::Interact_Implementation()
 bool AOPAG_ModuleBase::CanInteract_Implementation()
 {
 	if (GetParentActor() == nullptr)
-	{
 		return true;
-	}
+
+	if (AOPAG_Vendor* vendor = Cast<AOPAG_Vendor>(GetParentActor()))
+		return true;
+
 	return false;
 }
 
@@ -112,7 +141,7 @@ void AOPAG_ModuleBase::FlyRotationTimer_Implementation()
 
 const float AOPAG_ModuleBase::GetPriceTotal_Implementation()
 {
-	return PriceBase * (1 + (Level - 1));
+	return PriceBase * (1 + PriceMuliplierPercentage * (Level - 1));
 }
 
 bool AOPAG_ModuleBase::CanBuy_Implementation()
@@ -124,10 +153,10 @@ bool AOPAG_ModuleBase::CanBuy_Implementation()
 	}
 
 	// Equippable fire type check
-	const int FireMask = 1 << (int)Player->PrimaryGun->FireType;
+	const int FireMask = 1 << (int)Player->GetPrimaryGun()->GetFireType();
 
 	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
-	if (Vendor != nullptr && FireMask & EquippableFireTypes && Player->InventorySystemComp->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
+	if (Vendor != nullptr && FireMask & EquippableFireTypes && Player->GetInventorySystemComponent()->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
 	{
 		return true;
 	}
@@ -135,12 +164,21 @@ bool AOPAG_ModuleBase::CanBuy_Implementation()
 }
 #pragma endregion Interface
 
-void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, 
+#pragma region Attachment
+void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats,
 	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
 	SetParameters(NewRarity, NewStats, NewEquippableFireTypes);
 }
 
+void AOPAG_ModuleBase::OnDetach()
+{
+
+}
+
+#pragma endregion Attachment
+
+#pragma region Physics
 void AOPAG_ModuleBase::CheckIfPhysical() const
 {
 	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
@@ -150,9 +188,10 @@ void AOPAG_ModuleBase::CheckIfPhysical() const
 	{
 		ModuleMesh->SetSimulatePhysics(true);
 	}
-	else 
+	else
 	{
 		Sphere->SetCollisionProfileName("NoCollision");
 		ModuleMesh->SetCollisionProfileName("NoCollision");
 	}
 }
+#pragma endregion Physics

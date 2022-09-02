@@ -1,9 +1,6 @@
 #include "Weapons/Throwables/OPAG_Grenade.h"
 
 #include "Characters/Enemies/OPAG_Enemy.h"
-#include "Components/SphereComponent.h"
-#include "Components/StaticMeshComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
@@ -13,22 +10,6 @@ AOPAG_Grenade::AOPAG_Grenade()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
-	SphereComponent->SetSphereRadius(20.f);
-	SphereComponent->SetCollisionProfileName("BlockAll");
-	SphereComponent->OnComponentHit.AddDynamic(this, &AOPAG_Grenade::OnHit);
-	RootComponent = SphereComponent;
-
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GrenadeMesh"));
-	Mesh->SetCollisionProfileName("NoCollision");
-	Mesh->SetRelativeScale3D(FVector(.1f, .1f, .1f));
-	Mesh->SetupAttachment(RootComponent);
-
-	Projectile = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
-	Projectile->InitialSpeed = 3000.f;
-	Projectile->MaxSpeed = 3000.f;
-	Projectile->bShouldBounce = true;
-	Projectile->Velocity = FVector(3000.f, 0, 0);
 }
 
 void AOPAG_Grenade::DamageAllTargetsInRange()
@@ -50,7 +31,7 @@ void AOPAG_Grenade::DamageAllTargetsInRange()
 		}
 		for (AOPAG_Enemy* Enemy : HitEnemies)
 		{
-			Enemy->ReceiveDamage(Damage);
+			Enemy->ReceiveDamage(Damage, this);
 		}
 	}
 }

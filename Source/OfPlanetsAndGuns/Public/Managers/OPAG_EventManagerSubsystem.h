@@ -7,6 +7,8 @@
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "Characters/Player/OPAG_PlayerState.h"
+#include "Characters/Player/OPAG_PlayerState.h"
+#include "Abilities/OPAG_AbilityTypes.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
 class AOPAG_RoomStreamingVolume;
@@ -63,7 +65,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountDecrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLookedAtInteractable, bool, IsInteractable, FString, InteractText);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtInteractable);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_EightParams(FLookedAtModule, const FOPAG_GunStats, GunStats, const FOPAG_GunStats, CurrentModule, 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_SevenParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, 
 const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
 const int, EquippableTypes, const bool, CanBeEquipped);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
@@ -74,7 +76,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtGun);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGoldChanged, int, CurrentValue);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSpawnedEnemy, AOPAG_Enemy*, Enemy, AActor*, Caller);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyKilled, const AOPAG_Enemy* const, DeadEnemy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDamagedBy, AActor* const, Causer);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveForward, const FInputActionValue&, Value);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMoveRight, const FInputActionValue&, Value);
@@ -84,7 +88,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FJumping);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopJumping);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwapGuns);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadGun);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShoot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartShoot);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FKeepShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopShoot);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInteractWithItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSwitchToADSCamera);
@@ -92,16 +97,25 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResetFPSCamera);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUsePotion);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveDash);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveGunAbility);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FInspectGun);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, TSubclassOf<AOPAG_AbilityBase>, AbilityClass, const AActor*, Caller, FVector, Position, AOPAG_AbilityBase*, CastedAbility);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCastAbility, EAbilityTypes, AbilityType, AActor*, Caller, AActor*, Target, EAbilitySpawnPattern, AbilitySpawnPattern);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBrokenForceField);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FForceFieldHit, AActor*, OwnerInstance);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCastedEnemyWaveCleared);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDestroyedPillar);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableGunTextInVendor, AOPAG_ModularGun*, Gun);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableModuleTextInVendor, AOPAG_ModuleBase*, Module);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivePassiveAbilityEffect, TSubclassOf<UGameplayAbility>, PassiveAbilityClass);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemovePassiveAbilityEffect, FGameplayTagContainer, PassiveAbilityTagContainer);
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
+
 public:
 
 	FVector C;
@@ -197,7 +211,12 @@ public:
 
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
+		FSpawnedEnemy SpawnedEnemy;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
 		FEnemyKilled EnemyKilled;
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Enemy)
+		FDamagedBy DamagedBy;
 
 	//Game stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
@@ -221,7 +240,10 @@ public:
 		FTurn Turn;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
-		FShoot Shoot;
+		FStartShoot StartShoot;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+		FKeepShoot KeepShoot;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FStopShoot StopShoot;
@@ -256,12 +278,33 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
 		FActiveGunAbility ActiveGunAbility;
 
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Force Field Ability")
+		FDestroyedPillar DestroyedPillar;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Force Field Ability")
+		FBrokenForceField BrokenForceField;
+	
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
 		FCastAbility CastAbility;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+	FCastedEnemyWaveCleared CastedEnemyWaveCleared;
+	
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+		FForceFieldHit ForceFieldHit;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+	FActivePassiveAbilityEffect ActivePassiveAbilityEffect;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Ability")
+	FRemovePassiveAbilityEffect RemoveAbilityEffect;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
+	FInspectGun InspectGun;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Vendor")
 	FDisableGunTextInVendor DisableGunTextInVendor;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Vendor")
-	FDisableModuleTextInVendor DisableModuleTextInVendor;
+	FDisableModuleTextInVendor DisableModuleTextInVendor;	
 };

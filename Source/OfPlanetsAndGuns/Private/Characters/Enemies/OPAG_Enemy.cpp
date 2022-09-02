@@ -67,6 +67,7 @@ AOPAG_Enemy::AOPAG_Enemy()
 		EnemyHealthBarComponent->SetWidgetSpace(EWidgetSpace::World);
 		EnemyHealthBarComponent->SetDrawSize(FVector2D(100.f, 10.f));
 		EnemyHealthBarComponent->SetupAttachment(RootComponent);
+		EnemyHealthBarComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 
@@ -131,13 +132,13 @@ void AOPAG_Enemy::UpdateAcceleration(float const NewAcceleration) const
 	GetCharacterMovement()->MaxAcceleration = NewAcceleration;
 }
 
-void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
+void AOPAG_Enemy::ReceiveDamage(const float Damage, AActor* const Causer)
 {
-	Super::ReceiveDamage(DamageAmount);
+	Super::ReceiveDamage(Damage, this);
 	
 	//Triggers the damage sense on the AI controlled pawn
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this,
-		UGameplayStatics::GetPlayerPawn(GetWorld(), 0), DamageAmount,
+		UGameplayStatics::GetPlayerPawn(GetWorld(), 0), Damage,
 		UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(),
 		GetActorLocation(), NAME_None);
 	//TODO: Remove the print to screen
@@ -145,8 +146,11 @@ void AOPAG_Enemy::ReceiveDamage(float DamageAmount)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
 
 	// Update health bar
-	const float HealthPercent = BaseAttributeSet->GetHealth() / BaseAttributeSet->GetMaxHealth();
-	EnemyHealthBar->GetProgressBar()->SetPercent(HealthPercent);
+	if (BaseAttributeSet && EnemyHealthBar)
+	{
+		const float HealthPercent = BaseAttributeSet->GetHealth() / BaseAttributeSet->GetMaxHealth();
+		EnemyHealthBar->GetProgressBar()->SetPercent(HealthPercent);
+	}
 }
 
 void AOPAG_Enemy::Attack()
@@ -162,8 +166,8 @@ void AOPAG_Enemy::Death()
 		AIController->GetBrainComponent()->StopLogic("Death");
 	}
 
-	// Set HealthBar hidden
-	EnemyHealthBarComponent->SetHiddenInGame(true);
+	// Destroy health bar
+	EnemyHealthBarComponent->DestroyComponent(true);
 
 	//Mesh ragdoll functions
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
@@ -217,6 +221,16 @@ void AOPAG_Enemy::TurnOffBoosters() const
 	{
 		BoosterParticleComponent2->SetVisibility(false);
 	}
+}
+
+AActor* AOPAG_Enemy::GetFocusedActor() const
+{
+	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
+	{
+		return AIController->GetFocusActor();
+	}
+	else
+		return nullptr;
 }
 
 void AOPAG_Enemy::InitSpawnFX()
