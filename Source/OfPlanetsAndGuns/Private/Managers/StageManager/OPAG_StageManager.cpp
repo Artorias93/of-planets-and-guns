@@ -231,10 +231,16 @@ void AOPAG_StageManager::FilterStartingRooms(const TArray<FOPAG_RoomOffset*>& Ro
 {
 	for (FOPAG_RoomOffset* Room : RoomList)
 	{
-		if ((Room->bIsStartingRoom && bIsStartingRoom) ||
-			(!Room->bIsStartingRoom && !bIsStartingRoom))
-		{
-			FilteredRooms.Add(Room);
+		switch (Room->RoomType) { case ERoomType::Normal: 
+			if (!bIsStartingRoom) FilteredRooms.Add(Room);
+			break;
+		case ERoomType::SpaceshipStart: 
+			if (bIsStartingRoom && BaseGenerationData.StageIndex == 0) FilteredRooms.Add(Room);
+			break;
+		case ERoomType::TeleporterStart: 
+			if (bIsStartingRoom && BaseGenerationData.StageIndex > 0) FilteredRooms.Add(Room);
+			break;
+		default: ;
 		}
 	}
 }
@@ -394,9 +400,10 @@ void AOPAG_StageManager::FinishedLoadingStage() const
 	if (GI)
 	{
 		GI->GetEventManager()->StageLoaded.Broadcast(RoomCounter);
-		FTransform StartLocation = StagePathing[StartingRoom]->CurrentRoom->RoomOffset.Offset;
-		StartLocation += StagePathing[StartingRoom]->CurrentRoom->LevelStreaming->LevelTransform;
-		GI->GetEventManager()->PlacePlayerAtStart.Broadcast(StartLocation);
+		FTransform StartTransform = StagePathing[StartingRoom]->CurrentRoom->RoomOffset.Offset;
+		const FTransform LevelTransform = StagePathing[StartingRoom]->CurrentRoom->LevelStreaming->LevelTransform;
+		StartTransform.AddToTranslation(LevelTransform.GetTranslation());
+		GI->GetEventManager()->PlacePlayerAtStart.Broadcast(StartTransform);
 	}
 }
 
