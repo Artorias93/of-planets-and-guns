@@ -2,6 +2,8 @@
 
 
 #include "Characters/Enemies/PillarEnemy/OPAG_PillarEnemy.h"
+
+#include "Components/CapsuleComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
@@ -19,6 +21,10 @@ void AOPAG_PillarEnemy::Death()
 	{
 		EMS->DestroyedPillar.Broadcast();
 	}
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PillarMesh->SetSimulatePhysics(true);
+	PillarMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 
 	UGameplayStatics::SpawnEmitterAttached(
 		DeathParticle,
