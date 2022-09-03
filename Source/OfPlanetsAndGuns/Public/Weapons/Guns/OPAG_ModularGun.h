@@ -56,8 +56,11 @@ protected:
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float PriceBase = .0f;	
 
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UDataTable* ModuleSecondaryStatsModifierTable;
+
 	UPROPERTY(Category = "OPAG | Gun | Ammo", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-    UDataTable* AmmoReloadingMultipliersTable;
+	UDataTable* AmmoReloadingMultipliersTable;
 
 protected:
 	UPROPERTY(Category = "OPAG | Gun | Standard Modules", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -77,6 +80,7 @@ protected:
 
 protected:
 	FTimerHandle FlyRotationHandle;
+	TArray<FOPAG_SecondaryStatModifier*> ModuleSecondaryStatsModifiers;
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
 	FOPAG_GunStats StatsTotal;
 
@@ -117,6 +121,7 @@ public:
 
 	// Module
 	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules);
+	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules, const FOPAG_GunModuleStats& ModuleStats);
 	bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const EModuleBrand NewModuleBrand, const
 	                  FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity
 	                  & OldModuleRarity, EModuleBrand& OldModuleBrand, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
@@ -155,6 +160,9 @@ public:
 	// Modules struct getter
 	FOPAG_GunModules GetModulesStruct() const;
 	FOPAG_GunModules GetStandardModulesStruct() const;
+
+	// Modules secondary stats modifier array getter
+	const TArray<FOPAG_SecondaryStatModifier*>& GetSecondaryStatsModifiers() const;
 
 	// Modules getter
 	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;

@@ -124,11 +124,16 @@ void AOPAG_ModularGun::Tick(float DeltaTime)
 
 void AOPAG_ModularGun::PopulateAmmoTable()
 {
+	const FString Context;
+	if (ModuleSecondaryStatsModifierTable)
+	{
+		ModuleSecondaryStatsModifierTable->GetAllRows(Context, ModuleSecondaryStatsModifiers);
+	}
 	if (AmmoReloadingMultipliersTable)
 	{
-		const FString Context;
 		AmmoReloadingMultipliersTable->GetAllRows(Context, AmmoReloadingMultipliers);
 	}
+
 }
 
 void AOPAG_ModularGun::CheckIfPhysical() const
@@ -182,6 +187,11 @@ FOPAG_GunModules AOPAG_ModularGun::GetStandardModulesStruct() const
 	StandardModules.Sight = StandardSight;
 
 	return StandardModules;
+}
+
+const TArray<FOPAG_SecondaryStatModifier*>& AOPAG_ModularGun::GetSecondaryStatsModifiers() const
+{
+	return ModuleSecondaryStatsModifiers;
 }
 
 // Return module by child actor of socket
@@ -380,12 +390,25 @@ void AOPAG_ModularGun::GetCurrentState(FOPAG_GunState& GunState) const
 {
 	GunState.GunClass = GetClass();
 
+	AOPAG_ModuleBase* Module = nullptr;
 	GunState.AttachedModules.Barrel = Barrel->GetChildActorClass();
+	Module = Cast<AOPAG_ModuleBase>(Barrel->GetChildActor());
+	if (Module)	GunState.AttachedModuleStats.BarrelStats = Module->GetStats();
 	GunState.AttachedModules.Stock = Stock->GetChildActorClass();
+	Module = Cast<AOPAG_ModuleBase>(Stock->GetChildActor());
+	if (Module)	GunState.AttachedModuleStats.StockStats = Module->GetStats();
 	GunState.AttachedModules.Grip = Grip->GetChildActorClass();
+	Module = Cast<AOPAG_ModuleBase>(Grip->GetChildActor());
+	if (Module)	GunState.AttachedModuleStats.GripStats = Module->GetStats();
 	GunState.AttachedModules.Magazine = Magazine->GetChildActorClass();
+	Module = Cast<AOPAG_ModuleBase>(Magazine->GetChildActor());
+	if (Module)	GunState.AttachedModuleStats.MagazineStats = Module->GetStats();
 	GunState.AttachedModules.Sight = Sight->GetChildActorClass();
+	Module = Cast<AOPAG_ModuleBase>(Sight->GetChildActor());
+	if (Module)	GunState.AttachedModuleStats.SightStats = Module->GetStats();
 	GunState.AttachedModules.Accessory = Accessory->GetChildActorClass();
+	Module = Cast<AOPAG_ModuleBase>(Accessory->GetChildActor());
+	if (Module)	GunState.AttachedModuleStats.AccessoryStats = Module->GetStats();
 
 	GunState.AmmoCurrent = AmmoCurrent;
 	GunState.AmmoMax = AmmoMax;
@@ -447,6 +470,25 @@ void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules
 
 	// Update Stats
 	UpdateStatsTotal();
+}
+
+void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules,
+	const FOPAG_GunModuleStats& ModuleStats)
+{
+	CreateAndAttachAllModules(Modules);
+	AOPAG_ModuleBase* Module = nullptr;
+	Module = Cast<AOPAG_ModuleBase>(Barrel->GetChildActor());
+	if (Module && Modules.Barrel) Module->SetStats(ModuleStats.BarrelStats);
+	Module = Cast<AOPAG_ModuleBase>(Stock->GetChildActor());
+	if (Module && Modules.Stock) Module->SetStats(ModuleStats.StockStats);
+	Module = Cast<AOPAG_ModuleBase>(Grip->GetChildActor());
+	if (Module && Modules.Grip) Module->SetStats(ModuleStats.GripStats);
+	Module = Cast<AOPAG_ModuleBase>(Magazine->GetChildActor());
+	if (Module && Modules.Magazine) Module->SetStats(ModuleStats.MagazineStats);
+	Module = Cast<AOPAG_ModuleBase>(Sight->GetChildActor());
+	if (Module && Modules.Sight) Module->SetStats(ModuleStats.SightStats);
+	Module = Cast<AOPAG_ModuleBase>(Accessory->GetChildActor());
+	if (Module && Modules.Accessory) Module->SetStats(ModuleStats.AccessoryStats);
 }
 
 // Is important when generate the basic gun 

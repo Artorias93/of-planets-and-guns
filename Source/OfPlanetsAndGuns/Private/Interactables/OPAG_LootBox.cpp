@@ -1,7 +1,11 @@
 #include "Interactables/OPAG_LootBox.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
 #include <Components/PrimitiveComponent.h>
+
+#include "Characters/Player/OPAG_Player.h"
 #include "Interactables/OPAG_InteractableInterface.h"
+#include "Kismet/GameplayStatics.h"
+#include "Weapons/Modules/OPAG_ModuleBase.h"
 
 AOPAG_LootBox::AOPAG_LootBox()
 {
@@ -106,6 +110,19 @@ void AOPAG_LootBox::SpawnItem()
 	if (AOPAG_ModularGun* GunModular = Cast<AOPAG_ModularGun>(Item))
 	{
 		GunModular->CreateAndAttachAllModules(Modules);
+	}
+	// If the item is a module, apply bonus stats
+	if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(Item))
+	{
+		const AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (Player != nullptr)
+		{
+			const AOPAG_ModularGun* PrimaryGun = Player->GetPrimaryGun();
+			if (PrimaryGun != nullptr)
+			{
+				Module->SetStats(PrimaryGun->GetSecondaryStatsModifiers());
+			}
+		}
 	}
 
 	// Apply force for any items

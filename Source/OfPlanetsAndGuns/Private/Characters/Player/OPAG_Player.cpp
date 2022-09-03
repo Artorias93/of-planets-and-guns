@@ -1146,11 +1146,9 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 
 				AttachDefaultGuns();
 
-				if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
-				{
-					PrimaryGun->SetAmmoCurrent(StateToApply.PrimaryGun.AmmoCurrent);
-					PrimaryGun->SetAmmoMax(StateToApply.PrimaryGun.AmmoMax);
-				}
+				PrimaryGun->SetAmmoCurrent(StateToApply.PrimaryGun.AmmoCurrent);
+				PrimaryGun->SetAmmoMax(StateToApply.PrimaryGun.AmmoMax);
+
 				if (StateToApply.bIsPrimaryActive) SwapGuns();
 
 				EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());

@@ -96,8 +96,10 @@ public:
 	int GetEquippableFireTypes() const;
 
 	//Setter
-	void SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
-	                   NewEquippableFireTypes);
+	void SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats,
+		const int NewEquippableFireTypes);
+	void SetStats(const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers);
+	void SetStats(const FOPAG_GunStats NewStats);
 
 public:
 	FORCEINLINE USphereComponent* GetModuleSphereComponent() { return Sphere; }
