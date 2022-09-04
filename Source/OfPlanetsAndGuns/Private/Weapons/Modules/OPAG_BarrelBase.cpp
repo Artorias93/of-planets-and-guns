@@ -8,6 +8,7 @@ AOPAG_BarrelBase::AOPAG_BarrelBase()
 
 	// Initialize Parameters
 	Rarity = EModuleRarity::Common;
+	Brand = EModuleBrand::Standard;
 	Type = EModuleTypes::Barrel;
 }
 
