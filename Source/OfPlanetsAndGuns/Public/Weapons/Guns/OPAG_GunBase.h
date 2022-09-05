@@ -125,7 +125,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Maths Utility
-	static float CalculateFirePeriod(const float FireRate);
+	static float CalculatePeriod(const float FireRate);
 
 	// Main system for shooting
 	virtual int Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);

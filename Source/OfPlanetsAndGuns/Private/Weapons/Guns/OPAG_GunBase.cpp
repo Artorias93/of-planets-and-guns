@@ -118,7 +118,7 @@ void AOPAG_GunBase::DecrementAmmoCurrent(const int Value)
 #pragma endregion Set
 
 #pragma region Mathematic Utility
-float AOPAG_GunBase::CalculateFirePeriod(const float FireRate)
+float AOPAG_GunBase::CalculatePeriod(const float FireRate)
 {
 	return SecondsInOneMinute / FireRate;
 }

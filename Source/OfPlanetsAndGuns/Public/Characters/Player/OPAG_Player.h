@@ -187,6 +187,16 @@ private:
 	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	AOPAG_GunBase* CurrentGun;
 
+	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RecoilYawMin = -.01f;
+
+	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RecoilYawMax = .01f;
+
+private:
+	UPROPERTY()
+	TEnumAsByte<ETimelineDirection::Type> RecoilTimelineDirection;
+
 private:
 	// All socket names
 	const FName SocketCameraName = "SOCKET_Camera";
@@ -216,6 +226,7 @@ private:
 	float LastFireTime = .0f;
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
+	FOnTimelineEventStatic OnRecoilTimelineFinished;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
 private:
@@ -331,6 +342,7 @@ private:
 	// Timeline behavior | finished and progress
 	UFUNCTION() void DashTimelineFinished();
 	UFUNCTION() void RecoilTimelineProgress(float Value);
+	UFUNCTION() void RecoilTimelineFinished();
 
 public:
 	UFUNCTION() void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
