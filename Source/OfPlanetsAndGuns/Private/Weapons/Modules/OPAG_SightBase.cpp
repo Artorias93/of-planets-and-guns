@@ -12,6 +12,7 @@ AOPAG_SightBase::AOPAG_SightBase()
 
 	// Initialize Parameters
 	Rarity = EModuleRarity::Common;
+	Brand = EModuleBrand::Standard;
 	Type = EModuleTypes::Sight;
 }
 
@@ -28,10 +29,10 @@ void AOPAG_SightBase::Tick(float DeltaTime)
 
 }
 
-void AOPAG_SightBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats,
-	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
+void AOPAG_SightBase::OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand,
+                               const FOPAG_GunStats NewStats, const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
-	Super::OnAttach(NewRarity, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
+	Super::OnAttach(NewRarity, NewBrand, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
 
 	SightCameraComponent->SetComponentTickEnabled(true);
 }

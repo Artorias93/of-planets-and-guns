@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OPAG_RoomOffset.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/Actor.h"
 #include "OPAG_RoomManager.generated.h"
@@ -54,14 +55,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		AOPAG_RoomStreamingVolume* Volume;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExit), Category = "Room Manager")
-		int ExitSides;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (Bitmask, BitmaskEnum = ERoomExits), Category = "Room Manager")
+		uint8 ExitSides;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
 		int Weight;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Manager")
-		uint8 bIsStartingRoom : 1;
+		ERoomType RoomType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door Manager")
 		uint8 bIsRoomCleared : 1;

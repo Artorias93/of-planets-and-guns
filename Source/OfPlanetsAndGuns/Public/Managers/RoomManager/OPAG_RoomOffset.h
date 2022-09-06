@@ -19,6 +19,13 @@ enum class ERoomExits : uint8
 };
 ENUM_CLASS_FLAGS(ERoomExits);
 
+UENUM(BlueprintType)
+enum class ERoomType : uint8
+{
+	Normal,
+	SpaceshipStart,
+	TeleporterStart
+};
 
 USTRUCT(BlueprintType)
 struct OFPLANETSANDGUNS_API FOPAG_RoomOffset : public FTableRowBase
@@ -38,7 +45,7 @@ struct OFPLANETSANDGUNS_API FOPAG_RoomOffset : public FTableRowBase
 		uint8 ExitSides;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		uint8 bIsStartingRoom : 1;
+		ERoomType RoomType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FTransform Offset;

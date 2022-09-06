@@ -116,6 +116,7 @@ void AOPAG_Player::BeginPlay()
 
 	// 
 	InitDashValues();
+	InitUICounters();
 }
 
 void AOPAG_Player::Death()
@@ -209,7 +210,9 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
 		//UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
 		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Hit);
-		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
+			AttributeSetPlayer->GetShieldCapacityMax(),
+			bIsShieldBroken);
 	}
 }
 
@@ -355,12 +358,13 @@ void AOPAG_Player::InitDefaultValues()
 	}
 
 	bIsDashAlreadyInitialized = false;
+	bAreCountersAlreadyInitialized = false;
 }
 
 void AOPAG_Player::InitDashTimeline()
 {
 	DashTimeline->SetLooping(false);
-	DashTimeline->SetTimelineLength(5.f);
+	DashTimeline->SetTimelineLength(DashRestoreTime);
 	DashTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 	OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
 	DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
@@ -373,8 +377,14 @@ void AOPAG_Player::InitRecoilTimeline()
 		RecoilTimeline->SetLooping(false);
 		RecoilTimeline->SetTimelineLength(0);
 
+		RecoilTimeline->SetPropertySetObject(this);
+		RecoilTimeline->SetDirectionPropertyName(FName("RecoilTimelineDirection"));
+
 		OnRecoilTimelineProgress.BindUFunction(this, FName("RecoilTimelineProgress"));
 		RecoilTimeline->AddInterpFloat(RecoilCurveFloat, OnRecoilTimelineProgress);
+
+		OnRecoilTimelineFinished.BindUFunction(this, FName("RecoilTimelineFinished"));
+		RecoilTimeline->SetTimelineFinishedFunc(OnRecoilTimelineFinished);
 	}
 }
 
@@ -392,9 +402,28 @@ void AOPAG_Player::InitDashValues()
 		bIsFirstDash = false;
 		DashTimeline->PlayFromStart();
 	}
+}
 
-	for (int i = 0; i < AttributeSetPlayer->GetDashCount(); i++) {
+void AOPAG_Player::InitUICounters()
+{
+	if (bAreCountersAlreadyInitialized)
+		return;
+
+	bAreCountersAlreadyInitialized = true;
+
+	int i;
+	for (i = 0; i < AttributeSetPlayer->GetDashCount(); ++i) {
 		EMS->DashAmountIncrement.Broadcast();
+	}
+
+	for (i = 0; i < InventorySystemComp->BoltsAmount; ++i)
+	{
+		EMS->BoltsAmountIncrement.Broadcast();
+	}
+
+	for (i = 0; i < InventorySystemComp->PotionsAmount; ++i)
+	{
+		EMS->PotionsAmountIncrement.Broadcast();
 	}
 }
 #pragma endregion Init
@@ -579,7 +608,7 @@ void AOPAG_Player::StartShooting()
 {
 	if (CurrentGun->CanShoot() && !bInspecting)
 	{
-		const float FirePeriod = CurrentGun->CalculateFirePeriod(CurrentGun->GetStatsTotal().FireRate);
+		const float FirePeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().FireRate);
 		if (GetGameTimeSinceCreation() - LastFireTime > FirePeriod)
 		{
 			Shoot();
@@ -591,7 +620,7 @@ void AOPAG_Player::KeepShooting()
 {
 	if (CurrentGun->CanShoot() && !bInspecting)
 	{
-		const float FirePeriod = CurrentGun->CalculateFirePeriod(CurrentGun->GetStatsTotal().FireRate);
+		const float FirePeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().FireRate);
 		float ElapsedTime = GetGameTimeSinceCreation() - LastFireTime;
 		while (ElapsedTime > FirePeriod)
 		{
@@ -622,7 +651,9 @@ void AOPAG_Player::Shoot()
 	Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 
 	// Active recoil
-	RecoilTimeline->PlayFromStart();
+	const float RecoilPeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().RecoilRate);
+	RecoilTimeline->SetPlayRate(RecoilPeriod);
+	RecoilTimeline->Play();
 
 	// Update last fire time
 	LastFireTime = GetGameTimeSinceCreation();
@@ -729,6 +760,23 @@ void AOPAG_Player::ResetFPSCamera()
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	PlayerController->SetViewTarget(this);
 }
+
+FVector AOPAG_Player::GetViewLocation() const
+{
+	const float ScaledCapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	return FVector(.0f, .0f, ScaledCapsuleHalfHeight) + ViewOffset;
+}
+
+void AOPAG_Player::RelocateComponets()
+{
+	// Update the Pitch separately so that it is only applied to the camera.
+	const float NewPitch = GetControlRotation().Pitch;
+	SpringArm->SetRelativeRotation(FRotator(NewPitch, .0f, .0f));
+
+	// Apply the Yaw to the whole character.
+	const float NewYaw = GetControlRotation().Yaw;
+	SetActorRelativeRotation(FRotator(.0f, NewYaw, .0f));
+}
 #pragma endregion Camera
 
 #pragma region LookAtInteractable
@@ -789,16 +837,20 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 		// Initialize new module params
 		const FOPAG_GunStats NewModuleStats = Module->GetStats();
 		const EModuleRarity NewModuleRarity = Module->GetRarity();
+		const EModuleBrand NewModuleBrand = Module->GetBrand();
 		const int NewModuleEquippable = Module->GetEquippableFireTypes();
 		const TSubclassOf<AOPAG_ModuleBase> NewModuleClass = Module->GetClass();
 
 		// Create old module params
 		FOPAG_GunStats OldModuleStats;
 		EModuleRarity OldModuleRarity;
+		EModuleBrand OldModuleBrand;
 		int OldModuleEquippable;
 		TSubclassOf<AOPAG_ModuleBase> OldModuleClass;
 		
-		const bool bResult = PrimaryGun->AddNewModule(NewModuleClass, NewModuleRarity, NewModuleStats, NewModuleEquippable, OldModuleClass, OldModuleRarity, OldModuleStats, OldModuleEquippable);
+		const bool bResult = PrimaryGun->AddNewModule(NewModuleClass, NewModuleRarity, NewModuleBrand, 
+			NewModuleStats, NewModuleEquippable, OldModuleClass, 
+			OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
 		if (bResult)
 		{
 			Module->Destroy();
@@ -810,7 +862,7 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 				const FVector ModuleSpawnLocation = CalculateModuleSpawnLocation();
 				FActorSpawnParameters SpawnParams;
 				AOPAG_ModuleBase* OldModule = GetWorld()->SpawnActor<AOPAG_ModuleBase>(OldModuleClass, ModuleSpawnLocation, FRotator::ZeroRotator, SpawnParams);
-				OldModule->SetParameters(OldModuleRarity, OldModuleStats, OldModuleEquippable);
+				OldModule->SetParameters(OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
 				OldModule->ApplyForce_Implementation(CalculateThrowForce());
 			}
 		}
@@ -898,6 +950,14 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 		CameraDirection, LookUpCapsuleRadius, 0, InteractableTypesQuery,
 		false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true, 
 		FLinearColor::Red, FLinearColor::Green, 5.f);
+	OutHits.Sort([](FHitResult Lhs, FHitResult Rhs)
+	{
+		auto LeftModule = Cast<AOPAG_ModuleBase>(Lhs.Actor);
+		if (LeftModule) return true;
+		auto LeftWeapon = Cast<AOPAG_ModularGun>(Lhs.Actor);
+		if (LeftModule) return true;
+		return false;
+	});
 	if (bHasHit && OutHits.Num() > 0)
 	{
 		for (int i = 0; i < OutHits.Num(); ++i) {
@@ -1050,7 +1110,7 @@ const bool AOPAG_Player::GetIsRunning() const
 
 float AOPAG_Player::GetDashLenght() const
 {
-	return DashLenght;
+	return DashRestoreTime;
 }
 
 float AOPAG_Player::GetDashSpeed() const
@@ -1081,81 +1141,27 @@ void AOPAG_Player::DashTimelineFinished()
 
 void AOPAG_Player::RecoilTimelineProgress(float Value)
 {
-	const float GunRecoilInSeconds = CurrentGun->CalculateFirePeriod(CurrentGun->GetStatsTotal().RecoilRate);
-	const float RecoilPitch = GunRecoilInSeconds * Value;
-	AddControllerPitchInput(RecoilPitch);
-}
+	// Add yaw input to camera with randomizer value
+	const float RecoilYaw = FMath::RandRange(RecoilYawMin, RecoilYawMax);
+	AddControllerYawInput(RecoilYaw);
 
-void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	AOPAG_Drop* object = Cast<AOPAG_Drop>(OtherActor);
-	if (object) {
-		InventorySystemComp->AnalyzeItem(object);
-	}
-}
-
-void AOPAG_Player::SavePlayerState()
-{
-	FOPAG_PlayerState NewState;
-
-	NewState.LoadType = PlayerStateLoadType::PREVIOUS_STAGE;
-	NewState.Health = GetHealth();
-	NewState.Shield = AttributeSetPlayer->GetShieldCapacity();
-	NewState.DashCount = AttributeSetPlayer->GetDashCount();
-	NewState.GoldAmount = InventorySystemComp->GoldAmount;
-	NewState.BoltsAmount = InventorySystemComp->BoltsAmount;
-	NewState.PotionsAmount = InventorySystemComp->PotionsAmount;
-	NewState.bIsPrimaryActive = IsPrimaryGunActive();
-
-
-	PrimaryGun->GetCurrentState(NewState.PrimaryGun);
-
-	EMS->SavePlayerState.Broadcast(NewState);
-}
-
-void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
-{
-	if (StateToApply.LoadType == PlayerStateLoadType::NOT_LOADED) return;
-	if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
+	// Add pitch input to camera with randomizer value
+	if (RecoilTimelineDirection == ETimelineDirection::Forward)
 	{
-		SetHealth(StateToApply.Health);
-		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), StateToApply.Shield);
-		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), StateToApply.DashCount);
-
-		bIsDashAlreadyInitialized = false;
-		InitDashValues();	
-	
-		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
-		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
-
-		if (StateToApply.PrimaryGun.GunClass)
-		{
-			PrimaryGunComponent->SetChildActorClass(StateToApply.PrimaryGun.GunClass);
-			if (PrimaryGunComponent->GetChildActor())
-			{
-				SwapGuns();
-
-				PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
-				PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
-
-				AttachDefaultGuns();
-
-				if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
-				{
-					PrimaryGun->SetAmmoCurrent(StateToApply.PrimaryGun.AmmoCurrent);
-					PrimaryGun->SetAmmoMax(StateToApply.PrimaryGun.AmmoMax);
-				}
-				if (StateToApply.bIsPrimaryActive) SwapGuns();
-
-				EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
-				EMS->TotalAmmoChanged.Broadcast(CurrentGun->GetAmmoMax());
-			}
-		}
+		AddControllerPitchInput(-Value);
+		return;
 	}
+	AddControllerPitchInput(Value);
+}
 
-	InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
-
-	
+void AOPAG_Player::RecoilTimelineFinished()
+{
+	if (RecoilTimeline->GetPlaybackPosition() > .0f)
+	{
+		const float RecoilPeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().RecoilRate);
+		RecoilTimeline->SetPlayRate(RecoilPeriod);
+		RecoilTimeline->Reverse();
+	}
 }
 #pragma endregion Timeline
 
@@ -1191,13 +1197,18 @@ void AOPAG_Player::ResetShieldTimer()
 		{
 			GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
 			bIsShieldBroken = false;
+			EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(),
+				AttributeSetPlayer->GetShieldCapacityMax(),
+				bIsShieldBroken);
 			return;
 		}
 
 		const float NewShieldCapicityValue = FMath::Clamp(AttributeSetPlayer->GetShieldCapacity() + AttributeSetPlayer->GetShieldRechargeRate(), 0.f, AttributeSetPlayer->GetShieldCapacityMax());
 		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), NewShieldCapicityValue);
 	
-		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
+			AttributeSetPlayer->GetShieldCapacityMax(),
+			bIsShieldBroken);
 
 		//UE_LOG(LogTemp, Warning, TEXT("Current Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
 	}
@@ -1213,26 +1224,73 @@ void AOPAG_Player::ShieldCooldownTimer()
 }
 #pragma endregion Timer
 
-FVector AOPAG_Player::GetViewLocation() const
+#pragma region Player State
+void AOPAG_Player::SavePlayerState()
 {
-	const float ScaledCapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	return FVector(.0f, .0f, ScaledCapsuleHalfHeight) + ViewOffset;
+	FOPAG_PlayerState NewState;
+
+	NewState.LoadType = PlayerStateLoadType::PREVIOUS_STAGE;
+	NewState.Health = GetHealth();
+	NewState.Shield = AttributeSetPlayer->GetShieldCapacity();
+	NewState.DashCount = AttributeSetPlayer->GetDashCount();
+	NewState.GoldAmount = InventorySystemComp->GoldAmount;
+	NewState.BoltsAmount = InventorySystemComp->BoltsAmount;
+	NewState.PotionsAmount = InventorySystemComp->PotionsAmount;
+	NewState.bIsPrimaryActive = IsPrimaryGunActive();
+
+
+	PrimaryGun->GetCurrentState(NewState.PrimaryGun);
+
+	EMS->SavePlayerState.Broadcast(NewState);
 }
 
-void AOPAG_Player::RelocateComponets()
+void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 {
-	// Update the Pitch separately so that it is only applied to the camera.
-	const float NewPitch = GetControlRotation().Pitch;
-	SpringArm->SetRelativeRotation(FRotator(NewPitch, .0f, .0f));
+	if (StateToApply.LoadType == PlayerStateLoadType::NOT_LOADED) return;
+	if (StateToApply.LoadType == PlayerStateLoadType::PREVIOUS_STAGE)
+	{
+		SetHealth(StateToApply.Health);
+		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), StateToApply.Shield);
+		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), StateToApply.DashCount);
 
-	// Apply the Yaw to the whole character.
-	const float NewYaw = GetControlRotation().Yaw;
-	SetActorRelativeRotation(FRotator(.0f, NewYaw, .0f));
+		bIsDashAlreadyInitialized = false;
+		InitDashValues();
+
+		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
+		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
+		InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
+		bAreCountersAlreadyInitialized = false;
+		InitUICounters();
+
+		if (StateToApply.PrimaryGun.GunClass)
+		{
+			PrimaryGunComponent->SetChildActorClass(StateToApply.PrimaryGun.GunClass);
+			if (PrimaryGunComponent->GetChildActor())
+			{
+				SwapGuns();
+
+				PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
+				PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
+
+				AttachDefaultGuns();
+
+				PrimaryGun->SetAmmoCurrent(StateToApply.PrimaryGun.AmmoCurrent);
+				PrimaryGun->SetAmmoMax(StateToApply.PrimaryGun.AmmoMax);
+
+				if (StateToApply.bIsPrimaryActive) SwapGuns();
+
+				EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
+				EMS->TotalAmmoChanged.Broadcast(CurrentGun->GetAmmoMax());
+			}
+		}
+	}
 }
+#pragma endregion Player State
 
+#pragma region Animation Notify
 void AOPAG_Player::AttachMagazineToHandNotify()
 {
-	if(PrimaryGun == nullptr)	return;
+	if (PrimaryGun == nullptr)	return;
 
 	PrimaryGun->GetModuleBySocketType(EModuleTypes::Magazine)->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketHandLeft);
 }
@@ -1247,4 +1305,13 @@ void AOPAG_Player::AttachMagazineToGunNotify()
 void AOPAG_Player::CompleteInspectNotify()
 {
 	bInspecting = false;
+}
+#pragma endregion Animation Notify
+
+void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AOPAG_Drop* object = Cast<AOPAG_Drop>(OtherActor);
+	if (object) {
+		InventorySystemComp->AnalyzeItem(object);
+	}
 }

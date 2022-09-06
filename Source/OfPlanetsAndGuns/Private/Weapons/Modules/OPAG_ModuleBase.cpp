@@ -77,6 +77,11 @@ EModuleRarity AOPAG_ModuleBase::GetRarity() const
 	return Rarity;
 }
 
+EModuleBrand AOPAG_ModuleBase::GetBrand() const
+{
+	return Brand;
+}
+
 FOPAG_GunStats AOPAG_ModuleBase::GetStats() const
 {
 	return Stats;
@@ -89,11 +94,57 @@ int AOPAG_ModuleBase::GetEquippableFireTypes() const
 #pragma endregion Get
 
 #pragma region Set
-void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
+void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
 {
 	Rarity = NewRarity;
+	Brand = NewBrand;
 	Stats = NewStats;
 	EquippableFireTypes = NewEquippableFireTypes;
+}
+
+void AOPAG_ModuleBase::SetStats(const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers)
+{
+	for (FOPAG_SecondaryStatModifier* Modifier : StatModifiers)
+	{
+		if (Modifier->Brand == Brand)
+		{
+			const float BonusDelta = FMath::FRandRange(Level * Modifier->MinValue, Level * Modifier->MaxValue);
+
+			switch (Modifier->StatType)
+			{
+			case EModuleStatType::Damage:
+				if (Stats.Damage == 0.f)
+					Stats.Damage += FMath::RoundToInt(BonusDelta);
+				break;
+			case EModuleStatType::FireRate:
+				if (Stats.FireRate == 0.f)
+					Stats.FireRate += FMath::RoundToInt(BonusDelta);
+				break;
+			case EModuleStatType::Accuracy:
+				if (Stats.Accuracy == 0.f)
+					Stats.Accuracy += FMath::RoundToInt(BonusDelta);
+				break;
+			case EModuleStatType::RecoilRate:
+				if (Stats.RecoilRate == 0.f)
+					Stats.RecoilRate += FMath::RoundToInt(BonusDelta);
+				break;
+			case EModuleStatType::ReloadingTime:
+				if (Stats.ReloadingTime == 0.f)
+					Stats.ReloadingTime += BonusDelta;
+				break;
+			case EModuleStatType::ClipSize:
+				if (Stats.ClipSize == 0.f)
+					Stats.ClipSize += FMath::RoundToInt(BonusDelta);
+				break;
+			default:;
+			}
+		}
+	}
+}
+
+void AOPAG_ModuleBase::SetStats(const FOPAG_GunStats NewStats)
+{
+	Stats = NewStats;
 }
 #pragma endregion Set
 
@@ -165,10 +216,10 @@ bool AOPAG_ModuleBase::CanBuy_Implementation()
 #pragma endregion Interface
 
 #pragma region Attachment
-void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const FOPAG_GunStats NewStats,
+void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand,const FOPAG_GunStats NewStats,
 	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
-	SetParameters(NewRarity, NewStats, NewEquippableFireTypes);
+	SetParameters(NewRarity, NewBrand, NewStats, NewEquippableFireTypes);
 }
 
 void AOPAG_ModuleBase::OnDetach()

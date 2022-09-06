@@ -145,12 +145,13 @@ void AOPAG_Enemy::ReceiveDamage(const float Damage, AActor* const Causer)
 	if(GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
 
-	// Update health bar
+	// Update & show health bar
 	if (BaseAttributeSet && EnemyHealthBar)
 	{
 		const float HealthPercent = BaseAttributeSet->GetHealth() / BaseAttributeSet->GetMaxHealth();
 		EnemyHealthBar->GetProgressBar()->SetPercent(HealthPercent);
 	}
+	SetHealthBarVisible();
 }
 
 void AOPAG_Enemy::Attack()
@@ -169,18 +170,18 @@ void AOPAG_Enemy::Death()
 	// Destroy health bar
 	EnemyHealthBarComponent->DestroyComponent(true);
 
-	//Mesh ragdoll functions
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	GetMesh()->SetSimulatePhysics(true);
-	GetWorld()->GetTimerManager().SetTimer(RagdollTimerHandle, this, &AOPAG_Enemy::DropAndDespawn, RagdollDurationSeconds);
-}
-
-void AOPAG_Enemy::DropAndDespawn()
-{
 	// Drop loot
 	LootDropSystemComponent->DropLoot();
 
-	//Fill with everything from drops to enemy manager stuff
+	//Mesh ragdoll functions
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetSimulatePhysics(true);
+	GetWorld()->GetTimerManager().SetTimer(RagdollTimerHandle, this, &AOPAG_Enemy::Despawn, RagdollDurationSeconds);
+}
+
+void AOPAG_Enemy::Despawn()
+{
+		//Fill with everything from drops to enemy manager stuff
 
 	GetWorld()->GetTimerManager().ClearTimer(RagdollTimerHandle);
 	//Broadcasts the kill to the event manager
@@ -288,14 +289,18 @@ AOPAG_PatrolPath* AOPAG_Enemy::GetPatrolPath() const
 
 void AOPAG_Enemy::SetHealthBarVisible()
 {
-	EnemyHealthBarComponent->SetHiddenInGame(false);
-	GetWorld()->GetTimerManager().ClearTimer(UnseenByPlayerHandle);
-	GetWorld()->GetTimerManager().SetTimer(UnseenByPlayerHandle, this, &AOPAG_Enemy::ResetHealthBarHidden, 3.f, false);
+	if (EnemyHealthBarComponent != nullptr) {
+		EnemyHealthBarComponent->SetHiddenInGame(false);
+		GetWorld()->GetTimerManager().ClearTimer(UnseenByPlayerHandle);
+		GetWorld()->GetTimerManager().SetTimer(UnseenByPlayerHandle, this, &AOPAG_Enemy::ResetHealthBarHidden, 3.f, false);
+	}
 }
 
 void AOPAG_Enemy::ResetHealthBarHidden()
 {
-	EnemyHealthBarComponent->SetHiddenInGame(true);
+	if (EnemyHealthBarComponent != nullptr) {
+		EnemyHealthBarComponent->SetHiddenInGame(true);
+	}
 }
 
 

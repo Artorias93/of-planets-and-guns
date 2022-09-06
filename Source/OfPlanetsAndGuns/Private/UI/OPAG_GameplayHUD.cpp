@@ -4,7 +4,8 @@
 #include "UI/OPAG_UWPlayerStatsView.h"
 #include "UI/OPAG_UWPauseView.h"
 #include "UI/OPAG_UWLoadingScreenView.h"
-#include "UI/OPAG_UWModuleView.h"
+//#include "UI/OPAG_UWModuleView.h"
+#include "UI/OPAG_UWNewModuleView.h"
 #include "UI/OPAG_UWGunCompareView.h"
 #include "UI/OPAG_UWInteractView.h"
 #include "UI/OPAG_UWDamageIndicatorView.h"
@@ -82,12 +83,18 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		PauseViewWidget = CreateWidget<UOPAG_UWPauseView>(GetWorld(), PauseViewWidgetClass);
 	}
-	
+	/*
 	if (ModuleViewWidgetClass)
 	{
 		ModuleViewWidget = CreateWidget<UOPAG_UWModuleView>(GetWorld(), ModuleViewWidgetClass);
 	}
-
+	*/
+	
+	if (ModuleViewWidgetClass)
+	{
+		ModuleViewWidget = CreateWidget<UOPAG_UWNewModuleView>(GetWorld(), ModuleViewWidgetClass);
+	}
+	
 	if (GunCompareViewWidgetClass)
 	{
 		GunCompareViewWidget = CreateWidget<UOPAG_UWGunCompareView>(GetWorld(), GunCompareViewWidgetClass);

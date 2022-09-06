@@ -93,6 +93,7 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 
 							if (ModuleObj)
 							{
+								ModuleObj->SetStats(PrimaryGun->GetSecondaryStatsModifiers());
 								ModuleObj->GetModuleSphereComponent()->SetSimulatePhysics(true);
 							}
 						}

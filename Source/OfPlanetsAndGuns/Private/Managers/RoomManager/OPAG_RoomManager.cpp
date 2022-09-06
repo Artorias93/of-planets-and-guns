@@ -104,7 +104,7 @@ void AOPAG_RoomManager::UpdateData()
 			Row.Weight = Weight;
 			Row.ExitCount = Exits.Num();
 			Row.ExitSides = ExitSides;
-			Row.bIsStartingRoom = bIsStartingRoom;
+			Row.RoomType = RoomType;
 			Row.Offset = Entrance != nullptr ? Entrance->RoomOffset : FTransform::Identity;
 
 			DataTable->AddRow(FName(Name), Row);
@@ -141,7 +141,7 @@ void AOPAG_RoomManager::CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const
 
 void AOPAG_RoomManager::EnterRoom()
 {
-	if (!bHasBroadcastedEntry && !bIsStartingRoom)
+	if (!bHasBroadcastedEntry && RoomType == ERoomType::Normal)
 	{
 		bHasBroadcastedEntry = true;
 		bIsAwaitingDifficultyUpdate = true;

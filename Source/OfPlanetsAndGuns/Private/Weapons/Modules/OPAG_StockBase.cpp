@@ -4,6 +4,7 @@ AOPAG_StockBase::AOPAG_StockBase()
 {
 	// Initialize Parameters
 	Rarity = EModuleRarity::Common;
+	Brand = EModuleBrand::Standard;
 	Type = EModuleTypes::Stock;
 }
 

@@ -61,7 +61,7 @@ protected:
 
 	virtual void Tick(float DeltaTime) override;
 
-	void DropAndDespawn();
+	void Despawn();
 
 	void InitSpawnFX();
 

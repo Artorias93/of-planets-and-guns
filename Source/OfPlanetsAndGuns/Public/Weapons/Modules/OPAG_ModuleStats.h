@@ -24,3 +24,42 @@ enum class EModuleRarity : uint8
 	Epic,
 	Legendary,
 };
+
+UENUM(BlueprintType)
+enum class EModuleBrand : uint8
+{
+	Standard = 0x00,
+	Kaponian,
+	Uronian,
+	Blobius,
+	Neridian,
+};
+
+UENUM(BlueprintType)
+enum class EModuleStatType : uint8
+{
+	Damage,
+	FireRate,
+	Accuracy,
+	RecoilRate,
+	ReloadingTime,
+	ClipSize
+};
+
+USTRUCT(BlueprintType)
+struct OFPLANETSANDGUNS_API FOPAG_SecondaryStatModifier : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EModuleBrand Brand;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EModuleStatType StatType;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float MinValue;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float MaxValue;
+};
