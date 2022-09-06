@@ -30,6 +30,7 @@ public:
 	UPROPERTY(Category = "Inventory Stuff", EditAnywhere, BlueprintReadWrite)
 		int BoltsAmount = 0;
 
+
 private:
 	AOPAG_Player* Owner;
 };

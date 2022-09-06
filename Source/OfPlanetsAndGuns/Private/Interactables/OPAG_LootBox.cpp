@@ -1,5 +1,7 @@
 #include "Interactables/OPAG_LootBox.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include <Components/PrimitiveComponent.h>
 
 #include "Characters/Player/OPAG_Player.h"
@@ -42,6 +44,7 @@ FString AOPAG_LootBox::InteractString_Implementation()
 void AOPAG_LootBox::BeginPlay()
 {
 	Super::BeginPlay();
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 	
 }
 
@@ -82,6 +85,10 @@ void AOPAG_LootBox::Interact_Implementation()
 	bIsInteractable = false;
 
 	bHasBeenOpened = true;
+
+
+	if(SMS)
+		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Chest_Open);
 
 	// Active Timer for spawn items
 	SpawnItem();

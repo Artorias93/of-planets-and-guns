@@ -1,6 +1,8 @@
 #include "Weapons/Throwables/OPAG_Grenade.h"
 
 #include "Characters/Enemies/OPAG_Enemy.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystem.h"
 
@@ -37,6 +39,7 @@ void AOPAG_Grenade::DamageAllTargetsInRange()
 void AOPAG_Grenade::BeginPlay()
 {
 	Super::BeginPlay();
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 	
 }
 
@@ -51,7 +54,8 @@ void AOPAG_Grenade::Detonate()
 	DamageAllTargetsInRange();
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), EmitterTemplate, GetActorLocation(), FRotator::ZeroRotator, FVector(10.f, 10.f, 10.f), true, EPSCPoolMethod::None, true);
-	UGameplayStatics::PlaySound2D(GetWorld(), ExplosionSound);
+	//UGameplayStatics::PlaySound2D(GetWorld(), ExplosionSound);
+	SMS->PlayAbiltySounds( this , EAbilitySoundAction::GL_Explosion);
 
 	Destroy();
 }

@@ -13,6 +13,7 @@
 				"GameplayAbilities",
 				"AIModule",
 				"UMG",
+				"FMODStudio",
 				"CoreUObject"
 			]
 		}
@@ -28,6 +29,10 @@
 		},
 		{
 			"Name": "MultiUserClient",
+			"Enabled": true
+		},
+		{
+			"Name": "FMODStudio",
 			"Enabled": true
 		}
 	]

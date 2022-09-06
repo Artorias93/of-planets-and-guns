@@ -564,7 +564,7 @@ void AOPAG_ModularGun::UpdateStatsTotal()
 		StatsTotal.Damage += Modules[i]->GetStats().Damage;
 		StatsTotal.FireRate += Modules[i]->GetStats().FireRate;
 		StatsTotal.Accuracy += Modules[i]->GetStats().Accuracy;
-		StatsTotal.RecoilRate += Modules[i]->GetStats().RecoilRate;
+		StatsTotal.Stability += Modules[i]->GetStats().Stability;
 		StatsTotal.ReloadingTime += Modules[i]->GetStats().ReloadingTime;
 		StatsTotal.ClipSize += Modules[i]->GetStats().ClipSize;
 	}

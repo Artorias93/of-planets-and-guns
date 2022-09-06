@@ -124,9 +124,9 @@ void AOPAG_ModuleBase::SetStats(const TArray<FOPAG_SecondaryStatModifier*>& Stat
 				if (Stats.Accuracy == 0.f)
 					Stats.Accuracy += FMath::RoundToInt(BonusDelta);
 				break;
-			case EModuleStatType::RecoilRate:
-				if (Stats.RecoilRate == 0.f)
-					Stats.RecoilRate += FMath::RoundToInt(BonusDelta);
+			case EModuleStatType::Stability:
+				if (Stats.Stability == 0.f)
+					Stats.Stability += FMath::RoundToInt(BonusDelta);
 				break;
 			case EModuleStatType::ReloadingTime:
 				if (Stats.ReloadingTime == 0.f)
