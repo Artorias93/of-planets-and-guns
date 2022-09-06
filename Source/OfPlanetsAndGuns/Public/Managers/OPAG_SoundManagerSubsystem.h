@@ -92,6 +92,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "FMOD")
 		class UFMODAudioComponent* AudioComponent;
+	UPROPERTY(EditAnywhere, Category = "FMOD | Zipline")
+		class UFMODAudioComponent* ZiplineAudioComponent;
 
 	FFMODEventInstance InstanceWrapper;
 

@@ -79,7 +79,10 @@ void UOPAG_SoundManagerSubsystem::PlayEnviromentSounds(AActor* actor, EEnviromen
 		}
 		if (libraryRow) {
 			UFMODEvent* currentEvent = libraryRow->AudioContent;
-			AudioComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, false, true, true);
+			if(event == EEnviromentSoundAction::Zipline_On)
+				ZiplineAudioComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, false, true, true);
+			else
+				AudioComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, false, true, true);
 		}
 	}
 }
@@ -235,10 +238,8 @@ void UOPAG_SoundManagerSubsystem::PlayCharacterSounds(AActor* actor, ECharacterS
 }
 
 void UOPAG_SoundManagerSubsystem::StopSound() {
-	/*
-	if (UFMODBlueprintStatics::EventInstanceIsValid(InstanceWrapper)) {
-		InstanceWrapper.Instance->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
-		InstanceWrapper.Instance->release();
-	}
-	*/
+	if (ZiplineAudioComponent) {
+		ZiplineAudioComponent->Stop();
+		ZiplineAudioComponent->Release();
+	}	
 }
