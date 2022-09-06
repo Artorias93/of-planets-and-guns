@@ -13,6 +13,7 @@ class UStaticMeshComponent;
 class UChildActorComponent;
 class UCameraComponent;
 class AOPAG_CharacterBase;
+class UOPAG_SoundManagerSubsystem;
 class UOPAG_EventManagerSubsystem;
 class UParticleSystem;
 class USoundBase;
@@ -114,6 +115,9 @@ protected:
 protected:
 	FTimerHandle ResetShootHandle;
 	FTimerHandle ReloadHandle;
+
+	UPROPERTY()
+	UOPAG_SoundManagerSubsystem* SMS;
 
 protected:
 	// Boolean checks

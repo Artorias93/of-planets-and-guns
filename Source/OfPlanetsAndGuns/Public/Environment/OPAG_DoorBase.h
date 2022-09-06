@@ -19,6 +19,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	class UOPAG_SoundManagerSubsystem* SMS;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

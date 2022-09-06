@@ -11,6 +11,7 @@ enum class EFireTypes : uint8
 	SingleShot = 0x01,
 	Burst3 = 0x02,
 	Shotgun = 0x03,
+	Pistol = 0x04,
 };
 ENUM_CLASS_FLAGS(EFireTypes);
 

@@ -17,6 +17,7 @@
 #include "Environment/OPAG_Zipline.h"
 #include "Weapons/Modules/OPAG_AccessoryBase.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Items/OPAG_Drop.h"
@@ -122,7 +123,7 @@ void AOPAG_Player::BeginPlay()
 void AOPAG_Player::Death()
 {
 	Super::Death();
-
+	SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Death);
 	SavePlayerState();
 	EMS->PlayerDied.Broadcast();
 }
@@ -188,8 +189,11 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		Super::ReceiveDamage(Damage, Causer);
 
 		EMS->DamagedBy.Broadcast(Causer);
-		bIsShieldBroken = true;
-
+		if (!bIsShieldBroken) {
+			bIsShieldBroken = true;
+			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
+		}
+		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Damage);
 		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 		return;
 	}
@@ -206,8 +210,10 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
 		//UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
-
-		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
+		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Hit);
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
+			AttributeSetPlayer->GetShieldCapacityMax(),
+			bIsShieldBroken);
 	}
 }
 
@@ -359,7 +365,7 @@ void AOPAG_Player::InitDefaultValues()
 void AOPAG_Player::InitDashTimeline()
 {
 	DashTimeline->SetLooping(false);
-	DashTimeline->SetTimelineLength(5.f);
+	DashTimeline->SetTimelineLength(DashRestoreTime);
 	DashTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 	OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
 	DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
@@ -469,7 +475,7 @@ void AOPAG_Player::ActiveDash()
 		const bool bSuccess = AbilitySystemComp->TryActivateAbilityByClass(Dash, true);
 		if (bSuccess)
 		{
-
+			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Movement_Dash);
 			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), AttributeSetPlayer->GetDashCount() - 1);
 
 			EMS->DashAmountDecrement.Broadcast();
@@ -548,11 +554,11 @@ void AOPAG_Player::SwapGuns()
 			PrimaryGunComponent->GetChildActor()->SetActorHiddenInGame(true);
 			SecondaryGunComponent->GetChildActor()->SetActorHiddenInGame(false);
 			CurrentGun = SecondaryGun;
-
 			// Post animation change
 			Mesh1P->SetAnimInstanceClass(HandgunAnimClass);
 			//Mesh1P->SetRelativeLocation(MeshHandOffset);
 			Mesh1P->GetAnimInstance()->Montage_Play(SwapHandgunMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
+			SMS->PlayWeaponSounds(CurrentGun, EWeaponSoundAction::Pickup);
 		}
 		else
 		{
@@ -564,6 +570,7 @@ void AOPAG_Player::SwapGuns()
 			Mesh1P->SetAnimInstanceClass(RifleAnimClass);
 			//Mesh1P->SetRelativeLocation(MeshRifleOffset);
 			Mesh1P->GetAnimInstance()->Montage_Play(SwapRifleMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
+			SMS->PlayWeaponSounds(CurrentGun, EWeaponSoundAction::Pickup);
 		}
 
 		DebugCurretGunStats = CurrentGun->GetStatsTotal();
@@ -578,8 +585,7 @@ void AOPAG_Player::ReloadGun()
 	{
 		// Invoke reload to current gun
 		CurrentGun->Reload();
-
-		// Start montage with accurate reloading time
+		SMS->PlayWeaponSounds(PrimaryGun, EWeaponSoundAction::Reload);
 		const float ReloadAnimationLength = ReloadMontageToPlay->GetPlayLength();
 		const float ReloadTime = PrimaryGun->GetStatsTotal().ReloadingTime;
 		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, ReloadAnimationLength / ReloadTime, EMontagePlayReturnType::MontageLength, 0, true);
@@ -744,6 +750,7 @@ void AOPAG_Player::Jumping()
 {
 	if (JumpCurrentCount < JumpMaxCount)
 	{
+		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Movement_Jump);
 		ACharacter::Jump();
 	}
 }
@@ -936,6 +943,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		PrimaryGun->SetAmmoParams(NewAmmoCurrent, NewAmmoMax);
 		PrimaryGun->CreateAndAttachAllModules(NewGunModules);
 		CurrentGun = PrimaryGun;
+		SMS->PlayWeaponSounds(CurrentGun, EWeaponSoundAction::Pickup);
 		DebugCurretGunStats = CurrentGun->GetStatsTotal();
 
 		// Update ammo
@@ -1143,7 +1151,7 @@ const bool AOPAG_Player::GetIsRunning() const
 
 float AOPAG_Player::GetDashLenght() const
 {
-	return DashLenght;
+	return DashRestoreTime;
 }
 
 float AOPAG_Player::GetDashSpeed() const
@@ -1239,13 +1247,18 @@ void AOPAG_Player::ResetShieldTimer()
 		{
 			GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
 			bIsShieldBroken = false;
+			EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(),
+				AttributeSetPlayer->GetShieldCapacityMax(),
+				bIsShieldBroken);
 			return;
 		}
 
 		const float NewShieldCapicityValue = FMath::Clamp(AttributeSetPlayer->GetShieldCapacity() + AttributeSetPlayer->GetShieldRechargeRate(), 0.f, AttributeSetPlayer->GetShieldCapacityMax());
 		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), NewShieldCapicityValue);
 	
-		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
+			AttributeSetPlayer->GetShieldCapacityMax(),
+			bIsShieldBroken);
 
 		//UE_LOG(LogTemp, Warning, TEXT("Current Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
 	}
@@ -1295,6 +1308,9 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 
 		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
 		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
+		InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
+		bAreCountersAlreadyInitialized = false;
+		InitUICounters();
 
 		if (StateToApply.PrimaryGun.GunClass)
 		{
@@ -1318,7 +1334,6 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 			}
 		}
 	}
-	InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
 }
 #pragma endregion Player State
 

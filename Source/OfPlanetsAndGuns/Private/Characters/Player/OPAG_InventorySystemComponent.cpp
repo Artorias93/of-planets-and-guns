@@ -5,6 +5,7 @@
 #include "Items/OPAG_Drop.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 
 UOPAG_InventorySystemComponent::UOPAG_InventorySystemComponent()
 {
@@ -30,6 +31,8 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			BoltsAmount += Target->Amount;
 			if (Owner && Owner->EMS) {
 				Owner->EMS->BoltsAmountIncrement.Broadcast();
+				if(Owner->SMS)
+					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 			}
 			Target->Destroy();
 			break;
@@ -38,6 +41,8 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			GoldAmount += Target->Amount;
 			if (Owner && Owner->EMS) {
 				Owner->EMS->GoldChanged.Broadcast(GoldAmount);
+				if (Owner->SMS)
+					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 			}
 			Target->Destroy();
 			break;
@@ -45,6 +50,8 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 		case EDropType::Ammo:
 			if (Owner && Owner->EMS) {
 				Owner->EMS->AmmoPickedUp.Broadcast();
+				if (Owner->SMS)
+					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 			}
 			Target->Destroy();
 			break;
@@ -54,6 +61,8 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 				PotionsAmount += Target->Amount;
 				if (Owner && Owner->EMS) {
 					Owner->EMS->PotionsAmountIncrement.Broadcast();
+					if (Owner->SMS)
+						Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 				}
 				Target->Destroy();
 			}

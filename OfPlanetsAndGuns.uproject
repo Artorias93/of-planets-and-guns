@@ -12,7 +12,9 @@
 				"Engine",
 				"GameplayAbilities",
 				"AIModule",
-				"UMG"
+				"UMG",
+				"FMODStudio",
+				"CoreUObject"
 			]
 		}
 	],
@@ -27,6 +29,10 @@
 		},
 		{
 			"Name": "MultiUserClient",
+			"Enabled": true
+		},
+		{
+			"Name": "FMODStudio",
 			"Enabled": true
 		}
 	]

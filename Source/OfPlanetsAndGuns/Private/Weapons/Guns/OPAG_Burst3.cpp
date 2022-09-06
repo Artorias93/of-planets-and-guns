@@ -1,5 +1,6 @@
 #include "Weapons/Guns/OPAG_Burst3.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include <Kismet/GameplayStatics.h>
 
 AOPAG_Burst3::AOPAG_Burst3()
@@ -36,7 +37,8 @@ void AOPAG_Burst3::ShootBurst()
 
 			ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
 
-			UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+			//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+			SMS->PlayWeaponSounds(this, EWeaponSoundAction::Fire);
 			if (AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
 			{
 				MakeNoise(1.f, CharacterOwner, CharacterOwner->GetActorLocation(), 0);

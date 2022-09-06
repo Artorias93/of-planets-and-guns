@@ -13,6 +13,8 @@
 #include "Util/OPAG_UtilityFunctionLibrary.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
+
 #include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
@@ -49,6 +51,8 @@ void AOPAG_GunBase::BeginPlay()
 	Super::BeginPlay();
 
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+
 	check(EMS);
 
 	AmmoCurrent = GetStatsTotal().ClipSize;
@@ -144,7 +148,10 @@ int AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Directi
 
 	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
 
-	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+
+	//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+	SMS->PlayWeaponSounds( this , EWeaponSoundAction::Fire);
+	
 	if(AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
 	{
 		MakeNoise(1.f, CharacterOwner, CharacterOwner->GetActorLocation(), 0);
@@ -333,7 +340,7 @@ void AOPAG_GunBase::Reload()
 {
 	bIsReloading = true;
 	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_GunBase::WaitReloadingTimer, GetStatsTotal().ReloadingTime, false);
-	UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
+	//UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
 }
 
 void AOPAG_GunBase::WaitReloadingTimer()
