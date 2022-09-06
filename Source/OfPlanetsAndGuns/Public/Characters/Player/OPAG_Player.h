@@ -197,6 +197,7 @@ private:
 private:
 	// Boolean checks
 	bool bIsDashAlreadyInitialized;
+	bool bAreCountersAlreadyInitialized;
 	bool bInspecting = false;
 	bool bRunning = false;
 	bool bIsInADS = false;
@@ -246,6 +247,7 @@ private:
 	void InitDashTimeline();
 	void InitRecoilTimeline();
 	void InitDashValues();
+	void InitUICounters();
 
 	// Mathematics utility
 	const FVector CalculateThrowForce() const;
