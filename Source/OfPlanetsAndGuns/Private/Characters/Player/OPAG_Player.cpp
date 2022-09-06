@@ -360,7 +360,7 @@ void AOPAG_Player::InitDefaultValues()
 void AOPAG_Player::InitDashTimeline()
 {
 	DashTimeline->SetLooping(false);
-	DashTimeline->SetTimelineLength(5.f);
+	DashTimeline->SetTimelineLength(DashRestoreTime);
 	DashTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 	OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
 	DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
@@ -1104,7 +1104,7 @@ const bool AOPAG_Player::GetIsRunning() const
 
 float AOPAG_Player::GetDashLenght() const
 {
-	return DashLenght;
+	return DashRestoreTime;
 }
 
 float AOPAG_Player::GetDashSpeed() const

@@ -92,7 +92,7 @@ private:
 	float DashSpeed = 10000.f;
 
 	UPROPERTY(Category = "OPAG | Character | Dash", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float DashLenght = 500.f;
+	float DashRestoreTime = 5.f;
 
 private:
 	UPROPERTY(Category = "OPAG | Character | LookupInteractable", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))

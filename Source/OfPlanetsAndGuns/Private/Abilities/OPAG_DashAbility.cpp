@@ -21,7 +21,7 @@ void UOPAG_DashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		if (bResult)
 		{
 			// Gives small upwards force, after delay strong force
-			LaunchUpAndThenStrong();
+			LaunchUpAndThenForward();
 		}
 		else
 		{
@@ -30,7 +30,7 @@ void UOPAG_DashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	}
 }
 
-void UOPAG_DashAbility::LaunchUpAndThenStrong()
+void UOPAG_DashAbility::LaunchUpAndThenForward()
 {
 	const FVector Force(0.f, 0.f, 2.f);
 	Player->LaunchCharacter(Force, false, false);
