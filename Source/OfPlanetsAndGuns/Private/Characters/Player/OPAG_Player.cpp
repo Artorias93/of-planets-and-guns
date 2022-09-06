@@ -115,6 +115,7 @@ void AOPAG_Player::BeginPlay()
 
 	// 
 	InitDashValues();
+	InitUICounters();
 }
 
 void AOPAG_Player::Death()
@@ -351,6 +352,7 @@ void AOPAG_Player::InitDefaultValues()
 	}
 
 	bIsDashAlreadyInitialized = false;
+	bAreCountersAlreadyInitialized = false;
 }
 
 void AOPAG_Player::InitDashTimeline()
@@ -394,9 +396,28 @@ void AOPAG_Player::InitDashValues()
 		bIsFirstDash = false;
 		DashTimeline->PlayFromStart();
 	}
+}
 
-	for (int i = 0; i < AttributeSetPlayer->GetDashCount(); i++) {
+void AOPAG_Player::InitUICounters()
+{
+	if (bAreCountersAlreadyInitialized)
+		return;
+
+	bAreCountersAlreadyInitialized = true;
+
+	int i;
+	for (i = 0; i < AttributeSetPlayer->GetDashCount(); ++i) {
 		EMS->DashAmountIncrement.Broadcast();
+	}
+
+	for (i = 0; i < InventorySystemComp->BoltsAmount; ++i)
+	{
+		EMS->BoltsAmountIncrement.Broadcast();
+	}
+
+	for (i = 0; i < InventorySystemComp->PotionsAmount; ++i)
+	{
+		EMS->PotionsAmountIncrement.Broadcast();
 	}
 }
 #pragma endregion Init
@@ -1119,10 +1140,10 @@ void AOPAG_Player::RecoilTimelineProgress(float Value)
 	// Add pitch input to camera with randomizer value
 	if (RecoilTimelineDirection == ETimelineDirection::Forward)
 	{
-		AddControllerPitchInput(Value);
+		AddControllerPitchInput(-Value);
 		return;
 	}
-	AddControllerPitchInput(-Value);
+	AddControllerPitchInput(Value);
 }
 
 void AOPAG_Player::RecoilTimelineFinished()

@@ -25,11 +25,13 @@ EBTNodeResult::Type UOPAG_TaskChangeChargeState::ExecuteTask(UBehaviorTreeCompon
 					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "TopHeadSocket");
 				ShieldEnemy->TurnOnBoosters();
 				ShieldEnemy->GetCharacterMovement()->GravityScale = 0.f;
-				ShieldEnemy->bUseControllerRotationYaw = false;
+				//Controller's rotation is not used anymore
+				//ShieldEnemy->bUseControllerRotationYaw = false;
 			}
 			else
 			{
-				ShieldEnemy->bUseControllerRotationYaw = true;
+				//Controller's rotation is not used anymore
+				//ShieldEnemy->bUseControllerRotationYaw = true;
 				ShieldEnemy->GetCharacterMovement()->GravityScale = 1.f;
 				ShieldEnemy->TurnOffBoosters();
 				ShieldEnemy->GetShieldMesh()->AttachToComponent(ShieldEnemy->GetMesh(),
