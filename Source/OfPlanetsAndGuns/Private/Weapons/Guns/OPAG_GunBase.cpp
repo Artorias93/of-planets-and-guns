@@ -325,7 +325,7 @@ void AOPAG_GunBase::Reload()
 {
 	bIsReloading = true;
 	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_GunBase::WaitReloadingTimer, GetStatsTotal().ReloadingTime, false);
-	UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
+	//UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
 }
 
 void AOPAG_GunBase::WaitReloadingTimer()
