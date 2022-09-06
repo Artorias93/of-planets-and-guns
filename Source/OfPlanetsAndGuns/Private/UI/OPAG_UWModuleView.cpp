@@ -49,7 +49,7 @@ void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& CurrentModuleS
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, CurrentModuleStats.Damage, OtherModuleStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);
 	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, CurrentModuleStats.Accuracy, OtherModuleStats.Accuracy, true);
-	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, CurrentModuleStats.RecoilRate, OtherModuleStats.RecoilRate);
+	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, CurrentModuleStats.Stability, OtherModuleStats.Stability);
 	UpdateSingleStat(ReloadingText, ReloadingAmount, ReloadingDelta, CurrentModuleStats.ReloadingTime, OtherModuleStats.ReloadingTime, true);
 	UpdateSingleStat(ClipSizeText, ClipSizeAmount, ClipSizeDelta, CurrentModuleStats.ClipSize, OtherModuleStats.ClipSize);
 }

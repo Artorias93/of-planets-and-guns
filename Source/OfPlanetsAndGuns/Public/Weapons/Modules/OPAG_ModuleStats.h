@@ -41,7 +41,7 @@ enum class EModuleStatType : uint8
 	Damage,
 	FireRate,
 	Accuracy,
-	RecoilRate,
+	Stability,
 	ReloadingTime,
 	ClipSize
 };

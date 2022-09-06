@@ -20,6 +20,7 @@
 #include "Abilities/OPAG_ForceField.h"
 #include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
+#include "Items/OPAG_Barrel.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -92,6 +93,16 @@ int AOPAG_GunBase::GetAmmoCurrent() const
 int AOPAG_GunBase::GetAmmoMax() const
 {
 	return AmmoMax;
+}
+
+float AOPAG_GunBase::GetRecoilStrength() const
+{
+	return RecoilStrength;
+}
+
+float AOPAG_GunBase::GetRecoilSpeed() const
+{
+	return RecoilSpeed;
 }
 #pragma endregion Get
 
@@ -197,6 +208,11 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 				}
 			}
 		}
+		AOPAG_Barrel* Barrel = Cast<AOPAG_Barrel>(OutHit.GetActor());
+		if (Barrel != nullptr)
+		{
+			Barrel->Detonate();
+		}
 	}
 	
 	// Spawn emitter
@@ -236,16 +252,15 @@ float AOPAG_GunBase::CalculateSpread() const
 {
 	// Only use for aiming behavior
 	AOPAG_Player* Player = Cast<AOPAG_Player>(GetParentActor());
+	if(Player == nullptr)	return .0f;
 
+	const float ADSAccuracy = (100 + GetStatsTotal().Accuracy) / 2;
 	static constexpr float InternalRange = MaxInternalAccuracy - MinInternalAccuracy;
-	const float InternalAccuracy = ((GetStatsTotal().Accuracy * InternalRange) / 100.f) + MinInternalAccuracy;
+	const float InternalAccuracy = ((
+		(Player->GetIsADS() ? ADSAccuracy : GetStatsTotal().Accuracy) 
+		* InternalRange) / 100.f) + MinInternalAccuracy;
 	const float ClampedAccuracy = FMath::Clamp(InternalAccuracy, MinInternalAccuracy, MaxInternalAccuracy);
-	float Spread = .0f;
-
-	if (Player != nullptr && Player->GetIsADS())
-		Spread = (SpreadMax * (ShootConeLength - 100.f)) / 100;
-	else
-		Spread = (SpreadMax * (ShootConeLength - ClampedAccuracy)) / 100;
+	const float Spread = (SpreadMax * (ShootConeLength - ClampedAccuracy)) / 100;
 	return Spread;
 }
 

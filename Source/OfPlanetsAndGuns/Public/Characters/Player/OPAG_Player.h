@@ -167,11 +167,20 @@ private:
 	UPROPERTY(Category = "OPAG | Character | Timeline", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UTimelineComponent* RecoilTimeline;
 
+	UPROPERTY(Category = "OPAG | Character | Timeline", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UTimelineComponent* RecoilReverseTimeline;
+
 	UPROPERTY(Category = "OPAG | Character | Timeline", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* ADSCurveFloat;
 
 	UPROPERTY(Category = "OPAG | Character | Timeline", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* RecoilCurveFloat;
+
+	UPROPERTY(Category = "OPAG | Character | Timeline", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* RecoilReverseCurveFloat;
+
+	UPROPERTY(Category = "OPAG | Character | Timeline", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RecoilReverseLength = 1.f;
 
 private:
 	UPROPERTY(Category = "OPAG | Character | Widgets", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -187,15 +196,16 @@ private:
 	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	AOPAG_GunBase* CurrentGun;
 
-	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Character | Guns", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float RecoilYawMin = -.01f;
 
-	UPROPERTY(Category = "OPAG | Character | Guns", VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Character | Guns", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float RecoilYawMax = .01f;
 
 private:
-	UPROPERTY()
-	TEnumAsByte<ETimelineDirection::Type> RecoilTimelineDirection;
+	UPROPERTY() TEnumAsByte<ETimelineDirection::Type> RecoilTimelineDirection;
+	UPROPERTY() float Recoil = .0f;
+	UPROPERTY() float RecoilReverse = .0f;
 
 private:
 	// All socket names
@@ -225,9 +235,17 @@ private:
 
 	// Fire timers
 	float LastFireTime = .0f;
+	FRotator AccumulatedRecoilDeviation = FRotator::ZeroRotator;
+	FRotator CurrentDeltaRotation = FRotator::ZeroRotator;
+	float RandomRecoilYaw = .0f;
+
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
 	FOnTimelineEventStatic OnRecoilTimelineFinished;
+
+	FOnTimelineFloat OnRecoilReverseTimelineProgress;
+	FOnTimelineEventStatic OnRecoilReverseTimelineFinished;
+
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
 private:
@@ -345,6 +363,8 @@ private:
 	UFUNCTION() void DashTimelineFinished();
 	UFUNCTION() void RecoilTimelineProgress(float Value);
 	UFUNCTION() void RecoilTimelineFinished();
+	UFUNCTION() void RecoilReverseTimelineProgress(float Value);
+	UFUNCTION() void RecoilReverseTimelineFinished();
 
 public:
 	UFUNCTION() void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
