@@ -34,7 +34,7 @@ public:
 	UFUNCTION()
 	void UpdateHealthBar(const float CurrentValue, const float MaxValue);
 	UFUNCTION()
-	void UpdateShieldBar(const float CurrentValue, const float MaxValue);
+	void UpdateShieldBar(const float CurrentValue, const float MaxValue, const bool IsBroken);
 
 	UFUNCTION()
 	void IncrementDashAmount();
@@ -49,4 +49,8 @@ public:
 		UTexture2D* PotionsIconTexture;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 		UTexture2D* BoltsIconTexture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		FLinearColor ActiveShieldColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		FLinearColor BrokenShieldColor;
 };

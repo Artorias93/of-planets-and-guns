@@ -206,7 +206,9 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
 		//UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
 
-		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
+			AttributeSetPlayer->GetShieldCapacityMax(),
+			bIsShieldBroken);
 	}
 }
 
@@ -1189,13 +1191,18 @@ void AOPAG_Player::ResetShieldTimer()
 		{
 			GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
 			bIsShieldBroken = false;
+			EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(),
+				AttributeSetPlayer->GetShieldCapacityMax(),
+				bIsShieldBroken);
 			return;
 		}
 
 		const float NewShieldCapicityValue = FMath::Clamp(AttributeSetPlayer->GetShieldCapacity() + AttributeSetPlayer->GetShieldRechargeRate(), 0.f, AttributeSetPlayer->GetShieldCapacityMax());
 		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), NewShieldCapicityValue);
 	
-		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), AttributeSetPlayer->GetShieldCapacityMax());
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
+			AttributeSetPlayer->GetShieldCapacityMax(),
+			bIsShieldBroken);
 
 		//UE_LOG(LogTemp, Warning, TEXT("Current Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
 	}
@@ -1245,6 +1252,9 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 
 		InventorySystemComp->GoldAmount = StateToApply.GoldAmount;
 		InventorySystemComp->PotionsAmount = StateToApply.PotionsAmount;
+		InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
+		bAreCountersAlreadyInitialized = false;
+		InitUICounters();
 
 		if (StateToApply.PrimaryGun.GunClass)
 		{
@@ -1268,7 +1278,6 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 			}
 		}
 	}
-	InventorySystemComp->BoltsAmount = StateToApply.BoltsAmount;
 }
 #pragma endregion Player State
 
