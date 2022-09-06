@@ -34,4 +34,3 @@ void AOPAG_DoorBase::OpenDoor_Implementation()
 void AOPAG_DoorBase::CloseDoor_Implementation()
 {
 }
-

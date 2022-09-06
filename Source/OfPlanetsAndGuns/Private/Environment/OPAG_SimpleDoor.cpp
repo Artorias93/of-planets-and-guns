@@ -53,7 +53,6 @@ void AOPAG_SimpleDoor::OpenDoor_Implementation()
 		Timeline->PlayFromStart();
 		bIsOpen = true;
 	}
-
 }
 
 void AOPAG_SimpleDoor::CloseDoor_Implementation()

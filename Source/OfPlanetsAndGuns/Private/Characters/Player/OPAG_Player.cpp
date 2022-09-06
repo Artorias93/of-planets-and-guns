@@ -79,6 +79,7 @@ AOPAG_Player::AOPAG_Player()
 
 	DashTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DashTimeline"));
 	RecoilTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RecoilTimeline"));
+	RecoilReverseTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RecoilReverseTimeline"));
 }
 
 void AOPAG_Player::BeginPlay()
@@ -381,10 +382,24 @@ void AOPAG_Player::InitRecoilTimeline()
 		RecoilTimeline->SetDirectionPropertyName(FName("RecoilTimelineDirection"));
 
 		OnRecoilTimelineProgress.BindUFunction(this, FName("RecoilTimelineProgress"));
-		RecoilTimeline->AddInterpFloat(RecoilCurveFloat, OnRecoilTimelineProgress);
+		RecoilTimeline->AddInterpFloat(RecoilCurveFloat, OnRecoilTimelineProgress, FName("Recoil"));
 
 		OnRecoilTimelineFinished.BindUFunction(this, FName("RecoilTimelineFinished"));
 		RecoilTimeline->SetTimelineFinishedFunc(OnRecoilTimelineFinished);
+	}
+	if (RecoilReverseCurveFloat)
+	{
+		RecoilReverseTimeline->SetLooping(false);
+		RecoilReverseTimeline->SetTimelineLength(RecoilReverseLength);
+
+		RecoilReverseTimeline->SetPropertySetObject(this);
+		RecoilReverseTimeline->SetDirectionPropertyName(FName("RecoilTimelineDirection"));
+
+		OnRecoilReverseTimelineProgress.BindUFunction(this, FName("RecoilReverseTimelineProgress"));
+		RecoilReverseTimeline->AddInterpFloat(RecoilReverseCurveFloat, OnRecoilReverseTimelineProgress, FName("RecoilReverse"));
+
+		OnRecoilReverseTimelineFinished.BindUFunction(this, FName("RecoilReverseTimelineFinished"));
+		RecoilReverseTimeline->SetTimelineFinishedFunc(OnRecoilReverseTimelineFinished);
 	}
 }
 
@@ -651,9 +666,15 @@ void AOPAG_Player::Shoot()
 	Mesh1P->GetAnimInstance()->Montage_Play(FireMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 
 	// Active recoil
-	const float RecoilPeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().RecoilRate);
-	RecoilTimeline->SetPlayRate(RecoilPeriod);
-	RecoilTimeline->Play();
+	RandomRecoilYaw = FMath::RandRange(RecoilYawMin, RecoilYawMax);
+	RandomRecoilYaw *= ((100 - CurrentGun->GetStatsTotal().Stability) / 100) * CurrentGun->GetRecoilStrength();
+	AccumulatedRecoilDeviation -= CurrentDeltaRotation;
+	CurrentDeltaRotation = FRotator::ZeroRotator;
+
+	RecoilReverseTimeline->Stop();
+	RecoilTimeline->SetPlayRate(CurrentGun->GetRecoilSpeed());
+	RecoilReverseTimeline->SetPlayRate(CurrentGun->GetRecoilSpeed());
+	RecoilTimeline->PlayFromStart();
 
 	// Update last fire time
 	LastFireTime = GetGameTimeSinceCreation();
@@ -693,6 +714,12 @@ void AOPAG_Player::Lookup(const FInputActionValue& Value)
 	if (LookupScale != 0.0f)
 	{
 		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
+		//UE_LOG(LogTemp, Warning, TEXT("Pitch: %f"), LookupScale);
+
+		if (AccumulatedRecoilDeviation.Pitch > .0f)
+		{
+			AccumulatedRecoilDeviation.Pitch -= LookupScale;
+		}
 	}
 }
 
@@ -702,6 +729,20 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 	if (TurnScale != 0.0f)
 	{
 		AddControllerYawInput(TurnScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
+
+		//FVector TempVector = FVector(AccumulatedRecoilDeviation.Yaw, TurnScale, 0.f);
+
+		if (AccumulatedRecoilDeviation.Yaw < .0f && TurnScale < .0f)
+		{
+			AccumulatedRecoilDeviation.Yaw -= TurnScale;
+		}
+		else if (AccumulatedRecoilDeviation.Yaw > .0f && TurnScale > .0f)
+		{
+			AccumulatedRecoilDeviation.Yaw -= TurnScale;
+		}
+
+		/*TempVector.Z = AccumulatedRecoilDeviation.Yaw;
+		UE_LOG(LogTemp, Warning, TEXT("TEMP: %s"), *TempVector.ToString());*/
 	}
 }
 
@@ -1141,27 +1182,36 @@ void AOPAG_Player::DashTimelineFinished()
 
 void AOPAG_Player::RecoilTimelineProgress(float Value)
 {
-	// Add yaw input to camera with randomizer value
-	const float RecoilYaw = FMath::RandRange(RecoilYawMin, RecoilYawMax);
-	AddControllerYawInput(RecoilYaw);
+	Value *= ((100 - CurrentGun->GetStatsTotal().Stability) / 100) * CurrentGun->GetRecoilStrength();
 
-	// Add pitch input to camera with randomizer value
-	if (RecoilTimelineDirection == ETimelineDirection::Forward)
-	{
-		AddControllerPitchInput(-Value);
-		return;
-	}
-	AddControllerPitchInput(Value);
+	// Add yaw input to camera with randomizer value
+	AddControllerYawInput(-RandomRecoilYaw);
+
+	AddControllerPitchInput(-Value);
+	AccumulatedRecoilDeviation.Pitch += Value;
+	AccumulatedRecoilDeviation.Yaw += RandomRecoilYaw;
 }
 
 void AOPAG_Player::RecoilTimelineFinished()
 {
-	if (RecoilTimeline->GetPlaybackPosition() > .0f)
-	{
-		const float RecoilPeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().RecoilRate);
-		RecoilTimeline->SetPlayRate(RecoilPeriod);
-		RecoilTimeline->Reverse();
-	}
+	CurrentDeltaRotation = FRotator::ZeroRotator;
+	RecoilReverseTimeline->PlayFromStart();
+}
+
+void AOPAG_Player::RecoilReverseTimelineProgress(float Value)
+{
+	FRotator NextCurrentRotator = FMath::Lerp(FRotator::ZeroRotator, AccumulatedRecoilDeviation, 
+		RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength());
+
+	AddControllerPitchInput(NextCurrentRotator.Pitch - CurrentDeltaRotation.Pitch);
+	AddControllerYawInput(NextCurrentRotator.Yaw - CurrentDeltaRotation.Yaw);
+	CurrentDeltaRotation = NextCurrentRotator;
+}
+
+void AOPAG_Player::RecoilReverseTimelineFinished()
+{
+	AccumulatedRecoilDeviation = FRotator::ZeroRotator;
+	CurrentDeltaRotation = FRotator::ZeroRotator;
 }
 #pragma endregion Timeline
 

@@ -115,7 +115,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 	AddStatEntry("Damage: ", (int)CurrentModuleStats.Damage, (int)OtherModuleStats.Damage);
 	AddStatEntry("Fire Rate: ", (int)CurrentModuleStats.FireRate, (int)OtherModuleStats.FireRate);
 	AddStatEntry("Accuracy: ", (int)CurrentModuleStats.Accuracy, (int)OtherModuleStats.Accuracy);
-	AddStatEntry("Stability: ", (int)CurrentModuleStats.RecoilRate, (int)OtherModuleStats.RecoilRate);
+	AddStatEntry("Stability: ", (int)CurrentModuleStats.Stability, (int)OtherModuleStats.Stability);
 	AddStatEntry("Reloading Time: ", CurrentModuleStats.ReloadingTime, OtherModuleStats.ReloadingTime, true);
 	AddStatEntry("Clip Size: ", CurrentModuleStats.ClipSize, OtherModuleStats.ClipSize);
 	

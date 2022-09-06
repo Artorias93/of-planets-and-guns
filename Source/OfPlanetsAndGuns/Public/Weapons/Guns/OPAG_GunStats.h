@@ -43,8 +43,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 0.f, ClampMax = 100.f))
 		float Accuracy;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float RecoilRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 0.f, ClampMax = 100.f))
+		float Stability;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float ReloadingTime;
@@ -52,5 +52,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int ClipSize;
 
-	FOPAG_GunStats() : Damage(0), FireRate(0), Accuracy(0), RecoilRate(0), ReloadingTime(0), ClipSize(0) {}
+	FOPAG_GunStats() : Damage(0), FireRate(0), Accuracy(0), Stability(0), ReloadingTime(0), ClipSize(0) {}
 };
