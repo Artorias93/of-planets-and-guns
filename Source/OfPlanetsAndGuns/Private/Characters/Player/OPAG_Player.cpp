@@ -407,7 +407,7 @@ void AOPAG_Player::InitUICounters()
 
 	int i;
 	for (i = 0; i < AttributeSetPlayer->GetDashCount(); ++i) {
-		EMS->DashAmountIncrement.Broadcast();
+		EMS->DashInit.Broadcast();
 	}
 
 	for (i = 0; i < InventorySystemComp->BoltsAmount; ++i)

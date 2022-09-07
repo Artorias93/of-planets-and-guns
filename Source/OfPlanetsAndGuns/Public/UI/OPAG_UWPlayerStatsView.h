@@ -13,6 +13,7 @@ class UTextBlock;
 class UProgressBar;
 class UImage;
 class UHorizontalBox;
+class UHorizontalBoxSlot;
 class UTexture2D;
 
 UCLASS()
@@ -26,20 +27,22 @@ class OFPLANETSANDGUNS_API UOPAG_UWPlayerStatsView : public UUserWidget
 		UProgressBar* HealthBar;
 	UPROPERTY(meta = (BindWidget))
 		UProgressBar* ShieldBar;
-	UPROPERTY(meta = (BindWidget))
-		UProgressBar* DashBar;
 
 	UPROPERTY(meta = (BindWidget))
 		UHorizontalBox* DashBox; 
+
+	TArray<UProgressBar*> Dashes;
+	UProgressBar* LastRechargingDashBoxSlot;
+	int32 NextToBeUsedDashBoxSlot;
 
 public:
 	UFUNCTION()
 		void UpdateHealthBar(const float CurrentValue, const float MaxValue);
 	UFUNCTION()
 		void UpdateShieldBar(const float CurrentValue, const float MaxValue);
-	UFUNCTION()
-		void UpdateDashBar(const float CurrentValue, const float MaxValue);
 
+	UFUNCTION()
+	void DashInit();
 	UFUNCTION()
 	void IncrementDashAmount();
 	UFUNCTION()
@@ -53,4 +56,8 @@ public:
 		UTexture2D* PotionsIconTexture;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 		UTexture2D* BoltsIconTexture;
+
+protected:
+	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 };

@@ -46,7 +46,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FApplyPlayerState, const FOPAG_Playe
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FShieldChanged, float, CurrentValue, float, MaxValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FDashChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FColorAmmoChanged, const FLinearColor, ColorParam);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
@@ -54,6 +53,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashInit);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountDecrement);
 
@@ -174,8 +174,6 @@ public:
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FShieldChanged ShieldChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
-		FDashChanged DashChanged;
-	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FAmmoChanged TotalAmmoChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FAmmoChanged CurrentAmmoChanged;
@@ -183,6 +181,8 @@ public:
 		FColorAmmoChanged ColorAmmoChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FGoldChanged GoldChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FDashInit DashInit;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountIncrement DashAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
