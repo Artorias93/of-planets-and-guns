@@ -46,15 +46,6 @@ FString AOPAG_LootBox::InteractString_Implementation()
 
 void AOPAG_LootBox::DropTimelineProgress(FVector Value)
 {
-	/*FVector RandomDir = Lid->GetUpVector();
-	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
-	RandomDir.X = FMath::Sin(RandomAngle);
-	RandomDir.Y = FMath::Cos(RandomAngle);
-
-	const FVector Force = Item->GetActorUpVector() * ThrowItems + RandomDir * ThrowItems;
-	IOPAG_InteractableInterface::Execute_ApplyForce(Item, Force);*/
-
-
 	FVector NewLocation = LootSpawnPoint->GetComponentLocation();
 	NewLocation.X += RandomDropDir.X * Value.X * DropCurveXFactor;
 	NewLocation.Y += RandomDropDir.Y * Value.X * DropCurveXFactor;
@@ -173,5 +164,5 @@ void AOPAG_LootBox::SpawnItem()
 	}
 
 	// Re-call this method for any items
-	GetWorld()->GetTimerManager().SetTimer(SpawnItemsHandle, this, &AOPAG_LootBox::SpawnItem, 2.f, false);
+	GetWorld()->GetTimerManager().SetTimer(SpawnItemsHandle, this, &AOPAG_LootBox::SpawnItem, 0.5, false);
 }
