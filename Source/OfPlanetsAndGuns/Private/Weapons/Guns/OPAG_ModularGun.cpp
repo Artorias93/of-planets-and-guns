@@ -141,7 +141,7 @@ void AOPAG_ModularGun::CheckIfPhysical() const
 	// Control if module has parent gun -> is attached
 	if (GetParentActor() == nullptr)
 	{
-		Receiver->SetSimulatePhysics(true);
+		//Receiver->SetSimulatePhysics(true);
 	}
 }
 

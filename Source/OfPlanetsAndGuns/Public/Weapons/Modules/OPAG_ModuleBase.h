@@ -25,6 +25,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ModuleMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UPointLightComponent* ModuleHighlightUp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UPointLightComponent* ModuleHighlightDown;
+
 protected:
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FString Name;
@@ -53,8 +59,21 @@ protected:
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float PriceMuliplierPercentage = 1.f;
 
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float HighlightIncreaseSizeFactor = 0.5;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float CurrentHighlightIncreaseSizeFactor = 0;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RadiusIncreaseFactor = 250;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float IntensityIncreaseFactor = 100000;
+
 protected:
 	FTimerHandle FlyRotationHandle;
+	
 
 protected:
 	virtual void BeginPlay() override;
@@ -94,6 +113,7 @@ public:
 	EModuleBrand GetBrand() const;
 	FOPAG_GunStats GetStats() const;
 	int GetEquippableFireTypes() const;
+	FLinearColor GetColorFromRarity(int Value);
 
 	//Setter
 	void SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats,
