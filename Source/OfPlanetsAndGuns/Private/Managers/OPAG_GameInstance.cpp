@@ -273,6 +273,7 @@ void UOPAG_GameInstance::SetAudioLibraries()
 	SMS->EnviromentAudioLibrary = EnviromentAudioLibrary;
 	SMS->CharacterAudioLibrary = CharacterAudioLibrary;
 	SMS->UIAudioLibrary = UIAudioLibrary;
+	SMS->SoundtracksAudioLibrary = SoundtracksAudioLibrary;
 }
 
 void UOPAG_GameInstance::OnPlayerDeath()

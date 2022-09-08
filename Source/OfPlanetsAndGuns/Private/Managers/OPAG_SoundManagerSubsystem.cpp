@@ -52,6 +52,31 @@ void UOPAG_SoundManagerSubsystem::PlayAbiltySounds(const AActor* actor, EAbility
 	}
 }
 
+void UOPAG_SoundManagerSubsystem::PlayUISounds( EUISoundAction action) {
+	if (UIAudioLibrary) {
+		FAudioEvent* libraryRow;
+		switch (action)
+		{
+		case EUISoundAction::UI_Confirm:
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("UI_Confirm"), "", false);
+			break;
+		case EUISoundAction::UI_Move:
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("UI_Move"), "", false);
+			break;
+		case EUISoundAction::UI_Back:
+			libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("UI_Back"), "", false);
+			break;
+		default:
+			libraryRow = nullptr;
+			break;
+		}
+		if (libraryRow) {
+			UFMODEvent* currentEvent = libraryRow->AudioContent;
+			InstanceUI = UFMODBlueprintStatics::PlayEvent2D( GetWorld(), currentEvent, false);
+		}
+	}
+}
+
 void UOPAG_SoundManagerSubsystem::PlayEnviromentSounds(AActor* actor, EEnviromentSoundAction event){
 	FVector position = actor->GetActorLocation();
 	if (EnviromentAudioLibrary) {
@@ -236,6 +261,55 @@ void UOPAG_SoundManagerSubsystem::PlayCharacterSounds(AActor* actor, ECharacterS
 			UFMODEvent* currentEvent = libraryRow->AudioContent;
 			AudioComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, true, true, true);
 		}
+	}
+}
+void UOPAG_SoundManagerSubsystem::PlayAmbient() {
+	if (EnviromentAudioLibrary) {
+		if (InstanceAmbient.Instance->isValid())
+			StopAmbient();
+		FAudioEvent* libraryRow;
+		libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Ambient"), "", false);
+		if (libraryRow) {
+			UFMODEvent* currentEvent = libraryRow->AudioContent;
+			InstanceAmbient = UFMODBlueprintStatics::PlayEvent2D(GetWorld(), currentEvent, false);
+		}
+	}
+}
+void UOPAG_SoundManagerSubsystem::PlaySoundTrack(ESoundtrackType type) {
+	if (SoundtracksAudioLibrary) {
+		if (InstanceSoundtrack.Instance->isValid())
+			StopSoundtrack();
+		FAudioEvent* libraryRow;
+		switch (type)
+		{
+		case ESoundtrackType::Gameplay:
+			libraryRow = SoundtracksAudioLibrary->FindRow<FAudioEvent>(*FString("Soundtrack_Gameplay"), "", false);
+			break;
+		case ESoundtrackType::Menu:
+			libraryRow = nullptr;
+			break;
+		default:
+			libraryRow = nullptr;
+			break;
+		}
+		if (libraryRow) {
+			UFMODEvent* currentEvent = libraryRow->AudioContent;
+			InstanceSoundtrack = UFMODBlueprintStatics::PlayEvent2D(GetWorld(), currentEvent, false);
+		}
+	}
+}
+
+void UOPAG_SoundManagerSubsystem::StopSoundtrack() {
+	if (InstanceSoundtrack.Instance->isValid()) {
+		InstanceSoundtrack.Instance->stop(FMOD_STUDIO_STOP_MODE::FMOD_STUDIO_STOP_ALLOWFADEOUT);
+		InstanceSoundtrack.Instance->release();
+	}
+}
+
+void UOPAG_SoundManagerSubsystem::StopAmbient() {
+	if (InstanceAmbient.Instance->isValid()) {
+		InstanceAmbient.Instance->stop(FMOD_STUDIO_STOP_MODE::FMOD_STUDIO_STOP_ALLOWFADEOUT);
+		InstanceAmbient.Instance->release();
 	}
 }
 

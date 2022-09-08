@@ -53,6 +53,7 @@ enum class EEnviromentSoundAction : uint8
 	Doors_Close = 0x02,
 	Zipline_On = 0x03,
 	Zipline_Out = 0x04,
+	Ambient = 0x05,
 };
 ENUM_CLASS_FLAGS(EEnviromentSoundAction);
 
@@ -72,6 +73,23 @@ enum class ECharacterSoundAction : uint8
 };
 ENUM_CLASS_FLAGS(ECharacterSoundAction);
 
+UENUM(BlueprintType, meta = (Bitflags))
+enum class EUISoundAction : uint8
+{
+	UI_Confirm = 0x00,
+	UI_Move = 0x01,
+	UI_Back = 0x02,
+};
+ENUM_CLASS_FLAGS(EUISoundAction);
+
+UENUM(BlueprintType, meta = (Bitflags))
+enum class ESoundtrackType : uint8
+{
+	Gameplay = 0x00,
+	Menu = 0x01,
+};
+ENUM_CLASS_FLAGS(ESoundtrackType);
+
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_SoundManagerSubsystem : public UGameInstanceSubsystem
@@ -89,13 +107,18 @@ public:
 		UDataTable* CharacterAudioLibrary;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
 		UDataTable* UIAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* SoundtracksAudioLibrary;
 
 	UPROPERTY(EditAnywhere, Category = "FMOD")
 		class UFMODAudioComponent* AudioComponent;
 	UPROPERTY(EditAnywhere, Category = "FMOD | Zipline")
 		class UFMODAudioComponent* ZiplineAudioComponent;
 
-	FFMODEventInstance InstanceWrapper;
+
+	FFMODEventInstance InstanceUI;
+	FFMODEventInstance InstanceAmbient;
+	FFMODEventInstance InstanceSoundtrack;
 
 public: 
 	UFUNCTION(BlueprintCallable)
@@ -107,7 +130,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void PlayCharacterSounds(AActor* actor, ECharacterSoundAction event);
 	UFUNCTION(BlueprintCallable)
+		void PlayUISounds(EUISoundAction event);
+	UFUNCTION(BlueprintCallable)
+		void PlaySoundTrack(ESoundtrackType type);
+	UFUNCTION(BlueprintCallable)
+		void PlayAmbient();
+	UFUNCTION(BlueprintCallable)
 		void StopSound();
+	UFUNCTION(BlueprintCallable)
+		void StopSoundtrack();
+	UFUNCTION(BlueprintCallable)
+		void StopAmbient();
 private:
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponsFireSound(AOPAG_GunBase* weapon);

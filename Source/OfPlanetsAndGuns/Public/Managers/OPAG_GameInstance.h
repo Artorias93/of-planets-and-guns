@@ -55,6 +55,8 @@ public:
 		UDataTable* CharacterAudioLibrary;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
 		UDataTable* UIAudioLibrary;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+		UDataTable* SoundtracksAudioLibrary;
 
 private:
 	void BindEvents();
