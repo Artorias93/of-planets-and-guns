@@ -3,6 +3,7 @@
 
 #include "Environment/OPAG_Zipline.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 
 
@@ -63,9 +64,11 @@ void AOPAG_Zipline::Tick(float DeltaTime)
 
 void AOPAG_Zipline::Interact_Implementation()
 {
-
 	//if (StartingPoint == nullptr || EndingPoint == nullptr || PlayerRef == nullptr) return;
 	UE_LOG(LogTemp, Warning, TEXT("INTERACT"));
+
+	if (SMS && !bIsPlayerRidingZipline)
+		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Zipline_On);
 
 	float deltaDistance = FVector::Distance(StartingPoint, EndingPoint);
 	float deltaTime = deltaDistance / 1000;
@@ -112,6 +115,7 @@ void AOPAG_Zipline::SetUpZipline() {
 	bCanPlayerInteract = false;
 	bIsPlayerRidingZipline = false;
 
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 }
 
 void AOPAG_Zipline::OverlapPointABegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
@@ -145,6 +149,10 @@ void AOPAG_Zipline::OverlapReset(UPrimitiveComponent* OverlappedComponent, AActo
 
 void AOPAG_Zipline::OnZiplineEnded()
 {
+	if (SMS) {
+		SMS->StopSound();
+		//SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Zipline_Out);
+	}
 	bIsPlayerRidingZipline = false;
 }
 

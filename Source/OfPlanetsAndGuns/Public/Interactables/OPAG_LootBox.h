@@ -4,6 +4,7 @@
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "GameFramework/Actor.h"
 #include "Weapons/Guns/OPAG_GunState.h"
+#include "Components/TimelineComponent.h"
 #include "OPAG_LootBox.generated.h"
 
 UCLASS()
@@ -45,13 +46,36 @@ public:
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	int NumberOfModulesToSpawn = 1;
 
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	UTimelineComponent* DropTimeline;
 
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	class UCurveVector* CurveDropVector;
+
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	float DropCurveXFactor;
+
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	float DropCurveZFactor;
+
+	FOnTimelineVector OnDropTimelineProgress;
+	
+	UPROPERTY()
+	FVector DropTimelinePropertyName;
 
 private:
 	TArray<TSubclassOf<AActor>> Items;   
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
-	
+
+	class UOPAG_SoundManagerSubsystem* SMS = nullptr;
+
+	UPROPERTY()
+		AActor* SpawnedItem;
+
+	UPROPERTY()
+		FVector RandomDropDir;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -71,6 +95,9 @@ public:
 	virtual bool WillChangeInteractStateDynamically_Implementation() override;
 
 	FString InteractString_Implementation() override;
+
+	UFUNCTION()
+	void DropTimelineProgress(FVector Value);
 
 	UFUNCTION() void SpawnItem();
 };

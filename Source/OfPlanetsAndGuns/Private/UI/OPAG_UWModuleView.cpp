@@ -14,7 +14,8 @@ void UOPAG_UWModuleView::NativeConstruct()
 }
 
 void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& CurrentModuleStats,
-	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType, 
+	const FOPAG_GunStats& OtherModuleStats, const FString OtherModuleName, 
+	const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType, 
 	const int EquippableTypes, const bool CanBeEquipped)
 {
 	FullyAutomaticIcon->SetBrushTintColor(FLinearColor::White);
@@ -26,30 +27,31 @@ void UOPAG_UWModuleView::UpdateModuleValues(const FOPAG_GunStats& CurrentModuleS
 	ModuleRarity->SetText(FText::FromString(AOPAG_ModuleBase::GetRarityName(OtherModuleRarity)));
 	ModuleType->SetText(FText::FromString(AOPAG_ModuleBase::GetTypeName(OtherModuleType)));
 	
+	//Equippable Mask checking
 	int ResAR = EquippableTypes;
-	bool AR = ResAR & 1;
-	if (AR)
+	bool isAREquippable = ResAR & 1;
+	if (isAREquippable)
 		FullyAutomaticIcon->SetBrushTintColor(FLinearColor::Blue);
 
 	int ResSs = ResAR >> 1;
-	bool Ss = ResSs & 1;
-	if (Ss)
+	bool isSsEquippable = ResSs & 1;
+	if (isSsEquippable)
 		SingleShotIcon->SetBrushTintColor(FLinearColor::Blue);
 
 	int ResB3 = ResSs >> 1;
-	bool B3 = ResB3 & 1;
-	if (B3)
+	bool isBurst3Euippable = ResB3 & 1;
+	if (isBurst3Euippable)
 		Burst3Icon->SetBrushTintColor(FLinearColor::Blue);
 
 	int ResShg = ResB3 >> 1;
-	bool Shg = ResShg & 1;
-	if (Shg)
+	bool isShotgunEquippable = ResShg & 1;
+	if (isShotgunEquippable)
 		ShotgunIcon->SetBrushTintColor(FLinearColor::Blue);
 
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, CurrentModuleStats.Damage, OtherModuleStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, CurrentModuleStats.FireRate, OtherModuleStats.FireRate);
 	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, CurrentModuleStats.Accuracy, OtherModuleStats.Accuracy, true);
-	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, CurrentModuleStats.RecoilRate, OtherModuleStats.RecoilRate);
+	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, CurrentModuleStats.Stability, OtherModuleStats.Stability);
 	UpdateSingleStat(ReloadingText, ReloadingAmount, ReloadingDelta, CurrentModuleStats.ReloadingTime, OtherModuleStats.ReloadingTime, true);
 	UpdateSingleStat(ClipSizeText, ClipSizeAmount, ClipSizeDelta, CurrentModuleStats.ClipSize, OtherModuleStats.ClipSize);
 }

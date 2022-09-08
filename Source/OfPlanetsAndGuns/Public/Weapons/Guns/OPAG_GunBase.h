@@ -13,6 +13,7 @@ class UStaticMeshComponent;
 class UChildActorComponent;
 class UCameraComponent;
 class AOPAG_CharacterBase;
+class UOPAG_SoundManagerSubsystem;
 class UOPAG_EventManagerSubsystem;
 class UParticleSystem;
 class USoundBase;
@@ -80,6 +81,12 @@ protected:
 	float ReductionSpreadRadiusShootingMax = 10.f;
 
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RecoilStrength = 1.f;
+
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RecoilSpeed = 1.f;
+
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
 protected:
@@ -109,6 +116,9 @@ protected:
 	FTimerHandle ResetShootHandle;
 	FTimerHandle ReloadHandle;
 
+	UPROPERTY()
+	UOPAG_SoundManagerSubsystem* SMS;
+
 protected:
 	// Boolean checks
 	bool bCanShoot = true;
@@ -125,7 +135,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Maths Utility
-	static float CalculateFirePeriod(const float FireRate);
+	static float CalculatePeriod(const float FireRate);
 
 	// Main system for shooting
 	virtual int Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
@@ -170,6 +180,8 @@ public:
 	virtual FOPAG_GunStats GetStatsTotal() const;
 	int GetAmmoCurrent() const;
 	int GetAmmoMax() const;
+	float GetRecoilStrength() const;
+	float GetRecoilSpeed() const;
 
 	//Setter
 	virtual void SetStatsTotal(const FOPAG_GunStats GunStats);

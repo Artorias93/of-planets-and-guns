@@ -38,9 +38,18 @@ void UOPAG_UWPlayerStatsView::UpdateHealthBar(const float CurrentValue, const fl
 	}
 }
 
-void UOPAG_UWPlayerStatsView::UpdateShieldBar(const float CurrentValue, const float MaxValue)
+void UOPAG_UWPlayerStatsView::UpdateShieldBar(const float CurrentValue, const float MaxValue, const bool IsBroken)
 {
 	float Percentage = CurrentValue / MaxValue;
+
+	if (IsBroken)
+	{
+		ShieldBar->SetFillColorAndOpacity(BrokenShieldColor);
+	}
+	else
+	{
+		ShieldBar->SetFillColorAndOpacity(ActiveShieldColor);
+	}
 
 	if (ShieldBar && (Percentage >= 0.0f && Percentage <= 1.0f)) {
 		ShieldBar->SetPercent(Percentage);

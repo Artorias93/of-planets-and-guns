@@ -18,8 +18,8 @@ public:
 	UPROPERTY(Category = "DashAbility", VisibleAnywhere, BlueprintReadWrite)
 		AOPAG_Player* Player;
 
-	UPROPERTY(Category = "DashAbility", VisibleAnywhere, BlueprintReadWrite)
-		float Friction = 500.f;
+	//UPROPERTY(Category = "DashAbility", VisibleAnywhere, BlueprintReadWrite)
+		//float Friction = 500.f;
 
 	UPROPERTY(Category = "DashAbility", VisibleAnywhere, BlueprintReadWrite)
 		FVector LaunchDirection = FVector::ZeroVector;
@@ -35,7 +35,7 @@ protected:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 private:
-	UFUNCTION() void LaunchUpAndThenStrong();
+	UFUNCTION() void LaunchUpAndThenForward();
 	UFUNCTION() void LaunchStrong();
 	UFUNCTION() const FVector CalculateDirection() const;
 	UFUNCTION() const FVector CalculateForce() const;

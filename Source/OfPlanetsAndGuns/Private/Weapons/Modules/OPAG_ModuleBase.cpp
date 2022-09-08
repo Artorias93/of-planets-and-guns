@@ -5,6 +5,7 @@
 #include "Characters/Player/OPAG_Player.h"
 #include <Kismet/GameplayStatics.h>
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
+#include "Components/PointLightComponent.h"
 
 AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
@@ -15,6 +16,7 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 	{
 		ModuleMesh->SetCollisionProfileName(TEXT("Weapon"));
 		RootComponent = ModuleMesh;
+		ModuleMesh->SetSimulatePhysics(false);
 	}
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
@@ -23,6 +25,31 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 		Sphere->SetSphereRadius(32.f);
 		Sphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 		Sphere->SetupAttachment(ModuleMesh);
+		Sphere->SetSimulatePhysics(false);
+	}
+
+	ModuleHighlightUp = CreateDefaultSubobject<UPointLightComponent>(TEXT("HighlightUp"));
+	if (ModuleHighlightUp)
+	{
+		ModuleHighlightUp->SetupAttachment(Sphere);
+
+		ModuleHighlightUp->SetVisibility(false);
+		ModuleHighlightUp->SetAttenuationRadius(0);
+		ModuleHighlightUp->SetIntensity(0);
+		ModuleHighlightUp->CastShadows = false;
+
+	}
+
+	ModuleHighlightDown = CreateDefaultSubobject<UPointLightComponent>(TEXT("HighlightDown"));
+	if (ModuleHighlightDown)
+	{
+		ModuleHighlightDown->SetupAttachment(Sphere);
+
+		ModuleHighlightDown->SetVisibility(false);
+		ModuleHighlightDown->SetAttenuationRadius(0);
+		ModuleHighlightDown->SetIntensity(0);
+		ModuleHighlightDown->CastShadows = false;
+		
 	}
 }
 
@@ -32,12 +59,52 @@ void AOPAG_ModuleBase::BeginPlay()
 	
 	// This method is call for activate physical behavior when module is in the scene
 	CheckIfPhysical();
+	Sphere->SetSimulatePhysics(false);
+	
+	FLinearColor LightColor = GetColorFromRarity(Level);
+
+	ModuleHighlightUp->SetLightColor(LightColor);
+	ModuleHighlightDown->SetLightColor(LightColor);
+
+	if (GetParentActor() == nullptr)
+	{		
+		ModuleHighlightUp->SetVisibility(true);
+		ModuleHighlightUp->SetAttenuationRadius(0);
+		ModuleHighlightUp->SetIntensity(0);
+
+		ModuleHighlightDown->SetVisibility(true);
+		ModuleHighlightDown->SetAttenuationRadius(0);
+		ModuleHighlightDown->SetIntensity(0);
+
+		FVector RelativeLocation = ModuleHighlightUp->GetRelativeLocation();
+		RelativeLocation.Z -= 30;
+		ModuleHighlightUp->SetRelativeLocation(RelativeLocation);
+
+		RelativeLocation = ModuleHighlightDown->GetRelativeLocation();
+		RelativeLocation.Z += 20;
+		ModuleHighlightDown->SetRelativeLocation(RelativeLocation);
+
+		ModuleMesh->SetWorldScale3D(FVector(2, 2, 2));
+	}
 }
 
 void AOPAG_ModuleBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Need to disable the physics into the Tick to make it apply effectively, probably it's set true after begin play when droped on enemy killed
+	Sphere->SetSimulatePhysics(false);
+
+	// animation to let light grow and intensify
+	if (GetParentActor() == nullptr && CurrentHighlightIncreaseSizeFactor < HighlightIncreaseSizeFactor)
+	{
+		CurrentHighlightIncreaseSizeFactor += DeltaTime;
+		ModuleHighlightUp->SetAttenuationRadius(CurrentHighlightIncreaseSizeFactor * RadiusIncreaseFactor);
+		ModuleHighlightUp->SetIntensity(CurrentHighlightIncreaseSizeFactor * IntensityIncreaseFactor);
+
+		ModuleHighlightDown->SetAttenuationRadius(CurrentHighlightIncreaseSizeFactor * RadiusIncreaseFactor);
+		ModuleHighlightDown->SetIntensity(CurrentHighlightIncreaseSizeFactor * IntensityIncreaseFactor);
+	}
 }
 
 #pragma region Get
@@ -91,6 +158,35 @@ int AOPAG_ModuleBase::GetEquippableFireTypes() const
 {
 	return EquippableFireTypes;
 }
+FLinearColor AOPAG_ModuleBase::GetColorFromRarity(int Value)
+{
+	FLinearColor Color = FLinearColor(1, 1, 1);
+
+	switch (Value)
+	{
+	case 1:
+		Color = FLinearColor(1, 1, 1);	// White
+		break;
+
+	case 2:
+		Color = FLinearColor(0, 255, 0.05);	// Green
+		break;
+
+	case 3:
+		Color = FLinearColor(0, 0.09, 1);	// Blue
+		break;
+
+	case 4:
+		Color = FLinearColor(1, 0, 0.08);	// Purple
+		break;
+
+	case 5:
+		Color = FLinearColor(1, 0.5, 0);	// Gold
+		break;
+	}
+
+	return Color;
+}
 #pragma endregion Get
 
 #pragma region Set
@@ -124,9 +220,9 @@ void AOPAG_ModuleBase::SetStats(const TArray<FOPAG_SecondaryStatModifier*>& Stat
 				if (Stats.Accuracy == 0.f)
 					Stats.Accuracy += FMath::RoundToInt(BonusDelta);
 				break;
-			case EModuleStatType::RecoilRate:
-				if (Stats.RecoilRate == 0.f)
-					Stats.RecoilRate += FMath::RoundToInt(BonusDelta);
+			case EModuleStatType::Stability:
+				if (Stats.Stability == 0.f)
+					Stats.Stability += FMath::RoundToInt(BonusDelta);
 				break;
 			case EModuleStatType::ReloadingTime:
 				if (Stats.ReloadingTime == 0.f)
@@ -146,6 +242,7 @@ void AOPAG_ModuleBase::SetStats(const FOPAG_GunStats NewStats)
 {
 	Stats = NewStats;
 }
+
 #pragma endregion Set
 
 #pragma region Interface
@@ -172,7 +269,7 @@ bool AOPAG_ModuleBase::CanInteract_Implementation()
 
 void AOPAG_ModuleBase::ApplyForce_Implementation(const FVector Force)
 {
-	ModuleMesh->SetSimulatePhysics(true);
+	//ModuleMesh->SetSimulatePhysics(true);
 	ModuleMesh->AddForce(Force, NAME_None, true);
 }
 
@@ -219,12 +316,14 @@ bool AOPAG_ModuleBase::CanBuy_Implementation()
 void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand,const FOPAG_GunStats NewStats,
 	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
+	// when it's attached to the gun, scale it to original dimension
+	ModuleMesh->SetWorldScale3D(FVector(1, 1, 1));
+
 	SetParameters(NewRarity, NewBrand, NewStats, NewEquippableFireTypes);
 }
 
 void AOPAG_ModuleBase::OnDetach()
 {
-
 }
 
 #pragma endregion Attachment
@@ -237,7 +336,7 @@ void AOPAG_ModuleBase::CheckIfPhysical() const
 	// Control if module has parent gun -> is attached
 	if (GetParentActor() == nullptr || Vendor != nullptr)
 	{
-		ModuleMesh->SetSimulatePhysics(true);
+		//ModuleMesh->SetSimulatePhysics(true);
 	}
 	else
 	{

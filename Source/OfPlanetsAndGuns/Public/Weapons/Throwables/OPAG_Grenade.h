@@ -16,6 +16,10 @@ class OFPLANETSANDGUNS_API AOPAG_Grenade : public AOPAG_Throwable
 public:	
 	AOPAG_Grenade();
 
+	UPROPERTY()
+		class UOPAG_SoundManagerSubsystem* SMS;
+
+
 public:
 	UPROPERTY(Category = "Grenade", EditDefaultsOnly, BlueprintReadOnly)
 		UParticleSystem* EmitterTemplate;

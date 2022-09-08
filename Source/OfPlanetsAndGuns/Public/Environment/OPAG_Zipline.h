@@ -105,6 +105,8 @@ private:
 	UFUNCTION()
 		void OnZiplineEnded();
 
+	class UOPAG_SoundManagerSubsystem* SMS = nullptr;
+
 public:
 	FString InteractString_Implementation() override;
 

@@ -13,6 +13,9 @@ class OFPLANETSANDGUNS_API UOPAG_GameplayAbilityBase : public UGameplayAbility
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY()
+		class UOPAG_SoundManagerSubsystem* SMS = nullptr;
+public:
 	UOPAG_GameplayAbilityBase(const FObjectInitializer& ObjectInitializer);
 	
 protected:
