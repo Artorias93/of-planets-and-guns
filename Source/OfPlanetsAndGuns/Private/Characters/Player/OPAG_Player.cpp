@@ -1092,8 +1092,15 @@ void AOPAG_Player::UpdateComparison() {
 				CurrentModuleStats = CurrentModule->GetStats();
 			}
 
+			FString AbilityDescription = "";
+			
+			AOPAG_AccessoryBase* Accessory = Cast<AOPAG_AccessoryBase>(Module);
+
+			if (Accessory)
+				AbilityDescription = Accessory->AbilityDescription;
+
 			EMS->LookedAtModule.Broadcast(CurrentModuleStats, Module->GetStats(),
-				Module->GetModuleName(), Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
+				Module->GetModuleName(), AbilityDescription, Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
 
 			PreviousLookedAtModule = InteractableObject;
 		}
