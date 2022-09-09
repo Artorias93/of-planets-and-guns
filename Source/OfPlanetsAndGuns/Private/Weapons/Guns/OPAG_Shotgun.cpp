@@ -6,6 +6,7 @@
 #include "Weapons/Guns/OPAG_GunBase.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Items/OPAG_Barrel.h"
 
 AOPAG_Shotgun::AOPAG_Shotgun()
 {
@@ -47,6 +48,11 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 						Character->ReceiveDamage(Damage, GetParentActor());
 					}
 				}
+			}
+			AOPAG_Barrel* ExplosionBarrel = Cast<AOPAG_Barrel>(OutHit.GetActor());
+			if (ExplosionBarrel != nullptr)
+			{
+				ExplosionBarrel->Detonate();
 			}
 		}
 	}

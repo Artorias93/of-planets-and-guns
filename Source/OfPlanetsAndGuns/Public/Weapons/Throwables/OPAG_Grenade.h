@@ -17,24 +17,23 @@ public:
 	AOPAG_Grenade();
 
 	UPROPERTY()
-		class UOPAG_SoundManagerSubsystem* SMS;
+	class UOPAG_SoundManagerSubsystem* SMS;
 
-
-public:
-	UPROPERTY(Category = "Grenade", EditDefaultsOnly, BlueprintReadOnly)
-		UParticleSystem* EmitterTemplate;
-
-	UPROPERTY(Category = "Sound", EditDefaultsOnly, BlueprintReadWrite)
-		USoundBase* ExplosionSound;
-
-	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadWrite)
+protected:
+	UPROPERTY(Category = "OPAG | Granade | Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		float Damage = 100.f;
 
-	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "OPAG | Granade | Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		float Radius = 300.f;
 
-	UPROPERTY(Category = "Grenade", EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(Category = "OPAG | Granade | Settings", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		FVector ImpactPoint = FVector::ZeroVector;
+
+	UPROPERTY(Category = "OPAG | Granade | Camera Shake", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<UCameraShakeBase> ExplosionShake;
+
+	UPROPERTY(Category = "OPAG | Granade | Emitter", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UParticleSystem* EmitterTemplate;
 
 private:
 	virtual void DamageAllTargetsInRange();
@@ -47,5 +46,9 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION()	virtual void Detonate();
+
+public:
+	float GetDamage() const;
+	FVector GetImpactPoint() const;
 
 };

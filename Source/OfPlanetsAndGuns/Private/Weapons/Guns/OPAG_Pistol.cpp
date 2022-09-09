@@ -3,6 +3,7 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include <Kismet/GameplayStatics.h>
 #include "Characters/Enemies/OPAG_Enemy.h"
+#include "Items/OPAG_Barrel.h"
 
 AOPAG_Pistol::AOPAG_Pistol()
 {
@@ -55,6 +56,11 @@ void AOPAG_Pistol::ShootLineTrace(FVector StartShootLocation, FVector Direction,
 					Character->ReceiveDamage(StatsBase.Damage, GetParentActor());
 				}
 			}			
+		}
+		AOPAG_Barrel* Barrel = Cast<AOPAG_Barrel>(OutHit.GetActor());
+		if (Barrel != nullptr)
+		{
+			Barrel->Detonate();
 		}
 	}
 

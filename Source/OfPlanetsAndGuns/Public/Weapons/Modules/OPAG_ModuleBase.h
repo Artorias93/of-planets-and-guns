@@ -100,6 +100,7 @@ public:
 	virtual void OnDetach();
 private:
 	void CheckIfPhysical() const;
+	void SelectRarity();
 
 public:
 	// Getter
