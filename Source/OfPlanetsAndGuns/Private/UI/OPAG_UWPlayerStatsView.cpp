@@ -16,11 +16,6 @@ void UOPAG_UWPlayerStatsView::NativeConstruct() {
 	BindEvents();
 }
 
-void UOPAG_UWPlayerStatsView::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-}
-
 void UOPAG_UWPlayerStatsView::BindEvents()
 {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
@@ -28,12 +23,11 @@ void UOPAG_UWPlayerStatsView::BindEvents()
 	if (EMS) {
 		EMS->HealthChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateHealthBar);
 		EMS->ShieldChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateShieldBar);
+		//EMS->DashChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashChanged);
 
-		EMS->DashInit.AddDynamic(this, &UOPAG_UWPlayerStatsView::DashInit);
 		EMS->DashAmountIncrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::IncrementDashAmount);
 		EMS->DashAmountDecrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::DecrementDashAmount);
 	}
-
 }
 
 void UOPAG_UWPlayerStatsView::UpdateHealthBar(const float CurrentValue, const float MaxValue)
@@ -54,48 +48,36 @@ void UOPAG_UWPlayerStatsView::UpdateShieldBar(const float CurrentValue, const fl
 	}
 }
 
-void UOPAG_UWPlayerStatsView::DashInit()
+void UOPAG_UWPlayerStatsView::UpdateDashBar(const float CurrentValue, const float MaxValue)
 {
-	UProgressBar* const NewDashProgressBar = WidgetTree->ConstructWidget<UProgressBar>();
+	float Percentage = CurrentValue / MaxValue;
 
-	if (NewDashProgressBar)
-	{
-		NewDashProgressBar->SetPercent(1.f);
-		NewDashProgressBar->SetFillColorAndOpacity(FLinearColor::Red);
-		DashBox->AddChild(NewDashProgressBar);
+	if (DashBar && (Percentage >= 0.0f && Percentage <= 1.0f)) {
+		DashBar->SetPercent(Percentage);
 	}
+}
+
+void UOPAG_UWPlayerStatsView::IncrementDashAmount()
+{
+	UImage* const NewDashIcon = WidgetTree->ConstructWidget<UImage>();
+
+	if (DashIconTexture) {
+		NewDashIcon->SetBrushFromTexture(DashIconTexture);
+	}
+
+	if (NewDashIcon)
+		DashBox->AddChild(NewDashIcon);
 
 	UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(DashBox->GetSlots()[(DashBox->GetChildrenCount() - 1)]);
 
 	if (MyBoxSlot) {
 		MyBoxSlot->SetPadding(FMargin(5, 5, 5, 5));
 	}
-
-	Dashes.Add(NewDashProgressBar);
-	NextToBeUsedDashBoxSlot = Dashes.Num() - 1;
-}
-
-void UOPAG_UWPlayerStatsView::IncrementDashAmount()
-{
-	Dashes[NextToBeUsedDashBoxSlot]->SetPercent(1.0f);
-
-	if (NextToBeUsedDashBoxSlot < 5)
-		NextToBeUsedDashBoxSlot++;
-
-	UProgressBar* const LastUsedDashProgBar = Dashes[NextToBeUsedDashBoxSlot];
-
-	if (LastUsedDashProgBar)
-		LastRechargingDashBoxSlot = LastUsedDashProgBar;
 }
 
 void UOPAG_UWPlayerStatsView::DecrementDashAmount()
 {
-	UProgressBar* const LastUsedDashProgBar = Dashes[NextToBeUsedDashBoxSlot];
-
-	if (LastUsedDashProgBar) {
-		LastUsedDashProgBar->SetPercent(0.f);
-
-		if (NextToBeUsedDashBoxSlot > 0)
-			NextToBeUsedDashBoxSlot--;
+	if (DashBox->GetChildrenCount() > 0) {
+		DashBox->RemoveChildAt((DashBox->GetChildrenCount() - 1));
 	}
 }
