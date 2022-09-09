@@ -141,9 +141,9 @@ void AOPAG_Enemy::ReceiveDamage(const float Damage, AActor* const Causer)
 		UGameplayStatics::GetPlayerPawn(GetWorld(), 0), Damage,
 		UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation(),
 		GetActorLocation(), NAME_None);
-	//TODO: Remove the print to screen
-	if(GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
+	
+	// if(GEngine)
+	// 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Enemy taking damage! Current health: "+ FString::SanitizeFloat(GetHealth())));
 
 	// Update & show health bar
 	if (BaseAttributeSet && EnemyHealthBar)

@@ -11,6 +11,7 @@ AOPAG_Drop::AOPAG_Drop()
 	if (Sphere)
 	{
 		RootComponent = Sphere;
+		Sphere->SetSimulatePhysics(false);
 	}
 
 	DropMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DropMesh"));
@@ -18,6 +19,7 @@ AOPAG_Drop::AOPAG_Drop()
 	{
 		DropMesh->SetupAttachment(RootComponent);
 		DropMesh->SetCollisionProfileName("Drop");
+		DropMesh->SetSimulatePhysics(false);
 	}
 
 	HighlightMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HighlightMesh"));
