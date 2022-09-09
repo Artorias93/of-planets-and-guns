@@ -47,9 +47,9 @@ void AOPAG_SimpleDoor::BeginPlay()
 void AOPAG_SimpleDoor::OpenDoor_Implementation()
 {
 	CollisionVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Open);
 	if (Timeline != nullptr && !bIsOpen)
 	{
+		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Open);
 		Timeline->PlayFromStart();
 		bIsOpen = true;
 	}
@@ -58,9 +58,9 @@ void AOPAG_SimpleDoor::OpenDoor_Implementation()
 void AOPAG_SimpleDoor::CloseDoor_Implementation()
 {
 	CollisionVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Close);
 	if (Timeline != nullptr && bIsOpen)
 	{
+		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Close);
 		Timeline->ReverseFromEnd();
 		bIsOpen = false;
 	}

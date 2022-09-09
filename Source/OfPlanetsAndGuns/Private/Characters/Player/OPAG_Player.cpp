@@ -842,6 +842,7 @@ void AOPAG_Player::InteractWithItem()
 				IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
 			}
 		}
+		//UE_LOG(LogTemp, Log);
 		if (IOPAG_InteractableInterface::Execute_CanBuy(InteractableObject))
 		{
 			InventorySystemComp->GoldAmount -= IOPAG_InteractableInterface::Execute_GetPriceTotal(InteractableObject);
@@ -1068,7 +1069,7 @@ void AOPAG_Player::UpdateComparison() {
 
 	else if (InteractableObject != nullptr) {
 		AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject);
-		if (Gun && IOPAG_InteractableInterface::Execute_CanInteract(Gun)) {
+		if (Gun && ( IOPAG_InteractableInterface::Execute_CanInteract(Gun) || IOPAG_InteractableInterface::Execute_CanBuy(Gun) )) {
 
 			const FOPAG_GunStats OtherGunStats = Gun->GetStatsTotal();
 			const FString OtherGunName = (Gun->GetGunName()).ToString();
@@ -1080,7 +1081,7 @@ void AOPAG_Player::UpdateComparison() {
 		}
 
 		AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject);
-		if (Module && IOPAG_InteractableInterface::Execute_CanInteract(Module)) 
+		if (Module && (IOPAG_InteractableInterface::Execute_CanInteract(Module) || IOPAG_InteractableInterface::Execute_CanBuy(Module)))
 		{
 			FOPAG_GunStats CurrentModuleStats;
 			AOPAG_ModuleBase* CurrentModule = PrimaryGun->GetModuleBySocketType(Module->GetType());
