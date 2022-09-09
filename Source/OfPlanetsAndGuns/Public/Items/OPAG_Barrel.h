@@ -25,6 +25,9 @@ class OFPLANETSANDGUNS_API AOPAG_Barrel : public AActor
 public:	
 	AOPAG_Barrel();
 
+	UPROPERTY()
+	class UOPAG_SoundManagerSubsystem* SMS;
+
 private:
 	UPROPERTY(Category = "OPAG | Barrel | Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float Damage = 100.f;
@@ -43,9 +46,6 @@ private:
 
 	UPROPERTY(Category = "OPAG | Barrel | Emitter", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* ExplosionEmitter;
-
-	UPROPERTY(Category = "OPAG | Barrel | Sound", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	USoundBase* ExplosionSound;
 
 protected:
 	virtual void BeginPlay() override;
