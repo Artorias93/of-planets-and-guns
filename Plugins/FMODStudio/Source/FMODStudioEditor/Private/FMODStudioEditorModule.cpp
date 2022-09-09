@@ -241,7 +241,7 @@ public:
     FTickerDelegate OnTick;
 
     /** Handle for registered delegates. */
-    FDelegateHandle TickDelegateHandle;
+    FTSTicker::FDelegateHandle TickDelegateHandle;
     FDelegateHandle BeginPIEDelegateHandle;
     FDelegateHandle EndPIEDelegateHandle;
     FDelegateHandle PausePIEDelegateHandle;
@@ -357,7 +357,7 @@ void FFMODStudioEditorModule::OnPostEngineInit()
     ViewportDrawingDelegateHandle = UDebugDrawService::Register(TEXT("Editor"), ViewportDrawingDelegate);
 
     OnTick = FTickerDelegate::CreateRaw(this, &FFMODStudioEditorModule::Tick);
-    TickDelegateHandle = FTicker::GetCoreTicker().AddTicker(OnTick);
+    TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(OnTick);
 
     // Create asset builder
     AssetBuilder.Create();
@@ -521,12 +521,12 @@ void FFMODStudioEditorModule::ShowVersion()
 
 void FFMODStudioEditorModule::OpenIntegrationDocs()
 {
-    FPlatformProcess::LaunchFileInDefaultExternalApplication(TEXT("https://fmod.com/docs/2.02/unreal"));
+    FPlatformProcess::LaunchFileInDefaultExternalApplication(TEXT("https://www.fmod.com/docs/unreal"));
 }
 
 void FFMODStudioEditorModule::OpenAPIDocs()
 {
-    FPlatformProcess::LaunchFileInDefaultExternalApplication(TEXT("https://fmod.com/docs/2.02/api"));
+    FPlatformProcess::LaunchFileInDefaultExternalApplication(TEXT("https://www.fmod.com/docs/api"));
 }
 
 void FFMODStudioEditorModule::OpenVideoTutorials()
@@ -965,7 +965,7 @@ void FFMODStudioEditorModule::ValidateFMOD()
                 PackagingSettings->DirectoriesToAlwaysStageAsNonUFS.Add(Settings.BankOutputDirectory);
             }
 
-            PackagingSettings->UpdateDefaultConfigFile();
+            PackagingSettings->TryUpdateDefaultConfigFile();
         }
     }
     else if (!bPackagingFound)
@@ -978,7 +978,7 @@ void FFMODStudioEditorModule::ValidateFMOD()
         if (EAppReturnType::Yes == FMessageDialog::Open(EAppMsgType::YesNo, message))
         {
             PackagingSettings->DirectoriesToAlwaysStageAsNonUFS.Add(Settings.BankOutputDirectory);
-            PackagingSettings->UpdateDefaultConfigFile();
+            PackagingSettings->TryUpdateDefaultConfigFile();
         }
     }
 
@@ -1006,7 +1006,7 @@ void FFMODStudioEditorModule::ValidateFMOD()
                 GeneratedDir.Path = Settings.GetFullContentPath() / folder;
                 PackagingSettings->DirectoriesToAlwaysCook.Add(GeneratedDir);
             }
-            PackagingSettings->UpdateDefaultConfigFile();
+            PackagingSettings->TryUpdateDefaultConfigFile();
         }
     }
 
@@ -1171,7 +1171,7 @@ void FFMODStudioEditorModule::ShutdownModule()
         BankUpdateNotifier.BanksUpdatedEvent.RemoveAll(this);
 
         // Unregister tick function.
-        FTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
+        FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 
         FEditorDelegates::BeginPIE.Remove(BeginPIEDelegateHandle);
         FEditorDelegates::EndPIE.Remove(EndPIEDelegateHandle);

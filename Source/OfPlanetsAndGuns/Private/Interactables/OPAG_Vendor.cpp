@@ -195,8 +195,12 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 	AttachModulesToGun(*TempGunsList[1], true, RoomDifficulty);
 
 	// Set price to texts
-	TempGunsTextRender[0]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[0])));
-	TempGunsTextRender[1]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[1])));
+	TempGunsTextRender[0]->SetText(
+		FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[0])))
+	);
+	TempGunsTextRender[1]->SetText(
+		FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[1])))
+	);
 
 	// Spawn two modules
 	if (ModulesList.Num() == 0)
@@ -240,7 +244,9 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 
 		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(ChildActorModules[i]->GetChildActor());
 		TempModulesTextRender[i]->SetVisibility(true);
-		TempModulesTextRender[i]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(NewModule)));
+		TempModulesTextRender[i]->SetText(
+			FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(NewModule)))
+		);
 		IOPAG_InteractableInterface::Execute_ApplyFly(NewModule);
 	}
 }

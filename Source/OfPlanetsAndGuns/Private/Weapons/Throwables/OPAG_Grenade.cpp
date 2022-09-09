@@ -27,10 +27,10 @@ void AOPAG_Grenade::DamageAllTargetsInRange()
 		TArray<AOPAG_Enemy*> HitEnemies;
 		for (FHitResult OutHit : OutHits)
 		{
-			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHit.Actor);
+			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHit.GetActor());
 			if (Enemy) HitEnemies.AddUnique(Enemy);
 
-			AOPAG_Barrel* Barrel = Cast<AOPAG_Barrel>(OutHit.Actor);
+			AOPAG_Barrel* Barrel = Cast<AOPAG_Barrel>(OutHit.GetActor());
 			if (Barrel) Barrel->Detonate();
 		}
 		for (AOPAG_Enemy* Enemy : HitEnemies)

@@ -1,8 +1,0 @@
-{
-	"BuildId": "17155196",
-	"Modules": 
-	{
-		"FMODStudio": "UE4Editor-FMODStudio-Win64-DebugGame.dll",
-		"FMODStudioEditor": "UE4Editor-FMODStudioEditor-Win64-DebugGame.dll"
-	}
-}
