@@ -23,7 +23,6 @@ void UOPAG_UWPlayerStatsView::BindEvents()
 	if (EMS) {
 		EMS->HealthChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateHealthBar);
 		EMS->ShieldChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateShieldBar);
-		//EMS->DashChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashChanged);
 
 		EMS->DashAmountIncrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::IncrementDashAmount);
 		EMS->DashAmountDecrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::DecrementDashAmount);
@@ -45,15 +44,6 @@ void UOPAG_UWPlayerStatsView::UpdateShieldBar(const float CurrentValue, const fl
 
 	if (ShieldBar && (Percentage >= 0.0f && Percentage <= 1.0f)) {
 		ShieldBar->SetPercent(Percentage);
-	}
-}
-
-void UOPAG_UWPlayerStatsView::UpdateDashBar(const float CurrentValue, const float MaxValue)
-{
-	float Percentage = CurrentValue / MaxValue;
-
-	if (DashBar && (Percentage >= 0.0f && Percentage <= 1.0f)) {
-		DashBar->SetPercent(Percentage);
 	}
 }
 
