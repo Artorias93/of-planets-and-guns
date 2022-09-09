@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,7 +7,6 @@
 #include "Weapons/Guns/OPAG_GunBase.h"
 #include "FMODEvent.h"
 #include "FMODBlueprintStatics.h"
-
 #include "OPAG_SoundManagerSubsystem.generated.h"
 
 USTRUCT(Blueprintable)

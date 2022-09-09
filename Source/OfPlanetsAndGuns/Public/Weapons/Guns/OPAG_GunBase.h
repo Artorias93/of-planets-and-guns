@@ -81,6 +81,12 @@ protected:
 	float ReductionSpreadRadiusShootingMax = 10.f;
 
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RecoilStrength = 1.f;
+
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float RecoilSpeed = 1.f;
+
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
 protected:
@@ -174,6 +180,8 @@ public:
 	virtual FOPAG_GunStats GetStatsTotal() const;
 	int GetAmmoCurrent() const;
 	int GetAmmoMax() const;
+	float GetRecoilStrength() const;
+	float GetRecoilSpeed() const;
 
 	//Setter
 	virtual void SetStatsTotal(const FOPAG_GunStats GunStats);

@@ -14,6 +14,7 @@ class UBoxComponent;
 class UTextRenderComponent;
 class UChildActorComponent;
 class UOPAG_EventManagerSubsystem;
+class UNiagaraSystem;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Vendor : public AActor
@@ -27,11 +28,10 @@ public:
 	// Pedestal on which guns and modules spawn (upon interaction)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* Pedestal;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UBoxComponent* BoxCollision;
 
-	// Positions of the two guns and three modules
+	// Positions of the two guns and two modules
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* ChildActor_Gun1;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -41,24 +41,25 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UChildActorComponent* ChildActor_Module2;
 
+	// Text displaying prices
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UTextRenderComponent* PriceTextRender_Gun1;
-
+		UTextRenderComponent* PriceTextRender_Gun1;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UTextRenderComponent* PriceTextRender_Gun2;
-
+		UTextRenderComponent* PriceTextRender_Gun2;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UTextRenderComponent* PriceTextRender_Module1;
-
+		UTextRenderComponent* PriceTextRender_Module1;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UTextRenderComponent* PriceTextRender_Module2;
+		UTextRenderComponent* PriceTextRender_Module2;
 
+	// Particle effect
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UNiagaraSystem* ActivationParticles;
+
+	// Data tables
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UDataTable* DataTableGuns;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UDataTable* DataTableModules;
-
-public:
 
 private:
 	UOPAG_EventManagerSubsystem* EMS;
@@ -68,6 +69,7 @@ private:
 	FTimerHandle SpawnItemsHandle;
 
 	void PopulateGunAndModuleArray();
+	void ActivationParticleEffect();
 
 protected:
 	virtual void BeginPlay() override;
@@ -79,7 +81,6 @@ public:
 	void SpawnItem(const float RoomDifficulty);
 	void AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue);
 
-public:
 	UFUNCTION() void DisableGunTextInVendor(AOPAG_ModularGun* Gun);
 	UFUNCTION() void DisableModuleTextInVendor(AOPAG_ModuleBase* Module);
 

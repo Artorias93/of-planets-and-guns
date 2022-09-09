@@ -6,6 +6,9 @@
 #include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "Managers/RoomManager/OPAG_LootManagerComponent.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+//#include <NiagaraSystem.h>
 #include <Kismet/GameplayStatics.h>
 #include <Components/BoxComponent.h>
 #include <Components/TextRenderComponent.h>
@@ -106,8 +109,19 @@ void AOPAG_Vendor::BeginPlay()
 }
 
 void AOPAG_Vendor::Unlock() {
+	ActivationParticleEffect();
 	PopulateGunAndModuleArray();
 	SpawnItem(666);
+}
+
+void AOPAG_Vendor::ActivationParticleEffect() {
+	if (Pedestal == nullptr) return;
+	FVector EffectLocation = Pedestal->GetComponentLocation();
+	if (ActivationParticles != nullptr) {
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation, FRotator::MakeFromEuler(FVector(0,0,1)), FVector(50.0f));
+		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation, FRotator::MakeFromEuler(FVector(0,0,1)), FVector(50.0f));
+
+	}
 }
 
 // Called every frame

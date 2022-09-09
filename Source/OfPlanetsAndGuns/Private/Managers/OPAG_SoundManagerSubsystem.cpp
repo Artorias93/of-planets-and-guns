@@ -155,12 +155,10 @@ void UOPAG_SoundManagerSubsystem::PlayWeaponsReloadSound(AOPAG_GunBase* weapon) 
 		switch (weaponType)
 		{
 		case EFireTypes::Burst3:
-			//libraryRow = nullptr;
 			libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("3Burst_Reload"), "", false);
 			break;
 		case EFireTypes::FullyAutomatic:
-			libraryRow = nullptr;
-			//libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("FullAuto_Reload"), "", false);
+			libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("FullAuto_Reload"), "", false);
 			break;
 		case EFireTypes::Shotgun:
 			libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("Shotgun_Reload"), "", false);

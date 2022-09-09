@@ -99,9 +99,6 @@ bool AOPAG_ModularGun::CanInteract_Implementation()
 	if (GetParentActor() == nullptr)
 		return true;
 
-	if (AOPAG_Vendor* vendor = Cast<AOPAG_Vendor>(GetParentActor()))
-		return true;
-
 	return false;
 }
 
@@ -141,7 +138,7 @@ void AOPAG_ModularGun::CheckIfPhysical() const
 	// Control if module has parent gun -> is attached
 	if (GetParentActor() == nullptr)
 	{
-		Receiver->SetSimulatePhysics(true);
+		//Receiver->SetSimulatePhysics(true);
 	}
 }
 
@@ -564,7 +561,7 @@ void AOPAG_ModularGun::UpdateStatsTotal()
 		StatsTotal.Damage += Modules[i]->GetStats().Damage;
 		StatsTotal.FireRate += Modules[i]->GetStats().FireRate;
 		StatsTotal.Accuracy += Modules[i]->GetStats().Accuracy;
-		StatsTotal.RecoilRate += Modules[i]->GetStats().RecoilRate;
+		StatsTotal.Stability += Modules[i]->GetStats().Stability;
 		StatsTotal.ReloadingTime += Modules[i]->GetStats().ReloadingTime;
 		StatsTotal.ClipSize += Modules[i]->GetStats().ClipSize;
 	}

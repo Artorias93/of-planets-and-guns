@@ -81,21 +81,11 @@ void AOPAG_MeleeEnemy::OnAttackNotify(FName FunctionName, const FBranchingPointN
 	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
 		if (DamageCollisionBox->IsOverlappingActor(AIController->GetFocusActor()))
-		{
-			//TODO: Remove the print to screen
-			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("HIT!"));
-			
+		{			
 			if(AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
 				Player->ReceiveDamage(MeleeWeaponDamage, this);
 			}
-		}
-		else
-		{
-			//TODO: Remove the print to screen
-			if (GEngine)
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("MISS..."));
 		}
 	}
 }
