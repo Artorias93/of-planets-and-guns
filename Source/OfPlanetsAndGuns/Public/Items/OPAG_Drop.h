@@ -30,6 +30,20 @@ public:
 	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
 	USphereComponent* Sphere;
 
+	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	UStaticMeshComponent* HighlightMesh;
+
+	//UPROPERTY(EditAnywhere, Category = "Ability")
+	//class UMaterial* HighlightMaterial;
+
+	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	float DisablePhysicAfterSeconds;
+
+	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	float HighlightIncreaseSizeFactor;
+
+	float CurrentHighlightIncreaseSizeFactor;
+
 public:
 	UPROPERTY(Category = "Drop Stuff", EditAnywhere, BlueprintReadWrite)
 	int Amount = 1;
@@ -45,5 +59,5 @@ public:
 
 public:
 	void ApplyForce_Implementation(const FVector Force) override;
-
+	void FloatingDrop();
 };

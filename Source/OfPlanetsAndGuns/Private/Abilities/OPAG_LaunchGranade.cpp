@@ -1,5 +1,7 @@
 #include "Abilities/OPAG_LaunchGranade.h"
 #include "Weapons/Modules/OPAG_BarrelBase.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Camera/CameraComponent.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
@@ -16,6 +18,7 @@ void UOPAG_LaunchGranade::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 {
 	if (HasAuthorityOrPredictionKey(ActorInfo, &ActivationInfo))
 	{
+		
 		const AOPAG_Player* const Player = GetPlayer();
 		const AOPAG_AccessoryThrowable* const Accessory = Cast<AOPAG_AccessoryThrowable>(Player->GetPrimaryGun()->GetModuleBySocketType(EModuleTypes::Accessory));
 		if (Player == nullptr || Accessory == nullptr)
@@ -33,6 +36,10 @@ void UOPAG_LaunchGranade::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 		const FRotator CameraRotation = Player->GetCurrentPlayerCamera()->GetComponentRotation();
 		const TSubclassOf<AOPAG_Throwable> ThrowableClass = Accessory->GetThrowable();
 		Player->GetPrimaryGun()->ShootThrowable(ThrowableClass, CameraRotation);
+		if(!SMS)
+			SMS = GetWorld()->GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+		if (SMS)
+			SMS->PlayAbiltySounds(Player, EAbilitySoundAction::GL_Fire);
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
 }

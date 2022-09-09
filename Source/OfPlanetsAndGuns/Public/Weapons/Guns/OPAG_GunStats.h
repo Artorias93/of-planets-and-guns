@@ -11,6 +11,7 @@ enum class EFireTypes : uint8
 	SingleShot = 0x01,
 	Burst3 = 0x02,
 	Shotgun = 0x03,
+	Pistol = 0x04,
 };
 ENUM_CLASS_FLAGS(EFireTypes);
 
@@ -42,8 +43,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 0.f, ClampMax = 100.f))
 		float Accuracy;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float RecoilRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = 0.f, ClampMax = 100.f))
+		float Stability;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float ReloadingTime;
@@ -51,5 +52,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int ClipSize;
 
-	FOPAG_GunStats() : Damage(0), FireRate(0), Accuracy(0), RecoilRate(0), ReloadingTime(0), ClipSize(0) {}
+	FOPAG_GunStats() : Damage(0), FireRate(0), Accuracy(0), Stability(0), ReloadingTime(0), ClipSize(0) {}
 };

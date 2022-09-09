@@ -29,6 +29,9 @@ public:
 
 	UPROPERTY()
 	class UOPAG_EventManagerSubsystem* EMS;
+
+	UPROPERTY()
+	class UOPAG_SoundManagerSubsystem* SMS;
 	
 	virtual void ReceiveDamage(const float Damage, AActor* const Causer);
 	virtual void ReceiveDamage(AActor* Throwable);

@@ -50,16 +50,9 @@ private:
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	//void TimelineCallback(const float Height) const;
-
 	/////////////////////////////
 	//Variables
 	/////////////////////////////
-	
-//public:
-
-	// UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
-	// UCurveFloat* MovementCurve;
 	
 private:
 
@@ -94,10 +87,4 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI")
 	float ChargeDamage = 100.f;
-
-	// UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	// UTimelineComponent* Timeline;
-	//
-	// UPROPERTY()
-	// FVector InitialLocation;
 };
