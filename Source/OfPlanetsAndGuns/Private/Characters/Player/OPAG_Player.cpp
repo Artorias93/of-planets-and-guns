@@ -184,11 +184,13 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 	}
 
+	//Shows damage indicator widget
+	EMS->DamagedBy.Broadcast(Causer);
+
 	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
 	{
 		Super::ReceiveDamage(Damage, Causer);
-
-		EMS->DamagedBy.Broadcast(Causer);
+		
 		if (!bIsShieldBroken) {
 			bIsShieldBroken = true;
 			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
@@ -198,7 +200,7 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		return;
 	}
 	if (AbilitySystemComp && BaseAttributeSet)
-	{
+	{		
 		AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
 
 		//TODO: Rename BasicShot in AbilityTakeDamage
