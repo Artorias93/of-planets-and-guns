@@ -32,6 +32,7 @@
 #include <Animation/AnimBlueprintGeneratedClass.h>
 #include "Abilities/OPAG_HealthBuffAbility.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include "GenericPlatform/GenericPlatformCrashContext.h"
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -1358,6 +1359,13 @@ void AOPAG_Player::CompleteInspectNotify()
 {
 	bInspecting = false;
 }
+
+void AOPAG_Player::FootstepsMakeNoiseNotify()
+{
+	MakeNoise(FootstepsAILoudness, this, this->GetActorLocation(), 0);
+}
+
+
 #pragma endregion Animation Notify
 
 void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
