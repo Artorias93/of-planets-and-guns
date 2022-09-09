@@ -14,7 +14,7 @@ void UOPAG_Explosion::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 
 	if (Grenade)
 	{
-		const FVector ImpactPoint = Grenade->ImpactPoint;
+		const FVector ImpactPoint = Grenade->GetImpactPoint();
 		const TArray<AActor*> ActorsToIgnore;
 		TArray<FHitResult> OutHits;
 
@@ -37,7 +37,7 @@ void UOPAG_Explosion::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 			
 			if (Character)
 			{
-				const float Damage = Grenade->Damage;
+				const float Damage = Grenade->GetDamage();
 				Character->ReceiveDamage(Damage, Grenade);
 			}
 		}

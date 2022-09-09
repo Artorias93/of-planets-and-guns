@@ -268,7 +268,6 @@ void AOPAG_Player::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashRestoreTimeAttribute(), DebugDashRestoreTime);
 		}
 	}
-
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 #endif

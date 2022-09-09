@@ -29,6 +29,9 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Generate rarity of module
+	SelectRarity();
 	
 	// This method is call for activate physical behavior when module is in the scene
 	CheckIfPhysical();
@@ -246,3 +249,29 @@ void AOPAG_ModuleBase::CheckIfPhysical() const
 	}
 }
 #pragma endregion Physics
+
+#pragma region Other
+void AOPAG_ModuleBase::SelectRarity()
+{
+	if (GetLevel() <= 10)
+	{
+		Rarity = EModuleRarity::Common;
+	}
+	else if (GetLevel() <= 20)
+	{
+		Rarity = EModuleRarity::Uncommon;
+	}
+	else if (GetLevel() <= 30)
+	{
+		Rarity = EModuleRarity::Rare;
+	}
+	else if (GetLevel() <= 40)
+	{
+		Rarity = EModuleRarity::Epic;
+	}
+	else if (GetLevel() > 41)
+	{
+		Rarity = EModuleRarity::Legendary;
+	}
+}
+#pragma endregion Other
