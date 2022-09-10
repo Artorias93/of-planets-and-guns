@@ -996,9 +996,9 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 		FLinearColor::Red, FLinearColor::Green, 5.f);
 	OutHits.Sort([](FHitResult Lhs, FHitResult Rhs)
 	{
-		auto LeftModule = Cast<AOPAG_ModuleBase>(Lhs.Actor);
+		auto LeftModule = Cast<AOPAG_ModuleBase>(Lhs.GetActor());
 		if (LeftModule) return true;
-		auto LeftWeapon = Cast<AOPAG_ModularGun>(Lhs.Actor);
+		auto LeftWeapon = Cast<AOPAG_ModularGun>(Lhs.GetActor());
 		if (LeftModule) return true;
 		return false;
 	});
@@ -1115,7 +1115,7 @@ void AOPAG_Player::LookAtEnemy()
 		ETraceTypeQuery::TraceTypeQuery1, true,  ActorsToIgnore, EDrawDebugTrace::None, OutHitResults, true);
 	if (bResult && OutHitResults.Num() > 0) {
 		for (int i = 0; i < OutHitResults.Num(); i++) {
-			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHitResults[i].Actor);
+			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHitResults[i].GetActor());
 			if (Enemy != nullptr) {
 				Enemy->SetHealthBarVisible();
 			}
