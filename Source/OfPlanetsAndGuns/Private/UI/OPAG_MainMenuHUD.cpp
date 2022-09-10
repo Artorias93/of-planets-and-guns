@@ -1,7 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_MainMenuHUD.h"
+
+#include "LevelSequence.h"
+#include "LevelSequenceActor.h"
+#include "LevelSequencePlayer.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "UI/OPAG_UWMainMenuView.h"
@@ -22,6 +23,17 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		PC->SetInputMode(FInputModeUIOnly());
 		PC->bShowMouseCursor = true;
 	}
+	
+	
+	const FStringAssetReference SequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_MenuStart.LS_MenuStart");
+	if(ULevelSequence* const LevelSequence = Cast<ULevelSequence>(SequenceName.TryLoad()))
+	{
+		const FMovieSceneSequencePlaybackSettings Settings;
+		ALevelSequenceActor* OutActor;
+		ULevelSequencePlayer* LevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
+			LevelSequence, Settings, OutActor);
+		LevelSequencePlayer->Play();
+	}
 
 	if (MainMenuViewWidgetClass)
 	{
@@ -31,7 +43,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 			MainMenuViewWidget->AddToViewport(1);
 		}
 	}
-
+	
 	if (HubViewWidgetClass)
 	{
 		HubViewWidget = CreateWidget<UOPAG_UWHubView>(GetWorld(), HubViewWidgetClass);

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LevelSequencePlayer.h"
 #include "GameFramework/HUD.h"
 #include "OPAG_MainMenuHUD.generated.h"
 
