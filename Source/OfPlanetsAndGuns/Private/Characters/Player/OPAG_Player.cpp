@@ -433,6 +433,8 @@ void AOPAG_Player::InitUICounters()
 		EMS->DashAmountIncrement.Broadcast();
 	}
 
+	//Old unused
+	/*
 	for (i = 0; i < InventorySystemComp->BoltsAmount; ++i)
 	{
 		EMS->BoltsAmountIncrement.Broadcast();
@@ -442,6 +444,10 @@ void AOPAG_Player::InitUICounters()
 	{
 		EMS->PotionsAmountIncrement.Broadcast();
 	}
+	*/
+
+	EMS->PotionsAmountChanged.Broadcast(InventorySystemComp->PotionsAmount);
+	EMS->BoltsAmountChanged.Broadcast(InventorySystemComp->BoltsAmount);
 }
 #pragma endregion Init
 
@@ -506,7 +512,8 @@ void AOPAG_Player::ActiveGunAbility()
 		if (bResult)
 		{
 			InventorySystemComp->BoltsAmount--;
-			EMS->BoltsAmountDecrement.Broadcast();
+			EMS->BoltsAmountChanged.Broadcast(InventorySystemComp->BoltsAmount);
+			//EMS->BoltsAmountDecrement.Broadcast();
 		}
 	}
 }
@@ -1094,8 +1101,15 @@ void AOPAG_Player::UpdateComparison() {
 				CurrentModuleStats = CurrentModule->GetStats();
 			}
 
+			FString AbilityDescription = "";
+			
+			AOPAG_AccessoryBase* Accessory = Cast<AOPAG_AccessoryBase>(Module);
+
+			if (Accessory)
+				AbilityDescription = Accessory->AbilityDescription;
+
 			EMS->LookedAtModule.Broadcast(CurrentModuleStats, Module->GetStats(),
-				Module->GetModuleName(), Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
+				Module->GetModuleName(), AbilityDescription, Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
 
 			PreviousLookedAtModule = InteractableObject;
 		}
@@ -1135,7 +1149,9 @@ void AOPAG_Player::UsePotion()
 		if (bSuccess)
 		{
 			InventorySystemComp->PotionsAmount--;
-			EMS->PotionsAmountDecrement.Broadcast();
+
+			EMS->PotionsAmountChanged.Broadcast(InventorySystemComp->PotionsAmount);
+			//EMS->PotionsAmountDecrement.Broadcast();
 		}
 	}
 }

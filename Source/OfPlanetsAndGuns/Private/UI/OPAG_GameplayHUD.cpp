@@ -140,8 +140,10 @@ void AOPAG_GameplayHUD::HidePauseView() {
 
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 
-	if(EMS)
+	if (EMS) 
+	{
 		EMS->ResumeGame.Broadcast();
+	}
 }
 
 void AOPAG_GameplayHUD::UpdateLoadingScreenBar(float Percentage)
@@ -163,7 +165,7 @@ void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 }
 
 void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule, 
-	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
+	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const FString OtherModuleAbilityName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
 	const int EquippableTypes, const bool CanBeEquipped)
 {
 	if (GunCompareViewWidget->IsInViewport())
@@ -171,12 +173,12 @@ void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule
 
 	if (ModuleViewWidget) {
 		if (ModuleViewWidget->IsInViewport()) {
-			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity,
+			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleAbilityName, OtherModuleRarity,
 			                                     OtherModuleType, EquippableTypes, CanBeEquipped);
 		}
 		else {
 			ModuleViewWidget->AddToViewport(3);
-			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity, 
+			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleAbilityName, OtherModuleRarity,
 			                                     OtherModuleType, EquippableTypes, CanBeEquipped);
 		}
 	}
