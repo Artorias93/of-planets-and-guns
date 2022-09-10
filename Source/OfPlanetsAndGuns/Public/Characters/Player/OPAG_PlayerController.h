@@ -80,4 +80,6 @@ public:
 	UFUNCTION() void ActiveDash();
 	UFUNCTION() void ActiveGunAbility();
 
+	//Game logic
+	UFUNCTION() void PauseGame();
 };

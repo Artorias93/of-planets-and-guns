@@ -140,8 +140,10 @@ void AOPAG_GameplayHUD::HidePauseView() {
 
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 
-	if(EMS)
+	if (EMS) 
+	{
 		EMS->ResumeGame.Broadcast();
+	}
 }
 
 void AOPAG_GameplayHUD::UpdateLoadingScreenBar(float Percentage)
