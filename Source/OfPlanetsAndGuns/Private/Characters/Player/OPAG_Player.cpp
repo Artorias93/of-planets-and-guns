@@ -1160,6 +1160,7 @@ float AOPAG_Player::GetDashSpeed() const
 {
 	return DashSpeed;
 }
+
 #pragma endregion GET
 
 #pragma region Timeline

@@ -9,6 +9,7 @@ UDamageExecutionGAS::UDamageExecutionGAS(const FObjectInitializer& ObjectInitial
 	InvalidScopedModifierAttributes.Add(DamageStruct.HealthDef);
 #endif
 	RelevantAttributesToCapture.Add(DamageStruct.DamageTakenAmountDef);
+	RelevantAttributesToCapture.Add(DamageStruct.DamageMultiplierDef);
 }
 
 void UDamageExecutionGAS::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -36,8 +37,11 @@ void UDamageExecutionGAS::Execute_Implementation(const FGameplayEffectCustomExec
 	float DamageTaken = 0.f; 
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStruct.DamageTakenAmountDef, EvaluationParameters, DamageTaken);
 
+	float DamageMultiplier = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStruct.DamageMultiplierDef, EvaluationParameters, DamageMultiplier);
+
 	//Replace 1 with an optional attack multiplier
-	const float EffectiveDamageTaken = 1 * DamageTaken;
+	const float EffectiveDamageTaken = DamageMultiplier * DamageTaken;
 
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStruct.HealthProperty, EGameplayModOp::Additive, -EffectiveDamageTaken));
 }

@@ -11,11 +11,13 @@
 struct FDamageAttributes
 {
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Health);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(DamageMultiplier);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(DamageTakenAmount);
 
 	FDamageAttributes()
 	{
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UOPAG_AttributeSetBase, Health, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UOPAG_AttributeSetBase, DamageMultiplier, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UOPAG_AttributeSetBase, DamageTakenAmount, Source, true);
 	}
 };
