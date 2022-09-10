@@ -16,6 +16,9 @@ class OFPLANETSANDGUNS_API AOPAG_MainMenuHUD : public AHUD
 	GENERATED_BODY()
 
 	void BindEvents();
+
+	UFUNCTION()
+	void ShowMainMenu();
 	
 private:
 	UPROPERTY()

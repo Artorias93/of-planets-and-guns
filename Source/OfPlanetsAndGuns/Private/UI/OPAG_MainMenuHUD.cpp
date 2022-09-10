@@ -23,6 +23,16 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		PC->SetInputMode(FInputModeUIOnly());
 		PC->bShowMouseCursor = true;
 	}
+
+	if (MainMenuViewWidgetClass)
+	{
+		MainMenuViewWidget = CreateWidget<UOPAG_UWMainMenuView>(GetWorld(), MainMenuViewWidgetClass);
+	}
+
+	if (HubViewWidgetClass)
+	{
+		HubViewWidget = CreateWidget<UOPAG_UWHubView>(GetWorld(), HubViewWidgetClass);
+	}
 	
 	
 	const FStringAssetReference SequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_MenuStart.LS_MenuStart");
@@ -33,20 +43,15 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ULevelSequencePlayer* LevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			LevelSequence, Settings, OutActor);
 		LevelSequencePlayer->Play();
+		LevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu);
 	}
+}
 
-	if (MainMenuViewWidgetClass)
+void AOPAG_MainMenuHUD::ShowMainMenu()
+{
+	if (MainMenuViewWidget)
 	{
-		MainMenuViewWidget = CreateWidget<UOPAG_UWMainMenuView>(GetWorld(), MainMenuViewWidgetClass);
-		
-		if (MainMenuViewWidget) {
-			MainMenuViewWidget->AddToViewport(1);
-		}
-	}
-	
-	if (HubViewWidgetClass)
-	{
-		HubViewWidget = CreateWidget<UOPAG_UWHubView>(GetWorld(), HubViewWidgetClass);
+		MainMenuViewWidget->AddToViewport(1);
 	}
 }
 
