@@ -6,10 +6,11 @@
 #include "Characters/Player/OPAG_Player.h"
 #include <EnhancedInputComponent.h>
 #include "Managers/OPAG_GameInstance.h"
+#include "Characters/Player/OPAG_CheatManager.h"
 
 AOPAG_PlayerController::AOPAG_PlayerController()
 {
-	
+	CheatClass = UOPAG_CheatManager::StaticClass();
 }
 
 void AOPAG_PlayerController::BeginPlay()
