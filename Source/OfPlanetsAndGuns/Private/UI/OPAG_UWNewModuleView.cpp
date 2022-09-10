@@ -22,6 +22,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 	const FOPAG_GunStats& CurrentModuleStats,
 	const FOPAG_GunStats& OtherModuleStats, 
 	const FString OtherModuleName,
+	const FString OtherModuleAbilityName,
 	const EModuleRarity OtherModuleRarity, 
 	const EModuleTypes OtherModuleType,
 	const int EquippableTypes,
@@ -122,12 +123,15 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 	if (OtherModuleType == EModuleTypes::Accessory)
 	{
 		UTextBlock* const AbilityText = WidgetTree->ConstructWidget<UTextBlock>();
+
 		if (AbilityText) 
 		{
-			AbilityText->SetText(FText::FromString("Ability: \n Very powerful"));
+			FString abilityDescription = OtherModuleAbilityName;
+
+			AbilityText->SetText(FText::FromString("Ability: \n" + abilityDescription));
 			AbilityBox->AddChild(AbilityText);
 		}
-
+		
 		UImage* const BarImage = WidgetTree->ConstructWidget<UImage>();
 
 		if (BarImage) 

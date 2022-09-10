@@ -29,6 +29,7 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunView : public UUserWidget
 		UTextBlock* TotalAmmoText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* AmmoSeparatorText;
+
 public:
 	UFUNCTION()
 		void UpdateCurrentAmmoText(const int CurrentValue);
