@@ -119,8 +119,6 @@ void AOPAG_Vendor::ActivationParticleEffect() {
 	FVector EffectLocation = Pedestal->GetComponentLocation();
 	if (ActivationParticles != nullptr) {
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation, FRotator::MakeFromEuler(FVector(0,0,1)), FVector(50.0f));
-		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation, FRotator::MakeFromEuler(FVector(0,0,1)), FVector(50.0f));
-
 	}
 }
 
@@ -195,8 +193,12 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 	AttachModulesToGun(*TempGunsList[1], true, RoomDifficulty);
 
 	// Set price to texts
-	TempGunsTextRender[0]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[0])));
-	TempGunsTextRender[1]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[1])));
+	TempGunsTextRender[0]->SetText(
+		FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[0]), 0) + "$")
+	);
+	TempGunsTextRender[1]->SetText(
+		FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[1]), 0) + "$")
+	);
 
 	// Spawn two modules
 	if (ModulesList.Num() == 0)
@@ -240,7 +242,9 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 
 		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(ChildActorModules[i]->GetChildActor());
 		TempModulesTextRender[i]->SetVisibility(true);
-		TempModulesTextRender[i]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(NewModule)));
+		TempModulesTextRender[i]->SetText(
+			FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(NewModule), 0) + "$")
+		);
 		IOPAG_InteractableInterface::Execute_ApplyFly(NewModule);
 	}
 }
@@ -309,9 +313,11 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 
 void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)
 {
+	ActivationParticleEffect();
 	if (ChildActor_Gun1->GetChildActor() == Gun)
 	{
 		PriceTextRender_Gun1->SetVisibility(false);
+		
 	}
 	else if (ChildActor_Gun2->GetChildActor() == Gun)
 	{
@@ -321,6 +327,7 @@ void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)
 
 void AOPAG_Vendor::DisableModuleTextInVendor(AOPAG_ModuleBase* Module)
 {
+	ActivationParticleEffect();
 	if (ChildActor_Module1->GetChildActor() == Module)
 	{
 		PriceTextRender_Module1->SetVisibility(false);

@@ -204,6 +204,12 @@ private:
 	float RecoilYawMax = .01f;
 
 private:
+
+	//Footsteps "volume" for AI hearing perception [0,1]
+	UPROPERTY(Category="OPAG | Character | AI", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float FootstepsAILoudness = .5f;
+	
+private:
 	UPROPERTY() TEnumAsByte<ETimelineDirection::Type> RecoilTimelineDirection;
 	UPROPERTY() float Recoil = .0f;
 	UPROPERTY() float RecoilReverse = .0f;
@@ -379,6 +385,7 @@ public:
 	UFUNCTION(BlueprintCallable) void AttachMagazineToHandNotify();
 	UFUNCTION(BlueprintCallable) void AttachMagazineToGunNotify();
 	UFUNCTION(BlueprintCosmetic) void CompleteInspectNotify();
+	UFUNCTION(BlueprintCallable) void FootstepsMakeNoiseNotify();
 
 public:
 	// Getter and setter for shield element
