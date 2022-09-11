@@ -41,6 +41,8 @@ public:
 	void SetHealth(const float Health);
 	float GetHealthMax() const;
 	void SetHealthMax(const float HealthMax);
+	float GetDamageMultiplier() const;
+	void SetDamageMultiplier(const float DamageMultiplier);
 
 	// Shoot system
 	virtual void GetShootingDirection(FVector& OutStartLocation, FVector& OutDirection, float ShootingAccuracyTolerance = 0);

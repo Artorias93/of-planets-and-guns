@@ -1,7 +1,7 @@
 #include "Characters/OPAG_AttributeSetBase.h"
 #include "GameplayEffectExtension.h"
 
-UOPAG_AttributeSetBase::UOPAG_AttributeSetBase() {}
+UOPAG_AttributeSetBase::UOPAG_AttributeSetBase() : DamageMultiplier(1.0f) {}
 
 void UOPAG_AttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {

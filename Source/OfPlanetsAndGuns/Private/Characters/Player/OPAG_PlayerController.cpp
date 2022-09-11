@@ -6,10 +6,11 @@
 #include "Characters/Player/OPAG_Player.h"
 #include <EnhancedInputComponent.h>
 #include "Managers/OPAG_GameInstance.h"
+#include "Characters/Player/OPAG_CheatManager.h"
 
 AOPAG_PlayerController::AOPAG_PlayerController()
 {
-	
+	CheatClass = UOPAG_CheatManager::StaticClass();
 }
 
 void AOPAG_PlayerController::BeginPlay()
@@ -60,8 +61,12 @@ void AOPAG_PlayerController::SetupInputComponent()
 	EIC->BindAction(InputActions[5]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::SwitchToADSCamera);
 	EIC->BindAction(InputActions[5]->InputAction, ETriggerEvent::Completed, this, &AOPAG_PlayerController::ResetFPSCamera);
 
-	// binding event for health 
+	// Binding event for health 
 	EIC->BindAction(InputActions[6]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::UsePotion);
+
+	//Binding event for game logic
+	EIC->BindAction(InputActions[12]->InputAction, ETriggerEvent::Started, this, &AOPAG_PlayerController::PauseGame);
+
 }
 
 void AOPAG_PlayerController::PopulateArrayWithTable()
@@ -161,4 +166,9 @@ void AOPAG_PlayerController::ActiveDash()
 void AOPAG_PlayerController::ActiveGunAbility()
 {
 	EMS->ActiveGunAbility.Broadcast();
+}
+
+void AOPAG_PlayerController::PauseGame()
+{
+	EMS->PauseGame.Broadcast();
 }

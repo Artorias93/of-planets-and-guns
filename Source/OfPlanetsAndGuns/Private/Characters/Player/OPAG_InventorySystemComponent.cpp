@@ -28,11 +28,14 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 		switch (Target->DropType) {
 
 		case EDropType::Bolts:
-			BoltsAmount += Target->Amount;
-			if (Owner && Owner->EMS) {
-				Owner->EMS->BoltsAmountIncrement.Broadcast();
-				if(Owner->SMS)
-					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
+			if (BoltsAmount < 4){
+				BoltsAmount += Target->Amount;
+				if (Owner && Owner->EMS) {
+					//Owner->EMS->BoltsAmountIncrement.Broadcast();
+					Owner->EMS->BoltsAmountChanged.Broadcast(BoltsAmount);
+					if (Owner->SMS)
+						Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
+				}
 			}
 			Target->Destroy();
 			break;
@@ -57,10 +60,12 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			break;
 
 		case EDropType::Potion:
-			if (PotionsAmount < 4) {
+			if (PotionsAmount < 4) 
+			{
 				PotionsAmount += Target->Amount;
 				if (Owner && Owner->EMS) {
-					Owner->EMS->PotionsAmountIncrement.Broadcast();
+					//Owner->EMS->PotionsAmountIncrement.Broadcast();
+					Owner->EMS->PotionsAmountChanged.Broadcast(PotionsAmount);
 					if (Owner->SMS)
 						Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 				}
