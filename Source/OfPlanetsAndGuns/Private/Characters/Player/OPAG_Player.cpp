@@ -159,16 +159,19 @@ void AOPAG_Player::Tick(float DeltaTime)
 	UpdateInteractableMessage();
 	UpdateComparison();
 
-	/*
-	if (Shield != nullptr)
-	{
-		Shield->SetActorLocation(GetActorLocation());
-	}*/
-
 	// Check if player sees enemy (for health bar)
 	LookAtEnemy();
 
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractableObject->GetFullName());
+	/*FGameplayTagContainer TempTagsContainer;
+	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
+	float TimeRemaning;
+	float Duration;
+	bool bCheckResult = GetCooldownRemainingForTag(TempTagsContainer, TimeRemaning, Duration);
+	if(bCheckResult)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%f"), TimeRemaning);
+	}*/
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
@@ -488,6 +491,14 @@ void AOPAG_Player::ActiveDash()
 				DashTimeline->PlayFromStart();
 			}
 		}
+
+		/*FGameplayTagContainer TempTags;
+		TempTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
+		TArray<FActiveGameplayEffectHandle> TempEffectsArray = AbilitySystemComp->GetNumActiveGameplayEffects()
+		if (TempEffectsArray.Num() > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%f"), AbilitySystemComp->GetActiveGameplayEffect(TempEffectsArray[0])->GetTimeRemaining(UKismetSystemLibrary::GetGameTimeInSeconds(GetWorld())));
+		}*/
 	}
 }
 
@@ -578,6 +589,10 @@ void AOPAG_Player::SwapGuns()
 		DebugCurretGunStats = CurrentGun->GetStatsTotal();
 		EMS->TotalAmmoChanged.Broadcast(CurrentGun->GetAmmoMax());
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
+
+		// Switch current ammo color
+		FLinearColor NewColor = CurrentGun->GetAmmoCurrent() == 0 ? FLinearColor::Red : FLinearColor::White;
+		EMS->ColorAmmoChanged.Broadcast(NewColor);
 	}
 }
 
@@ -1123,7 +1138,6 @@ void AOPAG_Player::LookAtEnemy()
 		return;
 	}
 }
-
 #pragma endregion LookAtInteractable
 
 #pragma region Others Input
@@ -1364,9 +1378,40 @@ void AOPAG_Player::FootstepsMakeNoiseNotify()
 {
 	MakeNoise(FootstepsAILoudness, this, this->GetActorLocation(), 0);
 }
-
-
 #pragma endregion Animation Notify
+
+#pragma region AbilitySystemUtilities
+bool AOPAG_Player::GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration)
+{
+	if (AbilitySystemComp && CooldownTags.Num() > 0)
+	{
+		TimeRemaining = 0.f;
+		CooldownDuration = 0.f;
+
+		FGameplayEffectQuery const Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(CooldownTags);
+		TArray< TPair<float, float> > DurationAndTimeRemaining = AbilitySystemComp->GetActiveEffectsTimeRemainingAndDuration(Query);
+		if (DurationAndTimeRemaining.Num() > 0)
+		{
+			int32 BestIdx = 0;
+			float LongestTime = DurationAndTimeRemaining[0].Key;
+			for (int32 Idx = 1; Idx < DurationAndTimeRemaining.Num(); ++Idx)
+			{
+				if (DurationAndTimeRemaining[Idx].Key > LongestTime)
+				{
+					LongestTime = DurationAndTimeRemaining[Idx].Key;
+					BestIdx = Idx;
+				}
+			}
+
+			TimeRemaining = DurationAndTimeRemaining[BestIdx].Key;
+			CooldownDuration = DurationAndTimeRemaining[BestIdx].Value;
+
+			return true;
+		}
+	}
+	return false;
+}
+#pragma endregion AbilitySystemUtilities
 
 void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {

@@ -13,10 +13,13 @@
 #include "Util/OPAG_UtilityFunctionLibrary.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
 #include "Weapons/Modules/OPAG_ModuleBase.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include <GameFramework/CharacterMovementComponent.h>
 
 UOPAG_LootDropSystemComponent::UOPAG_LootDropSystemComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+
 }
 
 void UOPAG_LootDropSystemComponent::BeginPlay()
@@ -46,14 +49,25 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 {
 	float Chance = FMath::RandRange(0.f, 100.f);
 
+	// Calculate SpawnLocation
+	FVector SpawnLocation = Owner->GetActorLocation();
+	if (!Owner->GetCharacterMovement()->IsMovingOnGround())
+	{
+		TArray<AActor*> ActorsToIgnore;
+		FHitResult HitResult;
+		const bool bResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + (-Owner->GetActorUpVector() * 5000), TraceTypeQuery1, true, ActorsToIgnore, EDrawDebugTrace::Persistent, HitResult, true);
+		
+		if (bResult)
+		{
+			SpawnLocation = HitResult.ImpactPoint;
+		}
+	}
+
 	for (FOPAG_LootChance *Item : LootChances)
 	{
 		if (!Item) continue;
-		if (Chance < Item->LootChance) {
-
-
-			FVector SpawnLocation = Owner->GetActorLocation();
-
+		if (Chance < Item->LootChance)
+		{
 			for (FOPAG_DropList* Drop : DropList) 
 			{
 				if (!Drop) continue;
@@ -63,11 +77,11 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 					AOPAG_Drop* DropObj = GetWorld()->SpawnActor<AOPAG_Drop>(Drop->DropClass, 
 						SpawnLocation, FRotator::ZeroRotator);
 
-					if (DropObj)
+					/*if (DropObj)
 					{
-						DropObj->Sphere->SetSimulatePhysics(true);
+						//DropObj->Sphere->SetSimulatePhysics(true);
 						continue;
-					}
+					}*/
 				}
 			}
 

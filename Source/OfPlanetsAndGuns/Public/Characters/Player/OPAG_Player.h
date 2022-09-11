@@ -375,6 +375,7 @@ private:
 
 public:
 	UFUNCTION() void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	bool GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
 	UFUNCTION() void SavePlayerState();
 	UFUNCTION() void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
 
