@@ -93,8 +93,10 @@ public:
 	void HideModuleCompareView();
 
 	UFUNCTION()
-	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName,
-		const FString OtherGunType);
+	void ShowGunCompareView(const FOPAG_GunStats GunStats, 
+							const FOPAG_GunStats OtherGun, 
+							const FString OtherGunName,
+							const FString OtherGunType);
 	UFUNCTION()
 	void HideGunCompareView();
 

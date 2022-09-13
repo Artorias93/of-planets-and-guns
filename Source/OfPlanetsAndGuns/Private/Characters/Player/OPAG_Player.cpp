@@ -306,6 +306,8 @@ void AOPAG_Player::BindEvents()
 
 	EMS->PlacePlayerAtStart.AddDynamic(this, &AOPAG_Player::TeleportPlayerToStart);
 
+	EMS->PauseGame.AddDynamic(this, &AOPAG_Player::OnPauseGame);
+
 	// Buffer
 	EMS->ActivePassiveAbilityEffect.AddDynamic(this, &AOPAG_Player::ActivePassiveGunAbility);
 	EMS->RemoveAbilityEffect.AddDynamic(this, &AOPAG_Player::RemovePassiveGunAbility);
@@ -830,6 +832,11 @@ FVector AOPAG_Player::GetViewLocation() const
 {
 	const float ScaledCapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	return FVector(.0f, .0f, ScaledCapsuleHalfHeight) + ViewOffset;
+}
+
+void AOPAG_Player::OnPauseGame()
+{
+	EMS->GoldChanged.Broadcast(GetInventorySystemComponent()->GoldAmount);
 }
 
 void AOPAG_Player::RelocateComponets()

@@ -24,7 +24,8 @@ void UOPAG_UWPauseView::BindEvents()
 {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 
-	if (EMS) {
+	if (EMS) 
+	{
 		EMS->GoldChanged.AddUniqueDynamic(this, &UOPAG_UWPauseView::UpdateGoldValue);
 	}
 }
