@@ -35,5 +35,7 @@ public:
 	void NativeConstruct();
 
 	UFUNCTION()
-	void BackButtonClicked();
+		void BackButtonClicked();
+	UFUNCTION()
+		void GraphicsSliderChanged(float CurrentValue);
 };

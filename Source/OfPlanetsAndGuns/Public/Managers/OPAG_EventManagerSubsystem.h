@@ -34,6 +34,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageCleared, const EStageType, Nex
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomEntered);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQualitySettingsChanged, int32, Value);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnteredRoomStreamingVolume, AOPAG_RoomStreamingVolume* const, Volume);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLeftRoomStreamingVolume);
 
@@ -239,6 +241,8 @@ public:
 		FResumeGame ResumeGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQuitGame QuitGame;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FQualitySettingsChanged QualitySettingsChanged;
 
 	// Player Enhanced
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
