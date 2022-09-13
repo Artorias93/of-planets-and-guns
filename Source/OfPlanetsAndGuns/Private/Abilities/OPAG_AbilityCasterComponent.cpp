@@ -61,11 +61,11 @@ void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	
+
 	if (UClass* AbilityClass = GetAbilityClass(AbilityType))
 	{
-		TArray<FTransform> Transforms = GetAbilitySpawnTransforms(AbilitySpawnPattern, Caller->GetTransform());
-
+		TArray<FTransform> Transforms = GetAbilitySpawnTransforms(AbilitySpawnPattern, Caller->GetActorTransform());
+				
 		float IncreasingDelay = 0;
 		for (auto AbilityTranfrom : Transforms)
 		{
@@ -165,19 +165,19 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 	FTransform Transform2 = Origin;
 	FTransform Transform3 = Origin;
 	FTransform Transform4 = Origin;
-	FTransform Transform5 = Origin;
-
-	FVector Position1 = Transform1.GetLocation();
-	FVector Position2 = Transform1.GetLocation();
-	FVector Position3 = Transform1.GetLocation();
-	FVector Position4 = Transform1.GetLocation();
-	FVector Position5 = Transform1.GetLocation();
+	FTransform Transform5 = Origin;	
 
 	FRotator Rotation1 = Transform1.GetRotation().Rotator();
 	FRotator Rotation2 = Transform1.GetRotation().Rotator();
 	FRotator Rotation3 = Transform1.GetRotation().Rotator();
 	FRotator Rotation4 = Transform1.GetRotation().Rotator();
 	FRotator Rotation5 = Transform1.GetRotation().Rotator();
+
+	FVector Position1 = Transform1.GetTranslation();
+	FVector Position2 = Transform1.GetTranslation();
+	FVector Position3 = Transform1.GetTranslation();
+	FVector Position4 = Transform1.GetTranslation();
+	FVector Position5 = Transform1.GetTranslation();
 	
 	switch (AbilitySpawnPattern)
 	{
@@ -458,3 +458,16 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 	return Transforms;
 }
 
+FVector RotatePoint(FVector Point, float angle)
+{
+	float s = sin(angle);
+	float c = cos(angle);
+	// rotate point
+	float xnew = Point.X * c - Point.Y * s;
+	float ynew = Point.X * s + Point.Y * c;
+
+	Point.X = xnew;
+	Point.Y = ynew;
+
+	return Point;
+}

@@ -56,4 +56,5 @@ protected:
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
 		TArray<FTransform> GetAbilitySpawnTransforms(EAbilitySpawnPattern AbilitySpawnPattern, FTransform Origin);
 	
+	FVector RotatePoint(FVector Point, float angle);
 };
