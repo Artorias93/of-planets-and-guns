@@ -266,7 +266,7 @@ float AOPAG_GunBase::CalculateSpread() const
 	AOPAG_Player* Player = Cast<AOPAG_Player>(GetParentActor());
 	if(Player == nullptr)	return .0f;
 
-	const float ADSAccuracy = (100 + GetStatsTotal().Accuracy) / 2;
+	const float ADSAccuracy = 100 * AccuracyQualityInADS + GetStatsTotal().Accuracy * (1 - AccuracyQualityInADS);
 	static constexpr float InternalRange = MaxInternalAccuracy - MinInternalAccuracy;
 	const float InternalAccuracy = ((
 		(Player->GetIsADS() ? ADSAccuracy : GetStatsTotal().Accuracy) 

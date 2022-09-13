@@ -68,6 +68,9 @@ protected:
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float SpreadMax = 12.f;
 
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ClampMin = 0.f, ClampMax = 1.f))
+	float AccuracyQualityInADS = 0.75f;
+
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ProjectileRange = 2000.f;
 
