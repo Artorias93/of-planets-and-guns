@@ -5,6 +5,17 @@
 #include "OPAG_MainMenuHUD.generated.h"
 
 class ULevelSequencePlayer;
+
+UENUM()
+enum EMenuScreen
+{
+	Start     UMETA(DisplayName = "Start"),
+	MainMenu     UMETA(DisplayName = "MainMenu"),
+	Options      UMETA(DisplayName = "Options"),
+	Exit      UMETA(DisplayName = "Exit"),
+	PlanetSelection   UMETA(DisplayName = "Attacking")
+};
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_MainMenuHUD : public AHUD
 {
@@ -18,6 +29,8 @@ private:
 	ULevelSequencePlayer* StartLevelSequencePlayer;
 	UPROPERTY()
 	ULevelSequencePlayer* OptionsLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* ExitLevelSequencePlayer;
 	
 	UPROPERTY()
 	class UOPAG_UWMainMenuView* MainMenuViewWidget;
@@ -38,12 +51,19 @@ public:
 
 	UFUNCTION()
 	void ShowMainMenu();
-
+	UFUNCTION()
+	void HideMainMenu();
+	UFUNCTION()
+	void ShowExitMenu();
+	UFUNCTION()
+	void HideExitMenu();
 	UFUNCTION()
 	void ShowOptionsMenu();
+	UFUNCTION()
+	void HideOptionsMenu();
 
 	UFUNCTION()
-	void SequenceToOptionsMenu();
+	void SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const;
 
 protected:
 	virtual void BeginPlay() override;

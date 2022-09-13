@@ -36,6 +36,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 	//Main menu sequence names
 	const FStringAssetReference StartSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_MenuStart.LS_MenuStart");
 	const FStringAssetReference OptionsSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToOptions.LS_ToOptions");
+	const FStringAssetReference ExitSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToExit.LS_ToExit");
 
 	//Start sequence initialization
 	if(ULevelSequence* const StartLevelSequence = Cast<ULevelSequence>(StartSequenceName.TryLoad()))
@@ -46,7 +47,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 			StartLevelSequence, StartSettings, StartOutActor);
 		StartLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu);
 		
-		StartLevelSequencePlayer->Play();
+		SequencePlaySelection(Start, MainMenu);
 	}
 
 	//Options sequence initialization
@@ -58,11 +59,40 @@ void AOPAG_MainMenuHUD::BeginPlay()
 			OptionsLevelSequence, OptionsSettings, OptionsOutActor);
 		OptionsLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowOptionsMenu);
 	}
+
+	//Exit sequence initialization
+	if(ULevelSequence* const ExitLevelSequence = Cast<ULevelSequence>(ExitSequenceName.TryLoad()))
+	{
+		const FMovieSceneSequencePlaybackSettings ExitSettings;
+		ALevelSequenceActor* ExitOutActor;
+		ExitLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
+			ExitLevelSequence, ExitSettings, ExitOutActor);
+		ExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowExitMenu);
+	}
 }
 
-void AOPAG_MainMenuHUD::SequenceToOptionsMenu()
+void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const
 {
-	OptionsLevelSequencePlayer->Play();
+	switch(From)
+	{
+		case Start:
+			StartLevelSequencePlayer->Play();
+			break;
+		case MainMenu:
+			switch(To)
+			{
+				case Options:
+					OptionsLevelSequencePlayer->Play();
+					break;
+				case Exit:
+					ExitLevelSequencePlayer->Play();
+					break;
+				default:
+					break;
+			}			
+		default:
+			break;
+	}	
 }
 
 void AOPAG_MainMenuHUD::ShowMainMenu()
@@ -72,6 +102,36 @@ void AOPAG_MainMenuHUD::ShowMainMenu()
 		MainMenuViewWidget->AddToViewport(1);
 	}
 }
+
+void AOPAG_MainMenuHUD::HideMainMenu()
+{
+	if (MainMenuViewWidget)
+	{
+		MainMenuViewWidget->RemoveFromParent();
+	}
+}
+
+void AOPAG_MainMenuHUD::ShowOptionsMenu()
+{
+	
+}
+
+void AOPAG_MainMenuHUD::HideOptionsMenu()
+{
+	
+}
+
+void AOPAG_MainMenuHUD::ShowExitMenu()
+{
+
+}
+
+void AOPAG_MainMenuHUD::HideExitMenu()
+{
+
+}
+
+
 
 void AOPAG_MainMenuHUD::ShowHubView()
 {
@@ -86,7 +146,3 @@ void AOPAG_MainMenuHUD::ShowHubView()
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 }
 
-void AOPAG_MainMenuHUD::ShowOptionsMenu()
-{
-	
-}
