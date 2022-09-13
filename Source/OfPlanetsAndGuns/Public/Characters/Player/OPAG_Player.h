@@ -326,6 +326,10 @@ private:
 	void RelocateComponets();
 	FVector GetViewLocation() const;
 
+	// Game Stuff
+	UFUNCTION()
+	void OnPauseGame();
+
 private:
 	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);
 
