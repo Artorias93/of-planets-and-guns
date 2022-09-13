@@ -99,7 +99,7 @@ protected:
 	                  EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
 
 	// Ammo behavior
-	void UpdateAmmoWhenPickTheMagazine();
+	void UpdateAmmoOnModulePickup();
 	virtual void WaitReloadingTimer() override;
 	void PopulateAmmoTable();
 
