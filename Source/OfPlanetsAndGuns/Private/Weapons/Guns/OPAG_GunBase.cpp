@@ -99,6 +99,11 @@ int AOPAG_GunBase::GetAmmoMax() const
 	return AmmoMax;
 }
 
+float AOPAG_GunBase::GetReloadTime() const
+{
+	return (GetStatsTotal().ReloadingTime > MinReloadTime ? GetStatsTotal().ReloadingTime : MinReloadTime);
+}
+
 float AOPAG_GunBase::GetRecoilStrength() const
 {
 	return RecoilStrength;
@@ -339,7 +344,8 @@ TArray<AActor*> AOPAG_GunBase::CheckWhatActorsIgnoreLinetrace()
 void AOPAG_GunBase::Reload()
 {
 	bIsReloading = true;
-	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_GunBase::WaitReloadingTimer, GetStatsTotal().ReloadingTime, false);
+	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, 
+		&AOPAG_GunBase::WaitReloadingTimer, GetReloadTime(), false);
 	//UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
 }
 

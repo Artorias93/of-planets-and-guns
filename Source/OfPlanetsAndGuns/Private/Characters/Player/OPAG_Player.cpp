@@ -611,7 +611,7 @@ void AOPAG_Player::ReloadGun()
 		CurrentGun->Reload();
 		SMS->PlayWeaponSounds(PrimaryGun, EWeaponSoundAction::Reload);
 		const float ReloadAnimationLength = ReloadMontageToPlay->GetPlayLength();
-		const float ReloadTime = PrimaryGun->GetStatsTotal().ReloadingTime;
+		const float ReloadTime = PrimaryGun->GetReloadTime();
 		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, ReloadAnimationLength / ReloadTime, EMontagePlayReturnType::MontageLength, 0, true);
 		
 		// Update gun ui color
