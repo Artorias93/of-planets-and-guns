@@ -33,7 +33,9 @@ void UOPAG_UWMainMenuView::NewRunButtonClicked()
 
 void UOPAG_UWMainMenuView::OptionsButtonClicked()
 {
-
+	OptionsButton->OnClicked.RemoveDynamic(this, &UOPAG_UWMainMenuView::OptionsButtonClicked);
+	AOPAG_MainMenuHUD* MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	MyHUD->SequenceToOptionsMenu();
 }
 
 void UOPAG_UWMainMenuView::QuitButtonClicked()
