@@ -19,6 +19,9 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+		float ZAxisGroundedAbilityRelativeOffset = 270;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 		TSubclassOf<class AOPAG_ForceField> ForceFieldAbilityClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
