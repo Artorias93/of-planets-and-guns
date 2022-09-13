@@ -5,6 +5,7 @@
 #include "LevelSequencePlayer.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "UI/OPAG_UWConfirmExitView.h"
 #include "UI/OPAG_UWMainMenuView.h"
 #include "UI/OPAG_UWHubView.h"
 
@@ -28,6 +29,11 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		MainMenuViewWidget = CreateWidget<UOPAG_UWMainMenuView>(GetWorld(), MainMenuViewWidgetClass);
 	}
 
+	if (ConfirmExitViewWidgetClass)
+	{
+		ConfirmExitViewWidget = CreateWidget<UOPAG_UWConfirmExitView>(GetWorld(), ConfirmExitViewWidgetClass);
+	}
+
 	if (HubViewWidgetClass)
 	{
 		HubViewWidget = CreateWidget<UOPAG_UWHubView>(GetWorld(), HubViewWidgetClass);
@@ -37,6 +43,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 	const FStringAssetReference StartSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_MenuStart.LS_MenuStart");
 	const FStringAssetReference OptionsSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToOptions.LS_ToOptions");
 	const FStringAssetReference ExitSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToExit.LS_ToExit");
+	const FStringAssetReference QuitGameSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_QuitGame.LS_QuitGame");
 
 	//Start sequence initialization
 	if(ULevelSequence* const StartLevelSequence = Cast<ULevelSequence>(StartSequenceName.TryLoad()))
@@ -69,6 +76,27 @@ void AOPAG_MainMenuHUD::BeginPlay()
 			ExitLevelSequence, ExitSettings, ExitOutActor);
 		ExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowExitMenu);
 	}
+
+	//Quit Game sequence initialization
+	if(ULevelSequence* const QuitGameLevelSequence = Cast<ULevelSequence>(QuitGameSequenceName.TryLoad()))
+	{
+		const FMovieSceneSequencePlaybackSettings QuitGameSettings;
+		ALevelSequenceActor* QuitGameOutActor;
+		QuitGameLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
+			QuitGameLevelSequence, QuitGameSettings, QuitGameOutActor);
+		QuitGameLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::MenuCloseGame);
+	}
+
+	//Reverse Exit sequence initialization
+	if(ULevelSequence* const ReverseExitLevelSequence = Cast<ULevelSequence>(ExitSequenceName.TryLoad()))
+	{
+		FMovieSceneSequencePlaybackSettings ReverseExitSettings;
+		ReverseExitSettings.PlayRate = -1.f;
+		ALevelSequenceActor* ReverseExitOutActor;
+		ReverseExitLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
+			ReverseExitLevelSequence, ReverseExitSettings, ReverseExitOutActor);
+		ReverseExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu2);
+	}
 }
 
 void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const
@@ -89,7 +117,19 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 					break;
 				default:
 					break;
-			}			
+			}
+		case Exit:
+			switch(To)
+			{
+				case QuitGame:
+					QuitGameLevelSequencePlayer->Play();
+					break;
+				case MainMenu:
+					ReverseExitLevelSequencePlayer->Play();
+					break;
+				default:
+					break;
+			}
 		default:
 			break;
 	}	
@@ -97,6 +137,15 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 
 void AOPAG_MainMenuHUD::ShowMainMenu()
 {
+	if (MainMenuViewWidget)
+	{
+		MainMenuViewWidget->AddToViewport(1);
+	}
+}
+
+void AOPAG_MainMenuHUD::ShowMainMenu2()
+{
+	UE_LOG(LogTemp, Warning, TEXT("IN CALLING MAIN MENU TWO"));
 	if (MainMenuViewWidget)
 	{
 		MainMenuViewWidget->AddToViewport(1);
@@ -111,6 +160,29 @@ void AOPAG_MainMenuHUD::HideMainMenu()
 	}
 }
 
+void AOPAG_MainMenuHUD::ShowExitMenu()
+{
+	if(ConfirmExitViewWidget)
+	{
+		ConfirmExitViewWidget->AddToViewport(1);
+	}
+}
+
+void AOPAG_MainMenuHUD::HideExitMenu()
+{
+	if (ConfirmExitViewWidget)
+	{
+		ConfirmExitViewWidget->RemoveFromParent();
+	}
+}
+
+void AOPAG_MainMenuHUD::MenuCloseGame()
+{
+	//Closes the application
+	UE_LOG(LogTemp, Warning, TEXT("CLOSING THE APPLICATION"));
+	//FPlatformMisc::RequestExit(false);
+}
+
 void AOPAG_MainMenuHUD::ShowOptionsMenu()
 {
 	
@@ -120,18 +192,6 @@ void AOPAG_MainMenuHUD::HideOptionsMenu()
 {
 	
 }
-
-void AOPAG_MainMenuHUD::ShowExitMenu()
-{
-
-}
-
-void AOPAG_MainMenuHUD::HideExitMenu()
-{
-
-}
-
-
 
 void AOPAG_MainMenuHUD::ShowHubView()
 {

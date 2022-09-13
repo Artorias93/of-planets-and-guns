@@ -13,6 +13,7 @@ enum EMenuScreen
 	MainMenu     UMETA(DisplayName = "MainMenu"),
 	Options      UMETA(DisplayName = "Options"),
 	Exit      UMETA(DisplayName = "Exit"),
+	QuitGame      UMETA(DisplayName = "Exit"),
 	PlanetSelection   UMETA(DisplayName = "Attacking")
 };
 
@@ -31,11 +32,19 @@ private:
 	ULevelSequencePlayer* OptionsLevelSequencePlayer;
 	UPROPERTY()
 	ULevelSequencePlayer* ExitLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* ReverseExitLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* QuitGameLevelSequencePlayer;
 	
 	UPROPERTY()
 	class UOPAG_UWMainMenuView* MainMenuViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UOPAG_UWMainMenuView> MainMenuViewWidgetClass;
+	UPROPERTY()
+	class UOPAG_UWConfirmExitView* ConfirmExitViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UOPAG_UWConfirmExitView> ConfirmExitViewWidgetClass;
 	UPROPERTY()
 	class UOPAG_UWHubView* HubViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
@@ -52,11 +61,15 @@ public:
 	UFUNCTION()
 	void ShowMainMenu();
 	UFUNCTION()
+	void ShowMainMenu2();
+	UFUNCTION()
 	void HideMainMenu();
 	UFUNCTION()
 	void ShowExitMenu();
 	UFUNCTION()
 	void HideExitMenu();
+	UFUNCTION()
+	void MenuCloseGame();
 	UFUNCTION()
 	void ShowOptionsMenu();
 	UFUNCTION()
