@@ -30,5 +30,5 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Values", meta=(AllowPrivateAccess = true))
 	bool bIsCharging;
 
-	
+	FCollisionResponseContainer CollisionValues;	
 };
