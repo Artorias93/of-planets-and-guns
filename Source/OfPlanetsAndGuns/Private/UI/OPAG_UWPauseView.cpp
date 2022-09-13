@@ -39,7 +39,9 @@ void UOPAG_UWPauseView::ContinueButtonClicked()
 
 void UOPAG_UWPauseView::OptionsButtonClicked()
 {
-
+	AOPAG_GameplayHUD* MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	if (MyHUD)
+		MyHUD->ShowOptionsView();
 }
 
 void UOPAG_UWPauseView::ExitButtonClicked()

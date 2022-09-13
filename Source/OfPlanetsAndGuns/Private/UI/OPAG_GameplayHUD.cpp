@@ -10,6 +10,7 @@
 #include "UI/OPAG_UWInteractView.h"
 #include "UI/OPAG_UWDamageIndicatorView.h"
 #include "UI/OPAG_UWGameOverView.h"
+#include "UI/OPAG_UWOptionsView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -107,6 +108,11 @@ void AOPAG_GameplayHUD::BeginPlay()
 	if (InteractViewWidgetClass)
 	{
 		InteractViewWidget = CreateWidget<UOPAG_UWInteractView>(GetWorld(), InteractViewWidgetClass);
+	}
+
+	if (OptionsViewWidgetClass)
+	{
+		OptionsViewWidget = CreateWidget<UOPAG_UWOptionsView>(GetWorld(), OptionsViewWidgetClass);
 	}
 }
 
@@ -268,6 +274,8 @@ void AOPAG_GameplayHUD::HideInteractView()
 
 void AOPAG_GameplayHUD::ShowDamageIndicatorView(AActor* const CurrentThreatActor)
 {
+	// This widget can be instantiated multiple times
+
 	if (DamageIndicatorViewWidgetClass)
 	{
 		DamageIndicatorViewWidget = CreateWidget<UOPAG_UWDamageIndicatorView>(GetWorld(), DamageIndicatorViewWidgetClass);
@@ -292,3 +300,18 @@ void AOPAG_GameplayHUD::HideDamageIndicatorView()
 	}
 }
 
+void AOPAG_GameplayHUD::ShowOptionsView()
+{
+	if (OptionsViewWidget)
+	{
+		OptionsViewWidget->AddToViewport(3);
+	}
+}
+
+void AOPAG_GameplayHUD::HideOptionsView()
+{
+	if (OptionsViewWidget)
+	{
+		OptionsViewWidget->RemoveFromViewport();
+	}
+}
