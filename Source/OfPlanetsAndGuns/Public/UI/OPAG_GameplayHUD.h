@@ -38,6 +38,7 @@ private:
 		class UOPAG_UWLoadingScreenView* LoadingScreenViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWLoadingScreenView> LoadingScreenViewWidgetClass;
+
 	//OLD VERSION 
 	/*
 	UPROPERTY()
@@ -68,6 +69,10 @@ private:
 		class UOPAG_UWDamageIndicatorView* DamageIndicatorViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWDamageIndicatorView> DamageIndicatorViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWOptionsView* OptionsViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWOptionsView> OptionsViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
@@ -93,8 +98,10 @@ public:
 	void HideModuleCompareView();
 
 	UFUNCTION()
-	void ShowGunCompareView(const FOPAG_GunStats GunStats, const FOPAG_GunStats OtherGun, const FString OtherGunName,
-		const FString OtherGunType);
+	void ShowGunCompareView(const FOPAG_GunStats GunStats, 
+							const FOPAG_GunStats OtherGun, 
+							const FString OtherGunName,
+							const FString OtherGunType);
 	UFUNCTION()
 	void HideGunCompareView();
 
@@ -110,4 +117,9 @@ public:
 	void ShowDamageIndicatorView(AActor* const CurrentThreatActor);
 	UFUNCTION()
 	void HideDamageIndicatorView();
+
+	UFUNCTION()
+	void ShowOptionsView();
+	UFUNCTION()
+	void HideOptionsView();
 };

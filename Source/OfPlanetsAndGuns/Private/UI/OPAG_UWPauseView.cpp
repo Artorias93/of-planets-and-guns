@@ -24,7 +24,8 @@ void UOPAG_UWPauseView::BindEvents()
 {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 
-	if (EMS) {
+	if (EMS) 
+	{
 		EMS->GoldChanged.AddUniqueDynamic(this, &UOPAG_UWPauseView::UpdateGoldValue);
 	}
 }
@@ -38,7 +39,9 @@ void UOPAG_UWPauseView::ContinueButtonClicked()
 
 void UOPAG_UWPauseView::OptionsButtonClicked()
 {
-
+	AOPAG_GameplayHUD* MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	if (MyHUD)
+		MyHUD->ShowOptionsView();
 }
 
 void UOPAG_UWPauseView::ExitButtonClicked()
