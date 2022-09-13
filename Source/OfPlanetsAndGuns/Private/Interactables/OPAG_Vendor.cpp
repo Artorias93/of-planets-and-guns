@@ -118,7 +118,7 @@ void AOPAG_Vendor::ActivationParticleEffect() {
 	if (Pedestal == nullptr) return;
 	FVector EffectLocation = Pedestal->GetComponentLocation();
 	if (ActivationParticles != nullptr) {
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation, FRotator::MakeFromEuler(FVector(0,0,1)), FVector(50.0f));
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation);// , FRotator::MakeFromEuler(FVector(0, 0, 1)), FVector(50.0f));
 	}
 }
 

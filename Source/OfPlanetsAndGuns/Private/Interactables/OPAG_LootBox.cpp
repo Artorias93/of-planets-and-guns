@@ -4,6 +4,10 @@
 #include "Managers/OPAG_SoundManagerSubsystem.h"
 #include <Components/PrimitiveComponent.h>
 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+//#include <NiagaraSystem.h>
+
 #include "Characters/Player/OPAG_Player.h"
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -21,6 +25,7 @@ AOPAG_LootBox::AOPAG_LootBox()
 	Lid = CreateDefaultSubobject<UStaticMeshComponent>("Lid");
 	if (Lid)
 		Lid->SetupAttachment(RootComponent);
+		
 
 	LootSpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint");
 	if (LootSpawnPoint)
@@ -79,6 +84,7 @@ void AOPAG_LootBox::SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList)
 
 void AOPAG_LootBox::Unlock()
 {
+	ActivationParticleEffect();
 	bIsInteractable = true;
 }
 
@@ -87,8 +93,20 @@ void AOPAG_LootBox::SetModules(FOPAG_GunModules& ModulesStruct)
 	Modules = ModulesStruct;
 }
 
+void AOPAG_LootBox::ActivationParticleEffect()
+{
+	if (Crate == nullptr) return;
+	FVector EffectLocation = Crate->GetComponentLocation();
+	if (ActivationParticles != nullptr) {
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation);// FRotator::MakeFromEuler(FVector(0, 0, 1)), FVector(50.0f));
+	}
+	
+}
+
 void AOPAG_LootBox::Interact_Implementation()
 {
+	// particle effect
+	ActivationParticleEffect();
 	// Explosion behavior with half parabolic method
 	Lid->SetSimulatePhysics(true);
 	FVector RandomDir = Lid->GetUpVector();
