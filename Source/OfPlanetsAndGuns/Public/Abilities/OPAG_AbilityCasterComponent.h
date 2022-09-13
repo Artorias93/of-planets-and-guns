@@ -16,7 +16,7 @@ class OFPLANETSANDGUNS_API UOPAG_AbilityCasterComponent : public UActorComponent
 	
 public:
 	UOPAG_AbilityCasterComponent();
-	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 		float ZAxisGroundedAbilityRelativeOffset = 270;
@@ -55,6 +55,4 @@ protected:
 	
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
 		TArray<FTransform> GetAbilitySpawnTransforms(EAbilitySpawnPattern AbilitySpawnPattern, FTransform Origin);
-	
-	FVector RotatePoint(FVector Point, float angle);
 };
