@@ -7,6 +7,8 @@
 #include "Components/TimelineComponent.h"
 #include "OPAG_LootBox.generated.h"
 
+class UNiagaraSystem;
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_InteractableInterface
 {
@@ -27,7 +29,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* LootSpawnPoint;
 
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
 	UDataTable* LootChanceTable;
 
@@ -62,6 +63,9 @@ public:
 	
 	UPROPERTY()
 	FVector DropTimelinePropertyName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UNiagaraSystem* ActivationParticles;
 
 private:
 	TArray<TSubclassOf<AActor>> Items;   
@@ -100,4 +104,7 @@ public:
 	void DropTimelineProgress(FVector Value);
 
 	UFUNCTION() void SpawnItem();
+
+	UFUNCTION()
+	void ActivationParticleEffect();
 };

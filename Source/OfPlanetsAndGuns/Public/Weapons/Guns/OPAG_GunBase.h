@@ -111,6 +111,7 @@ protected:
 
 	static constexpr float MinInternalAccuracy = 97.f;
 	static constexpr float MaxInternalAccuracy = 100.f;
+	static constexpr float MinReloadTime = 0.1f;
 
 protected:
 	FTimerHandle ResetShootHandle;
@@ -180,6 +181,7 @@ public:
 	virtual FOPAG_GunStats GetStatsTotal() const;
 	int GetAmmoCurrent() const;
 	int GetAmmoMax() const;
+	float GetReloadTime() const;
 	float GetRecoilStrength() const;
 	float GetRecoilSpeed() const;
 
