@@ -19,6 +19,9 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+		float ZAxisGroundedAbilityRelativeOffset = 270;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 		TSubclassOf<class AOPAG_ForceField> ForceFieldAbilityClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
@@ -53,4 +56,5 @@ protected:
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
 		TArray<FTransform> GetAbilitySpawnTransforms(EAbilitySpawnPattern AbilitySpawnPattern, FTransform Origin);
 	
+	FVector RotatePoint(FVector Point, float angle);
 };

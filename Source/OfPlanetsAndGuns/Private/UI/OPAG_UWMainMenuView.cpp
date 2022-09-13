@@ -26,18 +26,28 @@ void UOPAG_UWMainMenuView::NewRunButtonClicked()
 {
 	NewRunButton->OnClicked.RemoveDynamic(this, &UOPAG_UWMainMenuView::NewRunButtonClicked);
 
-	AOPAG_MainMenuHUD* MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	if (MyHUD)
+	if (AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 		MyHUD->ShowHubView();
 }
 
 void UOPAG_UWMainMenuView::OptionsButtonClicked()
 {
-
+	if (AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		MyHUD->HideMainMenu();
+		OptionsButton->OnClicked.RemoveDynamic(this, &UOPAG_UWMainMenuView::OptionsButtonClicked);
+		MyHUD->SequencePlaySelection(MainMenu, Options);
+	}	
 }
 
 void UOPAG_UWMainMenuView::QuitButtonClicked()
 {
+	if (AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		MyHUD->HideMainMenu();
+		QuitButton->OnClicked.RemoveDynamic(this, &UOPAG_UWMainMenuView::QuitButtonClicked);
+		MyHUD->SequencePlaySelection(MainMenu, Exit);
+	}	
 
 }
 
