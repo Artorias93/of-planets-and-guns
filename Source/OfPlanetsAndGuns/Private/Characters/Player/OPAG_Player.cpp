@@ -159,16 +159,19 @@ void AOPAG_Player::Tick(float DeltaTime)
 	UpdateInteractableMessage();
 	UpdateComparison();
 
-	/*
-	if (Shield != nullptr)
-	{
-		Shield->SetActorLocation(GetActorLocation());
-	}*/
-
 	// Check if player sees enemy (for health bar)
 	LookAtEnemy();
 
 	//UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractableObject->GetFullName());
+	/*FGameplayTagContainer TempTagsContainer;
+	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
+	float TimeRemaning;
+	float Duration;
+	bool bCheckResult = GetCooldownRemainingForTag(TempTagsContainer, TimeRemaning, Duration);
+	if(bCheckResult)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%f"), TimeRemaning);
+	}*/
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
@@ -303,6 +306,8 @@ void AOPAG_Player::BindEvents()
 
 	EMS->PlacePlayerAtStart.AddDynamic(this, &AOPAG_Player::TeleportPlayerToStart);
 
+	EMS->PauseGame.AddDynamic(this, &AOPAG_Player::OnPauseGame);
+
 	// Buffer
 	EMS->ActivePassiveAbilityEffect.AddDynamic(this, &AOPAG_Player::ActivePassiveGunAbility);
 	EMS->RemoveAbilityEffect.AddDynamic(this, &AOPAG_Player::RemovePassiveGunAbility);
@@ -433,6 +438,8 @@ void AOPAG_Player::InitUICounters()
 		EMS->DashAmountIncrement.Broadcast();
 	}
 
+	//Old unused
+	/*
 	for (i = 0; i < InventorySystemComp->BoltsAmount; ++i)
 	{
 		EMS->BoltsAmountIncrement.Broadcast();
@@ -442,6 +449,10 @@ void AOPAG_Player::InitUICounters()
 	{
 		EMS->PotionsAmountIncrement.Broadcast();
 	}
+	*/
+
+	EMS->PotionsAmountChanged.Broadcast(InventorySystemComp->PotionsAmount);
+	EMS->BoltsAmountChanged.Broadcast(InventorySystemComp->BoltsAmount);
 }
 #pragma endregion Init
 
@@ -488,6 +499,14 @@ void AOPAG_Player::ActiveDash()
 				DashTimeline->PlayFromStart();
 			}
 		}
+
+		/*FGameplayTagContainer TempTags;
+		TempTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
+		TArray<FActiveGameplayEffectHandle> TempEffectsArray = AbilitySystemComp->GetNumActiveGameplayEffects()
+		if (TempEffectsArray.Num() > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%f"), AbilitySystemComp->GetActiveGameplayEffect(TempEffectsArray[0])->GetTimeRemaining(UKismetSystemLibrary::GetGameTimeInSeconds(GetWorld())));
+		}*/
 	}
 }
 
@@ -506,7 +525,8 @@ void AOPAG_Player::ActiveGunAbility()
 		if (bResult)
 		{
 			InventorySystemComp->BoltsAmount--;
-			EMS->BoltsAmountDecrement.Broadcast();
+			EMS->BoltsAmountChanged.Broadcast(InventorySystemComp->BoltsAmount);
+			//EMS->BoltsAmountDecrement.Broadcast();
 		}
 	}
 }
@@ -578,6 +598,10 @@ void AOPAG_Player::SwapGuns()
 		DebugCurretGunStats = CurrentGun->GetStatsTotal();
 		EMS->TotalAmmoChanged.Broadcast(CurrentGun->GetAmmoMax());
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
+
+		// Switch current ammo color
+		FLinearColor NewColor = CurrentGun->GetAmmoCurrent() == 0 ? FLinearColor::Red : FLinearColor::White;
+		EMS->ColorAmmoChanged.Broadcast(NewColor);
 	}
 }
 
@@ -589,7 +613,7 @@ void AOPAG_Player::ReloadGun()
 		CurrentGun->Reload();
 		SMS->PlayWeaponSounds(PrimaryGun, EWeaponSoundAction::Reload);
 		const float ReloadAnimationLength = ReloadMontageToPlay->GetPlayLength();
-		const float ReloadTime = PrimaryGun->GetStatsTotal().ReloadingTime;
+		const float ReloadTime = PrimaryGun->GetReloadTime();
 		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, ReloadAnimationLength / ReloadTime, EMontagePlayReturnType::MontageLength, 0, true);
 		
 		// Update gun ui color
@@ -810,6 +834,11 @@ FVector AOPAG_Player::GetViewLocation() const
 	return FVector(.0f, .0f, ScaledCapsuleHalfHeight) + ViewOffset;
 }
 
+void AOPAG_Player::OnPauseGame()
+{
+	EMS->GoldChanged.Broadcast(GetInventorySystemComponent()->GoldAmount);
+}
+
 void AOPAG_Player::RelocateComponets()
 {
 	// Update the Pitch separately so that it is only applied to the camera.
@@ -996,9 +1025,9 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 		FLinearColor::Red, FLinearColor::Green, 5.f);
 	OutHits.Sort([](FHitResult Lhs, FHitResult Rhs)
 	{
-		auto LeftModule = Cast<AOPAG_ModuleBase>(Lhs.Actor);
+		auto LeftModule = Cast<AOPAG_ModuleBase>(Lhs.GetActor());
 		if (LeftModule) return true;
-		auto LeftWeapon = Cast<AOPAG_ModularGun>(Lhs.Actor);
+		auto LeftWeapon = Cast<AOPAG_ModularGun>(Lhs.GetActor());
 		if (LeftModule) return true;
 		return false;
 	});
@@ -1094,8 +1123,15 @@ void AOPAG_Player::UpdateComparison() {
 				CurrentModuleStats = CurrentModule->GetStats();
 			}
 
+			FString AbilityDescription = "";
+			
+			AOPAG_AccessoryBase* Accessory = Cast<AOPAG_AccessoryBase>(Module);
+
+			if (Accessory)
+				AbilityDescription = Accessory->AbilityDescription;
+
 			EMS->LookedAtModule.Broadcast(CurrentModuleStats, Module->GetStats(),
-				Module->GetModuleName(), Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
+				Module->GetModuleName(), AbilityDescription, Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
 
 			PreviousLookedAtModule = InteractableObject;
 		}
@@ -1115,7 +1151,7 @@ void AOPAG_Player::LookAtEnemy()
 		ETraceTypeQuery::TraceTypeQuery1, true,  ActorsToIgnore, EDrawDebugTrace::None, OutHitResults, true);
 	if (bResult && OutHitResults.Num() > 0) {
 		for (int i = 0; i < OutHitResults.Num(); i++) {
-			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHitResults[i].Actor);
+			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHitResults[i].GetActor());
 			if (Enemy != nullptr) {
 				Enemy->SetHealthBarVisible();
 			}
@@ -1123,7 +1159,6 @@ void AOPAG_Player::LookAtEnemy()
 		return;
 	}
 }
-
 #pragma endregion LookAtInteractable
 
 #pragma region Others Input
@@ -1135,7 +1170,9 @@ void AOPAG_Player::UsePotion()
 		if (bSuccess)
 		{
 			InventorySystemComp->PotionsAmount--;
-			EMS->PotionsAmountDecrement.Broadcast();
+
+			EMS->PotionsAmountChanged.Broadcast(InventorySystemComp->PotionsAmount);
+			//EMS->PotionsAmountDecrement.Broadcast();
 		}
 	}
 }
@@ -1161,6 +1198,7 @@ float AOPAG_Player::GetDashSpeed() const
 {
 	return DashSpeed;
 }
+
 #pragma endregion GET
 
 #pragma region Timeline
@@ -1364,9 +1402,40 @@ void AOPAG_Player::FootstepsMakeNoiseNotify()
 {
 	MakeNoise(FootstepsAILoudness, this, this->GetActorLocation(), 0);
 }
-
-
 #pragma endregion Animation Notify
+
+#pragma region AbilitySystemUtilities
+bool AOPAG_Player::GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration)
+{
+	if (AbilitySystemComp && CooldownTags.Num() > 0)
+	{
+		TimeRemaining = 0.f;
+		CooldownDuration = 0.f;
+
+		FGameplayEffectQuery const Query = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(CooldownTags);
+		TArray< TPair<float, float> > DurationAndTimeRemaining = AbilitySystemComp->GetActiveEffectsTimeRemainingAndDuration(Query);
+		if (DurationAndTimeRemaining.Num() > 0)
+		{
+			int32 BestIdx = 0;
+			float LongestTime = DurationAndTimeRemaining[0].Key;
+			for (int32 Idx = 1; Idx < DurationAndTimeRemaining.Num(); ++Idx)
+			{
+				if (DurationAndTimeRemaining[Idx].Key > LongestTime)
+				{
+					LongestTime = DurationAndTimeRemaining[Idx].Key;
+					BestIdx = Idx;
+				}
+			}
+
+			TimeRemaining = DurationAndTimeRemaining[BestIdx].Key;
+			CooldownDuration = DurationAndTimeRemaining[BestIdx].Value;
+
+			return true;
+		}
+	}
+	return false;
+}
+#pragma endregion AbilitySystemUtilities
 
 void AOPAG_Player::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {

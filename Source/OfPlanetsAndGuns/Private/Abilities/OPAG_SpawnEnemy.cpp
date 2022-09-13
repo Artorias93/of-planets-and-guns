@@ -43,6 +43,9 @@ void AOPAG_SpawnEnemy::SpawnEnemy(T EnemyClass)
 
 	AOPAG_Enemy* Enemy = GetWorld()->SpawnActor<AOPAG_Enemy>(EnemyClass, GetActorLocation(), GetActorLocation().ToOrientationRotator(), SpawnInfo);
 
+	if (Enemy != nullptr)
+		Enemy->SetActorRotation(FRotator::ZeroRotator);
+
 	if (EMS != nullptr)
 	{
 		EMS->SpawnedEnemy.Broadcast(Enemy, Caller);

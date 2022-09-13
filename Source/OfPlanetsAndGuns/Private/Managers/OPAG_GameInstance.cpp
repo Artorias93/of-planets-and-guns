@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Managers/OPAG_SaveGame.h"
 #include "Util/OPAG_UtilityFunctionLibrary.h"
+#include "GameFramework/GameUserSettings.h"
 
 void UOPAG_GameInstance::BindEvents()
 {
@@ -21,6 +22,7 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->RoomCleared.AddDynamic(this, &UOPAG_GameInstance::OnRoomCleared);
 	EMS->PauseGame.AddDynamic(this, &UOPAG_GameInstance::OnPauseGame);
 	EMS->ResumeGame.AddDynamic(this, &UOPAG_GameInstance::OnResumeGame);
+	EMS->QualitySettingsChanged.AddDynamic(this, &UOPAG_GameInstance::OnQualitySettingsChanged);
 
 	EMS->LoadMainMenu.AddDynamic(this, &UOPAG_GameInstance::LoadMainMenu);
 	EMS->StartPlanet.AddDynamic(this, &UOPAG_GameInstance::LoadPlanet);
@@ -278,4 +280,16 @@ void UOPAG_GameInstance::SetAudioLibraries()
 void UOPAG_GameInstance::OnPlayerDeath()
 {
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
+}
+
+void UOPAG_GameInstance::OnQualitySettingsChanged(int32 Value)
+{
+	UGameUserSettings* GameUserSettings = Cast<UGameUserSettings>(GEngine->GetGameUserSettings());
+
+	if (GameUserSettings) 
+	{
+		GameUserSettings->SetOverallScalabilityLevel(Value);
+		GameUserSettings->SaveSettings();
+		GameUserSettings->ApplySettings(false);
+	}
 }

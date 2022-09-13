@@ -602,10 +602,7 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 			// Update Stats
 			UpdateStatsTotal();
 
-			if (Base->GetType() == EModuleTypes::Magazine)
-			{
-				UpdateAmmoWhenPickTheMagazine();
-			}
+			UpdateAmmoOnModulePickup();
 
 			return Result;
 		}
@@ -615,7 +612,7 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 #pragma endregion Create and Attach Modules
 
 #pragma region Ammo System
-void AOPAG_ModularGun::UpdateAmmoWhenPickTheMagazine()
+void AOPAG_ModularGun::UpdateAmmoOnModulePickup()
 {
 	const int ClipSize = GetStatsTotal().ClipSize;
 	if (ClipSize < AmmoCurrent)
@@ -627,8 +624,20 @@ void AOPAG_ModularGun::UpdateAmmoWhenPickTheMagazine()
 		EMS->TotalAmmoChanged.Broadcast(AmmoMax);
 		return;
 	}
-	AmmoCurrent = ClipSize;
+	const int AmmoDifference = ClipSize - AmmoCurrent;
+	const int RemainingInMax = AmmoMax - (AmmoDifference);
+	if (RemainingInMax <= 0)
+	{
+		AmmoCurrent += AmmoMax;
+		AmmoMax = 0;
+	}
+	else
+	{
+		AmmoCurrent += AmmoDifference;
+		AmmoMax -= AmmoDifference;
+	}
 	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
 }
 
 void AOPAG_ModularGun::IncrementAmmo()
@@ -650,9 +659,9 @@ void AOPAG_ModularGun::WaitReloadingTimer()
 	// Check the bool when interrupter the reloading
 	bIsReloading = false;
 
-	if (AmmoMax < GetStatsTotal().ClipSize)
+	if (AmmoMax < GetStatsTotal().ClipSize - AmmoCurrent)
 	{
-		AmmoCurrent = AmmoMax;
+		AmmoCurrent += AmmoMax;
 		AmmoMax = 0;
 	}
 	else

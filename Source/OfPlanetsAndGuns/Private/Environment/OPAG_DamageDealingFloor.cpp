@@ -63,7 +63,7 @@ void AOPAG_DamageDealingFloor::OnOverlapBegin(UPrimitiveComponent* OverlappedCom
 	if (OtherActor == Player)
 	{
 		CharacterToDamage = Player;
-		TickTimeline->Play();
+		TimelineFinished();
 	}
 }
 

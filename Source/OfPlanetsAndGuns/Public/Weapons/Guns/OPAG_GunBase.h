@@ -68,6 +68,9 @@ protected:
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float SpreadMax = 12.f;
 
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ClampMin = 0.f, ClampMax = 1.f))
+	float AccuracyQualityInADS = 0.75f;
+
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ProjectileRange = 2000.f;
 
@@ -111,6 +114,7 @@ protected:
 
 	static constexpr float MinInternalAccuracy = 97.f;
 	static constexpr float MaxInternalAccuracy = 100.f;
+	static constexpr float MinReloadTime = 0.1f;
 
 protected:
 	FTimerHandle ResetShootHandle;
@@ -180,6 +184,7 @@ public:
 	virtual FOPAG_GunStats GetStatsTotal() const;
 	int GetAmmoCurrent() const;
 	int GetAmmoMax() const;
+	float GetReloadTime() const;
 	float GetRecoilStrength() const;
 	float GetRecoilSpeed() const;
 

@@ -99,6 +99,11 @@ int AOPAG_GunBase::GetAmmoMax() const
 	return AmmoMax;
 }
 
+float AOPAG_GunBase::GetReloadTime() const
+{
+	return (GetStatsTotal().ReloadingTime > MinReloadTime ? GetStatsTotal().ReloadingTime : MinReloadTime);
+}
+
 float AOPAG_GunBase::GetRecoilStrength() const
 {
 	return RecoilStrength;
@@ -261,7 +266,7 @@ float AOPAG_GunBase::CalculateSpread() const
 	AOPAG_Player* Player = Cast<AOPAG_Player>(GetParentActor());
 	if(Player == nullptr)	return .0f;
 
-	const float ADSAccuracy = (100 + GetStatsTotal().Accuracy) / 2;
+	const float ADSAccuracy = 100 * AccuracyQualityInADS + GetStatsTotal().Accuracy * (1 - AccuracyQualityInADS);
 	static constexpr float InternalRange = MaxInternalAccuracy - MinInternalAccuracy;
 	const float InternalAccuracy = ((
 		(Player->GetIsADS() ? ADSAccuracy : GetStatsTotal().Accuracy) 
@@ -339,7 +344,8 @@ TArray<AActor*> AOPAG_GunBase::CheckWhatActorsIgnoreLinetrace()
 void AOPAG_GunBase::Reload()
 {
 	bIsReloading = true;
-	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, &AOPAG_GunBase::WaitReloadingTimer, GetStatsTotal().ReloadingTime, false);
+	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, 
+		&AOPAG_GunBase::WaitReloadingTimer, GetReloadTime(), false);
 	//UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
 }
 

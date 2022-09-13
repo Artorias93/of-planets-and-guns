@@ -81,6 +81,20 @@ void AOPAG_CharacterBase::SetHealthMax(const float HealthMax)
 	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetMaxHealthAttribute(), HealthMax);
 }
 
+float AOPAG_CharacterBase::GetDamageMultiplier() const
+{
+	if (AbilitySystemComp)
+	{
+		return AbilitySystemComp->GetNumericAttribute(BaseAttributeSet->GetDamageMultiplierAttribute());
+	}
+	return 1;
+}
+
+void AOPAG_CharacterBase::SetDamageMultiplier(const float DamageMultiplier)
+{
+	AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageMultiplierAttribute(), DamageMultiplier);
+}
+
 void AOPAG_CharacterBase::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel)
 {
 	if (AbilitySystemComp)

@@ -19,11 +19,16 @@ void UOPAG_UWCurrencyView::BindEvents()
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 
 	if (EMS) {
+		/*
 		EMS->PotionsAmountIncrement.AddDynamic(this, &UOPAG_UWCurrencyView::IncrementPotionsAmount);
 		EMS->PotionsAmountDecrement.AddDynamic(this, &UOPAG_UWCurrencyView::DecrementPotionsAmount);
 
 		EMS->BoltsAmountIncrement.AddDynamic(this, &UOPAG_UWCurrencyView::IncrementBoltsAmount);
 		EMS->BoltsAmountDecrement.AddDynamic(this, &UOPAG_UWCurrencyView::DecrementBoltsAmount);
+		*/
+
+		EMS->BoltsAmountChanged.AddDynamic(this, &UOPAG_UWCurrencyView::UpdateBoltsAmount);
+		EMS->PotionsAmountChanged.AddDynamic(this, &UOPAG_UWCurrencyView::UpdatePotionsAmount);
 	}
 }
 
@@ -74,5 +79,19 @@ void UOPAG_UWCurrencyView::DecrementBoltsAmount()
 {
 	if (BoltsBox->GetChildrenCount() > 0) {
 		BoltsBox->RemoveChildAt((BoltsBox->GetChildrenCount() - 1));
+	}
+}
+
+void UOPAG_UWCurrencyView::UpdateBoltsAmount(const int CurrentValue)
+{
+	if (BoltsText && CurrentValue >= 0) {
+		BoltsText->SetText(FText::FromString(FString::FromInt(CurrentValue)));
+	}
+}
+
+void UOPAG_UWCurrencyView::UpdatePotionsAmount(const int CurrentValue)
+{
+	if (PotionsText && CurrentValue >= 0) {
+		PotionsText->SetText(FText::FromString(FString::FromInt(CurrentValue)));
 	}
 }

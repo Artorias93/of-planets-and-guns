@@ -8,13 +8,14 @@
 #include "Characters/Player/OPAG_Player.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
-//#include <NiagaraSystem.h>
 #include <Kismet/GameplayStatics.h>
+#include <Kismet/KismetMathLibrary.h>
 #include <Components/BoxComponent.h>
 #include <Components/TextRenderComponent.h>
 #include <Components/ChildActorComponent.h>
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "../../Public/Managers/OPAG_GameInstance.h"
+
 
 // Sets default values
 AOPAG_Vendor::AOPAG_Vendor()
@@ -118,9 +119,7 @@ void AOPAG_Vendor::ActivationParticleEffect() {
 	if (Pedestal == nullptr) return;
 	FVector EffectLocation = Pedestal->GetComponentLocation();
 	if (ActivationParticles != nullptr) {
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation, FRotator::MakeFromEuler(FVector(0,0,1)), FVector(50.0f));
-		//UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation, FRotator::MakeFromEuler(FVector(0,0,1)), FVector(50.0f));
-
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation);// , FRotator::MakeFromEuler(FVector(0, 0, 1)), FVector(50.0f));
 	}
 }
 
@@ -129,6 +128,17 @@ void AOPAG_Vendor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	const AOPAG_Player* PlayerRef = GetWorld()->GetFirstPlayerController()->GetPawn<AOPAG_Player>(); // player ref
+	const FRotator LookToPlayerRotation1 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Gun1->GetComponentLocation(), PlayerRef->GetActorLocation());
+	const FRotator LookToPlayerRotation2 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Gun2->GetComponentLocation(), PlayerRef->GetActorLocation());
+	const FRotator LookToPlayerRotation3 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Module1->GetComponentLocation(), PlayerRef->GetActorLocation());
+	const FRotator LookToPlayerRotation4 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Module2->GetComponentLocation(), PlayerRef->GetActorLocation());
+
+	if (PriceTextRender_Gun1 != nullptr ) PriceTextRender_Gun1->SetWorldRotation(LookToPlayerRotation1);
+	if (PriceTextRender_Gun2 != nullptr ) PriceTextRender_Gun2->SetWorldRotation(LookToPlayerRotation2);
+	if (PriceTextRender_Module1 != nullptr ) PriceTextRender_Module1->SetWorldRotation(LookToPlayerRotation3);
+	if (PriceTextRender_Module2 != nullptr ) PriceTextRender_Module2->SetWorldRotation(LookToPlayerRotation4);
+	
 }
 
 // Call method for spawning all guns
@@ -195,8 +205,12 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 	AttachModulesToGun(*TempGunsList[1], true, RoomDifficulty);
 
 	// Set price to texts
-	TempGunsTextRender[0]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[0])));
-	TempGunsTextRender[1]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[1])));
+	TempGunsTextRender[0]->SetText(
+		FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[0]), 0) + "$")
+	);
+	TempGunsTextRender[1]->SetText(
+		FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(TempGunsList[1]), 0) + "$")
+	);
 
 	// Spawn two modules
 	if (ModulesList.Num() == 0)
@@ -240,7 +254,9 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 
 		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(ChildActorModules[i]->GetChildActor());
 		TempModulesTextRender[i]->SetVisibility(true);
-		TempModulesTextRender[i]->SetText(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(NewModule)));
+		TempModulesTextRender[i]->SetText(
+			FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(NewModule), 0) + "$")
+		);
 		IOPAG_InteractableInterface::Execute_ApplyFly(NewModule);
 	}
 }
@@ -309,9 +325,11 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 
 void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)
 {
+	ActivationParticleEffect();
 	if (ChildActor_Gun1->GetChildActor() == Gun)
 	{
 		PriceTextRender_Gun1->SetVisibility(false);
+		
 	}
 	else if (ChildActor_Gun2->GetChildActor() == Gun)
 	{
@@ -321,6 +339,7 @@ void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)
 
 void AOPAG_Vendor::DisableModuleTextInVendor(AOPAG_ModuleBase* Module)
 {
+	ActivationParticleEffect();
 	if (ChildActor_Module1->GetChildActor() == Module)
 	{
 		PriceTextRender_Module1->SetVisibility(false);

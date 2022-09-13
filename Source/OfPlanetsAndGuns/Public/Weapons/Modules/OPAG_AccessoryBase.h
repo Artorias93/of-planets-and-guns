@@ -16,6 +16,9 @@ class OFPLANETSANDGUNS_API AOPAG_AccessoryBase : public AOPAG_ModuleBase
 public:	
 	AOPAG_AccessoryBase();
 
+	UPROPERTY(Category = "Accessory Ability Description", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "Fill in with the ability's name"))
+	FString AbilityDescription = "(fill in with the ability's name HERE)";
+
 protected:
 	UPROPERTY(Category = "Accessory Ability", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	const TSubclassOf<UGameplayAbility> ActiveAbilityClass;

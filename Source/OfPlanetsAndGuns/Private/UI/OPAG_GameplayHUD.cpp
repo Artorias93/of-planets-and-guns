@@ -10,6 +10,7 @@
 #include "UI/OPAG_UWInteractView.h"
 #include "UI/OPAG_UWDamageIndicatorView.h"
 #include "UI/OPAG_UWGameOverView.h"
+#include "UI/OPAG_UWOptionsView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -22,7 +23,8 @@ void AOPAG_GameplayHUD::DrawHUD()
 
 void AOPAG_GameplayHUD::BindEvents() {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
-	if (EMS) {
+	if (EMS) 
+	{
 		EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
 		EMS->LoadingProgress.AddDynamic(this, &AOPAG_GameplayHUD::UpdateLoadingScreenBar);
 		EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
@@ -47,7 +49,8 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		PlayerStatsViewWidget = CreateWidget<UOPAG_UWPlayerStatsView>(GetWorld(), PlayerStatsViewWidgetClass);
 
-		if (PlayerStatsViewWidget) {
+		if (PlayerStatsViewWidget) 
+		{
 			PlayerStatsViewWidget->AddToViewport(1);
 		}
 	}
@@ -56,7 +59,8 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		GunViewWidget = CreateWidget<UOPAG_UWGunView>(GetWorld(), GunViewWidgetClass);
 
-		if (GunViewWidget) {
+		if (GunViewWidget) 
+		{
 			GunViewWidget->AddToViewport(1);
 		}
 	}
@@ -65,7 +69,8 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		CurrencyViewWidget = CreateWidget<UOPAG_UWCurrencyView>(GetWorld(), CurrencyViewWidgetClass);
 
-		if (CurrencyViewWidget) {
+		if (CurrencyViewWidget) 
+		{
 			CurrencyViewWidget->AddToViewport(1);
 		}
 	}
@@ -74,7 +79,8 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		LoadingScreenViewWidget = CreateWidget<UOPAG_UWLoadingScreenView>(GetWorld(), LoadingScreenViewWidgetClass); 
 		
-		if (LoadingScreenViewWidget) {
+		if (LoadingScreenViewWidget) 
+		{
 			LoadingScreenViewWidget->AddToViewport(3);
 		}
 	}
@@ -83,12 +89,6 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		PauseViewWidget = CreateWidget<UOPAG_UWPauseView>(GetWorld(), PauseViewWidgetClass);
 	}
-	/*
-	if (ModuleViewWidgetClass)
-	{
-		ModuleViewWidget = CreateWidget<UOPAG_UWModuleView>(GetWorld(), ModuleViewWidgetClass);
-	}
-	*/
 	
 	if (ModuleViewWidgetClass)
 	{
@@ -109,18 +109,26 @@ void AOPAG_GameplayHUD::BeginPlay()
 	{
 		InteractViewWidget = CreateWidget<UOPAG_UWInteractView>(GetWorld(), InteractViewWidgetClass);
 	}
+
+	if (OptionsViewWidgetClass)
+	{
+		OptionsViewWidget = CreateWidget<UOPAG_UWOptionsView>(GetWorld(), OptionsViewWidgetClass);
+	}
 }
 
-void AOPAG_GameplayHUD::ShowPauseView() {
+void AOPAG_GameplayHUD::ShowPauseView() 
+{
 
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
-	if (PC) {
+	if (PC) 
+	{
 		PC->SetInputMode(FInputModeUIOnly());
 		PC->bShowMouseCursor = true;
 	}
 	
-	if (PauseViewWidget) {
+	if (PauseViewWidget) 
+	{
 		PauseViewWidget->AddToViewport(2);
 	}
 }
@@ -129,19 +137,23 @@ void AOPAG_GameplayHUD::HidePauseView() {
 
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
-	if (PC) {
+	if (PC) 
+	{
 		PC->SetInputMode(FInputModeGameOnly());
 		PC->bShowMouseCursor = false;
 	}
 
-	if (PauseViewWidget) {
+	if (PauseViewWidget) 
+	{
 		PauseViewWidget->RemoveFromViewport();
 	}
 
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 
-	if(EMS)
+	if (EMS) 
+	{
 		EMS->ResumeGame.Broadcast();
+	}
 }
 
 void AOPAG_GameplayHUD::UpdateLoadingScreenBar(float Percentage)
@@ -157,34 +169,40 @@ void AOPAG_GameplayHUD::ShowLoadingScreenView()
 
 void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 {
-	if (LoadingScreenViewWidget) {
+	if (LoadingScreenViewWidget) 
+	{
 		LoadingScreenViewWidget->RemoveFromViewport();
 	}
 }
 
 void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule, 
-	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
-	const int EquippableTypes, const bool CanBeEquipped)
+	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const FString OtherModuleAbilityName, 
+	const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType, const int EquippableTypes, 
+	const bool CanBeEquipped)
 {
 	if (GunCompareViewWidget->IsInViewport())
 		HideGunCompareView();
 
-	if (ModuleViewWidget) {
-		if (ModuleViewWidget->IsInViewport()) {
-			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity,
-			                                     OtherModuleType, EquippableTypes, CanBeEquipped);
+	if (ModuleViewWidget) 
+	{
+		if (ModuleViewWidget->IsInViewport()) 
+		{
+			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleAbilityName, 
+				OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
 		}
-		else {
+		else 
+		{
 			ModuleViewWidget->AddToViewport(3);
-			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleRarity, 
-			                                     OtherModuleType, EquippableTypes, CanBeEquipped);
+			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleAbilityName, 
+				OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
 		}
 	}
 }
 
 void AOPAG_GameplayHUD::HideModuleCompareView()
 {
-	if (ModuleViewWidget) {
+	if (ModuleViewWidget) 
+	{
 		ModuleViewWidget->RemoveFromViewport();
 	}
 }
@@ -195,7 +213,8 @@ void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const 
 	if (ModuleViewWidget->IsInViewport())
 		HideModuleCompareView();
 
-	if (GunCompareViewWidget) {
+	if (GunCompareViewWidget) 
+	{
 		if (GunCompareViewWidget->IsInViewport()) 
 		{
 			GunCompareViewWidget->UpdateGunValues(GunStats, OtherGun, OtherGunName, OtherGunType);
@@ -210,7 +229,8 @@ void AOPAG_GameplayHUD::ShowGunCompareView(const FOPAG_GunStats GunStats, const 
 
 void AOPAG_GameplayHUD::HideGunCompareView()
 {
-	if (GunCompareViewWidget) {
+	if (GunCompareViewWidget) 
+	{
 		GunCompareViewWidget->RemoveFromViewport();
 	}
 }
@@ -219,36 +239,43 @@ void AOPAG_GameplayHUD::ShowGameOverView()
 {
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
 
-	if (PC) {
+	if (PC) 
+	{
 		PC->SetInputMode(FInputModeUIOnly());
 		PC->bShowMouseCursor = true;
 	}
 
-	if (GameOverViewWidget) {
+	if (GameOverViewWidget) 
+	{
 		GameOverViewWidget->AddToViewport(3);
 	}
 }
 
 void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, const FString InteractText)
 {
-	if (InteractViewWidget) {
+	if (InteractViewWidget) 
+	{
 		if (!InteractViewWidget->IsInViewport())
 		{
 			InteractViewWidget->AddToViewport(3);
 		}
+
 		InteractViewWidget->UpdateInteractText(bCanInteract, InteractText);
 	}
 }
 
 void AOPAG_GameplayHUD::HideInteractView()
 {
-	if (InteractViewWidget) {
+	if (InteractViewWidget) 
+	{
 		InteractViewWidget->RemoveFromViewport();
 	}
 }
 
 void AOPAG_GameplayHUD::ShowDamageIndicatorView(AActor* const CurrentThreatActor)
 {
+	// This widget can be instantiated multiple times
+
 	if (DamageIndicatorViewWidgetClass)
 	{
 		DamageIndicatorViewWidget = CreateWidget<UOPAG_UWDamageIndicatorView>(GetWorld(), DamageIndicatorViewWidgetClass);
@@ -260,14 +287,31 @@ void AOPAG_GameplayHUD::ShowDamageIndicatorView(AActor* const CurrentThreatActor
 		{
 			DamageIndicatorViewWidget->AddToViewport(1);
 		}
+
 		DamageIndicatorViewWidget->SetCurrentThreatActor(CurrentThreatActor);
 	}
 }
 
 void AOPAG_GameplayHUD::HideDamageIndicatorView()
 {
-	if (DamageIndicatorViewWidget) {
+	if (DamageIndicatorViewWidget) 
+	{
 		DamageIndicatorViewWidget->RemoveFromViewport();
 	}
 }
 
+void AOPAG_GameplayHUD::ShowOptionsView()
+{
+	if (OptionsViewWidget)
+	{
+		OptionsViewWidget->AddToViewport(3);
+	}
+}
+
+void AOPAG_GameplayHUD::HideOptionsView()
+{
+	if (OptionsViewWidget)
+	{
+		OptionsViewWidget->RemoveFromViewport();
+	}
+}
