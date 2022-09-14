@@ -44,4 +44,3 @@ void UOPAG_UWOptionsView::GraphicsSliderChanged(float CurrentValue)
 		EMS->QualitySettingsChanged.Broadcast(CurrentValue);
 	}
 }
-

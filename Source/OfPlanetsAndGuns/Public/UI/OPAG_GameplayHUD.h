@@ -18,6 +18,14 @@ class OFPLANETSANDGUNS_API AOPAG_GameplayHUD : public AHUD
 	virtual void BeginPlay() override;
 
 private:
+	/// 
+	/// Draft - Retainer container
+	UPROPERTY()
+		class UOPAG_UWGameplayHUDView* GameplayHUDViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWGameplayHUDView> GameplayHUDViewWidgetClass;
+	/// 
+	///
 	UPROPERTY()
 		class UOPAG_UWPlayerStatsView* PlayerStatsViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")

@@ -11,6 +11,8 @@
 #include "UI/OPAG_UWDamageIndicatorView.h"
 #include "UI/OPAG_UWGameOverView.h"
 #include "UI/OPAG_UWOptionsView.h"
+#include "UI/OPAG_UWGameplayHUDView.h"
+#include "Components/RetainerBox.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -45,13 +47,24 @@ void AOPAG_GameplayHUD::BeginPlay()
 
 	BindEvents();
 
+	if (GameplayHUDViewWidgetClass)
+	{
+		GameplayHUDViewWidget = CreateWidget<UOPAG_UWGameplayHUDView>(GetWorld(), GameplayHUDViewWidgetClass);
+
+		if (GameplayHUDViewWidget)
+		{
+			GameplayHUDViewWidget->AddToViewport(1);
+		}
+	}
+
 	if (PlayerStatsViewWidgetClass)
 	{
 		PlayerStatsViewWidget = CreateWidget<UOPAG_UWPlayerStatsView>(GetWorld(), PlayerStatsViewWidgetClass);
 
 		if (PlayerStatsViewWidget) 
 		{
-			PlayerStatsViewWidget->AddToViewport(1);
+			//PlayerStatsViewWidget->AddToViewport(1);
+			GameplayHUDViewWidget->GameplayRetainerBox->AddChild(PlayerStatsViewWidget);
 		}
 	}
 
