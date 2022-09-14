@@ -52,7 +52,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* StartOutActor;
 		StartLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			StartLevelSequence, StartSettings, StartOutActor);
-		StartLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu);
+		//StartLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu);
 		
 		SequencePlaySelection(Start, MainMenu);
 	}
@@ -64,7 +64,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* OptionsOutActor;
 		OptionsLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			OptionsLevelSequence, OptionsSettings, OptionsOutActor);
-		OptionsLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowOptionsMenu);
+		//OptionsLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowOptionsMenu);
 	}
 
 	//Exit sequence initialization
@@ -74,7 +74,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* ExitOutActor;
 		ExitLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			ExitLevelSequence, ExitSettings, ExitOutActor);
-		ExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowExitMenu);
+		//ExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowExitMenu);
 	}
 
 	//Quit Game sequence initialization
@@ -84,7 +84,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* QuitGameOutActor;
 		QuitGameLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			QuitGameLevelSequence, QuitGameSettings, QuitGameOutActor);
-		QuitGameLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::MenuCloseGame);
+		//QuitGameLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::MenuCloseGame);
 	}
 
 	//Reverse Exit sequence initialization
@@ -95,7 +95,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* ReverseExitOutActor;
 		ReverseExitLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			ReverseExitLevelSequence, ReverseExitSettings, ReverseExitOutActor);
-		ReverseExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu2);
+		//ReverseExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu);
 	}
 }
 
@@ -137,15 +137,8 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 
 void AOPAG_MainMenuHUD::ShowMainMenu()
 {
-	if (MainMenuViewWidget)
-	{
-		MainMenuViewWidget->AddToViewport(1);
-	}
-}
-
-void AOPAG_MainMenuHUD::ShowMainMenu2()
-{
-	UE_LOG(LogTemp, Warning, TEXT("IN CALLING MAIN MENU TWO"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("Calling ShowMainMenu()"));
+	
 	if (MainMenuViewWidget)
 	{
 		MainMenuViewWidget->AddToViewport(1);

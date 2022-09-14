@@ -13,8 +13,8 @@ enum EMenuScreen
 	MainMenu     UMETA(DisplayName = "MainMenu"),
 	Options      UMETA(DisplayName = "Options"),
 	Exit      UMETA(DisplayName = "Exit"),
-	QuitGame      UMETA(DisplayName = "Exit"),
-	PlanetSelection   UMETA(DisplayName = "Attacking")
+	QuitGame      UMETA(DisplayName = "QuitGame"),
+	PlanetSelection   UMETA(DisplayName = "PlanetSelection")
 };
 
 UCLASS()
@@ -61,8 +61,6 @@ public:
 	UFUNCTION()
 	void ShowMainMenu();
 	UFUNCTION()
-	void ShowMainMenu2();
-	UFUNCTION()
 	void HideMainMenu();
 	UFUNCTION()
 	void ShowExitMenu();
@@ -81,6 +79,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	void BindEvents();	
+//private:
+	//void BindEvents();	
 };
