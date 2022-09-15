@@ -24,21 +24,6 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		PC->bShowMouseCursor = true;
 	}
 
-	if (MainMenuViewWidgetClass)
-	{
-		MainMenuViewWidget = CreateWidget<UOPAG_UWMainMenuView>(GetWorld(), MainMenuViewWidgetClass);
-	}
-
-	if (ConfirmExitViewWidgetClass)
-	{
-		ConfirmExitViewWidget = CreateWidget<UOPAG_UWConfirmExitView>(GetWorld(), ConfirmExitViewWidgetClass);
-	}
-
-	if (HubViewWidgetClass)
-	{
-		HubViewWidget = CreateWidget<UOPAG_UWHubView>(GetWorld(), HubViewWidgetClass);
-	}
-
 	//Main menu sequence names
 	const FStringAssetReference StartSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_MenuStart.LS_MenuStart");
 	const FStringAssetReference OptionsSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToOptions.LS_ToOptions");
@@ -52,9 +37,6 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* StartOutActor;
 		StartLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			StartLevelSequence, StartSettings, StartOutActor);
-		//StartLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu);
-		
-		SequencePlaySelection(Start, MainMenu);
 	}
 
 	//Options sequence initialization
@@ -64,7 +46,6 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* OptionsOutActor;
 		OptionsLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			OptionsLevelSequence, OptionsSettings, OptionsOutActor);
-		//OptionsLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowOptionsMenu);
 	}
 
 	//Exit sequence initialization
@@ -74,7 +55,6 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* ExitOutActor;
 		ExitLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			ExitLevelSequence, ExitSettings, ExitOutActor);
-		//ExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowExitMenu);
 	}
 
 	//Quit Game sequence initialization
@@ -84,25 +64,16 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* QuitGameOutActor;
 		QuitGameLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			QuitGameLevelSequence, QuitGameSettings, QuitGameOutActor);
-		//QuitGameLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::MenuCloseGame);
 	}
 
-	//Reverse Exit sequence initialization
-	if(ULevelSequence* const ReverseExitLevelSequence = Cast<ULevelSequence>(ExitSequenceName.TryLoad()))
-	{
-		FMovieSceneSequencePlaybackSettings ReverseExitSettings;
-		ReverseExitSettings.PlayRate = -1.f;
-		ALevelSequenceActor* ReverseExitOutActor;
-		ReverseExitLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
-			ReverseExitLevelSequence, ReverseExitSettings, ReverseExitOutActor);
-		//ReverseExitLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::ShowMainMenu);
-	}
+	//Executes first sequence (menu opening)
+	SequencePlaySelection(Start, MainMenu);
 }
 
 void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const
 {
 	switch(From)
-	{
+	{		
 		case Start:
 			StartLevelSequencePlayer->Play();
 			break;
@@ -125,7 +96,7 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 					QuitGameLevelSequencePlayer->Play();
 					break;
 				case MainMenu:
-					ReverseExitLevelSequencePlayer->Play();
+					ExitLevelSequencePlayer->PlayReverse();
 					break;
 				default:
 					break;
@@ -134,6 +105,21 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 			break;
 	}	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void AOPAG_MainMenuHUD::ShowMainMenu()
 {
@@ -199,3 +185,12 @@ void AOPAG_MainMenuHUD::ShowHubView()
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 }
 
+void AOPAG_MainMenuHUD::GoFromMainMenuToExit()
+{
+	SequencePlaySelection(MainMenu, Exit);
+}
+
+void AOPAG_MainMenuHUD::GoFromExitToMainMenu()
+{
+	SequencePlaySelection(Exit, MainMenu);
+}

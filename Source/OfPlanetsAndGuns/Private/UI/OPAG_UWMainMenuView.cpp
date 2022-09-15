@@ -1,13 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_UWMainMenuView.h"
-#include "Components/ProgressBar.h"
-#include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Components/Button.h"
-#include "Managers/OPAG_GameInstance.h"
-#include "Managers/OPAG_EventManagerSubsystem.h"
 #include "UI/OPAG_MainMenuHUD.h"
 
 void UOPAG_UWMainMenuView::NativeConstruct() {

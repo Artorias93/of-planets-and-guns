@@ -4,6 +4,7 @@
 #include "GameFramework/HUD.h"
 #include "OPAG_MainMenuHUD.generated.h"
 
+class ULevelSequence;
 class ULevelSequencePlayer;
 
 UENUM()
@@ -32,8 +33,6 @@ private:
 	ULevelSequencePlayer* OptionsLevelSequencePlayer;
 	UPROPERTY()
 	ULevelSequencePlayer* ExitLevelSequencePlayer;
-	UPROPERTY()
-	ULevelSequencePlayer* ReverseExitLevelSequencePlayer;
 	UPROPERTY()
 	ULevelSequencePlayer* QuitGameLevelSequencePlayer;
 	
@@ -73,6 +72,10 @@ public:
 	UFUNCTION()
 	void HideOptionsMenu();
 
+	UFUNCTION(CallInEditor)
+	void GoFromMainMenuToExit();
+	UFUNCTION(CallInEditor)
+	void GoFromExitToMainMenu();
 	UFUNCTION()
 	void SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const;
 
