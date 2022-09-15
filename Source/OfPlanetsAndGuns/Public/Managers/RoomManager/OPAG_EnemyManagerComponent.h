@@ -34,6 +34,8 @@ class OFPLANETSANDGUNS_API UOPAG_EnemyManagerComponent : public UActorComponent
 
 	static constexpr int32 SpawnAttempts = 3;
 
+	class UOPAG_SoundManagerSubsystem* SMS;
+
 public:	
 	// Sets default values for this component's properties
 	UOPAG_EnemyManagerComponent();

@@ -263,20 +263,20 @@ void UOPAG_SoundManagerSubsystem::PlayCharacterSounds(AActor* actor, ECharacterS
 }
 void UOPAG_SoundManagerSubsystem::PlayAmbient() {
 	if (EnviromentAudioLibrary) {
-		if (InstanceAmbient.Instance->isValid())
-			StopAmbient();
+		//if (InstanceAmbient.Instance->isValid())
+			//StopAmbient();
 		FAudioEvent* libraryRow;
 		libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Ambient"), "", false);
 		if (libraryRow) {
 			UFMODEvent* currentEvent = libraryRow->AudioContent;
-			InstanceAmbient = UFMODBlueprintStatics::PlayEvent2D(GetWorld(), currentEvent, false);
+			InstanceAmbient = UFMODBlueprintStatics::PlayEvent2D(GetWorld(), currentEvent, true);
 		}
 	}
 }
 void UOPAG_SoundManagerSubsystem::PlaySoundTrack(ESoundtrackType type) {
 	if (SoundtracksAudioLibrary) {
-		if (InstanceSoundtrack.Instance->isValid())
-			StopSoundtrack();
+		//if (InstanceSoundtrack.Instance->isValid())
+			//StopSoundtrack();
 		FAudioEvent* libraryRow;
 		switch (type)
 		{
@@ -291,10 +291,20 @@ void UOPAG_SoundManagerSubsystem::PlaySoundTrack(ESoundtrackType type) {
 			break;
 		}
 		if (libraryRow) {
-			UFMODEvent* currentEvent = libraryRow->AudioContent;
-			InstanceSoundtrack = UFMODBlueprintStatics::PlayEvent2D(GetWorld(), currentEvent, false);
+			UFMODEvent* currentEvent = libraryRow->AudioContent;		
+			InstanceSoundtrack = UFMODBlueprintStatics::PlayEvent2D(GetWorld(), currentEvent, true);
+			UFMODBlueprintStatics::EventInstanceSetParameter(InstanceSoundtrack, FName("Intensity"), Intensity);
 		}
 	}
+}
+
+void UOPAG_SoundManagerSubsystem::SetIntensity(float value) {
+	if (value > 0)
+		Intensity += value;
+	else
+		Intensity = 0;
+	//InstanceSoundtrack.Instance->setParameterByName(TCHAR_TO_UTF8(*FName("Intensity").ToString()), Intensity , true);
+	UFMODBlueprintStatics::EventInstanceSetParameter(InstanceSoundtrack, FName("Intensity"), Intensity);
 }
 
 void UOPAG_SoundManagerSubsystem::StopSoundtrack() {

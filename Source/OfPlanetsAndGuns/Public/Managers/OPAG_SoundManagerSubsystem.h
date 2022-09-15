@@ -111,6 +111,9 @@ public:
 		class UFMODAudioComponent* AudioComponent;
 	UPROPERTY(EditAnywhere, Category = "FMOD | Zipline")
 		class UFMODAudioComponent* ZiplineAudioComponent;
+	UPROPERTY(EditAnywhere, Category = "FMOD | Soundtrack")
+		float Intensity = 0.0f;
+
 
 
 	FFMODEventInstance InstanceUI;
@@ -138,6 +141,8 @@ public:
 		void StopSoundtrack();
 	UFUNCTION(BlueprintCallable)
 		void StopAmbient();
+	UFUNCTION(BlueprintCallable)
+		void SetIntensity(float value);
 private:
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponsFireSound(AOPAG_GunBase* weapon);

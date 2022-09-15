@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Managers/RoomManager/OPAG_EnemyLevel.h"
 #include "Managers/RoomManager/OPAG_RoomManager.h"
 #include "Rooms/OPAG_EnemySpawnPoint.h"
@@ -75,12 +76,15 @@ void UOPAG_EnemyManagerComponent::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 	if (EnemiesInRoom.Remove(Enemy) > 0)
 	{
 		EnemyDeathCount++;
+
 		if (EnemyDeathCount >= TotalEnemyAmount)
 		{
 			AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
 			if (RoomManager)
 			{
 				RoomManager->RoomCleared();
+				if (SMS)
+					SMS->SetIntensity(0.0f);
 			}
 		}
 		else
@@ -102,6 +106,8 @@ void UOPAG_EnemyManagerComponent::BeginPlay()
 		GI->GetEventManager()->EnemyKilled.AddDynamic(this, 
 			&UOPAG_EnemyManagerComponent::OnEnemyDeath);
 	}
+	if (!SMS)
+		SMS = GI->GetSoundManager();
 }
 
 void UOPAG_EnemyManagerComponent::InitializeComponent()
@@ -163,6 +169,8 @@ void UOPAG_EnemyManagerComponent::SpawnWave()
 
 				EnemiesToSpawnNextWave -= SpawnedEnemies.Num();
 				EnemiesInRoom.Append(SpawnedEnemies);
+				if(SMS)
+					SMS->SetIntensity(10.f);
 			}
 		}
 	}

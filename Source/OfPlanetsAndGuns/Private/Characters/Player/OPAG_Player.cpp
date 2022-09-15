@@ -118,6 +118,8 @@ void AOPAG_Player::BeginPlay()
 	// 
 	InitDashValues();
 	InitUICounters();
+	SMS->PlayAmbient();
+	SMS->PlaySoundTrack(ESoundtrackType::Gameplay);
 }
 
 void AOPAG_Player::Death()
