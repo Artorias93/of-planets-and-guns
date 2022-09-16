@@ -89,6 +89,15 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 				default:
 					break;
 			}
+		case Options:
+			switch(To)
+			{
+				case MainMenu:
+					OptionsLevelSequencePlayer->PlayReverse();
+					break;
+				default:
+					break;
+			}
 		case Exit:
 			switch(To)
 			{
@@ -108,6 +117,35 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 
 
 
+
+
+
+
+
+
+
+
+
+
+void AOPAG_MainMenuHUD::GoFromMainMenuToExit()
+{
+	SequencePlaySelection(MainMenu, Exit);
+}
+
+void AOPAG_MainMenuHUD::GoFromExitToMainMenu()
+{
+	SequencePlaySelection(Exit, MainMenu);
+}
+
+void AOPAG_MainMenuHUD::GoFromMainMenuToOptions()
+{
+	SequencePlaySelection(MainMenu, Options);
+}
+
+void AOPAG_MainMenuHUD::GoFromOptionsToMainMenu()
+{
+	SequencePlaySelection(Options, MainMenu);
+}
 
 
 
@@ -185,12 +223,3 @@ void AOPAG_MainMenuHUD::ShowHubView()
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 }
 
-void AOPAG_MainMenuHUD::GoFromMainMenuToExit()
-{
-	SequencePlaySelection(MainMenu, Exit);
-}
-
-void AOPAG_MainMenuHUD::GoFromExitToMainMenu()
-{
-	SequencePlaySelection(Exit, MainMenu);
-}

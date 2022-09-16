@@ -9,6 +9,7 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "GameFramework/GameUserSettings.h"
+#include "UI/OPAG_MainMenuHUD.h"
 
 void UOPAG_UWOptionsView::NativeConstruct()
 {
@@ -30,9 +31,17 @@ void UOPAG_UWOptionsView::NativeConstruct()
 
 void UOPAG_UWOptionsView::BackButtonClicked()
 {
-	AOPAG_GameplayHUD* MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
-	if (MyHUD)
+	UE_LOG(LogTemp, Warning, TEXT("Back Button Clicked"));
+	if (AOPAG_GameplayHUD* const MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
 		MyHUD->HideOptionsView();
+		return;
+	}
+	if(const AOPAG_MainMenuHUD* const MenuHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("In cast body"));
+		MenuHUD->SequencePlaySelection(Options, MainMenu);
+	}
 }
 
 void UOPAG_UWOptionsView::GraphicsSliderChanged(float CurrentValue)

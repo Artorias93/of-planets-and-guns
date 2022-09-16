@@ -76,6 +76,10 @@ public:
 	void GoFromMainMenuToExit();
 	UFUNCTION(CallInEditor)
 	void GoFromExitToMainMenu();
+	UFUNCTION(CallInEditor)
+	void GoFromMainMenuToOptions();
+	UFUNCTION(CallInEditor)
+	void GoFromOptionsToMainMenu();
 	UFUNCTION()
 	void SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const;
 
