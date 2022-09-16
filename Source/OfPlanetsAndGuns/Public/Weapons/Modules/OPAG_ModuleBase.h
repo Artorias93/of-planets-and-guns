@@ -5,6 +5,7 @@
 #include "OPAG_ModuleStats.h"
 #include "GameFramework/Actor.h"
 #include "Interactables/OPAG_InteractableInterface.h"
+#include "Components/TimelineComponent.h"
 #include "OPAG_ModuleBase.generated.h"
 
 class USphereComponent;
@@ -24,12 +25,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ModuleMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UPointLightComponent* ModuleHighlightUp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UPointLightComponent* ModuleHighlightDown;
 
 protected:
 	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -57,6 +52,12 @@ protected:
 	float PriceMuliplierPercentage = 1.f;
 
 	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystemComponent* ModuleDropHighlight;
+
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* ModuleDropHighlightParticle;
+
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float HighlightIncreaseSizeFactor = 0.5;
 
 	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -68,6 +69,29 @@ protected:
 	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float IntensityIncreaseFactor = 100000;
 
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UTimelineComponent* ModuleDropTimeline;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UCurveVector* CurveModuleDropVector;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float ModuleDropCurveXFactor = 200;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float ModuleDropCurveZFactor = 100;
+
+	FOnTimelineVector OnModuleDropTimelineProgress;
+	
+	UPROPERTY()
+	FVector ModuleDropTimelinePropertyName;
+
+	UPROPERTY()
+	FVector RandomDropDir;
+
+	UPROPERTY()
+		FVector SpawnLocation;
+	
 protected:
 	FTimerHandle FlyRotationHandle;
 	
@@ -110,7 +134,7 @@ public:
 	EModuleBrand GetBrand() const;
 	FOPAG_GunStats GetStats() const;
 	int GetEquippableFireTypes() const;
-	FLinearColor GetColorFromRarity(int Value);
+	void LoadParticleFromRarity(EModuleRarity ModuleRarity);
 
 	//Setter
 	void SetParameters(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats,
@@ -118,6 +142,9 @@ public:
 	void SetStats(const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers);
 	void SetStats(const FOPAG_GunStats NewStats);
 
+	UFUNCTION()
+	void ModuleDropTimelineProgress(FVector Value);
+	
 public:
 	FORCEINLINE USphereComponent* GetModuleSphereComponent() { return Sphere; }
 

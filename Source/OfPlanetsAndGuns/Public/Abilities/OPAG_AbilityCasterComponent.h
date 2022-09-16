@@ -15,6 +15,7 @@ class OFPLANETSANDGUNS_API UOPAG_AbilityCasterComponent : public UActorComponent
 	bool bSequenced = false;
 	
 public:
+
 	UOPAG_AbilityCasterComponent();
 
 protected:

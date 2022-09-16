@@ -18,9 +18,16 @@ class OFPLANETSANDGUNS_API UOPAG_UWOptionsView : public UUserWidget
 	GENERATED_BODY()
 
 	UPROPERTY(meta = (BindWidget))
+		USlider* MasterSlider;
+	UPROPERTY(meta = (BindWidget))
 		USlider* MusicSlider;
 	UPROPERTY(meta = (BindWidget))
 		USlider* SFXSlider;
+	UPROPERTY(meta = (BindWidget))
+		USlider* AmbientSlider;
+	UPROPERTY(meta = (BindWidget))
+		USlider* SystemSlider;
+
 	UPROPERTY(meta = (BindWidget))
 		USlider* GraphicsSlider;
 

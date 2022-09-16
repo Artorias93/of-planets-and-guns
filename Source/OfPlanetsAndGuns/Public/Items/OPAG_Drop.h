@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "GameFramework/Actor.h"
+#include "Components/TimelineComponent.h"
 #include "OPAG_Drop.generated.h"
 
 class UStaticMeshComponent;
@@ -30,26 +31,49 @@ public:
 	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
 	USphereComponent* Sphere;
 
-	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Drop", EditDefaultsOnly, BlueprintReadWrite)
 	UStaticMeshComponent* HighlightMesh;
 
-	//UPROPERTY(EditAnywhere, Category = "Ability")
-	//class UMaterial* HighlightMaterial;
-
-	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Drop", EditDefaultsOnly, BlueprintReadWrite)
 	float DisablePhysicAfterSeconds;
 
-	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Drop", EditDefaultsOnly, BlueprintReadWrite)
 	float HighlightIncreaseSizeFactor;
 
 	float CurrentHighlightIncreaseSizeFactor;
 
+	UPROPERTY(Category = "Drop", EditDefaultsOnly, BlueprintReadWrite)
+		UTimelineComponent* DropTimeline;
+
+	UPROPERTY(Category = "Drop", EditDefaultsOnly, BlueprintReadWrite)
+		class UCurveVector* CurveDropVector;
+
+	UPROPERTY(Category = "Drop", EditDefaultsOnly, BlueprintReadWrite)
+		float DropCurveXFactor = 200;
+
+	UPROPERTY(Category = "Drop", EditDefaultsOnly, BlueprintReadWrite)
+		float DropCurveZFactor = 100;
+
+	FOnTimelineVector OnDropTimelineProgress;
+
+	UPROPERTY()
+		FVector DropTimelinePropertyName;
+
+	UPROPERTY()
+		FVector RandomDropDir;
+
+	UPROPERTY()
+		FVector SpawnLocation;
+
 public:
-	UPROPERTY(Category = "Drop Stuff", EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(Category = "Drop", EditAnywhere, BlueprintReadWrite)
 	int Amount = 1;
 	
-	UPROPERTY(Category = "Drop Stuff", EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(Category = "Drop", EditDefaultsOnly, BlueprintReadWrite)
 	EDropType DropType;
+
+	UFUNCTION()
+	void DropTimelineProgress(FVector Value);
 
 protected:
 	virtual void BeginPlay() override;

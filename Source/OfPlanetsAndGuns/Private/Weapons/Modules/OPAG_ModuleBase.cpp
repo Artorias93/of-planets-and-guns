@@ -5,7 +5,10 @@
 #include "Characters/Player/OPAG_Player.h"
 #include <Kismet/GameplayStatics.h>
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
+#include "Curves/CurveVector.h"
+#include "Particles/ParticleSystem.h"
 #include "Components/PointLightComponent.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
@@ -28,28 +31,17 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 		Sphere->SetSimulatePhysics(false);
 	}
 
-	ModuleHighlightUp = CreateDefaultSubobject<UPointLightComponent>(TEXT("HighlightUp"));
-	if (ModuleHighlightUp)
+	ModuleDropHighlight = CreateDefaultSubobject<UParticleSystemComponent>("HightLight Particle");
 	{
-		ModuleHighlightUp->SetupAttachment(Sphere);
-
-		ModuleHighlightUp->SetVisibility(false);
-		ModuleHighlightUp->SetAttenuationRadius(0);
-		ModuleHighlightUp->SetIntensity(0);
-		ModuleHighlightUp->CastShadows = false;
-
+		ModuleDropHighlight->SetupAttachment(Sphere);
 	}
 
-	ModuleHighlightDown = CreateDefaultSubobject<UPointLightComponent>(TEXT("HighlightDown"));
-	if (ModuleHighlightDown)
+	ModuleDropTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("ModuleDropTimeline"));
+	
+	static ConstructorHelpers::FObjectFinder<UCurveVector> CurveVector (TEXT("'/Game/OfPlanetsAndGuns/Interactables/Curve_Drop_Vector.Curve_Drop_Vector'"));
+	if (CurveVector.Succeeded())
 	{
-		ModuleHighlightDown->SetupAttachment(Sphere);
-
-		ModuleHighlightDown->SetVisibility(false);
-		ModuleHighlightDown->SetAttenuationRadius(0);
-		ModuleHighlightDown->SetIntensity(0);
-		ModuleHighlightDown->CastShadows = false;
-		
+		CurveModuleDropVector = CurveVector.Object;
 	}
 }
 
@@ -57,34 +49,42 @@ void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	SpawnLocation = GetActorLocation();
+
+	ModuleDropHighlight->Deactivate();
+	ModuleDropHighlight->bAutoActivate = false;
+
 	// This method is call for activate physical behavior when module is in the scene
 	CheckIfPhysical();
 	Sphere->SetSimulatePhysics(false);
 	
-	FLinearColor LightColor = GetColorFromRarity(Level);
+	ModuleDropTimeline->SetLooping(false);
+	ModuleDropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 
-	ModuleHighlightUp->SetLightColor(LightColor);
-	ModuleHighlightDown->SetLightColor(LightColor);
+	OnModuleDropTimelineProgress.BindUFunction(this, FName("ModuleDropTimelineProgress"));
+	ModuleDropTimeline->AddInterpVector(CurveModuleDropVector, OnModuleDropTimelineProgress, FName("ModuleDropTimelinePropertyName"));
 
-	if (GetParentActor() == nullptr)
-	{		
-		ModuleHighlightUp->SetVisibility(true);
-		ModuleHighlightUp->SetAttenuationRadius(0);
-		ModuleHighlightUp->SetIntensity(0);
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDropDir.X = FMath::Sin(RandomAngle);
+	RandomDropDir.Y = FMath::Cos(RandomAngle);
 
-		ModuleHighlightDown->SetVisibility(true);
-		ModuleHighlightDown->SetAttenuationRadius(0);
-		ModuleHighlightDown->SetIntensity(0);
+	LoadParticleFromRarity(GetRarity());
 
-		FVector RelativeLocation = ModuleHighlightUp->GetRelativeLocation();
-		RelativeLocation.Z -= 30;
-		ModuleHighlightUp->SetRelativeLocation(RelativeLocation);
+	if (ModuleDropHighlightParticle != nullptr)
+	{
+		ModuleDropHighlight->SetTemplate(ModuleDropHighlightParticle);
 
-		RelativeLocation = ModuleHighlightDown->GetRelativeLocation();
-		RelativeLocation.Z += 20;
-		ModuleHighlightDown->SetRelativeLocation(RelativeLocation);
+		if (GetParentActor() == nullptr)
+		{
+			ModuleDropHighlight->Activate();
+			ModuleDropHighlight->SetVisibility(true);
+			ModuleDropHighlight->bAutoActivate = true;
 
-		ModuleMesh->SetWorldScale3D(FVector(2, 2, 2));
+			ModuleMesh->SetWorldScale3D(FVector(2, 2, 2));
+
+			ModuleDropTimeline->PlayFromStart();
+		}
 	}
 }
 
@@ -98,12 +98,7 @@ void AOPAG_ModuleBase::Tick(float DeltaTime)
 	// animation to let light grow and intensify
 	if (GetParentActor() == nullptr && CurrentHighlightIncreaseSizeFactor < HighlightIncreaseSizeFactor)
 	{
-		CurrentHighlightIncreaseSizeFactor += DeltaTime;
-		ModuleHighlightUp->SetAttenuationRadius(CurrentHighlightIncreaseSizeFactor * RadiusIncreaseFactor);
-		ModuleHighlightUp->SetIntensity(CurrentHighlightIncreaseSizeFactor * IntensityIncreaseFactor);
-
-		ModuleHighlightDown->SetAttenuationRadius(CurrentHighlightIncreaseSizeFactor * RadiusIncreaseFactor);
-		ModuleHighlightDown->SetIntensity(CurrentHighlightIncreaseSizeFactor * IntensityIncreaseFactor);
+		CurrentHighlightIncreaseSizeFactor += DeltaTime;		
 	}
 }
 
@@ -175,34 +170,31 @@ int AOPAG_ModuleBase::GetEquippableFireTypes() const
 {
 	return EquippableFireTypes;
 }
-FLinearColor AOPAG_ModuleBase::GetColorFromRarity(int Value)
+void AOPAG_ModuleBase::LoadParticleFromRarity(EModuleRarity ModuleRarity)
 {
-	FLinearColor Color = FLinearColor(1, 1, 1);
 
-	switch (Value)
+	switch (ModuleRarity)
 	{
-	case 1:
-		Color = FLinearColor(1, 1, 1);	// White
+	case EModuleRarity::Common:
+		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Common.P_Modules_Common'"), NULL, LOAD_None, NULL);
 		break;
 
-	case 2:
-		Color = FLinearColor(0, 255, 0.05);	// Green
+	case EModuleRarity::Uncommon:
+		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Uncommon.P_Modules_Uncommon'"), NULL, LOAD_None, NULL);
 		break;
 
-	case 3:
-		Color = FLinearColor(0, 0.09, 1);	// Blue
+	case EModuleRarity::Rare:
+		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Rare.P_Modules_Rare'"), NULL, LOAD_None, NULL);
 		break;
 
-	case 4:
-		Color = FLinearColor(1, 0, 0.08);	// Purple
+	case EModuleRarity::Epic:
+		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Epic.P_Modules_Epic'"), NULL, LOAD_None, NULL);
 		break;
 
-	case 5:
-		Color = FLinearColor(1, 0.5, 0);	// Gold
+	case EModuleRarity::Legendary:
+		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Legendary.P_Modules_Legendary'"), NULL, LOAD_None, NULL);
 		break;
 	}
-
-	return Color;
 }
 #pragma endregion Get
 
@@ -338,7 +330,6 @@ void AOPAG_ModuleBase::OnAttach(const EModuleBrand NewBrand,const FOPAG_GunStats
 void AOPAG_ModuleBase::OnDetach()
 {
 }
-
 #pragma endregion Attachment
 
 #pragma region Physics
@@ -358,3 +349,15 @@ void AOPAG_ModuleBase::CheckIfPhysical() const
 	}
 }
 #pragma endregion Physics
+
+#pragma region Drop
+void AOPAG_ModuleBase::ModuleDropTimelineProgress(FVector Value)
+{
+	FVector NewLocation = SpawnLocation;
+	NewLocation.X += RandomDropDir.X * Value.X * ModuleDropCurveXFactor;
+	NewLocation.Y += RandomDropDir.Y * Value.X * ModuleDropCurveXFactor;
+	NewLocation.Z += Value.Z * ModuleDropCurveZFactor;
+
+	SetActorLocation(NewLocation);
+}
+#pragma endregion Drop
