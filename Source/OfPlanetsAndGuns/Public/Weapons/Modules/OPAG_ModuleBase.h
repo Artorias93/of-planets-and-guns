@@ -5,6 +5,7 @@
 #include "OPAG_ModuleStats.h"
 #include "GameFramework/Actor.h"
 #include "Interactables/OPAG_InteractableInterface.h"
+#include "Components/TimelineComponent.h"
 #include "OPAG_ModuleBase.generated.h"
 
 class USphereComponent;
@@ -71,6 +72,29 @@ protected:
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float IntensityIncreaseFactor = 100000;
 
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UTimelineComponent* ModuleDropTimeline;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UCurveVector* CurveModuleDropVector;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float ModuleDropCurveXFactor = 200;
+
+	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float ModuleDropCurveZFactor = 100;
+
+	FOnTimelineVector OnModuleDropTimelineProgress;
+	
+	UPROPERTY()
+	FVector ModuleDropTimelinePropertyName;
+
+	UPROPERTY()
+	FVector RandomDropDir;
+
+	UPROPERTY()
+		FVector SpawnLocation;
+	
 protected:
 	FTimerHandle FlyRotationHandle;
 	
@@ -122,6 +146,9 @@ public:
 	void SetStats(const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers);
 	void SetStats(const FOPAG_GunStats NewStats);
 
+	UFUNCTION()
+	void ModuleDropTimelineProgress(FVector Value);
+	
 public:
 	FORCEINLINE USphereComponent* GetModuleSphereComponent() { return Sphere; }
 
