@@ -7,7 +7,6 @@
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Curves/CurveVector.h"
 #include "Particles/ParticleSystem.h"
-#include "Components/PointLightComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 
 AOPAG_ModuleBase::AOPAG_ModuleBase()
@@ -91,15 +90,6 @@ void AOPAG_ModuleBase::BeginPlay()
 void AOPAG_ModuleBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// Need to disable the physics into the Tick to make it apply effectively, probably it's set true after begin play when droped on enemy killed
-	Sphere->SetSimulatePhysics(false);
-
-	// animation to let light grow and intensify
-	if (GetParentActor() == nullptr && CurrentHighlightIncreaseSizeFactor < HighlightIncreaseSizeFactor)
-	{
-		CurrentHighlightIncreaseSizeFactor += DeltaTime;		
-	}
 }
 
 #pragma region Get
