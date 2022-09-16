@@ -146,6 +146,7 @@ public:
 
 	// Reload system
 	virtual void Reload();
+	void StopReloading();
 
 	// Subsystem shooting
 	UFUNCTION(BlueprintCallable) float CalculateSpreadRadius() const;

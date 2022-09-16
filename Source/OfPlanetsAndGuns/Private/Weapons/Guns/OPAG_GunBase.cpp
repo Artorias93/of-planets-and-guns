@@ -349,6 +349,14 @@ void AOPAG_GunBase::Reload()
 	//UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
 }
 
+void AOPAG_GunBase::StopReloading()
+{
+	// Check the bool when interrupter the reloading
+	bIsReloading = false;
+
+	GetWorld()->GetTimerManager().ClearTimer(ReloadHandle);
+}
+
 void AOPAG_GunBase::WaitReloadingTimer()
 {
 	// Check the bool when interrupter the reloading

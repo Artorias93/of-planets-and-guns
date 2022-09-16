@@ -570,7 +570,17 @@ void AOPAG_Player::AttachDefaultGuns()
 
 void AOPAG_Player::SwapGuns()
 {
-	if(bInspecting)	return;
+	if (bInspecting)	StopInspectGun();
+
+	// Clear reload, update the last fire time and re-attach the clip on gun
+	if (!CurrentGun->CanReloading())
+	{
+		CurrentGun->StopReloading();
+		AttachMagazineToGunNotify();
+
+		// Update last fire time
+		LastFireTime = GetGameTimeSinceCreation();
+	}
 
 	if (PrimaryGunComponent->GetChildActor() && SecondaryGunComponent->GetChildActor())
 	{
@@ -612,6 +622,8 @@ void AOPAG_Player::SwapGuns()
 
 void AOPAG_Player::ReloadGun()
 {
+	if (bInspecting)	StopInspectGun();
+
 	if (CurrentGun->CanReloading())
 	{
 		if (bIsInADS)
@@ -649,15 +661,25 @@ const bool AOPAG_Player::IsPrimaryGunActive() const
 
 void AOPAG_Player::InspectGun()
 {
-	//bInspecting = true;
+	if(bInspecting)	return;
+
 	Mesh1P->GetAnimInstance()->Montage_Play(InspectGunMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
+	bInspecting = true;
+}
+
+void AOPAG_Player::StopInspectGun()
+{
+	Mesh1P->GetAnimInstance()->Montage_Stop(.01f, InspectGunMontageToPlay);
+	bInspecting = false;
 }
 #pragma endregion Guns
 
 #pragma region Shooting Behavior
 void AOPAG_Player::StartShooting()
 {
-	if (CurrentGun->CanShoot() && !bInspecting)
+	if(bInspecting)	StopInspectGun();
+
+	if (CurrentGun->CanShoot())
 	{
 		const float FirePeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().FireRate);
 		if (GetGameTimeSinceCreation() - LastFireTime > FirePeriod)
@@ -669,7 +691,9 @@ void AOPAG_Player::StartShooting()
 
 void AOPAG_Player::KeepShooting()
 {
-	if (CurrentGun->CanShoot() && !bInspecting)
+	if (bInspecting)	StopInspectGun();
+
+	if (CurrentGun->CanShoot())
 	{
 		const float FirePeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().FireRate);
 		float ElapsedTime = GetGameTimeSinceCreation() - LastFireTime;
