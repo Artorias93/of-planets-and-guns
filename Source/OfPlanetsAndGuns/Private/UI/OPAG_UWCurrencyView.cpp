@@ -34,8 +34,9 @@ void UOPAG_UWCurrencyView::BindEvents()
 		EMS->HideGoldInGame.AddUniqueDynamic(this, &UOPAG_UWCurrencyView::HideGold);
 	}
 
-	GoldIcon->SetIsEnabled(false);
-	GoldText->SetIsEnabled(false);
+	GoldIcon->SetVisibility(ESlateVisibility::Hidden);
+	GoldText->SetVisibility(ESlateVisibility::Hidden);
+	
 }
 
 void UOPAG_UWCurrencyView::IncrementPotionsAmount()
@@ -114,8 +115,8 @@ void UOPAG_UWCurrencyView::ShowGold()
 {
 	if (GoldText && GoldIcon)
 	{
-		GoldIcon->SetIsEnabled(true);
-		GoldText->SetIsEnabled(true);
+		GoldIcon->SetVisibility(ESlateVisibility::Visible);
+		GoldText->SetVisibility(ESlateVisibility::Visible);
 	}
 }
 
@@ -123,7 +124,7 @@ void UOPAG_UWCurrencyView::HideGold()
 {
 	if (GoldText && GoldIcon)
 	{
-		GoldIcon->SetIsEnabled(false);
-		GoldText->SetIsEnabled(false);
+		GoldIcon->SetVisibility(ESlateVisibility::Hidden);
+		GoldText->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
