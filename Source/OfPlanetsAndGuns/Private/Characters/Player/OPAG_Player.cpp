@@ -148,6 +148,10 @@ void AOPAG_Player::Tick(float DeltaTime)
 	SpringArm->SetRelativeLocation(NewLocationSpring);
 
 	// Update aim behavior
+	if (bIsTryingToADSDuringReload)
+	{
+		SwitchToADSCamera();
+	}
 	if (bIsInADS)
 	{
 		MakingAimCameraRotate();
@@ -608,8 +612,13 @@ void AOPAG_Player::SwapGuns()
 
 void AOPAG_Player::ReloadGun()
 {
-	if (CurrentGun->CanReloading() && !bIsInADS)
+	if (CurrentGun->CanReloading())
 	{
+		if (bIsInADS)
+		{
+			ResetFPSCamera();
+			bIsTryingToADSDuringReload = true;
+		}
 		// Invoke reload to current gun
 		CurrentGun->Reload();
 		SMS->PlayWeaponSounds(PrimaryGun, EWeaponSoundAction::Reload);
@@ -795,11 +804,16 @@ void AOPAG_Player::MakingAimCameraRotate()
 
 void AOPAG_Player::SwitchToADSCamera()
 {
-	if(!CurrentGun->CanAim() || bInspecting)	return;
+	if (!CurrentGun->CanAim() || bInspecting)
+	{
+		bIsTryingToADSDuringReload = true;
+		return;
+	}
 
 	// Set ADS and initialize new camera view
 	AActor* NewViewTarget = nullptr;
 	bIsInADS = true;
+	bIsTryingToADSDuringReload = false;
 
 	const bool bIsPrimaryGun = IsPrimaryGunActive();
 	if (bIsPrimaryGun)
@@ -823,6 +837,7 @@ void AOPAG_Player::SwitchToADSCamera()
 void AOPAG_Player::ResetFPSCamera()
 {
 	bIsInADS = false;
+	bIsTryingToADSDuringReload = false;
 	CurrentCamera = Camera;
 
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();

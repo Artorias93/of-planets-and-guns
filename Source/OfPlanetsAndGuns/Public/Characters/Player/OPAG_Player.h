@@ -229,6 +229,7 @@ private:
 	bool bRunning = false;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
+	bool bIsTryingToADSDuringReload = false;
 	bool bHasAlreadyLooked = false;
 	bool bIsShieldBroken = false;
 
