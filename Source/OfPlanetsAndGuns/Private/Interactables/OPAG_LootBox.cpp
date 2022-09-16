@@ -172,7 +172,7 @@ void AOPAG_LootBox::SpawnItem()
 	}
 
 	// Apply force for any items
-	if (Item->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
+	if (Item && Item->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
 	{
 		float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
 		RandomDropDir.X = FMath::Sin(RandomAngle);
