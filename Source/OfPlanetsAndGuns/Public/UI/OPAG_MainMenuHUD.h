@@ -10,12 +10,13 @@ class ULevelSequencePlayer;
 UENUM()
 enum EMenuScreen
 {
-	Start     UMETA(DisplayName = "Start"),
-	MainMenu     UMETA(DisplayName = "MainMenu"),
-	Options      UMETA(DisplayName = "Options"),
-	Exit      UMETA(DisplayName = "Exit"),
-	QuitGame      UMETA(DisplayName = "QuitGame"),
-	PlanetSelection   UMETA(DisplayName = "PlanetSelection")
+	Start             UMETA(DisplayName = "Start"),
+	MainMenu          UMETA(DisplayName = "MainMenu"),
+	LevelSelection    UMETA(DisplayName = "LevelSelection"),
+	Level1            UMETA(DisplayName = "Level1"),
+	Options           UMETA(DisplayName = "Options"),
+	Exit              UMETA(DisplayName = "Exit"),
+	QuitGame          UMETA(DisplayName = "QuitGame")	
 };
 
 UCLASS()
@@ -30,48 +31,28 @@ private:
 	UPROPERTY()
 	ULevelSequencePlayer* StartLevelSequencePlayer;
 	UPROPERTY()
+	ULevelSequencePlayer* LevelSelectionLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* Level1LevelSequencePlayer;
+	UPROPERTY()
 	ULevelSequencePlayer* OptionsLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* OptionsToMenuLevelSequencePlayer;
 	UPROPERTY()
 	ULevelSequencePlayer* ExitLevelSequencePlayer;
 	UPROPERTY()
 	ULevelSequencePlayer* QuitGameLevelSequencePlayer;
-	
-	UPROPERTY()
-	class UOPAG_UWMainMenuView* MainMenuViewWidget;
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<UOPAG_UWMainMenuView> MainMenuViewWidgetClass;
-	UPROPERTY()
-	class UOPAG_UWConfirmExitView* ConfirmExitViewWidget;
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<UOPAG_UWConfirmExitView> ConfirmExitViewWidgetClass;
-	UPROPERTY()
-	class UOPAG_UWHubView* HubViewWidget;
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-	TSubclassOf<UOPAG_UWHubView> HubViewWidgetClass;
 
 	//Functions
 
 public:
 	virtual void DrawHUD() override;
 
-	UFUNCTION()
-	void ShowHubView();
-
-	UFUNCTION()
-	void ShowMainMenu();
-	UFUNCTION()
-	void HideMainMenu();
-	UFUNCTION()
-	void ShowExitMenu();
-	UFUNCTION()
-	void HideExitMenu();
-	UFUNCTION()
-	void MenuCloseGame();
-	UFUNCTION()
-	void ShowOptionsMenu();
-	UFUNCTION()
-	void HideOptionsMenu();
-
+	//TODO: DEBUG FUNCTIONS IN EDITOR, TO BE DELETED
+	UFUNCTION(CallInEditor)
+	void GoFromMainMenuToLevelSelection();
+	UFUNCTION(CallInEditor)
+	void GoFromLevelSelectionToMainMenu();
 	UFUNCTION(CallInEditor)
 	void GoFromMainMenuToExit();
 	UFUNCTION(CallInEditor)
@@ -86,6 +67,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-//private:
-	//void BindEvents();	
+private:
+	UFUNCTION()
+	void StartLevel1();	
 };

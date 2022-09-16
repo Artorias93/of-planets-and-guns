@@ -18,14 +18,15 @@ void UOPAG_UWMainMenuView::BindEvents()
 void UOPAG_UWMainMenuView::NewRunButtonClicked()
 {
 	if (AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
-		MyHUD->ShowHubView();
+	{
+		MyHUD->SequencePlaySelection(MainMenu, LevelSelection);
+	}
 }
 
 void UOPAG_UWMainMenuView::OptionsButtonClicked()
 {
 	if (AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
-		//MyHUD->HideMainMenu();
 		MyHUD->SequencePlaySelection(MainMenu, Options);
 	}	
 }
