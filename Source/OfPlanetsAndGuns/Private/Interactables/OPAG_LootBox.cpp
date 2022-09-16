@@ -7,6 +7,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 
+#include "Materials/MaterialInstanceDynamic.h"
+
 #include "Characters/Player/OPAG_Player.h"
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -50,6 +52,14 @@ void AOPAG_LootBox::BeginPlay()
 {
 	Super::BeginPlay();
 	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+	
+
+	
+	// Make lid material color pulse
+	auto Material = Lid->GetMaterial(0);
+	DynamicMaterial = UMaterialInstanceDynamic::Create(Material, NULL);
+	Lid->SetMaterial(0, DynamicMaterial);
+	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 0.0f);
 }
 
 void AOPAG_LootBox::Tick(float DeltaTime)
@@ -67,6 +77,9 @@ void AOPAG_LootBox::Unlock()
 {
 	ActivationParticleEffect();
 	bIsInteractable = true;
+
+	// Make Lid Material Pulse
+	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 1.0f);
 }
 
 void AOPAG_LootBox::SetModules(FOPAG_GunModules& ModulesStruct)
@@ -109,6 +122,9 @@ void AOPAG_LootBox::Interact_Implementation()
 
 	// Active Timer for spawn items
 	SpawnItem();
+
+	// Make Lid Material Stop Pulse
+	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 0.0f);
 }
 
 bool AOPAG_LootBox::CanInteract_Implementation()
@@ -151,6 +167,7 @@ void AOPAG_LootBox::SpawnItem()
 			}
 		}
 	}
+
 
 	// Re-call this method for any items
 	GetWorld()->GetTimerManager().SetTimer(SpawnItemsHandle, this, &AOPAG_LootBox::SpawnItem, 0.5, false);

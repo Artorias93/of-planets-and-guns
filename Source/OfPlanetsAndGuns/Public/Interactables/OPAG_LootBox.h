@@ -7,6 +7,7 @@
 #include "OPAG_LootBox.generated.h"
 
 class UNiagaraSystem;
+class UMaterialInstanceDynamic;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_InteractableInterface
@@ -67,6 +68,7 @@ public:
 	void SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList);
 	void Unlock();
 	void SetModules(FOPAG_GunModules& ModulesStruct);
+	UMaterialInstanceDynamic* DynamicMaterial; //////////////////////////////////////////////////////////////////////
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) void Interact();
 	virtual void Interact_Implementation() override;
