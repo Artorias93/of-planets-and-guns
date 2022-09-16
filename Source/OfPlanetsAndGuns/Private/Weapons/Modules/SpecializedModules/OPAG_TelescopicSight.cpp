@@ -52,10 +52,10 @@ void AOPAG_TelescopicSight::BeginPlay()
 	ScopeView->SetVisibility(false);
 }
 
-void AOPAG_TelescopicSight::OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand,
+void AOPAG_TelescopicSight::OnAttach(const EModuleBrand NewBrand,
                                      const FOPAG_GunStats NewStats, const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
-	Super::OnAttach(NewRarity, NewBrand, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
+	Super::OnAttach(NewBrand, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
 
 	if (!bIsAttachedToPlayer) return;
 

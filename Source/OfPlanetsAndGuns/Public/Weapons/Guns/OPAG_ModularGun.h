@@ -95,7 +95,7 @@ protected:
 
 	// Create and Attach module behavior
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const;
-	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const
+	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const
 	                  EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
 
 	// Ammo behavior

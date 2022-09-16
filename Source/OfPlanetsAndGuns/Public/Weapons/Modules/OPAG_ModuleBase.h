@@ -26,50 +26,47 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* ModuleMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UPointLightComponent* ModuleHighlightUp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UPointLightComponent* ModuleHighlightDown;
-
 protected:
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FString Name;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	int Level = 0;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float PriceBase = .0f;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EModuleTypes Type;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	EModuleRarity Rarity;
-
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	EModuleBrand Brand;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FOPAG_GunStats Stats;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", Bitmask, BitmaskEnum = "EFireTypes"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", Bitmask, BitmaskEnum = "EFireTypes"))
 	int EquippableFireTypes;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float PriceMuliplierPercentage = 1.f;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystemComponent* ModuleDropHighlight;
+
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* ModuleDropHighlightParticle;
+
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float HighlightIncreaseSizeFactor = 0.5;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float CurrentHighlightIncreaseSizeFactor = 0;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float RadiusIncreaseFactor = 250;
 
-	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float IntensityIncreaseFactor = 100000;
 
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -117,14 +114,13 @@ public:
 	FString InteractString_Implementation() override;
 
 	// Attach module to gun
-	virtual void OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
+	virtual void OnAttach(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
 	                      NewEquippableFireTypes, const bool bIsAttachedToPlayer);
 
 	// Detach module to gun
 	virtual void OnDetach();
 private:
 	void CheckIfPhysical() const;
-	void SelectRarity();
 
 public:
 	// Getter
@@ -138,10 +134,10 @@ public:
 	EModuleBrand GetBrand() const;
 	FOPAG_GunStats GetStats() const;
 	int GetEquippableFireTypes() const;
-	FLinearColor GetColorFromRarity(int Value);
+	void LoadParticleFromRarity(EModuleRarity ModuleRarity);
 
 	//Setter
-	void SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats,
+	void SetParameters(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats,
 		const int NewEquippableFireTypes);
 	void SetStats(const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers);
 	void SetStats(const FOPAG_GunStats NewStats);

@@ -19,7 +19,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
+	virtual void OnAttach(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
 	                      NewEquippableFireTypes, const bool bIsAttachedToPlayer) override;
 
 public:
