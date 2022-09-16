@@ -1009,7 +1009,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	OldGun->SetAmmoParams(OldAmmoCurrent, OldAmmoMax);
 	OldGun->CreateAndAttachAllModules(OldGunModules);
 	OldGun->DetachAllModules(CalculateThrowForce());
-	OldGun->ApplyForce_Implementation(CalculateThrowForce());
+	//OldGun->ApplyForce_Implementation(CalculateThrowForce());
 }
 
 const FVector AOPAG_Player::CalculateModuleSpawnLocation() const

@@ -55,19 +55,7 @@ protected:
 	class UParticleSystemComponent* ModuleDropHighlight;
 
 	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UParticleSystem* ModuleDropHighlightParticle;
-
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float HighlightIncreaseSizeFactor = 0.5;
-
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float CurrentHighlightIncreaseSizeFactor = 0;
-
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float RadiusIncreaseFactor = 250;
-
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float IntensityIncreaseFactor = 100000;
+	class UParticleSystem* ModuleDropHighlightParticle;	
 
 	UPROPERTY(Category = "OPAG | Gun | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UTimelineComponent* ModuleDropTimeline;

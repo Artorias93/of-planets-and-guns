@@ -23,6 +23,7 @@
 #include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "Items/OPAG_Barrel.h"
+#include "Curves/CurveVector.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -31,7 +32,10 @@ AOPAG_GunBase::AOPAG_GunBase()
 	Receiver = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Receiver"));
 	Receiver->CanCharacterStepUpOn = ECB_Owner;
 	Receiver->SetCollisionProfileName("Weapon");
+
 	RootComponent = Receiver;
+
+	Receiver->SetSimulatePhysics(false);
 
 	ADSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ADSCamera"));
 	if (ADSCamera)
@@ -44,11 +48,21 @@ AOPAG_GunBase::AOPAG_GunBase()
 		ADSCamera->Mobility = EComponentMobility::Movable;
 		ADSCamera->SetupAttachment(RootComponent);
 	}
+
+	GunDropTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("GunDropTimeline"));
+
+	static ConstructorHelpers::FObjectFinder<UCurveVector> CurveVector(TEXT("'/Game/OfPlanetsAndGuns/Interactables/Curve_Drop_Vector.Curve_Drop_Vector'"));
+	if (CurveVector.Succeeded())
+	{
+		CurveGunDropVector = CurveVector.Object;
+	}
 }
 
 void AOPAG_GunBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GunSpawnLocation = GetActorLocation();
 
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
@@ -56,6 +70,22 @@ void AOPAG_GunBase::BeginPlay()
 	check(EMS);
 
 	AmmoCurrent = GetStatsTotal().ClipSize;
+
+	GunDropTimeline->SetLooping(false);
+	GunDropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+
+	OnGunDropTimelineProgress.BindUFunction(this, FName("GunDropTimelineProgress"));
+	GunDropTimeline->AddInterpVector(CurveGunDropVector, OnGunDropTimelineProgress, FName("GunDropTimelinePropertyName"));
+
+	if (GetParentActor() == nullptr)
+	{
+		// Find a random angle in order to determine the direction where the module will drop
+		float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+		RandomDropDir.X = FMath::Sin(RandomAngle);
+		RandomDropDir.Y = FMath::Cos(RandomAngle);
+
+		GunDropTimeline->PlayFromStart();
+	}
 }
 
 void AOPAG_GunBase::Tick(float DeltaTime)
@@ -338,6 +368,7 @@ TArray<AActor*> AOPAG_GunBase::CheckWhatActorsIgnoreLinetrace()
 
 	return Objects;
 }
+
 #pragma endregion Shooting Utility
 
 #pragma region Reload
@@ -375,3 +406,15 @@ bool AOPAG_GunBase::CanAim() const
 	return !bIsReloading;
 }
 #pragma endregion Checking
+
+#pragma region Drop
+void AOPAG_GunBase::GunDropTimelineProgress(FVector Value)
+{
+	FVector NewLocation = GunSpawnLocation;
+	NewLocation.X += RandomDropDir.X * Value.X * GunDropCurveXFactor;
+	NewLocation.Y += RandomDropDir.Y * Value.X * GunDropCurveXFactor;
+	NewLocation.Z += Value.Z * GunDropCurveZFactor;
+
+	SetActorLocation(NewLocation);
+}
+#pragma endregion Drop
