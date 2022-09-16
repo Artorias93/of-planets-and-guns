@@ -4,7 +4,6 @@
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "GameFramework/Actor.h"
 #include "Weapons/Guns/OPAG_GunState.h"
-#include "Components/TimelineComponent.h"
 #include "OPAG_LootBox.generated.h"
 
 class UNiagaraSystem;
@@ -47,23 +46,6 @@ public:
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	int NumberOfModulesToSpawn = 1;
 
-	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	UTimelineComponent* DropTimeline;
-
-	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	class UCurveVector* CurveDropVector;
-
-	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	float DropCurveXFactor;
-
-	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	float DropCurveZFactor;
-
-	FOnTimelineVector OnDropTimelineProgress;
-	
-	UPROPERTY()
-	FVector DropTimelinePropertyName;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UNiagaraSystem* ActivationParticles;
 
@@ -76,9 +58,6 @@ private:
 
 	UPROPERTY()
 		AActor* SpawnedItem;
-
-	UPROPERTY()
-		FVector RandomDropDir;
 
 protected:
 	virtual void BeginPlay() override;
@@ -99,9 +78,6 @@ public:
 	virtual bool WillChangeInteractStateDynamically_Implementation() override;
 
 	FString InteractString_Implementation() override;
-
-	UFUNCTION()
-	void DropTimelineProgress(FVector Value);
 
 	UFUNCTION() void SpawnItem();
 

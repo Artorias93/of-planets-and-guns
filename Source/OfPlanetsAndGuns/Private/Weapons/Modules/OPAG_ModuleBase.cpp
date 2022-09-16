@@ -5,6 +5,7 @@
 #include "Characters/Player/OPAG_Player.h"
 #include <Kismet/GameplayStatics.h>
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
+#include "Curves/CurveVector.h"
 #include "Components/PointLightComponent.h"
 
 AOPAG_ModuleBase::AOPAG_ModuleBase()
@@ -51,12 +52,24 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 		ModuleHighlightDown->CastShadows = false;
 		
 	}
+
+	ModuleDropTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("ModuleDropTimeline"));
+	
+	static ConstructorHelpers::FObjectFinder<UCurveVector> CurveVector (TEXT("'/Game/OfPlanetsAndGuns/Interactables/Curve_Drop_Vector.Curve_Drop_Vector'"));
+	if (CurveVector.Succeeded())
+	{
+		CurveModuleDropVector = CurveVector.Object;
+	}
 }
 
 void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	SpawnLocation = GetActorLocation();
 
+	//CurveModuleDropVector = LoadObject<UCurveVector>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Interactables/Curve_Drop_Vector.Curve_Drop_Vector'"), NULL, LOAD_None, NULL);
+	
 	// Generate rarity of module
 	SelectRarity();
 	
@@ -64,6 +77,17 @@ void AOPAG_ModuleBase::BeginPlay()
 	CheckIfPhysical();
 	Sphere->SetSimulatePhysics(false);
 	
+	ModuleDropTimeline->SetLooping(false);
+	ModuleDropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+
+	OnModuleDropTimelineProgress.BindUFunction(this, FName("ModuleDropTimelineProgress"));
+	ModuleDropTimeline->AddInterpVector(CurveModuleDropVector, OnModuleDropTimelineProgress, FName("ModuleDropTimelinePropertyName"));
+
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDropDir.X = FMath::Sin(RandomAngle);
+	RandomDropDir.Y = FMath::Cos(RandomAngle);
+
 	FLinearColor LightColor = GetColorFromRarity(Level);
 
 	ModuleHighlightUp->SetLightColor(LightColor);
@@ -88,7 +112,13 @@ void AOPAG_ModuleBase::BeginPlay()
 		ModuleHighlightDown->SetRelativeLocation(RelativeLocation);
 
 		ModuleMesh->SetWorldScale3D(FVector(2, 2, 2));
+
+		ModuleDropTimeline->PlayFromStart();
 	}
+
+	
+
+		
 }
 
 void AOPAG_ModuleBase::Tick(float DeltaTime)
@@ -371,3 +401,15 @@ void AOPAG_ModuleBase::SelectRarity()
 	}
 }
 #pragma endregion Other
+
+#pragma region Drop
+void AOPAG_ModuleBase::ModuleDropTimelineProgress(FVector Value)
+{
+	FVector NewLocation = SpawnLocation;
+	NewLocation.X += RandomDropDir.X * Value.X * ModuleDropCurveXFactor;
+	NewLocation.Y += RandomDropDir.Y * Value.X * ModuleDropCurveXFactor;
+	NewLocation.Z += Value.Z * ModuleDropCurveZFactor;
+
+	SetActorLocation(NewLocation);
+}
+#pragma endregion Drop

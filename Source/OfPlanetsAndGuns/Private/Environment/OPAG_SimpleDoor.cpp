@@ -49,7 +49,8 @@ void AOPAG_SimpleDoor::OpenDoor_Implementation()
 	CollisionVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	if (Timeline != nullptr && !bIsOpen)
 	{
-		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Open);
+		SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+		if (SMS) SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Open);
 		Timeline->PlayFromStart();
 		bIsOpen = true;
 	}
@@ -60,7 +61,8 @@ void AOPAG_SimpleDoor::CloseDoor_Implementation()
 	CollisionVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	if (Timeline != nullptr && bIsOpen)
 	{
-		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Close);
+		SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+		if (SMS) SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Doors_Close);
 		Timeline->ReverseFromEnd();
 		bIsOpen = false;
 	}

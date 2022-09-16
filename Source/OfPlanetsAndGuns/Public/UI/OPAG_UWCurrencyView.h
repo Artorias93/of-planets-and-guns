@@ -29,11 +29,15 @@ class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
 		UImage* PotionsIcon;
 	UPROPERTY(meta = (BindWidget))
 		UImage* BoltsIcon;
+	UPROPERTY(meta = (BindWidget))
+		UImage* GoldIcon;
 
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* PotionsText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* BoltsText;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* GoldText;
 
 public:
 	//Unused
@@ -52,6 +56,12 @@ public:
 		void UpdateBoltsAmount(const int CurrentValue);
 	UFUNCTION()
 		void UpdatePotionsAmount(const int CurrentValue);
+	UFUNCTION()
+		void UpdateGoldValue(const int Value); 
+	UFUNCTION()
+		void ShowGold(); 
+	UFUNCTION()
+		void HideGold();
 
 	void NativeConstruct();
 

@@ -23,6 +23,7 @@
 #include "Items/OPAG_Drop.h"
 #include "Components/CapsuleComponent.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
+#include "Weapons/Modules/OPAG_MagazineBase.h"
 #include "Characters/Player/OPAG_PlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
@@ -926,6 +927,12 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 			OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
 		if (bResult)
 		{
+			AOPAG_MagazineBase* Magazine = Cast<AOPAG_MagazineBase>(Module);
+			if (Magazine) 
+			{
+				EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
+			}
+
 			Module->Destroy();
 
 			// Control if gun equip the module
