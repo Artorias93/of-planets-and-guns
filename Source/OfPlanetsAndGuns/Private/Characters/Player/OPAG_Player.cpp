@@ -23,6 +23,7 @@
 #include "Items/OPAG_Drop.h"
 #include "Components/CapsuleComponent.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
+#include "Weapons/Modules/OPAG_MagazineBase.h"
 #include "Characters/Player/OPAG_PlayerState.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
@@ -147,6 +148,10 @@ void AOPAG_Player::Tick(float DeltaTime)
 	SpringArm->SetRelativeLocation(NewLocationSpring);
 
 	// Update aim behavior
+	if (bIsTryingToADSDuringReload)
+	{
+		SwitchToADSCamera();
+	}
 	if (bIsInADS)
 	{
 		MakingAimCameraRotate();
@@ -565,7 +570,17 @@ void AOPAG_Player::AttachDefaultGuns()
 
 void AOPAG_Player::SwapGuns()
 {
-	if(bInspecting)	return;
+	if (bInspecting)	StopInspectGun();
+
+	// Clear reload, update the last fire time and re-attach the clip on gun
+	if (!CurrentGun->CanReloading())
+	{
+		CurrentGun->StopReloading();
+		AttachMagazineToGunNotify();
+
+		// Update last fire time
+		LastFireTime = GetGameTimeSinceCreation();
+	}
 
 	if (PrimaryGunComponent->GetChildActor() && SecondaryGunComponent->GetChildActor())
 	{
@@ -607,8 +622,15 @@ void AOPAG_Player::SwapGuns()
 
 void AOPAG_Player::ReloadGun()
 {
-	if (CurrentGun->CanReloading() && !bIsInADS)
+	if (bInspecting)	StopInspectGun();
+
+	if (CurrentGun->CanReloading())
 	{
+		if (bIsInADS)
+		{
+			ResetFPSCamera();
+			bIsTryingToADSDuringReload = true;
+		}
 		// Invoke reload to current gun
 		CurrentGun->Reload();
 		SMS->PlayWeaponSounds(PrimaryGun, EWeaponSoundAction::Reload);
@@ -639,15 +661,25 @@ const bool AOPAG_Player::IsPrimaryGunActive() const
 
 void AOPAG_Player::InspectGun()
 {
-	//bInspecting = true;
+	if(bInspecting)	return;
+
 	Mesh1P->GetAnimInstance()->Montage_Play(InspectGunMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
+	bInspecting = true;
+}
+
+void AOPAG_Player::StopInspectGun()
+{
+	Mesh1P->GetAnimInstance()->Montage_Stop(.01f, InspectGunMontageToPlay);
+	bInspecting = false;
 }
 #pragma endregion Guns
 
 #pragma region Shooting Behavior
 void AOPAG_Player::StartShooting()
 {
-	if (CurrentGun->CanShoot() && !bInspecting)
+	if(bInspecting)	StopInspectGun();
+
+	if (CurrentGun->CanShoot())
 	{
 		const float FirePeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().FireRate);
 		if (GetGameTimeSinceCreation() - LastFireTime > FirePeriod)
@@ -659,7 +691,9 @@ void AOPAG_Player::StartShooting()
 
 void AOPAG_Player::KeepShooting()
 {
-	if (CurrentGun->CanShoot() && !bInspecting)
+	if (bInspecting)	StopInspectGun();
+
+	if (CurrentGun->CanShoot())
 	{
 		const float FirePeriod = AOPAG_GunBase::CalculatePeriod(CurrentGun->GetStatsTotal().FireRate);
 		float ElapsedTime = GetGameTimeSinceCreation() - LastFireTime;
@@ -740,11 +774,14 @@ void AOPAG_Player::Lookup(const FInputActionValue& Value)
 	if (LookupScale != 0.0f)
 	{
 		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
-		//UE_LOG(LogTemp, Warning, TEXT("Pitch: %f"), LookupScale);
 
-		if (AccumulatedRecoilDeviation.Pitch > .0f)
+		if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale > 0.f)
 		{
 			AccumulatedRecoilDeviation.Pitch -= LookupScale;
+		}
+		if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale < 0.f)
+		{
+			AccumulatedRecoilDeviation.Pitch += LookupScale;
 		}
 	}
 }
@@ -756,8 +793,6 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 	{
 		AddControllerYawInput(TurnScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
 
-		//FVector TempVector = FVector(AccumulatedRecoilDeviation.Yaw, TurnScale, 0.f);
-
 		if (AccumulatedRecoilDeviation.Yaw < .0f && TurnScale < .0f)
 		{
 			AccumulatedRecoilDeviation.Yaw -= TurnScale;
@@ -766,9 +801,6 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 		{
 			AccumulatedRecoilDeviation.Yaw -= TurnScale;
 		}
-
-		/*TempVector.Z = AccumulatedRecoilDeviation.Yaw;
-		UE_LOG(LogTemp, Warning, TEXT("TEMP: %s"), *TempVector.ToString());*/
 	}
 }
 
@@ -794,11 +826,16 @@ void AOPAG_Player::MakingAimCameraRotate()
 
 void AOPAG_Player::SwitchToADSCamera()
 {
-	if(!CurrentGun->CanAim() || bInspecting)	return;
+	if (!CurrentGun->CanAim() || bInspecting)
+	{
+		bIsTryingToADSDuringReload = true;
+		return;
+	}
 
 	// Set ADS and initialize new camera view
 	AActor* NewViewTarget = nullptr;
 	bIsInADS = true;
+	bIsTryingToADSDuringReload = false;
 
 	const bool bIsPrimaryGun = IsPrimaryGunActive();
 	if (bIsPrimaryGun)
@@ -822,6 +859,7 @@ void AOPAG_Player::SwitchToADSCamera()
 void AOPAG_Player::ResetFPSCamera()
 {
 	bIsInADS = false;
+	bIsTryingToADSDuringReload = false;
 	CurrentCamera = Camera;
 
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
@@ -926,6 +964,12 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 			OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
 		if (bResult)
 		{
+			AOPAG_MagazineBase* Magazine = Cast<AOPAG_MagazineBase>(Module);
+			if (Magazine) 
+			{
+				EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
+			}
+
 			Module->Destroy();
 
 			// Control if gun equip the module
@@ -935,7 +979,7 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 				const FVector ModuleSpawnLocation = CalculateModuleSpawnLocation();
 				FActorSpawnParameters SpawnParams;
 				AOPAG_ModuleBase* OldModule = GetWorld()->SpawnActor<AOPAG_ModuleBase>(OldModuleClass, ModuleSpawnLocation, FRotator::ZeroRotator, SpawnParams);
-				OldModule->SetParameters(OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
+				OldModule->SetParameters(OldModuleBrand, OldModuleStats, OldModuleEquippable);
 				OldModule->ApplyForce_Implementation(CalculateThrowForce());
 			}
 		}
@@ -989,7 +1033,7 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	OldGun->SetAmmoParams(OldAmmoCurrent, OldAmmoMax);
 	OldGun->CreateAndAttachAllModules(OldGunModules);
 	OldGun->DetachAllModules(CalculateThrowForce());
-	OldGun->ApplyForce_Implementation(CalculateThrowForce());
+	//OldGun->ApplyForce_Implementation(CalculateThrowForce());
 }
 
 const FVector AOPAG_Player::CalculateModuleSpawnLocation() const

@@ -271,8 +271,10 @@ void AOPAG_Enemy::SpawnFXFinished()
 	{
 		GetMesh()->SetMaterial(i, NormalMaterials[i]);
 	}
-	SpawnParticle->Deactivate();
-	SpawnParticle->DestroyComponent();
+	if (SpawnParticle != nullptr) {
+		SpawnParticle->Deactivate();
+		SpawnParticle->DestroyComponent();
+	}
 }
 
 #pragma region Getters & Setters

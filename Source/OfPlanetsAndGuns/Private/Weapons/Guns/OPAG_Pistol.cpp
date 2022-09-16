@@ -64,9 +64,6 @@ void AOPAG_Pistol::ShootLineTrace(FVector StartShootLocation, FVector Direction,
 		}
 	}
 
-	//Decrement Ammo
-	AmmoCurrent--;
-
 	// Spawn emitter
 	// const FVector MuzzleLocation = GetMuzzle()->GetActorLocation();
 	UGameplayStatics::SpawnEmitterAttached(MuzzlePartile, GetMuzzle(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None, true);

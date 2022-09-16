@@ -19,6 +19,8 @@
 #include "Interactables/OPAG_Vendor.h"
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Weapons/Throwables/OPAG_Throwable.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AOPAG_ModularGun::AOPAG_ModularGun()
 {
@@ -30,6 +32,11 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	Magazine = CreateDefaultSubobject<UChildActorComponent>(TEXT("Magazine"));
 	Sight = CreateDefaultSubobject<UChildActorComponent>(TEXT("Sight"));
 	Accessory = CreateDefaultSubobject<UChildActorComponent>(TEXT("Accessory"));
+
+	GunDropHighlight = CreateDefaultSubobject<UParticleSystemComponent>("HightLight Particle");
+	{
+		GunDropHighlight->SetupAttachment(RootComponent);
+	}
 }
 
 const float AOPAG_ModularGun::GetPriceTotal_Implementation()
@@ -111,12 +118,31 @@ void AOPAG_ModularGun::BeginPlay()
 	CheckIfPhysical();
 
 	AmmoCurrent = GetStatsTotal().ClipSize;
+
+	GunDropHighlight->Deactivate();
+	GunDropHighlight->bAutoActivate = false;
+
+	// Working, but not sure if needed
+
+	/*EModuleRarity GunRarity = GetGunRarity();	
+	LoadParticleFromRarity(GunRarity);
+
+	if (GunDropHighlightParticle)
+	{		
+		GunDropHighlight->SetTemplate(GunDropHighlightParticle);
+
+		if (GetParentActor() == nullptr)
+		{
+			GunDropHighlight->Activate();
+			GunDropHighlight->SetVisibility(true);
+			GunDropHighlight->bAutoActivate = true;
+		}
+	}	*/
 }
 
 void AOPAG_ModularGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AOPAG_ModularGun::PopulateAmmoTable()
@@ -501,7 +527,7 @@ void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSub
 			const FOPAG_GunStats ModuleStats = Base->GetStats();
 			const int ModuleEquippableFireTypes = Base->GetEquippableFireTypes();
 
-			AttachModule(ModuleSlot, Module, ModuleRarity, ModuleBrand, 
+			AttachModule(ModuleSlot, Module, ModuleBrand, 
 				ModuleStats, ModuleEquippableFireTypes);
 		}
 	}
@@ -510,7 +536,7 @@ void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSub
 // Set child create the object in scene and set the actor's child
 // After this is important set the specific params of module (when invoke set child... the module has the default params, not the values in scene)
 bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule,
-	const EModuleRarity NewModuleRarity, const EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, 
+	const EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, 
 	const int NewModuleEquippableFireTypes) const
 {
 	ModuleSlot->SetChildActorClass(NewModule);
@@ -518,7 +544,7 @@ bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSub
 	AOPAG_ModuleBase* Module = GetModule(ModuleSlot);
 	if (Module)
 	{
-		Module->OnAttach(NewModuleRarity, NewModuleBrand, NewModuleStats, 
+		Module->OnAttach(NewModuleBrand, NewModuleStats, 
 		                 NewModuleEquippableFireTypes, GetParentActor() == GetWorld()->GetFirstPlayerController()->GetPawn());
 
 		const FName SocketName = GetSocketNameByModuleType(Module->GetType());
@@ -596,7 +622,7 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 		// Call the attach module method for set child actor with socket
 		if (ModuleSlot)
 		{
-			const bool Result = AttachModule(ModuleSlot, NewModule, NewModuleRarity, NewModuleBrand, NewModuleStats, 
+			const bool Result = AttachModule(ModuleSlot, NewModule, NewModuleBrand, NewModuleStats, 
 				NewModuleEquippableFireTypes);
 
 			// Update Stats
@@ -686,3 +712,46 @@ bool AOPAG_ModularGun::HasSight() const
 	return Sight->GetChildActor() != nullptr;
 }
 #pragma endregion Checks
+
+EModuleRarity AOPAG_ModularGun::GetGunRarity() const
+{
+	int BarrelRarity	= GetModuleBySocketType(EModuleTypes::Barrel) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
+	int AccesoryRarity	= GetModuleBySocketType(EModuleTypes::Accessory) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
+	int GripRarity		= GetModuleBySocketType(EModuleTypes::Grip) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
+	int MagazineRarity	= GetModuleBySocketType(EModuleTypes::Magazine) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
+	int SightRarity		= GetModuleBySocketType(EModuleTypes::Sight) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
+	int StockRarity		= GetModuleBySocketType(EModuleTypes::Stock) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;	
+
+	int RarityAvg = FMath::RoundToInt((BarrelRarity + AccesoryRarity + GripRarity + MagazineRarity + SightRarity + StockRarity) / 6);
+
+	EModuleRarity Rarity = static_cast<EModuleRarity>(RarityAvg);
+
+	return Rarity;
+}
+
+void AOPAG_ModularGun::LoadParticleFromRarity(EModuleRarity ModuleRarity)
+{
+
+	switch (ModuleRarity)
+	{
+	case EModuleRarity::Common:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Common.P_Modules_Common'"), NULL, LOAD_None, NULL);
+		break;
+
+	case EModuleRarity::Uncommon:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Uncommon.P_Modules_Uncommon'"), NULL, LOAD_None, NULL);
+		break;
+
+	case EModuleRarity::Rare:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Rare.P_Modules_Rare'"), NULL, LOAD_None, NULL);
+		break;
+
+	case EModuleRarity::Epic:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Epic.P_Modules_Epic'"), NULL, LOAD_None, NULL);
+		break;
+
+	case EModuleRarity::Legendary:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Legendary.P_Modules_Legendary'"), NULL, LOAD_None, NULL);
+		break;
+	}
+}

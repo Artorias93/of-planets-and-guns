@@ -229,6 +229,7 @@ private:
 	bool bRunning = false;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
+	bool bIsTryingToADSDuringReload = false;
 	bool bHasAlreadyLooked = false;
 	bool bIsShieldBroken = false;
 
@@ -353,6 +354,7 @@ private:
 	UFUNCTION() void ReloadGun();
 	UFUNCTION() void IncrementPrimaryGunAmmo();
 	UFUNCTION() void InspectGun();
+	void StopInspectGun();
 
 	// Interact with items
 	UFUNCTION() void InteractWithItem();
@@ -389,7 +391,7 @@ public:
 	UFUNCTION(BlueprintCallable) const bool GetIsRunning() const;
 	UFUNCTION(BlueprintCallable) void AttachMagazineToHandNotify();
 	UFUNCTION(BlueprintCallable) void AttachMagazineToGunNotify();
-	UFUNCTION(BlueprintCosmetic) void CompleteInspectNotify();
+	UFUNCTION(BlueprintCallable) void CompleteInspectNotify();
 	UFUNCTION(BlueprintCallable) void FootstepsMakeNoiseNotify();
 
 public:

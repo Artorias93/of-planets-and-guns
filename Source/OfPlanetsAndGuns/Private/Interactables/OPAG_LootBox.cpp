@@ -6,7 +6,8 @@
 
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
-//#include <NiagaraSystem.h>
+
+#include "Materials/MaterialInstanceDynamic.h"
 
 #include "Characters/Player/OPAG_Player.h"
 #include "Interactables/OPAG_InteractableInterface.h"
@@ -30,8 +31,6 @@ AOPAG_LootBox::AOPAG_LootBox()
 	LootSpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint");
 	if (LootSpawnPoint)
 		LootSpawnPoint->SetupAttachment(RootComponent);
-
-	DropTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DropTimeline"));
 }
 
 bool AOPAG_LootBox::WillChangeInteractStateDynamically_Implementation()
@@ -49,26 +48,18 @@ FString AOPAG_LootBox::InteractString_Implementation()
 		return "Open Lootbox [E]";
 }
 
-void AOPAG_LootBox::DropTimelineProgress(FVector Value)
-{
-	FVector NewLocation = LootSpawnPoint->GetComponentLocation();
-	NewLocation.X += RandomDropDir.X * Value.X * DropCurveXFactor;
-	NewLocation.Y += RandomDropDir.Y * Value.X * DropCurveXFactor;
-	NewLocation.Z += Value.Z * DropCurveZFactor;
-
-	SpawnedItem->SetActorLocation(NewLocation);
-}
-
 void AOPAG_LootBox::BeginPlay()
 {
 	Super::BeginPlay();
 	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 	
-	DropTimeline->SetLooping(false);
-	DropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 
-	OnDropTimelineProgress.BindUFunction(this, FName("DropTimelineProgress"));
-	DropTimeline->AddInterpVector(CurveDropVector, OnDropTimelineProgress, FName("DropTimelinePropertyName"));
+	
+	// Make lid material color pulse
+	auto Material = Lid->GetMaterial(0);
+	DynamicMaterial = UMaterialInstanceDynamic::Create(Material, NULL);
+	Lid->SetMaterial(0, DynamicMaterial);
+	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 0.0f);
 }
 
 void AOPAG_LootBox::Tick(float DeltaTime)
@@ -86,6 +77,9 @@ void AOPAG_LootBox::Unlock()
 {
 	ActivationParticleEffect();
 	bIsInteractable = true;
+
+	// Make Lid Material Pulse
+	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 1.0f);
 }
 
 void AOPAG_LootBox::SetModules(FOPAG_GunModules& ModulesStruct)
@@ -128,6 +122,9 @@ void AOPAG_LootBox::Interact_Implementation()
 
 	// Active Timer for spawn items
 	SpawnItem();
+
+	// Make Lid Material Stop Pulse
+	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 0.0f);
 }
 
 bool AOPAG_LootBox::CanInteract_Implementation()
@@ -171,15 +168,6 @@ void AOPAG_LootBox::SpawnItem()
 		}
 	}
 
-	// Apply force for any items
-	if (Item->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
-	{
-		float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
-		RandomDropDir.X = FMath::Sin(RandomAngle);
-		RandomDropDir.Y = FMath::Cos(RandomAngle);
-
-		DropTimeline->PlayFromStart();	
-	}
 
 	// Re-call this method for any items
 	GetWorld()->GetTimerManager().SetTimer(SpawnItemsHandle, this, &AOPAG_LootBox::SpawnItem, 0.5, false);

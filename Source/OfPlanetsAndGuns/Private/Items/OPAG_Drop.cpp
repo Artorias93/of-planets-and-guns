@@ -2,6 +2,7 @@
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Math/Color.h"
+#include "Curves/CurveVector.h"
 
 AOPAG_Drop::AOPAG_Drop()
 {
@@ -34,6 +35,14 @@ AOPAG_Drop::AOPAG_Drop()
 		HighlightMesh->SetWorldScale3D(FVector(0, 0, 0));
 	}
 
+	DropTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DropTimeline"));
+
+	static ConstructorHelpers::FObjectFinder<UCurveVector> CurveVector(TEXT("'/Game/OfPlanetsAndGuns/Interactables/Curve_Drop_Vector.Curve_Drop_Vector'"));
+	if (CurveVector.Succeeded())
+	{
+		CurveDropVector = CurveVector.Object;
+	}
+
 	CurrentHighlightIncreaseSizeFactor = 0;
 }
 
@@ -41,8 +50,20 @@ void AOPAG_Drop::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AOPAG_Drop::FloatingDrop, DisablePhysicAfterSeconds, false);
+	SpawnLocation = GetActorLocation();
+
+	DropTimeline->SetLooping(false);
+	DropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+
+	OnDropTimelineProgress.BindUFunction(this, FName("DropTimelineProgress"));
+	DropTimeline->AddInterpVector(CurveDropVector, OnDropTimelineProgress, FName("DropTimelinePropertyName"));
+
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDropDir.X = FMath::Sin(RandomAngle);
+	RandomDropDir.Y = FMath::Cos(RandomAngle);
+
+	DropTimeline->PlayFromStart();
 }
 
 void AOPAG_Drop::Tick(float DeltaTime)
@@ -66,4 +87,14 @@ void AOPAG_Drop::FloatingDrop()
 {
 	DropMesh->SetSimulatePhysics(false);
 	Sphere->SetSimulatePhysics(false);
+}
+
+void AOPAG_Drop::DropTimelineProgress(FVector Value)
+{
+	FVector NewLocation = SpawnLocation;
+	NewLocation.X += RandomDropDir.X * Value.X * DropCurveXFactor;
+	NewLocation.Y += RandomDropDir.Y * Value.X * DropCurveXFactor;
+	NewLocation.Z += Value.Z * DropCurveZFactor;
+
+	SetActorLocation(NewLocation);
 }
