@@ -34,7 +34,7 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
-	virtual void OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand,
+	virtual void OnAttach(const EModuleBrand NewBrand,
 	                      const FOPAG_GunStats NewStats, const int NewEquippableFireTypes, const bool bIsAttachedToPlayer) override;
 	virtual void OnDetach() override;
 

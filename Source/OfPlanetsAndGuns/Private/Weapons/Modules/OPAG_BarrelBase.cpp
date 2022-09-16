@@ -7,7 +7,6 @@ AOPAG_BarrelBase::AOPAG_BarrelBase()
 	MuzzleComponent->SetupAttachment(RootComponent);
 
 	// Initialize Parameters
-	Rarity = EModuleRarity::Common;
 	Brand = EModuleBrand::Standard;
 	Type = EModuleTypes::Barrel;
 }

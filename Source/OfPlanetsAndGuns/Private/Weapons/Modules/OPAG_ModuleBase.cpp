@@ -56,9 +56,6 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 void AOPAG_ModuleBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// Generate rarity of module
-	SelectRarity();
 	
 	// This method is call for activate physical behavior when module is in the scene
 	CheckIfPhysical();
@@ -144,7 +141,24 @@ EModuleTypes AOPAG_ModuleBase::GetType() const
 
 EModuleRarity AOPAG_ModuleBase::GetRarity() const
 {
-	return Rarity;
+	if (Level > 11 && Level < 21)
+	{
+		return EModuleRarity::Uncommon;
+	}
+	if (Level > 21 && Level < 31)
+	{
+		return EModuleRarity::Rare;
+	}
+	if (Level > 31 && Level < 41)
+	{
+		return EModuleRarity::Epic;
+	}
+	if (Level > 41)
+	{
+		return EModuleRarity::Legendary;
+	}
+
+	return EModuleRarity::Common;
 }
 
 EModuleBrand AOPAG_ModuleBase::GetBrand() const
@@ -193,9 +207,8 @@ FLinearColor AOPAG_ModuleBase::GetColorFromRarity(int Value)
 #pragma endregion Get
 
 #pragma region Set
-void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
+void AOPAG_ModuleBase::SetParameters(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
 {
-	Rarity = NewRarity;
 	Brand = NewBrand;
 	Stats = NewStats;
 	EquippableFireTypes = NewEquippableFireTypes;
@@ -313,13 +326,13 @@ bool AOPAG_ModuleBase::CanBuy_Implementation()
 #pragma endregion Interface
 
 #pragma region Attachment
-void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand,const FOPAG_GunStats NewStats,
+void AOPAG_ModuleBase::OnAttach(const EModuleBrand NewBrand,const FOPAG_GunStats NewStats,
 	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
 	// when it's attached to the gun, scale it to original dimension
 	ModuleMesh->SetWorldScale3D(FVector(1, 1, 1));
 
-	SetParameters(NewRarity, NewBrand, NewStats, NewEquippableFireTypes);
+	SetParameters(NewBrand, NewStats, NewEquippableFireTypes);
 }
 
 void AOPAG_ModuleBase::OnDetach()
@@ -345,29 +358,3 @@ void AOPAG_ModuleBase::CheckIfPhysical() const
 	}
 }
 #pragma endregion Physics
-
-#pragma region Other
-void AOPAG_ModuleBase::SelectRarity()
-{
-	if (GetLevel() <= 10)
-	{
-		Rarity = EModuleRarity::Common;
-	}
-	else if (GetLevel() <= 20)
-	{
-		Rarity = EModuleRarity::Uncommon;
-	}
-	else if (GetLevel() <= 30)
-	{
-		Rarity = EModuleRarity::Rare;
-	}
-	else if (GetLevel() <= 40)
-	{
-		Rarity = EModuleRarity::Epic;
-	}
-	else if (GetLevel() > 41)
-	{
-		Rarity = EModuleRarity::Legendary;
-	}
-}
-#pragma endregion Other

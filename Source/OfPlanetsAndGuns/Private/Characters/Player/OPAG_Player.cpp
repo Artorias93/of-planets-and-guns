@@ -740,11 +740,14 @@ void AOPAG_Player::Lookup(const FInputActionValue& Value)
 	if (LookupScale != 0.0f)
 	{
 		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
-		//UE_LOG(LogTemp, Warning, TEXT("Pitch: %f"), LookupScale);
 
-		if (AccumulatedRecoilDeviation.Pitch > .0f)
+		if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale > 0.f)
 		{
 			AccumulatedRecoilDeviation.Pitch -= LookupScale;
+		}
+		if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale < 0.f)
+		{
+			AccumulatedRecoilDeviation.Pitch += LookupScale;
 		}
 	}
 }
@@ -756,8 +759,6 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 	{
 		AddControllerYawInput(TurnScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
 
-		//FVector TempVector = FVector(AccumulatedRecoilDeviation.Yaw, TurnScale, 0.f);
-
 		if (AccumulatedRecoilDeviation.Yaw < .0f && TurnScale < .0f)
 		{
 			AccumulatedRecoilDeviation.Yaw -= TurnScale;
@@ -766,9 +767,6 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 		{
 			AccumulatedRecoilDeviation.Yaw -= TurnScale;
 		}
-
-		/*TempVector.Z = AccumulatedRecoilDeviation.Yaw;
-		UE_LOG(LogTemp, Warning, TEXT("TEMP: %s"), *TempVector.ToString());*/
 	}
 }
 
@@ -935,7 +933,7 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 				const FVector ModuleSpawnLocation = CalculateModuleSpawnLocation();
 				FActorSpawnParameters SpawnParams;
 				AOPAG_ModuleBase* OldModule = GetWorld()->SpawnActor<AOPAG_ModuleBase>(OldModuleClass, ModuleSpawnLocation, FRotator::ZeroRotator, SpawnParams);
-				OldModule->SetParameters(OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
+				OldModule->SetParameters(OldModuleBrand, OldModuleStats, OldModuleEquippable);
 				OldModule->ApplyForce_Implementation(CalculateThrowForce());
 			}
 		}
