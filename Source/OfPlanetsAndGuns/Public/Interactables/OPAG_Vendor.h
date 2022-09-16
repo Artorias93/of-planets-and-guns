@@ -30,6 +30,9 @@ public:
 		UStaticMeshComponent* Pedestal;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UBoxComponent* BoxCollision;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UBoxComponent* BoxMoneyTrigger;
+	
 
 	// Positions of the two guns and two modules
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -67,9 +70,11 @@ private:
 	TArray<FOPAG_GunList*> GunsList;
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
+	bool ShowingMerch;
 
 	void PopulateGunAndModuleArray();
 	void ActivationParticleEffect();
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -81,7 +86,14 @@ public:
 	void SpawnItem(const float RoomDifficulty);
 	void AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue);
 
-	UFUNCTION() void DisableGunTextInVendor(AOPAG_ModularGun* Gun);
-	UFUNCTION() void DisableModuleTextInVendor(AOPAG_ModuleBase* Module);
-
+	UFUNCTION() 
+		void DisableGunTextInVendor(AOPAG_ModularGun* Gun);
+	UFUNCTION() 
+		void DisableModuleTextInVendor(AOPAG_ModuleBase* Module);
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };

@@ -13,6 +13,7 @@
 #include <Components/BoxComponent.h>
 #include <Components/TextRenderComponent.h>
 #include <Components/ChildActorComponent.h>
+#include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "../../Public/Managers/OPAG_GameInstance.h"
 
@@ -22,6 +23,7 @@ AOPAG_Vendor::AOPAG_Vendor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	ShowingMerch = false;
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	if (BoxCollision != nullptr)
@@ -29,6 +31,15 @@ AOPAG_Vendor::AOPAG_Vendor()
 		BoxCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 		BoxCollision->SetBoxExtent(FVector(32.f, 200.f, 32.f));
 		RootComponent = BoxCollision;
+	}
+
+	BoxMoneyTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Money Trigger"));
+	if (BoxMoneyTrigger != nullptr)
+	{
+		BoxMoneyTrigger->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+		BoxMoneyTrigger->SetBoxExtent(FVector(232.f, 400.f, 232.f));
+		BoxMoneyTrigger->SetupAttachment(RootComponent);
+		
 	}
 
 	Pedestal = CreateDefaultSubobject<UStaticMeshComponent>("Pedestal");
@@ -107,9 +118,12 @@ void AOPAG_Vendor::BeginPlay()
 	EMS->DisableGunTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableGunTextInVendor);
 	EMS->DisableModuleTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableModuleTextInVendor);
 
+	BoxMoneyTrigger->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapBegin);
+	BoxMoneyTrigger->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapEnd);
 }
 
 void AOPAG_Vendor::Unlock() {
+	ShowingMerch = true;
 	ActivationParticleEffect();
 	PopulateGunAndModuleArray();
 	SpawnItem(666);
@@ -139,6 +153,28 @@ void AOPAG_Vendor::Tick(float DeltaTime)
 	if (PriceTextRender_Module1 != nullptr ) PriceTextRender_Module1->SetWorldRotation(LookToPlayerRotation3);
 	if (PriceTextRender_Module2 != nullptr ) PriceTextRender_Module2->SetWorldRotation(LookToPlayerRotation4);
 	
+}
+
+// Overlap Begin
+void AOPAG_Vendor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
+	AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor);
+	if (Player != nullptr && Player->GetInventorySystemComponent() != nullptr) {
+		if (ShowingMerch) {
+			EMS->ShowGoldInGame.Broadcast();
+			EMS->GoldChanged.Broadcast(Player->GetInventorySystemComponent()->GoldAmount);
+		}
+	}
+
+}
+
+void AOPAG_Vendor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
+	AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor);
+	if (Player != nullptr) {
+		EMS->HideGoldInGame.Broadcast();
+	}
+
 }
 
 // Call method for spawning all guns

@@ -33,4 +33,11 @@ public:
 
 private:
 	AOPAG_Player* Owner;
+
+	FTimerHandle GoldShowTimerHandle;
+
+	float GoldShowTimer = 2.0f;
+
+	UFUNCTION()
+	void OnGoldShowFinished();
 };

@@ -22,6 +22,11 @@ void UOPAG_InventorySystemComponent::BeginPlay()
 	}
 }
 
+void UOPAG_InventorySystemComponent::OnGoldShowFinished()
+{
+	Owner->EMS->HideGoldInGame.Broadcast();
+}
+
 void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 {
 	if (Target) {
@@ -44,6 +49,11 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			GoldAmount += Target->Amount;
 			if (Owner && Owner->EMS) {
 				Owner->EMS->GoldChanged.Broadcast(GoldAmount);
+				Owner->EMS->ShowGoldInGame.Broadcast();
+
+				GetWorld()->GetTimerManager().SetTimer(GoldShowTimerHandle, this,
+					&UOPAG_InventorySystemComponent::OnGoldShowFinished, GoldShowTimer, false);
+
 				if (Owner->SMS)
 					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 			}
