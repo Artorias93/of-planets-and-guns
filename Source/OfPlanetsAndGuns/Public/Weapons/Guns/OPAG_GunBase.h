@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "OPAG_GunStats.h"
+#include "Components/TimelineComponent.h"
 #include "OPAG_GunBase.generated.h"
 
 class USkeletalMeshComponent;
@@ -107,6 +108,30 @@ protected:
 	USoundBase* ReloadSound;
 
 protected:
+	UPROPERTY(Category = "OPAG | Gun | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UTimelineComponent* GunDropTimeline;
+
+	UPROPERTY(Category = "OPAG | Gun | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		class UCurveVector* CurveGunDropVector;
+
+	UPROPERTY(Category = "OPAG | Gun | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float GunDropCurveXFactor = 200;
+
+	UPROPERTY(Category = "OPAG | Gun | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float GunDropCurveZFactor = 100;
+
+	FOnTimelineVector OnGunDropTimelineProgress;
+
+	UPROPERTY()
+		FVector GunDropTimelinePropertyName;
+
+	UPROPERTY()
+		FVector RandomDropDir;
+
+	UPROPERTY()
+		FVector GunSpawnLocation;
+
+protected:
 	UOPAG_EventManagerSubsystem* EMS;
 
 protected:
@@ -177,6 +202,9 @@ protected:
 	FVector ApplyNoise(const FVector Direction) const;
 	FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction) const;
 	TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
+
+	UFUNCTION()
+	void GunDropTimelineProgress(FVector Value);
 
 public:
 	// Getter

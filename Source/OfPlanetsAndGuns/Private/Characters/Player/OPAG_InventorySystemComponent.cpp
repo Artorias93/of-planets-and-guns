@@ -33,14 +33,12 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 		switch (Target->DropType) {
 
 		case EDropType::Bolts:
-			if (BoltsAmount < 4){
-				BoltsAmount += Target->Amount;
-				if (Owner && Owner->EMS) {
-					//Owner->EMS->BoltsAmountIncrement.Broadcast();
-					Owner->EMS->BoltsAmountChanged.Broadcast(BoltsAmount);
-					if (Owner->SMS)
-						Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
-				}
+			BoltsAmount += Target->Amount;
+			if (Owner && Owner->EMS) {
+				//Owner->EMS->BoltsAmountIncrement.Broadcast();
+				Owner->EMS->BoltsAmountChanged.Broadcast(BoltsAmount);
+				if (Owner->SMS)
+					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 			}
 			Target->Destroy();
 			break;
