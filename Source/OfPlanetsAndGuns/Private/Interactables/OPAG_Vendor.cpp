@@ -143,15 +143,19 @@ void AOPAG_Vendor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	const AOPAG_Player* PlayerRef = GetWorld()->GetFirstPlayerController()->GetPawn<AOPAG_Player>(); // player ref
-	const FRotator LookToPlayerRotation1 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Gun1->GetComponentLocation(), PlayerRef->GetActorLocation());
-	const FRotator LookToPlayerRotation2 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Gun2->GetComponentLocation(), PlayerRef->GetActorLocation());
-	const FRotator LookToPlayerRotation3 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Module1->GetComponentLocation(), PlayerRef->GetActorLocation());
-	const FRotator LookToPlayerRotation4 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Module2->GetComponentLocation(), PlayerRef->GetActorLocation());
+	if (PlayerRef != nullptr) {
+		const FRotator LookToPlayerRotation1 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Gun1->GetComponentLocation(), PlayerRef->GetActorLocation());
+		const FRotator LookToPlayerRotation2 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Gun2->GetComponentLocation(), PlayerRef->GetActorLocation());
+		const FRotator LookToPlayerRotation3 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Module1->GetComponentLocation(), PlayerRef->GetActorLocation());
+		const FRotator LookToPlayerRotation4 = UKismetMathLibrary::FindLookAtRotation(PriceTextRender_Module2->GetComponentLocation(), PlayerRef->GetActorLocation());
 
-	if (PriceTextRender_Gun1 != nullptr ) PriceTextRender_Gun1->SetWorldRotation(LookToPlayerRotation1);
-	if (PriceTextRender_Gun2 != nullptr ) PriceTextRender_Gun2->SetWorldRotation(LookToPlayerRotation2);
-	if (PriceTextRender_Module1 != nullptr ) PriceTextRender_Module1->SetWorldRotation(LookToPlayerRotation3);
-	if (PriceTextRender_Module2 != nullptr ) PriceTextRender_Module2->SetWorldRotation(LookToPlayerRotation4);
+		PriceTextRender_Gun1->SetWorldRotation(LookToPlayerRotation1);
+		PriceTextRender_Gun2->SetWorldRotation(LookToPlayerRotation2);
+		PriceTextRender_Module1->SetWorldRotation(LookToPlayerRotation3);
+		PriceTextRender_Module2->SetWorldRotation(LookToPlayerRotation4);
+	}
+	
+
 	
 }
 
