@@ -27,7 +27,6 @@ void AOPAG_MainMenuHUD::BeginPlay()
 	const FStringAssetReference LevelSelectionSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToLevelSelection.LS_ToLevelSelection");	
 	const FStringAssetReference Level1SequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToPlanet1.LS_ToPlanet1");	
 	const FStringAssetReference OptionsSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToOptionsView.LS_ToOptionsView");
-	const FStringAssetReference OptionsToMenuSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_OptionsToMenu.LS_OptionsToMenu");
 	const FStringAssetReference ExitSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToExit.LS_ToExit");
 	const FStringAssetReference QuitGameSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_QuitGame.LS_QuitGame");
 
@@ -65,15 +64,6 @@ void AOPAG_MainMenuHUD::BeginPlay()
 		ALevelSequenceActor* OptionsOutActor;
 		OptionsLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
 			OptionsLevelSequence, OptionsSettings, OptionsOutActor);
-	}
-
-	//Options to menu sequence initialization
-	if(ULevelSequence* const OptionsToMenuLevelSequence = Cast<ULevelSequence>(OptionsToMenuSequenceName.TryLoad()))
-	{
-		const FMovieSceneSequencePlaybackSettings OptionsToMenuSettings;
-		ALevelSequenceActor* OptionsToMenuOutActor;
-		OptionsToMenuLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
-			OptionsToMenuLevelSequence, OptionsToMenuSettings, OptionsToMenuOutActor);
 	}
 
 	//Exit sequence initialization
@@ -128,7 +118,6 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 			switch(To)
 			{
 				case Level1:
-					UE_LOG(LogTemp, Warning, TEXT("InLevel1Selection"));
 					Level1LevelSequencePlayer->Play();
 					break;
 				case MainMenu:
