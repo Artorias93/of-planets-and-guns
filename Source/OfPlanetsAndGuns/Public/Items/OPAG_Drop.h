@@ -84,4 +84,6 @@ public:
 public:
 	void ApplyForce_Implementation(const FVector Force) override;
 	void FloatingDrop();
+	void StartDropTimeline();
+
 };

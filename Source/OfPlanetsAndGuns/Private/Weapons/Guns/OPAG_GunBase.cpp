@@ -62,8 +62,6 @@ void AOPAG_GunBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GunSpawnLocation = GetActorLocation();
-
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 
@@ -75,17 +73,7 @@ void AOPAG_GunBase::BeginPlay()
 	GunDropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 
 	OnGunDropTimelineProgress.BindUFunction(this, FName("GunDropTimelineProgress"));
-	GunDropTimeline->AddInterpVector(CurveGunDropVector, OnGunDropTimelineProgress, FName("GunDropTimelinePropertyName"));
-
-	if (GetParentActor() == nullptr)
-	{
-		// Find a random angle in order to determine the direction where the module will drop
-		float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
-		RandomDropDir.X = FMath::Sin(RandomAngle);
-		RandomDropDir.Y = FMath::Cos(RandomAngle);
-
-		GunDropTimeline->PlayFromStart();
-	}
+	GunDropTimeline->AddInterpVector(CurveGunDropVector, OnGunDropTimelineProgress, FName("GunDropTimelinePropertyName"));	
 }
 
 void AOPAG_GunBase::Tick(float DeltaTime)

@@ -49,21 +49,12 @@ AOPAG_Drop::AOPAG_Drop()
 void AOPAG_Drop::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	SpawnLocation = GetActorLocation();
 
 	DropTimeline->SetLooping(false);
 	DropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 
 	OnDropTimelineProgress.BindUFunction(this, FName("DropTimelineProgress"));
-	DropTimeline->AddInterpVector(CurveDropVector, OnDropTimelineProgress, FName("DropTimelinePropertyName"));
-
-	// Find a random angle in order to determine the direction where the module will drop
-	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
-	RandomDropDir.X = FMath::Sin(RandomAngle);
-	RandomDropDir.Y = FMath::Cos(RandomAngle);
-
-	DropTimeline->PlayFromStart();
+	DropTimeline->AddInterpVector(CurveDropVector, OnDropTimelineProgress, FName("DropTimelinePropertyName"));	
 }
 
 void AOPAG_Drop::Tick(float DeltaTime)
@@ -97,4 +88,16 @@ void AOPAG_Drop::DropTimelineProgress(FVector Value)
 	NewLocation.Z += Value.Z * DropCurveZFactor;
 
 	SetActorLocation(NewLocation);
+}
+
+void AOPAG_Drop::StartDropTimeline()
+{
+	SpawnLocation = GetActorLocation();
+
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDropDir.X = FMath::Sin(RandomAngle);
+	RandomDropDir.Y = FMath::Cos(RandomAngle);
+
+	DropTimeline->PlayFromStart();
 }
