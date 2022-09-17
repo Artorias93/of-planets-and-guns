@@ -170,8 +170,7 @@ int AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Directi
 	ShootLineTrace(StartShootLocation, Direction, ShooterCharacter);
 
 	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
-
-
+	
 	//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 	SMS->PlayWeaponSounds( this , EWeaponSoundAction::Fire);
 	

@@ -106,8 +106,6 @@ void AOPAG_RangedEnemy::StartShooting()
 
 	if(AimingLed)
 		AimingLed->SetVisibility(false);
-
-	UE_LOG(LogTemp, Warning, TEXT("I'm shooting dude"));
 }
 
 void AOPAG_RangedEnemy::Death()
