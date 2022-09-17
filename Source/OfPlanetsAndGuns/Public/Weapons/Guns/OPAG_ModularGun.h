@@ -187,4 +187,5 @@ public:
 	EModuleRarity GetGunRarity() const;
 
 	void LoadParticleFromRarity(EModuleRarity ModuleRarity);
+	void StartDropTimeline();
 };

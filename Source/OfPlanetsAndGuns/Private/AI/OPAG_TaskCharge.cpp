@@ -34,7 +34,7 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 
 				if(!UKismetSystemLibrary::BoxTraceSingle(GetWorld(), EnemyPos, ChargePoint,
 					BoxTraceHalfSize, FRotator::ZeroRotator, TraceTypeQuery1,
-					false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true)) 
+					false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true)) 
 				{
 					if(const UNavigationSystemV1* const NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
 					{
