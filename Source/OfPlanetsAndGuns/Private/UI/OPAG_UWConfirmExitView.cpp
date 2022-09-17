@@ -17,7 +17,6 @@ void UOPAG_UWConfirmExitView::ExitYesButtonClicked()
 {
 	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
-		//MyHUD->HideExitMenu();
 		MyHUD->SequencePlaySelection(Exit, QuitGame);
 	}
 }
@@ -26,7 +25,6 @@ void UOPAG_UWConfirmExitView::ExitNoButtonClicked()
 {
 	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
-		//MyHUD->HideExitMenu();
 		MyHUD->SequencePlaySelection(Exit, MainMenu);
 	}
 }

@@ -58,4 +58,6 @@ private:
 	
 	UFUNCTION()
 	void StartLevel1();
+	UFUNCTION()
+	void AbortGame();
 };

@@ -112,7 +112,6 @@ void AOPAG_ShieldEnemy::Death()
 	{
 		ShieldMesh->K2_DetachFromComponent(EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld);
 		ShieldMesh->SetSimulatePhysics(true);
-		//TODO: Check if this is correct, given that the shield usually has collision unlike the sword
 		ShieldMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	}
 

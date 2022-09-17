@@ -89,6 +89,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 
 	//Delegate binding
 	Level1LevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::StartLevel1);
+	QuitGameLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::AbortGame);
 }
 
 void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const
@@ -168,4 +169,10 @@ void AOPAG_MainMenuHUD::StartLevel1()
 	}
 	
 	EMS->StartPlanet.Broadcast(0);
+}
+
+void AOPAG_MainMenuHUD::AbortGame()
+{
+	UKismetSystemLibrary::QuitGame(GetWorld(), GetOwningPlayerController(),
+		EQuitPreference::Quit, false);
 }
