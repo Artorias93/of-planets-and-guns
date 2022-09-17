@@ -77,6 +77,11 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 					AOPAG_Drop* DropObj = GetWorld()->SpawnActor<AOPAG_Drop>(Drop->DropClass, 
 						SpawnLocation, FRotator::ZeroRotator);
 
+					if (DropObj != nullptr)
+					{
+						DropObj->StartDropTimeline();
+					}
+
 					/*if (DropObj)
 					{
 						//DropObj->Sphere->SetSimulatePhysics(true);
@@ -109,6 +114,7 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 							{
 								ModuleObj->SetStats(PrimaryGun->GetSecondaryStatsModifiers());
 								ModuleObj->GetModuleSphereComponent()->SetSimulatePhysics(false);
+								ModuleObj->StartDropTimeline();
 							}
 						}
 					}

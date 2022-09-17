@@ -991,7 +991,8 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 				FActorSpawnParameters SpawnParams;
 				AOPAG_ModuleBase* OldModule = GetWorld()->SpawnActor<AOPAG_ModuleBase>(OldModuleClass, ModuleSpawnLocation, FRotator::ZeroRotator, SpawnParams);
 				OldModule->SetParameters(OldModuleBrand, OldModuleStats, OldModuleEquippable);
-				OldModule->ApplyForce_Implementation(CalculateThrowForce());
+				//OldModule->ApplyForce_Implementation(CalculateThrowForce());
+				OldModule->StartDropTimeline();
 			}
 		}
 	}
@@ -1041,9 +1042,13 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 	// Spawn the old primary gun in scene
 	const FVector GunSpawnLocation = CalculateModuleSpawnLocation();
 	AOPAG_ModularGun* OldGun = GetWorld()->SpawnActor<AOPAG_ModularGun>(OldGunClass, GunSpawnLocation, FRotator::ZeroRotator);
-	OldGun->SetAmmoParams(OldAmmoCurrent, OldAmmoMax);
-	OldGun->CreateAndAttachAllModules(OldGunModules);
-	OldGun->DetachAllModules(CalculateThrowForce());
+	if (OldGun)
+	{
+		OldGun->SetAmmoParams(OldAmmoCurrent, OldAmmoMax);
+		OldGun->CreateAndAttachAllModules(OldGunModules);
+		OldGun->DetachAllModules(CalculateThrowForce());
+		OldGun->StartDropTimeline();
+	}
 	//OldGun->ApplyForce_Implementation(CalculateThrowForce());
 }
 

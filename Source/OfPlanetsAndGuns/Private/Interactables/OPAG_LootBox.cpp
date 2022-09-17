@@ -1,5 +1,6 @@
 #include "Interactables/OPAG_LootBox.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
+#include "Items/OPAG_Drop.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_SoundManagerSubsystem.h"
 #include <Components/PrimitiveComponent.h>
@@ -52,9 +53,7 @@ void AOPAG_LootBox::BeginPlay()
 {
 	Super::BeginPlay();
 	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
-	
-
-	
+		
 	// Make lid material color pulse
 	auto Material = Lid->GetMaterial(0);
 	DynamicMaterial = UMaterialInstanceDynamic::Create(Material, NULL);
@@ -153,10 +152,13 @@ void AOPAG_LootBox::SpawnItem()
 	if (AOPAG_ModularGun* GunModular = Cast<AOPAG_ModularGun>(Item))
 	{
 		GunModular->CreateAndAttachAllModules(Modules);
+		GunModular->StartDropTimeline();
 	}
 	// If the item is a module, apply bonus stats
 	if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(Item))
 	{
+		Module->StartDropTimeline();
+
 		const AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 		if (Player != nullptr)
 		{
@@ -168,6 +170,10 @@ void AOPAG_LootBox::SpawnItem()
 		}
 	}
 
+	if (AOPAG_Drop* Drop = Cast<AOPAG_Drop>(Item))
+	{
+		Drop->StartDropTimeline();
+	}
 
 	// Re-call this method for any items
 	GetWorld()->GetTimerManager().SetTimer(SpawnItemsHandle, this, &AOPAG_LootBox::SpawnItem, 0.5, false);

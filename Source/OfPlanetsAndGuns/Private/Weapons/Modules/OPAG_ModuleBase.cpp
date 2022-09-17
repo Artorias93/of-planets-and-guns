@@ -46,9 +46,7 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 
 void AOPAG_ModuleBase::BeginPlay()
 {
-	Super::BeginPlay();
-	
-	SpawnLocation = GetActorLocation();
+	Super::BeginPlay();	
 
 	ModuleDropHighlight->Deactivate();
 	ModuleDropHighlight->bAutoActivate = false;
@@ -61,12 +59,7 @@ void AOPAG_ModuleBase::BeginPlay()
 	ModuleDropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 
 	OnModuleDropTimelineProgress.BindUFunction(this, FName("ModuleDropTimelineProgress"));
-	ModuleDropTimeline->AddInterpVector(CurveModuleDropVector, OnModuleDropTimelineProgress, FName("ModuleDropTimelinePropertyName"));
-
-	// Find a random angle in order to determine the direction where the module will drop
-	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
-	RandomDropDir.X = FMath::Sin(RandomAngle);
-	RandomDropDir.Y = FMath::Cos(RandomAngle);
+	ModuleDropTimeline->AddInterpVector(CurveModuleDropVector, OnModuleDropTimelineProgress, FName("ModuleDropTimelinePropertyName"));	
 
 	LoadParticleFromRarity(GetRarity());
 
@@ -80,9 +73,7 @@ void AOPAG_ModuleBase::BeginPlay()
 			ModuleDropHighlight->SetVisibility(true);
 			ModuleDropHighlight->bAutoActivate = true;
 
-			ModuleMesh->SetWorldScale3D(FVector(2, 2, 2));
-
-			ModuleDropTimeline->PlayFromStart();
+			ModuleMesh->SetWorldScale3D(FVector(2, 2, 2));			
 		}
 	}
 }
@@ -264,8 +255,7 @@ bool AOPAG_ModuleBase::CanInteract_Implementation()
 
 void AOPAG_ModuleBase::ApplyForce_Implementation(const FVector Force)
 {
-	//ModuleMesh->SetSimulatePhysics(true);
-	ModuleMesh->AddForce(Force, NAME_None, true);
+	
 }
 
 void AOPAG_ModuleBase::ApplyFly_Implementation()
@@ -319,6 +309,7 @@ void AOPAG_ModuleBase::OnAttach(const EModuleBrand NewBrand,const FOPAG_GunStats
 
 void AOPAG_ModuleBase::OnDetach()
 {
+
 }
 #pragma endregion Attachment
 
@@ -349,5 +340,16 @@ void AOPAG_ModuleBase::ModuleDropTimelineProgress(FVector Value)
 	NewLocation.Z += Value.Z * ModuleDropCurveZFactor;
 
 	SetActorLocation(NewLocation);
+}
+void AOPAG_ModuleBase::StartDropTimeline()
+{
+	SpawnLocation = GetActorLocation();
+
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDropDir.X = FMath::Sin(RandomAngle);
+	RandomDropDir.Y = FMath::Cos(RandomAngle);
+
+	ModuleDropTimeline->PlayFromStart();
 }
 #pragma endregion Drop

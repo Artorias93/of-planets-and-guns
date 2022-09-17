@@ -78,7 +78,7 @@ protected:
 	FVector RandomDropDir;
 
 	UPROPERTY()
-		FVector SpawnLocation;
+	FVector SpawnLocation;
 	
 protected:
 	FTimerHandle FlyRotationHandle;
@@ -135,5 +135,6 @@ public:
 	
 public:
 	FORCEINLINE USphereComponent* GetModuleSphereComponent() { return Sphere; }
+	void StartDropTimeline();
 
 };
