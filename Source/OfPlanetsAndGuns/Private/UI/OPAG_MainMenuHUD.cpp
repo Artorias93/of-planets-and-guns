@@ -173,6 +173,8 @@ void AOPAG_MainMenuHUD::StartLevel1()
 
 void AOPAG_MainMenuHUD::AbortGame()
 {
-	UKismetSystemLibrary::QuitGame(GetWorld(), GetOwningPlayerController(),
-		EQuitPreference::Quit, false);
+	// const UOPAG_GameInstance* const GameInstance = GetWorld()->GetGameInstance<UOPAG_GameInstance>();
+	// const UOPAG_EventManagerSubsystem* const EMS =  GameInstance->GetEventManager();
+	// EMS->QuitGame.Broadcast();
+	UKismetSystemLibrary::QuitGame(GetWorld(), GetOwningPlayerController(),	EQuitPreference::Quit, false);
 }
