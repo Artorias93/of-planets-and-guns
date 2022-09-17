@@ -1432,7 +1432,7 @@ void AOPAG_Player::AttachMagazineToHandNotify()
 
 void AOPAG_Player::AttachMagazineToGunNotify()
 {
-	if (PrimaryGun == nullptr)	return;
+	if (PrimaryGun == nullptr || PrimaryGun->GetModuleBySocketType(EModuleTypes::Magazine) == nullptr)	return;
 
 	PrimaryGun->GetModuleBySocketType(EModuleTypes::Magazine)->AttachToComponent(PrimaryGun->GetReceiverMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, "Magazine");
 }
