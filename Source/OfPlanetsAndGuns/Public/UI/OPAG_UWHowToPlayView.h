@@ -1,9 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "Components/Button.h"
+#include "Components/CanvasPanel.h"
 #include "OPAG_UWHowToPlayView.generated.h"
+
+class UButton;
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWHowToPlayView : public UUserWidget
@@ -12,6 +13,19 @@ class OFPLANETSANDGUNS_API UOPAG_UWHowToPlayView : public UUserWidget
 	
 	//Variables
 
+	int CurrentPage;
+
+	UPROPERTY(meta = (BindWidget))
+	UCanvasPanel* Pag0;
+	UPROPERTY(meta = (BindWidget))
+	UCanvasPanel* Pag1;
+	UPROPERTY(meta = (BindWidget))
+	UCanvasPanel* Pag2;
+
+	UPROPERTY()
+	TArray<UCanvasPanel*> PagesList;
+	
+private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* PreviousButton;
 	UPROPERTY(meta = (BindWidget))

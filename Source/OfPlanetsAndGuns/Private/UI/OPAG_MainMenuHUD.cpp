@@ -29,6 +29,7 @@ void AOPAG_MainMenuHUD::BeginPlay()
 	const FStringAssetReference OptionsSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToOptionsView.LS_ToOptionsView");
 	const FStringAssetReference ExitSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToExit.LS_ToExit");
 	const FStringAssetReference QuitGameSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_QuitGame.LS_QuitGame");
+	const FStringAssetReference HowToPlaySequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToHowToPlay.LS_ToHowToPlay");
 
 	//Start sequence initialization
 	if(ULevelSequence* const StartLevelSequence = Cast<ULevelSequence>(StartSequenceName.TryLoad()))
@@ -84,6 +85,15 @@ void AOPAG_MainMenuHUD::BeginPlay()
 			QuitGameLevelSequence, QuitGameSettings, QuitGameOutActor);
 	}
 
+	//How to play sequence initialization
+	if(ULevelSequence* const HowToPlayLevelSequence = Cast<ULevelSequence>(HowToPlaySequenceName.TryLoad()))
+	{
+		const FMovieSceneSequencePlaybackSettings HowToPlaySettings;
+		ALevelSequenceActor* HowToPlayOutActor;
+		HowToPlayLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
+			HowToPlayLevelSequence, HowToPlaySettings, HowToPlayOutActor);
+	}
+
 	//Executes first sequence (menu opening)
 	SequencePlaySelection(Start, MainMenu);
 
@@ -110,6 +120,9 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 					break;
 				case Exit:
 					ExitLevelSequencePlayer->Play();
+					break;
+				case HowToPlay:
+					HowToPlayLevelSequencePlayer->Play();
 					break;
 				default:
 					break;
@@ -146,6 +159,16 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 					break;
 				case MainMenu:
 					ExitLevelSequencePlayer->PlayReverse();
+					break;
+				default:
+					break;
+			}
+			break;
+		case HowToPlay:
+			switch(To)
+			{
+				case MainMenu:
+					HowToPlayLevelSequencePlayer->PlayReverse();
 					break;
 				default:
 					break;

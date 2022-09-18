@@ -16,7 +16,8 @@ enum EMenuScreen
 	Level1            UMETA(DisplayName = "Level1"),
 	Options           UMETA(DisplayName = "Options"),
 	Exit              UMETA(DisplayName = "Exit"),
-	QuitGame          UMETA(DisplayName = "QuitGame")	
+	QuitGame          UMETA(DisplayName = "QuitGame"),
+	HowToPlay         UMETA(DisplayName = "HowToPlay")
 };
 
 UCLASS()
@@ -40,6 +41,8 @@ class OFPLANETSANDGUNS_API AOPAG_MainMenuHUD : public AHUD
 	ULevelSequencePlayer* ExitLevelSequencePlayer;
 	UPROPERTY()
 	ULevelSequencePlayer* QuitGameLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* HowToPlayLevelSequencePlayer;
 
 	//Functions
 

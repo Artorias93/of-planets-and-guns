@@ -19,19 +19,23 @@ class OFPLANETSANDGUNS_API UOPAG_UWMainMenuView : public UUserWidget
 	void BindEvents();
 
 	UPROPERTY(meta = (BindWidget))
-		UButton* NewRunButton;
+	UButton* NewRunButton;
 	UPROPERTY(meta = (BindWidget))
-		UButton* OptionsButton;
+	UButton* OptionsButton;
 	UPROPERTY(meta = (BindWidget))
-		UButton* QuitButton;
+	UButton* QuitButton;
+	UPROPERTY(meta = (BindWidget))
+	UButton* HowToPlayButton;
 
 public:
 	UFUNCTION()
-		void NewRunButtonClicked();
+	void NewRunButtonClicked();
 	UFUNCTION()
-		void OptionsButtonClicked();
+	void OptionsButtonClicked();
 	UFUNCTION()
-		void QuitButtonClicked();
+	void QuitButtonClicked();
+	UFUNCTION()
+	void HowToPlayButtonClicked();
 
 	void NativeConstruct();
 };

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_UWGunCompareView.h"
 #include "Weapons/Guns/OPAG_GunBase.h"
 #include "Kismet/KismetTextLibrary.h"
@@ -39,7 +36,7 @@ void UOPAG_UWGunCompareView::UpdateGunValues(const FOPAG_GunStats& GunStats, con
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, OtherGunStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, OtherGunStats.FireRate);
 	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, GunStats.Accuracy, OtherGunStats.Accuracy);
-	UpdateSingleStat(RecoilText, RecoilAmount, RecoilDelta, GunStats.Stability, OtherGunStats.Stability);
+	UpdateSingleStat(StabilityText, StabilityAmount, StabilityDelta, GunStats.Stability, OtherGunStats.Stability);
 	UpdateSingleStat(ReloadingText, ReloadingAmount, ReloadingDelta, GunStats.ReloadingTime, OtherGunStats.ReloadingTime, true);
 	UpdateSingleStat(ClipSizeText, ClipSizeAmount, ClipSizeDelta, GunStats.ClipSize, OtherGunStats.ClipSize);
 }
@@ -47,7 +44,7 @@ void UOPAG_UWGunCompareView::UpdateGunValues(const FOPAG_GunStats& GunStats, con
 void UOPAG_UWGunCompareView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, UTextBlock* DeltaText, float OldValue, float NewValue,
 	bool bIsInverted)
 {
-	float Delta = NewValue - OldValue;
+	const float Delta = NewValue - OldValue;
 
 	FString DeltaString;
 
