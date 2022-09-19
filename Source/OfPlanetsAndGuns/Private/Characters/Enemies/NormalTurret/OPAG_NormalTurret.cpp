@@ -67,7 +67,8 @@ void AOPAG_NormalTurret::Death()
 
 void AOPAG_NormalTurret::StartShooting()
 {
-	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
+	if (ShotTimerHandle.IsValid())
+		GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 
 	ShootLineTrace(StartLocation, TurretShootDirection);
 	
