@@ -16,7 +16,8 @@ enum EMenuScreen
 	Level1            UMETA(DisplayName = "Level1"),
 	Options           UMETA(DisplayName = "Options"),
 	Exit              UMETA(DisplayName = "Exit"),
-	QuitGame          UMETA(DisplayName = "QuitGame")	
+	QuitGame          UMETA(DisplayName = "QuitGame"),
+	HowToPlay         UMETA(DisplayName = "HowToPlay")
 };
 
 UCLASS()
@@ -25,9 +26,7 @@ class OFPLANETSANDGUNS_API AOPAG_MainMenuHUD : public AHUD
 	GENERATED_BODY()
 
 	//Variables
-
-private:
-
+	
 	UPROPERTY()
 	ULevelSequencePlayer* StartLevelSequencePlayer;
 	UPROPERTY()
@@ -42,32 +41,26 @@ private:
 	ULevelSequencePlayer* ExitLevelSequencePlayer;
 	UPROPERTY()
 	ULevelSequencePlayer* QuitGameLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* HowToPlayLevelSequencePlayer;
 
 	//Functions
 
 public:
+	
 	virtual void DrawHUD() override;
-
-	//TODO: DEBUG FUNCTIONS IN EDITOR, TO BE DELETED
-	UFUNCTION(CallInEditor)
-	void GoFromMainMenuToLevelSelection();
-	UFUNCTION(CallInEditor)
-	void GoFromLevelSelectionToMainMenu();
-	UFUNCTION(CallInEditor)
-	void GoFromMainMenuToExit();
-	UFUNCTION(CallInEditor)
-	void GoFromExitToMainMenu();
-	UFUNCTION(CallInEditor)
-	void GoFromMainMenuToOptions();
-	UFUNCTION(CallInEditor)
-	void GoFromOptionsToMainMenu();
+	
 	UFUNCTION()
 	void SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const;
 
 protected:
+	
 	virtual void BeginPlay() override;
 
 private:
+	
 	UFUNCTION()
-	void StartLevel1();	
+	void StartLevel1();
+	UFUNCTION()
+	void AbortGame();
 };

@@ -16,10 +16,10 @@ void AOPAG_MainMenuHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	 if (PC) {
-	 	PC->SetInputMode(FInputModeUIOnly());
-	 	PC->bShowMouseCursor = true;
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	 if (PlayerController) {
+	 	PlayerController->SetInputMode(FInputModeUIOnly());
+	 	PlayerController->bShowMouseCursor = true;
 	 }
 
 	//Main menu sequence names
@@ -27,9 +27,9 @@ void AOPAG_MainMenuHUD::BeginPlay()
 	const FStringAssetReference LevelSelectionSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToLevelSelection.LS_ToLevelSelection");	
 	const FStringAssetReference Level1SequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToPlanet1.LS_ToPlanet1");	
 	const FStringAssetReference OptionsSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToOptionsView.LS_ToOptionsView");
-	const FStringAssetReference OptionsToMenuSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_OptionsToMenu.LS_OptionsToMenu");
 	const FStringAssetReference ExitSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToExit.LS_ToExit");
 	const FStringAssetReference QuitGameSequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_QuitGame.LS_QuitGame");
+	const FStringAssetReference HowToPlaySequenceName("/Game/OfPlanetsAndGuns/UI/Sequences/LS_ToHowToPlay.LS_ToHowToPlay");
 
 	//Start sequence initialization
 	if(ULevelSequence* const StartLevelSequence = Cast<ULevelSequence>(StartSequenceName.TryLoad()))
@@ -67,15 +67,6 @@ void AOPAG_MainMenuHUD::BeginPlay()
 			OptionsLevelSequence, OptionsSettings, OptionsOutActor);
 	}
 
-	//Options to menu sequence initialization
-	if(ULevelSequence* const OptionsToMenuLevelSequence = Cast<ULevelSequence>(OptionsToMenuSequenceName.TryLoad()))
-	{
-		const FMovieSceneSequencePlaybackSettings OptionsToMenuSettings;
-		ALevelSequenceActor* OptionsToMenuOutActor;
-		OptionsToMenuLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
-			OptionsToMenuLevelSequence, OptionsToMenuSettings, OptionsToMenuOutActor);
-	}
-
 	//Exit sequence initialization
 	if(ULevelSequence* const ExitLevelSequence = Cast<ULevelSequence>(ExitSequenceName.TryLoad()))
 	{
@@ -94,15 +85,25 @@ void AOPAG_MainMenuHUD::BeginPlay()
 			QuitGameLevelSequence, QuitGameSettings, QuitGameOutActor);
 	}
 
+	//How to play sequence initialization
+	if(ULevelSequence* const HowToPlayLevelSequence = Cast<ULevelSequence>(HowToPlaySequenceName.TryLoad()))
+	{
+		const FMovieSceneSequencePlaybackSettings HowToPlaySettings;
+		ALevelSequenceActor* HowToPlayOutActor;
+		HowToPlayLevelSequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(),
+			HowToPlayLevelSequence, HowToPlaySettings, HowToPlayOutActor);
+	}
+
 	//Executes first sequence (menu opening)
 	SequencePlaySelection(Start, MainMenu);
 
-	//Events binding
+	//Delegate binding
 	Level1LevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::StartLevel1);
+	QuitGameLevelSequencePlayer->OnStop.AddUniqueDynamic(this, &AOPAG_MainMenuHUD::AbortGame);
 }
 
 void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const
-{
+{	
 	switch(From)
 	{		
 		case Start:
@@ -120,6 +121,9 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 				case Exit:
 					ExitLevelSequencePlayer->Play();
 					break;
+				case HowToPlay:
+					HowToPlayLevelSequencePlayer->Play();
+					break;
 				default:
 					break;
 			}
@@ -128,7 +132,6 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 			switch(To)
 			{
 				case Level1:
-					UE_LOG(LogTemp, Warning, TEXT("InLevel1Selection"));
 					Level1LevelSequencePlayer->Play();
 					break;
 				case MainMenu:
@@ -161,6 +164,16 @@ void AOPAG_MainMenuHUD::SequencePlaySelection(const EMenuScreen From, const EMen
 					break;
 			}
 			break;
+		case HowToPlay:
+			switch(To)
+			{
+				case MainMenu:
+					HowToPlayLevelSequencePlayer->PlayReverse();
+					break;
+				default:
+					break;
+			}
+			break;
 		default:
 			break;
 	}
@@ -170,40 +183,21 @@ void AOPAG_MainMenuHUD::StartLevel1()
 {
 	const UOPAG_GameInstance* const GameInstance = GetWorld()->GetGameInstance<UOPAG_GameInstance>();
 	const UOPAG_EventManagerSubsystem* const EMS =  GameInstance->GetEventManager();
-	APlayerController* PC = GetWorld()->GetFirstPlayerController();
-	if (PC) {
-		PC->SetInputMode(FInputModeGameOnly());
-		PC->bShowMouseCursor = false;
+	
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController)
+	{
+		PlayerController->SetInputMode(FInputModeGameOnly());
+		PlayerController->bShowMouseCursor = false;
 	}
+	
 	EMS->StartPlanet.Broadcast(0);
 }
 
-//TODO: EDITOR FUNCTIONS, TO BE DELETED
-void AOPAG_MainMenuHUD::GoFromMainMenuToLevelSelection()
+void AOPAG_MainMenuHUD::AbortGame()
 {
-	SequencePlaySelection(MainMenu, LevelSelection);
-}
-
-void AOPAG_MainMenuHUD::GoFromLevelSelectionToMainMenu()
-{
-	SequencePlaySelection(LevelSelection, MainMenu);
-}
-void AOPAG_MainMenuHUD::GoFromMainMenuToExit()
-{
-	SequencePlaySelection(MainMenu, Exit);
-}
-
-void AOPAG_MainMenuHUD::GoFromExitToMainMenu()
-{
-	SequencePlaySelection(Exit, MainMenu);
-}
-
-void AOPAG_MainMenuHUD::GoFromMainMenuToOptions()
-{
-	SequencePlaySelection(MainMenu, Options);
-}
-
-void AOPAG_MainMenuHUD::GoFromOptionsToMainMenu()
-{
-	SequencePlaySelection(Options, MainMenu);
+	// const UOPAG_GameInstance* const GameInstance = GetWorld()->GetGameInstance<UOPAG_GameInstance>();
+	// const UOPAG_EventManagerSubsystem* const EMS =  GameInstance->GetEventManager();
+	// EMS->QuitGame.Broadcast();
+	UKismetSystemLibrary::QuitGame(GetWorld(), GetOwningPlayerController(),	EQuitPreference::Quit, false);
 }

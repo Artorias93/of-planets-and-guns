@@ -13,11 +13,12 @@ void UOPAG_UWMainMenuView::BindEvents()
 	NewRunButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWMainMenuView::NewRunButtonClicked);
 	OptionsButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWMainMenuView::OptionsButtonClicked);
 	QuitButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWMainMenuView::QuitButtonClicked);
+	HowToPlayButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWMainMenuView::HowToPlayButtonClicked);
 }
 
 void UOPAG_UWMainMenuView::NewRunButtonClicked()
 {
-	if (AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
 		MyHUD->SequencePlaySelection(MainMenu, LevelSelection);
 	}
@@ -25,7 +26,7 @@ void UOPAG_UWMainMenuView::NewRunButtonClicked()
 
 void UOPAG_UWMainMenuView::OptionsButtonClicked()
 {
-	if (AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
 		MyHUD->SequencePlaySelection(MainMenu, Options);
 	}	
@@ -33,11 +34,18 @@ void UOPAG_UWMainMenuView::OptionsButtonClicked()
 
 void UOPAG_UWMainMenuView::QuitButtonClicked()
 {
-	if (AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
 		//MyHUD->HideMainMenu();
 		MyHUD->SequencePlaySelection(MainMenu, Exit);
 	}	
-
 }
 
+void UOPAG_UWMainMenuView::HowToPlayButtonClicked()
+{
+	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		//MyHUD->HideMainMenu();
+		MyHUD->SequencePlaySelection(MainMenu, HowToPlay);
+	}	
+}

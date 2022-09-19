@@ -162,10 +162,7 @@ void AOPAG_Enemy::Attack()
 void AOPAG_Enemy::Death()
 {
 	//Stops executing AI tasks
-	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(GetController()))
-	{
-		AIController->GetBrainComponent()->StopLogic("Death");
-	}
+	GetController()->UnPossess();
 
 	// Destroy health bar
 	EnemyHealthBarComponent->DestroyComponent(true);
@@ -181,8 +178,6 @@ void AOPAG_Enemy::Death()
 
 void AOPAG_Enemy::Despawn()
 {
-		//Fill with everything from drops to enemy manager stuff
-
 	GetWorld()->GetTimerManager().ClearTimer(RagdollTimerHandle);
 	//Broadcasts the kill to the event manager
 	const auto GI = GetGameInstance<UOPAG_GameInstance>();

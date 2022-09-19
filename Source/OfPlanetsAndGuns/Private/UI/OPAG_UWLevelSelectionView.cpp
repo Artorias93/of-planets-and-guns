@@ -13,7 +13,7 @@ void UOPAG_UWLevelSelectionView::NativeConstruct()
 
 void UOPAG_UWLevelSelectionView::Planet1ButtonClicked()
 {
-	if(AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	if(const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
 		MyHUD->SequencePlaySelection(LevelSelection, Level1);
 	}	
@@ -21,7 +21,7 @@ void UOPAG_UWLevelSelectionView::Planet1ButtonClicked()
 
 void UOPAG_UWLevelSelectionView::BackButtonClicked()
 {
-	if(AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	if(const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
 		MyHUD->SequencePlaySelection(LevelSelection, MainMenu);
 	}	

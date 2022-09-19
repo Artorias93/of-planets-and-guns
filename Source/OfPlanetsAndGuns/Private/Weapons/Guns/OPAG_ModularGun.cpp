@@ -115,7 +115,6 @@ void AOPAG_ModularGun::BeginPlay()
 
 	CreateAndAttachAllModules(GetStandardModulesStruct());
 	PopulateAmmoTable();
-	CheckIfPhysical();
 
 	AmmoCurrent = GetStatsTotal().ClipSize;
 
@@ -157,15 +156,6 @@ void AOPAG_ModularGun::PopulateAmmoTable()
 		AmmoReloadingMultipliersTable->GetAllRows(Context, AmmoReloadingMultipliers);
 	}
 
-}
-
-void AOPAG_ModularGun::CheckIfPhysical() const
-{
-	// Control if module has parent gun -> is attached
-	if (GetParentActor() == nullptr)
-	{
-		//Receiver->SetSimulatePhysics(true);
-	}
 }
 
 #pragma region Setter
@@ -368,26 +358,30 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 	const FRotator SpawnRotator = FRotator::ZeroRotator;
 	AActor* TempActor = GetWorld()->SpawnActor(TempModuleClass, &SpawnLocation, &SpawnRotator);
 	AOPAG_ModuleBase* TempModule = Cast<AOPAG_ModuleBase>(TempActor);
-	TempModule->ApplyForce_Implementation(Force);
 
-	// If the module isn't the standard, so is important attach the standard 
-	switch (TempModule->GetType())
+	if (TempModule)
 	{
-	case EModuleTypes::Barrel:
-		CreateModule(ChildModule, StandardBarrel);
-		break;
-	case EModuleTypes::Stock:
-		CreateModule(ChildModule, StandardStock);
-		break;
-	case EModuleTypes::Grip:
-		CreateModule(ChildModule, StandardGrip);
-		break;
-	case EModuleTypes::Magazine:
-		CreateModule(ChildModule, StandardMagazine);
-		break;
-	case EModuleTypes::Sight:
-		CreateModule(ChildModule, StandardSight);
-		break;
+		TempModule->StartDropTimeline();
+
+		// If the module isn't the standard, so is important attach the standard 
+		switch (TempModule->GetType())
+		{
+		case EModuleTypes::Barrel:
+			CreateModule(ChildModule, StandardBarrel);
+			break;
+		case EModuleTypes::Stock:
+			CreateModule(ChildModule, StandardStock);
+			break;
+		case EModuleTypes::Grip:
+			CreateModule(ChildModule, StandardGrip);
+			break;
+		case EModuleTypes::Magazine:
+			CreateModule(ChildModule, StandardMagazine);
+			break;
+		case EModuleTypes::Sight:
+			CreateModule(ChildModule, StandardSight);
+			break;
+		}
 	}
 }
 
@@ -754,4 +748,16 @@ void AOPAG_ModularGun::LoadParticleFromRarity(EModuleRarity ModuleRarity)
 		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Legendary.P_Modules_Legendary'"), NULL, LOAD_None, NULL);
 		break;
 	}
+}
+
+void AOPAG_ModularGun::StartDropTimeline()
+{
+	GunSpawnLocation = GetActorLocation();
+
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDropDir.X = FMath::Sin(RandomAngle);
+	RandomDropDir.Y = FMath::Cos(RandomAngle);
+
+	GunDropTimeline->PlayFromStart();
 }
