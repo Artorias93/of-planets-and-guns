@@ -93,7 +93,6 @@ void AOPAG_LootBox::ActivationParticleEffect()
 	if (ActivationParticles != nullptr) {
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation);// FRotator::MakeFromEuler(FVector(0, 0, 1)), FVector(50.0f));
 	}
-	
 }
 
 void AOPAG_LootBox::Interact_Implementation()
@@ -151,7 +150,7 @@ void AOPAG_LootBox::SpawnItem()
 	// If the item is gun, that gun is generate with random modules
 	if (AOPAG_ModularGun* GunModular = Cast<AOPAG_ModularGun>(Item))
 	{
-		GunModular->CreateAndAttachAllModules(Modules);
+		GunModular->CreateAndAttachAllModules(Modules, GunModular->GetSecondaryStatsModifiers());
 		GunModular->StartDropTimeline();
 	}
 	// If the item is a module, apply bonus stats

@@ -155,7 +155,6 @@ void AOPAG_ModularGun::PopulateAmmoTable()
 	{
 		AmmoReloadingMultipliersTable->GetAllRows(Context, AmmoReloadingMultipliers);
 	}
-
 }
 
 #pragma region Setter
@@ -508,6 +507,25 @@ void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules
 	if (Module && Modules.Accessory) Module->SetStats(ModuleStats.AccessoryStats);
 }
 
+void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules,
+	const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers)
+{
+	CreateAndAttachAllModules(Modules);
+	AOPAG_ModuleBase* Module = nullptr;
+	Module = Cast<AOPAG_ModuleBase>(Barrel->GetChildActor());
+	if (Module && Modules.Barrel) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Stock->GetChildActor());
+	if (Module && Modules.Stock) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Grip->GetChildActor());
+	if (Module && Modules.Grip) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Magazine->GetChildActor());
+	if (Module && Modules.Magazine) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Sight->GetChildActor());
+	if (Module && Modules.Sight) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Accessory->GetChildActor());
+	if (Module && Modules.Accessory) Module->SetStats(StatModifiers);
+}
+
 // Is important when generate the basic gun 
 void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const
 {
@@ -709,18 +727,33 @@ bool AOPAG_ModularGun::HasSight() const
 
 EModuleRarity AOPAG_ModularGun::GetGunRarity() const
 {
-	int BarrelRarity	= GetModuleBySocketType(EModuleTypes::Barrel) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
-	int AccesoryRarity	= GetModuleBySocketType(EModuleTypes::Accessory) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
-	int GripRarity		= GetModuleBySocketType(EModuleTypes::Grip) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
-	int MagazineRarity	= GetModuleBySocketType(EModuleTypes::Magazine) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
-	int SightRarity		= GetModuleBySocketType(EModuleTypes::Sight) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;
-	int StockRarity		= GetModuleBySocketType(EModuleTypes::Stock) != nullptr ? (int) GetModuleBySocketType(EModuleTypes::Barrel)->GetRarity() : 0;	
-
-	int RarityAvg = FMath::RoundToInt((BarrelRarity + AccesoryRarity + GripRarity + MagazineRarity + SightRarity + StockRarity) / 6);
-
-	EModuleRarity Rarity = static_cast<EModuleRarity>(RarityAvg);
-
+	int Result = 0;
+	for (int i = 0; i < ModuleTypeCount(); i++)
+	{
+		AOPAG_ModuleBase* ModuleBase = GetModuleBySocketType(static_cast<EModuleTypes>(i));
+		if (ModuleBase != nullptr)
+		{
+			Result += (int) ModuleBase->GetRarity();
+		}
+	}
+	
+	int RarityAvg = FMath::RoundToInt(Result / 6);
+	const EModuleRarity Rarity = static_cast<EModuleRarity>(RarityAvg);
 	return Rarity;
+}
+
+int AOPAG_ModularGun::GetLevel() const
+{
+	int Result = 0;
+	for (int i = 0; i < ModuleTypeCount(); i++)
+	{
+		AOPAG_ModuleBase* ModuleBase = GetModuleBySocketType(static_cast<EModuleTypes>(i));
+		if (ModuleBase != nullptr)
+		{
+			Result += ModuleBase->GetLevel();
+		}
+	}
+	return Result > 0 ? Result : 1;
 }
 
 void AOPAG_ModularGun::LoadParticleFromRarity(EModuleRarity ModuleRarity)

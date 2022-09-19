@@ -205,7 +205,8 @@ protected:
 	void ResetReductionSpreadRadiusShooting();
 
 	// Subsystem for shooting
-	float CalculateDamage(const bool IsHeadshot) const;
+	float CalculateMultiplierByLevel() const;
+	float CalculateDamage(const bool IsHeadshot, const float MultiplierByLevel) const;
 	void AddCritToDamage(float& Damage) const;
 	float CalculateSpread() const;
 	FVector2D CalculateRandPointInCircle() const;
@@ -225,6 +226,7 @@ public:
 	float GetReloadTime() const;
 	float GetRecoilStrength() const;
 	float GetRecoilSpeed() const;
+	virtual int GetLevel() const;
 
 	//Setter
 	virtual void SetStatsTotal(const FOPAG_GunStats GunStats);

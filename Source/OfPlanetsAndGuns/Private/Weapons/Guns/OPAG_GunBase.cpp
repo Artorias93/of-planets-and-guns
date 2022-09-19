@@ -139,6 +139,11 @@ float AOPAG_GunBase::GetRecoilSpeed() const
 {
 	return RecoilSpeed;
 }
+
+int AOPAG_GunBase::GetLevel() const
+{
+	return 1;
+}
 #pragma endregion Get
 
 #pragma region Set
@@ -258,7 +263,8 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 				{
 					//Check for head shot
 					const bool IsHeadshot = OutHit.GetComponent()->ComponentHasTag("Head");
-					Character->ReceiveDamage(CalculateDamage(IsHeadshot), GetParentActor());
+					const float MultiplierByLevel = CalculateMultiplierByLevel(); 
+					Character->ReceiveDamage(CalculateDamage(IsHeadshot, MultiplierByLevel), GetParentActor());
 				}
 			}
 		}
@@ -282,10 +288,24 @@ void AOPAG_GunBase::ResetShootTimer()
 #pragma endregion Shooting Behavior
 
 #pragma region Shooting Utility
-float AOPAG_GunBase::CalculateDamage(const bool IsHeadshot) const
+float AOPAG_GunBase::CalculateMultiplierByLevel() const
+{
+	int Level = GetLevel();
+	if (Level > 10 && Level < 24)
+	{
+		return 2;
+	}
+	if (Level > 25)
+	{
+		return 3;
+	}
+	return 1;
+}
+
+float AOPAG_GunBase::CalculateDamage(const bool IsHeadshot, const float MultiplierByLevel) const
 {
 	const float DamageRandomnessAmount = GetStatsTotal().Damage * 0.01f * DamageRandomnessPercentage;
-	float AdjustedDamage = GetStatsTotal().Damage + FMath::RandRange(-DamageRandomnessAmount, DamageRandomnessAmount);
+	float AdjustedDamage = (GetStatsTotal().Damage + FMath::RandRange(-DamageRandomnessAmount, DamageRandomnessAmount)) * MultiplierByLevel;
 	if (IsHeadshot || FMath::RandRange(0.f, 100.f) < BaseCritChance)
 	{
 		AddCritToDamage(AdjustedDamage);

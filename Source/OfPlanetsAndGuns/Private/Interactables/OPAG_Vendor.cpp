@@ -126,7 +126,7 @@ void AOPAG_Vendor::Unlock() {
 	ShowingMerch = true;
 	ActivationParticleEffect();
 	PopulateGunAndModuleArray();
-	SpawnItem(666);
+	SpawnItem(666);	// change with difficulty
 }
 
 void AOPAG_Vendor::ActivationParticleEffect() {
@@ -293,6 +293,13 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 		ChildActorModules[i]->SetChildActorClass(NewModuleClass);
 
 		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(ChildActorModules[i]->GetChildActor());
+		
+		const AOPAG_ModularGun* PrimaryGun = Player->GetPrimaryGun();
+		if (PrimaryGun != nullptr)
+		{
+			NewModule->SetStats(PrimaryGun->GetSecondaryStatsModifiers());
+		}
+
 		FVector newModuleScale(2.f, 2.f, 2.f);
 		NewModule->SetActorScale3D(newModuleScale);
 		TempModulesTextRender[i]->SetVisibility(true);
@@ -361,8 +368,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 		// Remove the select index for no-repeat the same or not fiend module
 		ModuleTypes.RemoveAt(RandomModuleIndex);
 	}
-
-	Gun.CreateAndAttachAllModules(ModulesStruct);
+	Gun.CreateAndAttachAllModules(ModulesStruct, Gun.GetSecondaryStatsModifiers());
 }
 
 void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)
