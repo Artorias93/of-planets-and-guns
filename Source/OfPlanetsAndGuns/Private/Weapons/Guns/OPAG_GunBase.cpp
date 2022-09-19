@@ -24,6 +24,7 @@
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "Items/OPAG_Barrel.h"
 #include "Curves/CurveVector.h"
+#include <Kismet/KismetMathLibrary.h>
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -56,6 +57,18 @@ AOPAG_GunBase::AOPAG_GunBase()
 	{
 		CurveGunDropVector = CurveVector.Object;
 	}
+
+	static ConstructorHelpers::FClassFinder<AActor> ProjectileTraceClass(TEXT("'/Game/OfPlanetsAndGuns/Weapons/Throwables/BP_ProjectileTrace'"));
+	if (ProjectileTraceClass.Succeeded())
+	{
+		ProjectileTrace = ProjectileTraceClass.Class;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> BulletConcreteDecalObject(TEXT("'/Game/OfPlanetsAndGuns/MaterialsLibrary/MI_Decal_Bullet_Concrete'"));
+	if (BulletConcreteDecalObject.Succeeded())
+	{
+		BulletConcreteDecal = BulletConcreteDecalObject.Object;
+	}
 }
 
 void AOPAG_GunBase::BeginPlay()
@@ -85,11 +98,6 @@ void AOPAG_GunBase::Tick(float DeltaTime)
 UCameraComponent* AOPAG_GunBase::GetADSCamera() const
 {
 	return ADSCamera;
-}
-
-void AOPAG_GunBase::ResetReductionSpreadRadiusShooting()
-{
-	ReductionSpreadRadiusShooting = 1.f;
 }
 
 FName AOPAG_GunBase::GetGunName() const
@@ -177,9 +185,17 @@ int AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Directi
 	if(AOPAG_CharacterBase* const CharacterOwner = Cast<AOPAG_CharacterBase>(GetParentActor()))
 	{
 		MakeNoise(1.f, CharacterOwner, CharacterOwner->GetActorLocation(), 0);
-	}	
+	}
+	
+	// Spawn muzzle emitter
+	UGameplayStatics::SpawnEmitterAttached(MuzzlePartile, GetMuzzle(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None, true);
 
 	return 1;
+}
+
+void AOPAG_GunBase::StopShoot()
+{
+	GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, 0.2f, false);
 }
 
 void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
@@ -197,19 +213,28 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 	// If Actor is inherited by character base, invoke take damage
 	if (bIsHit)
 	{
+		// Spawn bullet concrete
+		const FVector BulletConcreteLocation = OutHit.ImpactPoint;
+		const FRotator BulletConcreteRotation = OutHit.ImpactNormal.Rotation();
+		UGameplayStatics::SpawnDecalAtLocation(GetWorld(), BulletConcreteDecal, FVector(5.f, 5.f, 5.f), BulletConcreteLocation, BulletConcreteRotation, 15.f);
+
+		// Spawn particle when impact to hit point
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitPartile, OutHit.Location, FRotator::ZeroRotator, true, EPSCPoolMethod::None, true);
-		/*
-		FHitResult OutHit2;
-		const bool bIsHit2 = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), MuzzleLocation, OutHit.Location, ObjectTypesQuery, false,
-			ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHit2, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 		
-		const FVector LookDirection = bIsHit2 ? OutHit2.ImpactPoint : OutHit2.TraceEnd;
-		const FRotator LookRotator = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, LookDirection);
-		const FTransform TracerTransform(MuzzleLocation, LookRotator, FVector(.3f, .3f, .3f));
+		// Draw projectile trace
+		if (ProjectileTrace != nullptr)
+		{
+			FHitResult OutHit2;
+			const bool bIsHit2 = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), GetMuzzle()->GetComponentLocation(), OutHit.Location, ObjectTypesQuery, false,
+				ActorsToIgnore, EDrawDebugTrace::None, OutHit2, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
-		// Spawn trace in the space
-	    GetWorld()->SpawnActor(TracerClass, TracerTransform);*/
+			const FVector LookDirection = bIsHit2 ? OutHit2.ImpactPoint : OutHit2.TraceEnd;
+			const FRotator LookRotator = UKismetMathLibrary::FindLookAtRotation(GetMuzzle()->GetComponentLocation(), LookDirection);
+			const FTransform TracerTransform(LookRotator, GetMuzzle()->GetComponentLocation(), FVector(.3f, .3f, .3f));
 
+			// Spawn trace in the space
+			GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
+		}
 
 		// It should be implemented by a "Hittable interface, were the gun just check if the hitted actor has this interface, if yes, send the an hit event with the hitted actor as param"
 		if (AOPAG_ForceField* ForceField = Cast<AOPAG_ForceField>(OutHit.GetActor()))
@@ -217,7 +242,7 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 			EMS->ForceFieldHit.Broadcast(ForceField);
 		}
 
-
+		// All behavior with targets
 		AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
 		if (Character)
 		{
@@ -231,7 +256,7 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 				//If the hit component is the shield, damage is not applied
 				if(!OutHit.GetComponent()->ComponentHasTag("Shield"))
 				{
-					//Check for headshot
+					//Check for head shot
 					const bool IsHeadshot = OutHit.GetComponent()->ComponentHasTag("Head");
 					Character->ReceiveDamage(CalculateDamage(IsHeadshot), GetParentActor());
 				}
@@ -243,10 +268,6 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 			Barrel->Detonate();
 		}
 	}
-	
-	// Spawn emitter
-	// const FVector MuzzleLocation = GetMuzzle()->GetActorLocation();
-	UGameplayStatics::SpawnEmitterAttached(MuzzlePartile, GetMuzzle(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None, true);
 }
 
 USceneComponent* AOPAG_GunBase::GetMuzzle() const
@@ -297,7 +318,7 @@ float AOPAG_GunBase::CalculateSpreadRadius() const
 {
 	const float Spread = CalculateSpread();
 	const float SpreadRadius = FMath::Tan(Spread / 2) * ShootConeLength;
-	
+
 	const AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(GetParentActor());
 	if (Character)
 	{
@@ -413,3 +434,15 @@ void AOPAG_GunBase::GunDropTimelineProgress(FVector Value)
 	SetActorLocation(NewLocation);
 }
 #pragma endregion Drop
+
+#pragma region ReductionSpreadRadiusShooting
+void AOPAG_GunBase::ResetReductionSpreadRadiusShooting()
+{
+	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting - .15f, 1.f, ReductionSpreadRadiusShootingMax);
+
+	if (!bIsShoot && ReductionSpreadRadiusShooting != 1.f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, 0.15f, false);
+	}
+}
+#pragma endregion ReductionSpreadRadiusShooting

@@ -93,6 +93,12 @@ protected:
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
 
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AActor> ProjectileTrace;
+
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UMaterialInterface* BulletConcreteDecal;
+
 protected:
 	UPROPERTY(Category = "OPAG | Gun | Emitter", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* MuzzlePartile;
@@ -144,6 +150,7 @@ protected:
 protected:
 	FTimerHandle ResetShootHandle;
 	FTimerHandle ReloadHandle;
+	FTimerHandle ResetReductionSpreadRadiusShootingHandle;
 
 	UPROPERTY()
 	UOPAG_SoundManagerSubsystem* SMS;
@@ -168,6 +175,7 @@ public:
 
 	// Main system for shooting
 	virtual int Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
+	virtual void StopShoot();
 
 	// Reload system
 	virtual void Reload();
@@ -178,7 +186,6 @@ public:
 
 	// Camera behavior
 	UCameraComponent* GetADSCamera() const;
-	void ResetReductionSpreadRadiusShooting();
 
 	// Checking
 	bool CanShoot() const;
@@ -194,6 +201,9 @@ protected:
 	// Reload
 	virtual void WaitReloadingTimer();
 
+	//ReductionSpreadRadiusShooting
+	void ResetReductionSpreadRadiusShooting();
+
 	// Subsystem for shooting
 	float CalculateDamage(const bool IsHeadshot) const;
 	void AddCritToDamage(float& Damage) const;
@@ -203,8 +213,7 @@ protected:
 	FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction) const;
 	TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
 
-	UFUNCTION()
-	void GunDropTimelineProgress(FVector Value);
+	UFUNCTION() void GunDropTimelineProgress(FVector Value);
 
 public:
 	// Getter

@@ -718,7 +718,7 @@ void AOPAG_Player::KeepShooting()
 
 void AOPAG_Player::StopShooting()
 {
-
+	CurrentGun->StopShoot();
 }
 
 // This method is linked with input fire 
@@ -739,9 +739,6 @@ void AOPAG_Player::Shoot()
 	// Active recoil
 	RandomRecoilYaw = FMath::RandRange(RecoilYawMin, RecoilYawMax);
 	RandomRecoilYaw *= ((100 - CurrentGun->GetStatsTotal().Stability) / 100) * CurrentGun->GetRecoilStrength();
-	AccumulatedRecoilDeviation -= CurrentDeltaRotation;
-	CurrentDeltaRotation = FRotator::ZeroRotator;
-
 	RecoilReverseTimeline->Stop();
 	RecoilTimeline->SetPlayRate(CurrentGun->GetRecoilSpeed());
 	RecoilReverseTimeline->SetPlayRate(CurrentGun->GetRecoilSpeed());
@@ -785,15 +782,6 @@ void AOPAG_Player::Lookup(const FInputActionValue& Value)
 	if (LookupScale != 0.0f)
 	{
 		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
-
-		if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale > 0.f)
-		{
-			AccumulatedRecoilDeviation.Pitch -= LookupScale;
-		}
-		if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale < 0.f)
-		{
-			AccumulatedRecoilDeviation.Pitch += LookupScale;
-		}
 	}
 }
 
@@ -803,15 +791,6 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 	if (TurnScale != 0.0f)
 	{
 		AddControllerYawInput(TurnScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
-
-		if (AccumulatedRecoilDeviation.Yaw < .0f && TurnScale < .0f)
-		{
-			AccumulatedRecoilDeviation.Yaw -= TurnScale;
-		}
-		else if (AccumulatedRecoilDeviation.Yaw > .0f && TurnScale > .0f)
-		{
-			AccumulatedRecoilDeviation.Yaw -= TurnScale;
-		}
 	}
 }
 
@@ -1295,24 +1274,32 @@ void AOPAG_Player::RecoilTimelineProgress(float Value)
 
 void AOPAG_Player::RecoilTimelineFinished()
 {
-	CurrentDeltaRotation = FRotator::ZeroRotator;
+	AccumulatedRecoilDeviationBeforeGoingDown = AccumulatedRecoilDeviation;
+	LastTimelimeReverseRecoilValue = .0f;
+
 	RecoilReverseTimeline->PlayFromStart();
 }
 
 void AOPAG_Player::RecoilReverseTimelineProgress(float Value)
 {
-	FRotator NextCurrentRotator = FMath::Lerp(FRotator::ZeroRotator, AccumulatedRecoilDeviation, 
-		RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength());
+	float DeltaTimeline = RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength() - LastTimelimeReverseRecoilValue;
+	LastTimelimeReverseRecoilValue = RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength();
 
-	AddControllerPitchInput(NextCurrentRotator.Pitch - CurrentDeltaRotation.Pitch);
-	AddControllerYawInput(NextCurrentRotator.Yaw - CurrentDeltaRotation.Yaw);
-	CurrentDeltaRotation = NextCurrentRotator;
+	float DeltaPitch = AccumulatedRecoilDeviationBeforeGoingDown.Pitch * DeltaTimeline;
+	AddControllerPitchInput(DeltaPitch);
+
+	float DeltaYaw = AccumulatedRecoilDeviationBeforeGoingDown.Yaw * DeltaTimeline;
+	AddControllerYawInput(DeltaYaw);
+
+	AccumulatedRecoilDeviation.Pitch -= DeltaPitch;
+	AccumulatedRecoilDeviation.Yaw -= DeltaYaw;
 }
 
 void AOPAG_Player::RecoilReverseTimelineFinished()
 {
+	// UE_LOG(LogTemp, Warning, TEXT("Finished Accumulated:%s"), *AccumulatedRecoilDeviation.ToString());
+	// Only to avoid that float errors accumulated
 	AccumulatedRecoilDeviation = FRotator::ZeroRotator;
-	CurrentDeltaRotation = FRotator::ZeroRotator;
 }
 #pragma endregion Timeline
 
