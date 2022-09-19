@@ -29,7 +29,7 @@ void UOPAG_ServiceShoot::TickNode(UBehaviorTreeComponent& OwnerBTComponent, uint
 			{
 				if(AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 				{
-					//Constructing what's needed for the SphereTrace
+					//Constructing what's needed for the LineTrace
 					TArray<AActor*> ActorsToIgnore;
 					ActorsToIgnore.Add(Enemy);
 					FHitResult HitResult;

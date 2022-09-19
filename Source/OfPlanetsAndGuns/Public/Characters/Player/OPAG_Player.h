@@ -7,6 +7,7 @@
 #include "GameplayEffectTypes.h"
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
+#include "NiagaraComponent.h"
 #include "OPAG_PlayerState.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -36,6 +37,9 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UNiagaraComponent* DashNiagaraComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
@@ -287,7 +291,7 @@ private:
 	void InitUICounters();
 
 	// Mathematics utility
-	const FVector CalculateThrowForce() const;
+	FVector CalculateThrowForce() const;
 	
 	// Ability behavior
 	void InitializeAbilities();
@@ -354,6 +358,7 @@ private:
 	UFUNCTION() void ReloadGun();
 	UFUNCTION() void IncrementPrimaryGunAmmo();
 	UFUNCTION() void InspectGun();
+	void StopInspectGun();
 
 	// Interact with items
 	UFUNCTION() void InteractWithItem();
@@ -386,11 +391,11 @@ public:
 
 public:
 	// Callable in animation
-	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
-	UFUNCTION(BlueprintCallable) const bool GetIsRunning() const;
+	UFUNCTION(BlueprintCallable) bool GetIsADS() const;
+	UFUNCTION(BlueprintCallable) bool GetIsRunning() const;
 	UFUNCTION(BlueprintCallable) void AttachMagazineToHandNotify();
 	UFUNCTION(BlueprintCallable) void AttachMagazineToGunNotify();
-	UFUNCTION(BlueprintCosmetic) void CompleteInspectNotify();
+	UFUNCTION(BlueprintCallable) void CompleteInspectNotify();
 	UFUNCTION(BlueprintCallable) void FootstepsMakeNoiseNotify();
 
 public:

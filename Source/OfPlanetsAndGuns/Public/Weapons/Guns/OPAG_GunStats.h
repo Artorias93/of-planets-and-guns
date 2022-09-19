@@ -53,4 +53,7 @@ public:
 		int ClipSize;
 
 	FOPAG_GunStats() : Damage(0), FireRate(0), Accuracy(0), Stability(0), ReloadingTime(0), ClipSize(0) {}
+	FOPAG_GunStats(float NewDamage, float NewFireRate, float NewAccuracy, float NewStability, float NewReloading, 
+		int NewClipSize) : Damage(NewDamage), FireRate(NewFireRate), Accuracy(NewAccuracy), Stability(NewStability), 
+		ReloadingTime(NewReloading), ClipSize(NewClipSize) {}
 };

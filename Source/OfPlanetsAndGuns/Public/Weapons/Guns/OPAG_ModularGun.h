@@ -79,6 +79,13 @@ protected:
 	TSubclassOf<AOPAG_ModuleBase> StandardSight;
 
 protected:
+	UPROPERTY(Category = "OPAG | Module | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystemComponent* GunDropHighlight;
+
+	UPROPERTY(Category = "OPAG | Module | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* GunDropHighlightParticle;
+
+protected:
 	FTimerHandle FlyRotationHandle;
 	TArray<FOPAG_SecondaryStatModifier*> ModuleSecondaryStatsModifiers;
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
@@ -176,4 +183,9 @@ public:
 	//Setter
 	virtual void SetStatsTotal(const FOPAG_GunStats GunStats);
 	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
+
+	EModuleRarity GetGunRarity() const;
+
+	void LoadParticleFromRarity(EModuleRarity ModuleRarity);
+	void StartDropTimeline();
 };

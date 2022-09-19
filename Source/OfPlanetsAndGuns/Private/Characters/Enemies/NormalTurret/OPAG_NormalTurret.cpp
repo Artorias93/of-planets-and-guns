@@ -122,7 +122,7 @@ void AOPAG_NormalTurret::ShootLineTrace(FVector StartShootLocation, FVector Dire
 	TArray<AActor*> ActorsToIgnore = GetAllActorsToIgnore();
 
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, StartShootLocation + Direction * 2000, ObjectTypesQuery, false,
-		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+		ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
 	// If Actor is inheritance by character base, invoke take damage
 	if (bIsHit)

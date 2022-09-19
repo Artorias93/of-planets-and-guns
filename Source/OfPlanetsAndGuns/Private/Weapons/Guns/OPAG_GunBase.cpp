@@ -23,6 +23,7 @@
 #include "Characters/Enemies/ShieldEnemy/OPAG_ShieldEnemy.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "Items/OPAG_Barrel.h"
+#include "Curves/CurveVector.h"
 
 AOPAG_GunBase::AOPAG_GunBase()
 {
@@ -31,7 +32,10 @@ AOPAG_GunBase::AOPAG_GunBase()
 	Receiver = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Receiver"));
 	Receiver->CanCharacterStepUpOn = ECB_Owner;
 	Receiver->SetCollisionProfileName("Weapon");
+
 	RootComponent = Receiver;
+
+	Receiver->SetSimulatePhysics(false);
 
 	ADSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ADSCamera"));
 	if (ADSCamera)
@@ -43,6 +47,14 @@ AOPAG_GunBase::AOPAG_GunBase()
 		ADSCamera->SetFieldOfView(60.f);
 		ADSCamera->Mobility = EComponentMobility::Movable;
 		ADSCamera->SetupAttachment(RootComponent);
+	}
+
+	GunDropTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("GunDropTimeline"));
+
+	static ConstructorHelpers::FObjectFinder<UCurveVector> CurveVector(TEXT("'/Game/OfPlanetsAndGuns/Interactables/Curve_Drop_Vector.Curve_Drop_Vector'"));
+	if (CurveVector.Succeeded())
+	{
+		CurveGunDropVector = CurveVector.Object;
 	}
 }
 
@@ -56,6 +68,12 @@ void AOPAG_GunBase::BeginPlay()
 	check(EMS);
 
 	AmmoCurrent = GetStatsTotal().ClipSize;
+
+	GunDropTimeline->SetLooping(false);
+	GunDropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+
+	OnGunDropTimelineProgress.BindUFunction(this, FName("GunDropTimelineProgress"));
+	GunDropTimeline->AddInterpVector(CurveGunDropVector, OnGunDropTimelineProgress, FName("GunDropTimelinePropertyName"));	
 }
 
 void AOPAG_GunBase::Tick(float DeltaTime)
@@ -152,8 +170,7 @@ int AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Directi
 	ShootLineTrace(StartShootLocation, Direction, ShooterCharacter);
 
 	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting + .15f, 1.f, ReductionSpreadRadiusShootingMax);
-
-
+	
 	//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 	SMS->PlayWeaponSounds( this , EWeaponSoundAction::Fire);
 	
@@ -338,6 +355,7 @@ TArray<AActor*> AOPAG_GunBase::CheckWhatActorsIgnoreLinetrace()
 
 	return Objects;
 }
+
 #pragma endregion Shooting Utility
 
 #pragma region Reload
@@ -347,6 +365,14 @@ void AOPAG_GunBase::Reload()
 	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, 
 		&AOPAG_GunBase::WaitReloadingTimer, GetReloadTime(), false);
 	//UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
+}
+
+void AOPAG_GunBase::StopReloading()
+{
+	// Check the bool when interrupter the reloading
+	bIsReloading = false;
+
+	GetWorld()->GetTimerManager().ClearTimer(ReloadHandle);
 }
 
 void AOPAG_GunBase::WaitReloadingTimer()
@@ -375,3 +401,15 @@ bool AOPAG_GunBase::CanAim() const
 	return !bIsReloading;
 }
 #pragma endregion Checking
+
+#pragma region Drop
+void AOPAG_GunBase::GunDropTimelineProgress(FVector Value)
+{
+	FVector NewLocation = GunSpawnLocation;
+	NewLocation.X += RandomDropDir.X * Value.X * GunDropCurveXFactor;
+	NewLocation.Y += RandomDropDir.Y * Value.X * GunDropCurveXFactor;
+	NewLocation.Z += Value.Z * GunDropCurveZFactor;
+
+	SetActorLocation(NewLocation);
+}
+#pragma endregion Drop
