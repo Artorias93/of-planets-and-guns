@@ -444,19 +444,6 @@ void AOPAG_Player::InitUICounters()
 		EMS->DashAmountIncrement.Broadcast();
 	}
 
-	//Old unused
-	/*
-	for (i = 0; i < InventorySystemComp->BoltsAmount; ++i)
-	{
-		EMS->BoltsAmountIncrement.Broadcast();
-	}
-
-	for (i = 0; i < InventorySystemComp->PotionsAmount; ++i)
-	{
-		EMS->PotionsAmountIncrement.Broadcast();
-	}
-	*/
-
 	EMS->PotionsAmountChanged.Broadcast(InventorySystemComp->PotionsAmount);
 	EMS->BoltsAmountChanged.Broadcast(InventorySystemComp->BoltsAmount);
 }
@@ -508,14 +495,6 @@ void AOPAG_Player::ActiveDash()
 				DashTimeline->PlayFromStart();
 			}
 		}
-
-		/*FGameplayTagContainer TempTags;
-		TempTags.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
-		TArray<FActiveGameplayEffectHandle> TempEffectsArray = AbilitySystemComp->GetNumActiveGameplayEffects()
-		if (TempEffectsArray.Num() > 0)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%f"), AbilitySystemComp->GetActiveGameplayEffect(TempEffectsArray[0])->GetTimeRemaining(UKismetSystemLibrary::GetGameTimeInSeconds(GetWorld())));
-		}*/
 	}
 }
 
@@ -778,7 +757,16 @@ void AOPAG_Player::MoveRight(const FInputActionValue& Value)
 
 void AOPAG_Player::Lookup(const FInputActionValue& Value)
 {
-	const float LookupScale = Value[1];
+	LookupScale = Value[1];
+	if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale > .0f)
+	{
+		AccumulatedRecoilDeviation.Pitch -= LookupScale;
+		if (AccumulatedRecoilDeviation.Pitch <= .0f)
+		{
+			RecoilReverseTimeline->Stop();
+			AccumulatedRecoilDeviation = FRotator::ZeroRotator;
+		}
+	}
 	if (LookupScale != 0.0f)
 	{
 		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
@@ -1301,6 +1289,12 @@ void AOPAG_Player::RecoilTimelineFinished()
 
 void AOPAG_Player::RecoilReverseTimelineProgress(float Value)
 {
+	if (AccumulatedRecoilDeviation.Pitch < .0f)
+	{
+		RecoilReverseTimeline->Stop();
+		AccumulatedRecoilDeviation = FRotator::ZeroRotator;
+	}
+
 	float DeltaTimeline = RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength() - LastTimelimeReverseRecoilValue;
 	LastTimelimeReverseRecoilValue = RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength();
 

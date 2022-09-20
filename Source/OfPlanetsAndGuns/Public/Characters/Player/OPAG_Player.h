@@ -251,6 +251,7 @@ private:
 	FRotator AccumulatedRecoilDeviationBeforeGoingDown = FRotator::ZeroRotator;
 	float RandomRecoilYaw = .0f;
 	float LastTimelimeReverseRecoilValue = .0f;
+	float LookupScale = .0f;
 
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
