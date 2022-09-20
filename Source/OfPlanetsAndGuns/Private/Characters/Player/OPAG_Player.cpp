@@ -1095,18 +1095,28 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 
 void AOPAG_Player::UpdateInteractableMessage() {
 	bool bShouldUpdateMessage = false;
-	if (InteractableObject)
+
+	if (InteractableObject) 
+	{
 		if (IOPAG_InteractableInterface::Execute_WillChangeInteractStateDynamically(InteractableObject))
 		{
 			bShouldUpdateMessage = true;
 		}
 
-	if (!bShouldUpdateMessage && bHasAlreadyLooked) {
+		if(!bHasAlreadyLooked)
+			bShouldUpdateMessage = true;
+	}
+
+	if (!bShouldUpdateMessage && bHasAlreadyLooked) 
+	{
 		bHasAlreadyLooked = InteractableObject != nullptr;
-		if (!bHasAlreadyLooked) {
+
+		if (!bHasAlreadyLooked) 
+		{
 			EMS->UnlookedAtInteractable.Broadcast();
 		}
-		else bShouldUpdateMessage = true;
+		else 
+			bShouldUpdateMessage = true;
 	}
 
 	if (bShouldUpdateMessage && InteractableObject) {
