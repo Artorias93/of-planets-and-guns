@@ -84,6 +84,9 @@ AOPAG_Enemy::AOPAG_Enemy()
 		BoosterParticleComponent2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
 			"RightFootSocket");
 	}
+
+	//Binding of SetIsJumping for when the jumping timer reaches 0
+	JumpingDelegate.BindUFunction(this, "SetIsJumping", false);
 }
 
 void AOPAG_Enemy::BeginPlay()
@@ -192,7 +195,17 @@ bool AOPAG_Enemy::GetIsJumping() const
 
 void AOPAG_Enemy::SetIsJumping(const bool Value)
 {
+	if(Value)
+		TurnOnBoosters();
+	else
+		TurnOffBoosters();
 	bIsJumping = Value;
+}
+
+void AOPAG_Enemy::TurnOffJumpingAfterSeconds(const float JumpDuration, const float AnimFraction)
+{
+	GetWorld()->GetTimerManager().SetTimer(JumpingTimerHandle, JumpingDelegate,
+		JumpDuration * AnimFraction, false);
 }
 
 void AOPAG_Enemy::TurnOnBoosters() const
