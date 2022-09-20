@@ -95,7 +95,6 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 				const AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 				if (Player != nullptr)
 				{
-
 					const AOPAG_ModularGun* PrimaryGun = Player->GetPrimaryGun();
 					if (PrimaryGun != nullptr)
 					{

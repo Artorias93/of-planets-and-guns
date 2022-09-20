@@ -55,6 +55,8 @@ private:
 
 	AOPAG_Vendor* Vendor;
 
+	float RoomDifficulty = .0f;
+
 protected:
 	virtual void BeginPlay() override;
 

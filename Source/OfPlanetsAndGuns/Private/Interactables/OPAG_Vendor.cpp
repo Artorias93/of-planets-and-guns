@@ -16,6 +16,7 @@
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "../../Public/Managers/OPAG_GameInstance.h"
+#include "Managers/RoomManager/OPAG_RoomManager.h"
 
 
 // Sets default values
@@ -122,11 +123,11 @@ void AOPAG_Vendor::BeginPlay()
 	BoxMoneyTrigger->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapEnd);
 }
 
-void AOPAG_Vendor::Unlock() {
+void AOPAG_Vendor::Unlock(const float Difficulty) {
 	ShowingMerch = true;
 	ActivationParticleEffect();
-	PopulateGunAndModuleArray();
-	SpawnItem(666);	// change with difficulty
+	PopulateGunAndModuleArray();	
+	SpawnItem(Difficulty);
 }
 
 void AOPAG_Vendor::ActivationParticleEffect() {
@@ -154,9 +155,6 @@ void AOPAG_Vendor::Tick(float DeltaTime)
 		PriceTextRender_Module1->SetWorldRotation(LookToPlayerRotation3);
 		PriceTextRender_Module2->SetWorldRotation(LookToPlayerRotation4);
 	}
-	
-
-	
 }
 
 // Overlap Begin

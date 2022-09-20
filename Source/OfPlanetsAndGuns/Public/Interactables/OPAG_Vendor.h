@@ -81,7 +81,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	void Unlock();
+	void Unlock(const float Difficulty);
 
 	void SpawnItem(const float RoomDifficulty);
 	void AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue);
