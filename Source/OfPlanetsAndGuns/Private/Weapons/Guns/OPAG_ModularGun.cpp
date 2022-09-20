@@ -727,33 +727,40 @@ bool AOPAG_ModularGun::HasSight() const
 
 EModuleRarity AOPAG_ModularGun::GetGunRarity() const
 {
-	int Result = 0;
-	for (int i = 0; i < ModuleTypeCount(); i++)
+	int Level = GetLevel();
+	if (Level == 2)
 	{
-		AOPAG_ModuleBase* ModuleBase = GetModuleBySocketType(static_cast<EModuleTypes>(i));
-		if (ModuleBase != nullptr)
-		{
-			Result += (int) ModuleBase->GetRarity();
-		}
+		return EModuleRarity::Uncommon;
 	}
-	
-	int RarityAvg = FMath::RoundToInt(Result / 6);
-	const EModuleRarity Rarity = static_cast<EModuleRarity>(RarityAvg);
-	return Rarity;
+	if (Level == 3)
+	{
+		return EModuleRarity::Rare;
+	}
+	if (Level == 4)
+	{
+		return EModuleRarity::Epic;
+	}
+	if (Level >= 5)
+	{
+		return EModuleRarity::Legendary;
+	}
+	return EModuleRarity::Common;
 }
 
 int AOPAG_ModularGun::GetLevel() const
 {
 	int Result = 0;
+	int Count = 0;
 	for (int i = 0; i < ModuleTypeCount(); i++)
 	{
 		AOPAG_ModuleBase* ModuleBase = GetModuleBySocketType(static_cast<EModuleTypes>(i));
 		if (ModuleBase != nullptr)
 		{
 			Result += ModuleBase->GetLevel();
+			Count++;
 		}
 	}
-	return Result > 0 ? Result : 1;
+	return FMath::RoundToInt(Result / Count);
 }
 
 void AOPAG_ModularGun::LoadParticleFromRarity(EModuleRarity ModuleRarity)
