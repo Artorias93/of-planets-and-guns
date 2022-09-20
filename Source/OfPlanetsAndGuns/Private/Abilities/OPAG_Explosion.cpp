@@ -26,7 +26,7 @@ void UOPAG_Explosion::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 			ETraceTypeQuery::TraceTypeQuery3,
 			false,
 			ActorsToIgnore,
-			EDrawDebugTrace::ForDuration,
+			EDrawDebugTrace::None,
 			OutHits,
 			true
 		);

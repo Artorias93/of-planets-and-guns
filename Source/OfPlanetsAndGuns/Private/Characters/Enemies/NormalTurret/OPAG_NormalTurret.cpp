@@ -36,9 +36,9 @@ void AOPAG_NormalTurret::Attack()
 {	
 	if (!GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
 	{
-		GetShootingDirection(StartLocation, TurretShootDirection, 10.f);
+		GetShootingDirection(StartLocation, TurretShootDirection, TurretShootingAccuracyTolerance);
 		GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &AOPAG_NormalTurret::StartShooting,
-			.5f);
+			ShootingTimer);
 	}
 }
 

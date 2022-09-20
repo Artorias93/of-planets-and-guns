@@ -212,11 +212,13 @@ void AOPAG_Enemy::TurnOnBoosters() const
 {
 	if(BoosterParticleComponent1)
 	{
-		BoosterParticleComponent1->SetVisibility(true);
+		BoosterParticleComponent1->Activate();
+		//BoosterParticleComponent1->SetVisibility(true);
 	}
 	if(BoosterParticleComponent2)
 	{
-		BoosterParticleComponent2->SetVisibility(true);
+		BoosterParticleComponent2->Activate();
+		//BoosterParticleComponent2->SetVisibility(true);
 	}
 }
 
@@ -224,11 +226,13 @@ void AOPAG_Enemy::TurnOffBoosters() const
 {
 	if(BoosterParticleComponent1)
 	{
-		BoosterParticleComponent1->SetVisibility(false);
+		BoosterParticleComponent1->Deactivate();
+		//BoosterParticleComponent1->SetVisibility(false);
 	}
 	if(BoosterParticleComponent2)
 	{
-		BoosterParticleComponent2->SetVisibility(false);
+		BoosterParticleComponent2->Deactivate();
+		//BoosterParticleComponent2->SetVisibility(false);
 	}
 }
 

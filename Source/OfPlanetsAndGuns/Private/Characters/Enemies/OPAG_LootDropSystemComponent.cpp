@@ -55,7 +55,9 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 	{
 		TArray<AActor*> ActorsToIgnore;
 		FHitResult HitResult;
-		const bool bResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + (-Owner->GetActorUpVector() * 5000), TraceTypeQuery1, true, ActorsToIgnore, EDrawDebugTrace::Persistent, HitResult, true);
+		const bool bResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(),
+			Owner->GetActorLocation(), Owner->GetActorLocation() + (-Owner->GetActorUpVector() * 5000),
+			TraceTypeQuery1, true, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true);
 		
 		if (bResult)
 		{
