@@ -129,6 +129,7 @@ public:
 	// Module
 	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules);
 	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules, const FOPAG_GunModuleStats& ModuleStats);
+	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules, const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers);
 	bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const EModuleBrand NewModuleBrand, const
 	                  FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity
 	                  & OldModuleRarity, EModuleBrand& OldModuleBrand, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
@@ -185,6 +186,7 @@ public:
 	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
 
 	EModuleRarity GetGunRarity() const;
+	virtual int GetLevel() const;
 
 	void LoadParticleFromRarity(EModuleRarity ModuleRarity);
 	void StartDropTimeline();

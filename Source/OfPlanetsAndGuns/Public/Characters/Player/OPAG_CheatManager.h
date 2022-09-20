@@ -15,5 +15,8 @@ class OFPLANETSANDGUNS_API UOPAG_CheatManager : public UCheatManager
 	UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
 	virtual void NoobGun();
 
+	UFUNCTION(exec, BlueprintCallable, Category = "Cheat Manager")
+	virtual void Gold(int Value);
+
 	virtual void God() override;
 };

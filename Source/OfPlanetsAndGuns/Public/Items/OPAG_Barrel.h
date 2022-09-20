@@ -47,6 +47,9 @@ private:
 	UPROPERTY(Category = "OPAG | Barrel | Emitter", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* ExplosionEmitter;
 
+private:
+	bool bIsDetonating = false;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -56,4 +59,8 @@ public:
 
 private:
 	void DamageAllTargetsInRange();
+
+public:
+	FORCEINLINE bool IsDetonating() const { return bIsDetonating; }
+
 };

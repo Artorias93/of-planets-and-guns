@@ -31,7 +31,7 @@ public:
 
 	void StartShooting();
 	
-	void GetShootingDirection(FVector& Start, FVector& ShootDirection, float const ShootingAccuracyTolerance);
+	void GetShootingDirection(FVector& Start, FVector& ShootDirection, float const TurretShootingAccuracyTolerance);
 
 	void ShootLineTrace(FVector StartShootLocation, FVector Direction);
 
@@ -43,6 +43,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Normal Turret")
 		float ExplosionPower = 900.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Normal Turret")
+	float TurretShootingAccuracyTolerance = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Normal Turret")
+	float ShootingTimer = .5f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
 		float Damage;

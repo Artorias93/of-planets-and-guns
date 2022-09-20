@@ -141,6 +141,19 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 			AbilityBox->AddChild(BarImage);
 		}
 	}
+
+	if (CanBeEquipped) 
+	{
+		ModuleBackground->SetColorAndOpacity(BackgroundBlue);
+		ModuleForeground->SetColorAndOpacity(ForegroundBlue);
+		EquippableText->SetText(FText::FromString("Equipable"));
+	}
+	else 
+	{
+		ModuleBackground->SetColorAndOpacity(BackgroundRed);
+		ModuleForeground->SetColorAndOpacity(ForegroundRed);
+		EquippableText->SetText(FText::FromString("Not Equipable"));
+	}
 }
 
 void UOPAG_UWNewModuleView::AddStatEntry(FString StatName, float OldStat, float NewStat, bool bIsInverted) 
@@ -150,7 +163,7 @@ void UOPAG_UWNewModuleView::AddStatEntry(FString StatName, float OldStat, float 
 	if (Delta != 0) 
 	{
 		UOPAG_ModuleStatItem* item = NewObject<UOPAG_ModuleStatItem>(UOPAG_ModuleStatItem::StaticClass());
-		item->Init(StatName, FString::SanitizeFloat(NewStat, 0), FString::SanitizeFloat(Delta, 0), Delta < 0, bIsInverted);
+		item->Init(StatName, FString::Printf(TEXT("%.2f"), OldStat), FString::Printf(TEXT("%.2f"), NewStat), Delta < 0, bIsInverted);
 		StatsListView->AddItem(item);
 		item->MarkPendingKill();
 	}

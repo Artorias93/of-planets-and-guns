@@ -84,6 +84,9 @@ AOPAG_Enemy::AOPAG_Enemy()
 		BoosterParticleComponent2->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
 			"RightFootSocket");
 	}
+
+	//Binding of SetIsJumping for when the jumping timer reaches 0
+	JumpingDelegate.BindUFunction(this, "SetIsJumping", false);
 }
 
 void AOPAG_Enemy::BeginPlay()
@@ -192,18 +195,30 @@ bool AOPAG_Enemy::GetIsJumping() const
 
 void AOPAG_Enemy::SetIsJumping(const bool Value)
 {
+	if(Value)
+		TurnOnBoosters();
+	else
+		TurnOffBoosters();
 	bIsJumping = Value;
+}
+
+void AOPAG_Enemy::TurnOffJumpingAfterSeconds(const float JumpDuration, const float AnimFraction)
+{
+	GetWorld()->GetTimerManager().SetTimer(JumpingTimerHandle, JumpingDelegate,
+		JumpDuration * AnimFraction, false);
 }
 
 void AOPAG_Enemy::TurnOnBoosters() const
 {
 	if(BoosterParticleComponent1)
 	{
-		BoosterParticleComponent1->SetVisibility(true);
+		BoosterParticleComponent1->Activate();
+		//BoosterParticleComponent1->SetVisibility(true);
 	}
 	if(BoosterParticleComponent2)
 	{
-		BoosterParticleComponent2->SetVisibility(true);
+		BoosterParticleComponent2->Activate();
+		//BoosterParticleComponent2->SetVisibility(true);
 	}
 }
 
@@ -211,11 +226,13 @@ void AOPAG_Enemy::TurnOffBoosters() const
 {
 	if(BoosterParticleComponent1)
 	{
-		BoosterParticleComponent1->SetVisibility(false);
+		BoosterParticleComponent1->Deactivate();
+		//BoosterParticleComponent1->SetVisibility(false);
 	}
 	if(BoosterParticleComponent2)
 	{
-		BoosterParticleComponent2->SetVisibility(false);
+		BoosterParticleComponent2->Deactivate();
+		//BoosterParticleComponent2->SetVisibility(false);
 	}
 }
 

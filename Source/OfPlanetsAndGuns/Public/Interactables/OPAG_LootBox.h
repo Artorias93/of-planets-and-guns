@@ -39,10 +39,10 @@ public:
 	float ThrowItems = 100.f;
 
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	int MinModules = 0;
+		int MinModules = 0;
 
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	int MaxModules = 3;
+		int MaxModules = 3;
 
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	int NumberOfModulesToSpawn = 1;

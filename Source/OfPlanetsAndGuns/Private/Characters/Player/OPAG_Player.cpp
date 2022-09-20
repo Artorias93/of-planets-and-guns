@@ -176,17 +176,6 @@ void AOPAG_Player::Tick(float DeltaTime)
 
 	// Check if player sees enemy (for health bar)
 	LookAtEnemy();
-
-	//UE_LOG(LogTemp, Warning, TEXT("%s"), *InteractableObject->GetFullName());
-	/*FGameplayTagContainer TempTagsContainer;
-	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
-	float TimeRemaning;
-	float Duration;
-	bool bCheckResult = GetCooldownRemainingForTag(TempTagsContainer, TimeRemaning, Duration);
-	if(bCheckResult)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%f"), TimeRemaning);
-	}*/
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
@@ -361,8 +350,12 @@ void AOPAG_Player::InitDefaultValues()
 	{
 		CurrentGun = Cast<AOPAG_GunBase>(PrimaryGunComponent->GetChildActor());
 		PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
+		
+		// Update debug stats and modules struct
+		#if WITH_EDITOR
 		DebugCurretGunStats = CurrentGun->GetStatsTotal();
 		DebugCurretGunModules = PrimaryGun->GetModulesStruct();
+		#endif
 	}
 	if (Camera)
 	{
@@ -564,7 +557,7 @@ void AOPAG_Player::RemovePassiveGunAbility(FGameplayTagContainer PassiveAbilityT
 #pragma endregion Ability
 
 #pragma region Guns
-// Method invoked in beginplay to attach all guns to the player's mesh
+// Method invoked in begin play to attach all guns to the player's mesh
 void AOPAG_Player::AttachDefaultGuns()
 {
 	if (PrimaryGunComponent->GetChildActor())
@@ -718,7 +711,7 @@ void AOPAG_Player::KeepShooting()
 
 void AOPAG_Player::StopShooting()
 {
-
+	CurrentGun->StopShoot();
 }
 
 // This method is linked with input fire 
@@ -739,9 +732,6 @@ void AOPAG_Player::Shoot()
 	// Active recoil
 	RandomRecoilYaw = FMath::RandRange(RecoilYawMin, RecoilYawMax);
 	RandomRecoilYaw *= ((100 - CurrentGun->GetStatsTotal().Stability) / 100) * CurrentGun->GetRecoilStrength();
-	AccumulatedRecoilDeviation -= CurrentDeltaRotation;
-	CurrentDeltaRotation = FRotator::ZeroRotator;
-
 	RecoilReverseTimeline->Stop();
 	RecoilTimeline->SetPlayRate(CurrentGun->GetRecoilSpeed());
 	RecoilReverseTimeline->SetPlayRate(CurrentGun->GetRecoilSpeed());
@@ -753,7 +743,14 @@ void AOPAG_Player::Shoot()
 	// Update Ammo
 	CurrentGun->DecrementAmmoCurrent(AmmoConsumate);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
-	if (CurrentGun->GetAmmoCurrent() == 0)	EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
+	if (CurrentGun->GetAmmoCurrent() == 0)
+	{
+		// Update ui gun icon -> set linear color to red
+		EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
+
+		// Auto-reload
+		ReloadGun();
+	}
 }
 
 // Override the default method GetShootingDirection 
@@ -785,15 +782,6 @@ void AOPAG_Player::Lookup(const FInputActionValue& Value)
 	if (LookupScale != 0.0f)
 	{
 		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
-
-		if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale > 0.f)
-		{
-			AccumulatedRecoilDeviation.Pitch -= LookupScale;
-		}
-		if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale < 0.f)
-		{
-			AccumulatedRecoilDeviation.Pitch += LookupScale;
-		}
 	}
 }
 
@@ -803,15 +791,6 @@ void AOPAG_Player::Turn(const FInputActionValue& Value)
 	if (TurnScale != 0.0f)
 	{
 		AddControllerYawInput(TurnScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
-
-		if (AccumulatedRecoilDeviation.Yaw < .0f && TurnScale < .0f)
-		{
-			AccumulatedRecoilDeviation.Yaw -= TurnScale;
-		}
-		else if (AccumulatedRecoilDeviation.Yaw > .0f && TurnScale > .0f)
-		{
-			AccumulatedRecoilDeviation.Yaw -= TurnScale;
-		}
 	}
 }
 
@@ -991,9 +970,14 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 				FActorSpawnParameters SpawnParams;
 				AOPAG_ModuleBase* OldModule = GetWorld()->SpawnActor<AOPAG_ModuleBase>(OldModuleClass, ModuleSpawnLocation, FRotator::ZeroRotator, SpawnParams);
 				OldModule->SetParameters(OldModuleBrand, OldModuleStats, OldModuleEquippable);
-				//OldModule->ApplyForce_Implementation(CalculateThrowForce());
 				OldModule->StartDropTimeline();
 			}
+
+			// Update debug stats
+			#if WITH_EDITOR
+			DebugCurretGunStats = CurrentGun->GetStatsTotal();
+			DebugCurretGunModules = PrimaryGun->GetModulesStruct();
+			#endif
 		}
 	}
 }
@@ -1032,7 +1016,12 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		PrimaryGun->CreateAndAttachAllModules(NewGunModules);
 		CurrentGun = PrimaryGun;
 		SMS->PlayWeaponSounds(CurrentGun, EWeaponSoundAction::Pickup);
+		
+		// Update debug stats and struct
+		#if WITH_EDITOR
 		DebugCurretGunStats = CurrentGun->GetStatsTotal();
+		DebugCurretGunModules = PrimaryGun->GetModulesStruct();
+		#endif
 
 		// Update ammo
 		PrimaryGun->SetAmmoCurrent(PrimaryGun->GetStatsTotal().ClipSize);
@@ -1049,7 +1038,6 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		OldGun->DetachAllModules(CalculateThrowForce());
 		OldGun->StartDropTimeline();
 	}
-	//OldGun->ApplyForce_Implementation(CalculateThrowForce());
 }
 
 const FVector AOPAG_Player::CalculateModuleSpawnLocation() const
@@ -1107,18 +1095,28 @@ AActor* AOPAG_Player::CheckLookAtInteractableItems()
 
 void AOPAG_Player::UpdateInteractableMessage() {
 	bool bShouldUpdateMessage = false;
-	if (InteractableObject)
+
+	if (InteractableObject) 
+	{
 		if (IOPAG_InteractableInterface::Execute_WillChangeInteractStateDynamically(InteractableObject))
 		{
 			bShouldUpdateMessage = true;
 		}
 
-	if (!bShouldUpdateMessage && bHasAlreadyLooked) {
+		if(!bHasAlreadyLooked)
+			bShouldUpdateMessage = true;
+	}
+
+	if (!bShouldUpdateMessage && bHasAlreadyLooked) 
+	{
 		bHasAlreadyLooked = InteractableObject != nullptr;
-		if (!bHasAlreadyLooked) {
+
+		if (!bHasAlreadyLooked) 
+		{
 			EMS->UnlookedAtInteractable.Broadcast();
 		}
-		else bShouldUpdateMessage = true;
+		else 
+			bShouldUpdateMessage = true;
 	}
 
 	if (bShouldUpdateMessage && InteractableObject) {
@@ -1295,24 +1293,32 @@ void AOPAG_Player::RecoilTimelineProgress(float Value)
 
 void AOPAG_Player::RecoilTimelineFinished()
 {
-	CurrentDeltaRotation = FRotator::ZeroRotator;
+	AccumulatedRecoilDeviationBeforeGoingDown = AccumulatedRecoilDeviation;
+	LastTimelimeReverseRecoilValue = .0f;
+
 	RecoilReverseTimeline->PlayFromStart();
 }
 
 void AOPAG_Player::RecoilReverseTimelineProgress(float Value)
 {
-	FRotator NextCurrentRotator = FMath::Lerp(FRotator::ZeroRotator, AccumulatedRecoilDeviation, 
-		RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength());
+	float DeltaTimeline = RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength() - LastTimelimeReverseRecoilValue;
+	LastTimelimeReverseRecoilValue = RecoilReverseTimeline->GetPlaybackPosition() / RecoilReverseTimeline->GetTimelineLength();
 
-	AddControllerPitchInput(NextCurrentRotator.Pitch - CurrentDeltaRotation.Pitch);
-	AddControllerYawInput(NextCurrentRotator.Yaw - CurrentDeltaRotation.Yaw);
-	CurrentDeltaRotation = NextCurrentRotator;
+	float DeltaPitch = AccumulatedRecoilDeviationBeforeGoingDown.Pitch * DeltaTimeline;
+	AddControllerPitchInput(DeltaPitch);
+
+	float DeltaYaw = AccumulatedRecoilDeviationBeforeGoingDown.Yaw * DeltaTimeline;
+	AddControllerYawInput(DeltaYaw);
+
+	AccumulatedRecoilDeviation.Pitch -= DeltaPitch;
+	AccumulatedRecoilDeviation.Yaw -= DeltaYaw;
 }
 
 void AOPAG_Player::RecoilReverseTimelineFinished()
 {
+	// UE_LOG(LogTemp, Warning, TEXT("Finished Accumulated:%s"), *AccumulatedRecoilDeviation.ToString());
+	// Only to avoid that float errors accumulated
 	AccumulatedRecoilDeviation = FRotator::ZeroRotator;
-	CurrentDeltaRotation = FRotator::ZeroRotator;
 }
 #pragma endregion Timeline
 
@@ -1421,7 +1427,7 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 				SwapGuns();
 
 				PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
-				PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules);
+				PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules, StateToApply.PrimaryGun.AttachedModuleStats);
 
 				AttachDefaultGuns();
 

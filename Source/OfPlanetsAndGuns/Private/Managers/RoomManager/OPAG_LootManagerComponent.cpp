@@ -23,6 +23,11 @@ void UOPAG_LootManagerComponent::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnLootContainers();
+
+	const AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
+	checkf(RoomManager, TEXT("Bad Room Manager Owner"));
+
+	RoomDifficulty = RoomManager->GetCurrentRoomDifficulty();
 }
 
 void UOPAG_LootManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -36,19 +41,15 @@ void UOPAG_LootManagerComponent::GenerateLoot()
 	// Populate items list 
 	PopulateLootLists();
 
-	const AOPAG_RoomManager* RoomManager = GetOwner<AOPAG_RoomManager>();
-	checkf(RoomManager, TEXT("Bad Room Manager Owner"));
-
-	const float Difficulty = RoomManager->GetCurrentRoomDifficulty();
-	GenerateIndividualLoot(LootBoxA.Key, LootBoxA.Value, Difficulty);
-	GenerateIndividualLoot(LootBoxB.Key, LootBoxB.Value, Difficulty);
+	GenerateIndividualLoot(LootBoxA.Key, LootBoxA.Value, RoomDifficulty);
+	GenerateIndividualLoot(LootBoxB.Key, LootBoxB.Value, RoomDifficulty);
 }
 
 void UOPAG_LootManagerComponent::Unlock() const
 {
 	if (LootBoxA.Key) LootBoxA.Key->Unlock();
 	if (LootBoxB.Key) LootBoxB.Key->Unlock();
-	if (Vendor) Vendor->Unlock();
+	if (Vendor) Vendor->Unlock(RoomDifficulty);
 }
 
 void UOPAG_LootManagerComponent::SpawnLootContainers()
@@ -167,7 +168,7 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 				while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 				{
 					const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
-					TSubclassOf<AActor> Module = SelectRandomModule(Modules, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+					TSubclassOf<AActor> Module = SelectRandomModule(Modules, DifficultyValue * DifficultyMultiplierGun, FireMask, ModuleTypes[RandomModuleIndex]);
 					if (Module != nullptr)
 					{
 						switch (ModuleTypes[RandomModuleIndex])

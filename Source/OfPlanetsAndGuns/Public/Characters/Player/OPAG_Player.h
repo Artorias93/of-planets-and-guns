@@ -248,8 +248,9 @@ private:
 	// Fire timers
 	float LastFireTime = .0f;
 	FRotator AccumulatedRecoilDeviation = FRotator::ZeroRotator;
-	FRotator CurrentDeltaRotation = FRotator::ZeroRotator;
+	FRotator AccumulatedRecoilDeviationBeforeGoingDown = FRotator::ZeroRotator;
 	float RandomRecoilYaw = .0f;
+	float LastTimelimeReverseRecoilValue = .0f;
 
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;

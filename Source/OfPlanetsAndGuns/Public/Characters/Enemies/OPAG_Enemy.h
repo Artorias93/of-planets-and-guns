@@ -47,6 +47,9 @@ public:
 	void SetIsJumping(const bool Value);
 
 	UFUNCTION(BlueprintCallable)
+	void TurnOffJumpingAfterSeconds(const float JumpDuration, const float AnimFraction);
+
+	UFUNCTION(BlueprintCallable)
 	void TurnOnBoosters() const;
 
 	UFUNCTION(BlueprintCallable)
@@ -84,7 +87,10 @@ protected:
 private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG AI", meta = (AllowPrivateAccess = true))
-	bool bIsJumping;	
+	bool bIsJumping;
+	
+	FTimerHandle JumpingTimerHandle;
+	FTimerDelegate JumpingDelegate;
 	
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	UBehaviorTree* BehaviorTree;

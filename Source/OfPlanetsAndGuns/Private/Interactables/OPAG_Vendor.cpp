@@ -16,6 +16,7 @@
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "../../Public/Managers/OPAG_GameInstance.h"
+#include "Managers/RoomManager/OPAG_RoomManager.h"
 
 
 // Sets default values
@@ -122,11 +123,11 @@ void AOPAG_Vendor::BeginPlay()
 	BoxMoneyTrigger->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapEnd);
 }
 
-void AOPAG_Vendor::Unlock() {
+void AOPAG_Vendor::Unlock(const float Difficulty) {
 	ShowingMerch = true;
 	ActivationParticleEffect();
-	PopulateGunAndModuleArray();
-	SpawnItem(666);
+	PopulateGunAndModuleArray();	
+	SpawnItem(Difficulty);
 }
 
 void AOPAG_Vendor::ActivationParticleEffect() {
@@ -154,9 +155,6 @@ void AOPAG_Vendor::Tick(float DeltaTime)
 		PriceTextRender_Module1->SetWorldRotation(LookToPlayerRotation3);
 		PriceTextRender_Module2->SetWorldRotation(LookToPlayerRotation4);
 	}
-	
-
-	
 }
 
 // Overlap Begin
@@ -293,6 +291,13 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 		ChildActorModules[i]->SetChildActorClass(NewModuleClass);
 
 		AOPAG_ModuleBase* NewModule = Cast<AOPAG_ModuleBase>(ChildActorModules[i]->GetChildActor());
+		
+		const AOPAG_ModularGun* PrimaryGun = Player->GetPrimaryGun();
+		if (PrimaryGun != nullptr)
+		{
+			NewModule->SetStats(PrimaryGun->GetSecondaryStatsModifiers());
+		}
+
 		FVector newModuleScale(2.f, 2.f, 2.f);
 		NewModule->SetActorScale3D(newModuleScale);
 		TempModulesTextRender[i]->SetVisibility(true);
@@ -305,8 +310,8 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 
 void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue)
 {
-	int MinModules = IsPowerful ? 2 : 0;
-	int MaxModules = IsPowerful ? 6 : 3;
+	int MinModules = IsPowerful ? MinPowerful : MinBare;
+	int MaxModules = IsPowerful ? MaxPowerful : MinPowerful;
 
 	// Init gun's fire type (util for pick random modules)
 	const int FireMask = 1 << (int)Gun.GetFireType();
@@ -327,7 +332,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 	while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 	{
 		const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
-		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModule(ModulesList, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModule(ModulesList, DifficultyValue * DifficultyMultiplierGun, FireMask, ModuleTypes[RandomModuleIndex]);
 		if (Module != nullptr)
 		{
 			switch (ModuleTypes[RandomModuleIndex])
@@ -361,8 +366,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 		// Remove the select index for no-repeat the same or not fiend module
 		ModuleTypes.RemoveAt(RandomModuleIndex);
 	}
-
-	Gun.CreateAndAttachAllModules(ModulesStruct);
+	Gun.CreateAndAttachAllModules(ModulesStruct, Gun.GetSecondaryStatsModifiers());
 }
 
 void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)

@@ -117,23 +117,22 @@ EModuleTypes AOPAG_ModuleBase::GetType() const
 
 EModuleRarity AOPAG_ModuleBase::GetRarity() const
 {
-	if (Level > 11 && Level < 21)
+	if (Level == 2)
 	{
 		return EModuleRarity::Uncommon;
 	}
-	if (Level > 21 && Level < 31)
+	if (Level == 3)
 	{
 		return EModuleRarity::Rare;
 	}
-	if (Level > 31 && Level < 41)
+	if (Level == 4)
 	{
 		return EModuleRarity::Epic;
 	}
-	if (Level > 41)
+	if (Level >= 5)
 	{
 		return EModuleRarity::Legendary;
 	}
-
 	return EModuleRarity::Common;
 }
 
@@ -266,7 +265,7 @@ void AOPAG_ModuleBase::ApplyFly_Implementation()
 
 void AOPAG_ModuleBase::FlyRotationTimer_Implementation()
 {
-	// on every frame change rotationg for a smooth rotating actor
+	// on every frame change rotating for a smooth rotating actor
 	FRotator NewRotation = FRotator(0, 1, 0);
 	FQuat QuatRotation = FQuat(NewRotation);
 	ModuleMesh->AddWorldRotation(QuatRotation, false, 0, ETeleportType::None);
@@ -274,7 +273,8 @@ void AOPAG_ModuleBase::FlyRotationTimer_Implementation()
 
 const float AOPAG_ModuleBase::GetPriceTotal_Implementation()
 {
-	return PriceBase * (1 + PriceMuliplierPercentage * (Level - 1));
+	return 20 * Level; // Temporary
+	// return PriceBase * (1 + PriceMuliplierPercentage * (Level - 1));
 }
 
 bool AOPAG_ModuleBase::CanBuy_Implementation()

@@ -1,6 +1,7 @@
 #include "Characters/Player/OPAG_CheatManager.h"
 #include "Characters/Player/OPAG_Player.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
+#include "Characters/Player/OPAG_InventorySystemComponent.h"
 
 void UOPAG_CheatManager::SetPlayerDamageMultiplier(const float DamageMultiplier)
 {
@@ -27,5 +28,14 @@ void UOPAG_CheatManager::God()
 	if (Pawn != nullptr)
 	{
 		Pawn->SetDamageMultiplier(0.0f);
+	}
+}
+
+void UOPAG_CheatManager::Gold(int Value)
+{
+	AOPAG_Player* Player = Cast<AOPAG_Player>(GetOuterAPlayerController()->GetPawn());
+	if (Player != nullptr)
+	{
+		Player->GetInventorySystemComponent()->SetGold(Value);
 	}
 }
