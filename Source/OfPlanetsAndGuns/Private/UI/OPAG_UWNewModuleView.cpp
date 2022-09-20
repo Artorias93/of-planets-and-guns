@@ -141,6 +141,19 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 			AbilityBox->AddChild(BarImage);
 		}
 	}
+
+	if (CanBeEquipped) 
+	{
+		ModuleBackground->SetColorAndOpacity(BackgroundBlue);
+		ModuleForeground->SetColorAndOpacity(ForegroundBlue);
+		EquippableText->SetText(FText::FromString("Equipable"));
+	}
+	else 
+	{
+		ModuleBackground->SetColorAndOpacity(BackgroundRed);
+		ModuleForeground->SetColorAndOpacity(ForegroundRed);
+		EquippableText->SetText(FText::FromString("Not Equipable"));
+	}
 }
 
 void UOPAG_UWNewModuleView::AddStatEntry(FString StatName, float OldStat, float NewStat, bool bIsInverted) 
