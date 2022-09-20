@@ -18,6 +18,7 @@ public:
 	UOPAG_InventorySystemComponent();
 
 	void AnalyzeItem(AOPAG_Drop* Target);
+	void SetGold(const int Value);
 
 protected:
 	virtual void BeginPlay() override;

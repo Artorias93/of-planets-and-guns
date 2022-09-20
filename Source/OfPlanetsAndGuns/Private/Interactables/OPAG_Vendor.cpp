@@ -310,8 +310,8 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 
 void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerful, const float DifficultyValue)
 {
-	int MinModules = IsPowerful ? 2 : 0;
-	int MaxModules = IsPowerful ? 6 : 3;
+	int MinModules = IsPowerful ? MinPowerful : MinBare;
+	int MaxModules = IsPowerful ? MaxPowerful : MinPowerful;
 
 	// Init gun's fire type (util for pick random modules)
 	const int FireMask = 1 << (int)Gun.GetFireType();
@@ -332,7 +332,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 	while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 	{
 		const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
-		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModule(ModulesList, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+		TSubclassOf<AActor> Module = UOPAG_LootManagerComponent::SelectRandomModule(ModulesList, DifficultyValue * DifficultyMultiplierGun, FireMask, ModuleTypes[RandomModuleIndex]);
 		if (Module != nullptr)
 		{
 			switch (ModuleTypes[RandomModuleIndex])

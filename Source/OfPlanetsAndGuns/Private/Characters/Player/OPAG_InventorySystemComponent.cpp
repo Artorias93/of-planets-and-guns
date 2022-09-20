@@ -44,17 +44,7 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			break;
 
 		case EDropType::Gold:
-			GoldAmount += Target->Amount;
-			if (Owner && Owner->EMS) {
-				Owner->EMS->GoldChanged.Broadcast(GoldAmount);
-				Owner->EMS->ShowGoldInGame.Broadcast();
-
-				GetWorld()->GetTimerManager().SetTimer(GoldShowTimerHandle, this,
-					&UOPAG_InventorySystemComponent::OnGoldShowFinished, GoldShowTimer, false);
-
-				if (Owner->SMS)
-					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
-			}
+			SetGold(Target->Amount);
 			Target->Destroy();
 			break;
 
@@ -84,5 +74,20 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 		default:
 			break;
 		}
+	}
+}
+
+void UOPAG_InventorySystemComponent::SetGold(const int Value)
+{
+	GoldAmount += Value;
+	if (Owner && Owner->EMS) {
+		Owner->EMS->GoldChanged.Broadcast(GoldAmount);
+		Owner->EMS->ShowGoldInGame.Broadcast();
+
+		GetWorld()->GetTimerManager().SetTimer(GoldShowTimerHandle, this,
+			&UOPAG_InventorySystemComponent::OnGoldShowFinished, GoldShowTimer, false);
+
+		if (Owner->SMS)
+			Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 	}
 }

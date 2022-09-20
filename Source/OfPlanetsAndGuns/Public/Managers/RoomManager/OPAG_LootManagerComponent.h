@@ -45,6 +45,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
 		TSubclassOf<AOPAG_Vendor> VendorClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
+	float DifficultyMultiplierGun = 1.f;
+
 private:
 	TPair<AOPAG_LootBox*, TArray<FOPAG_LootChance*>> LootBoxA;
 	TPair<AOPAG_LootBox*, TArray<FOPAG_LootChance*>> LootBoxB;

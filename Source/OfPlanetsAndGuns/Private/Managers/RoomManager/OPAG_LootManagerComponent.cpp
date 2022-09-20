@@ -168,7 +168,7 @@ void UOPAG_LootManagerComponent::GenerateIndividualLoot(AOPAG_LootBox* LootBox, 
 				while (Count < RandomNumberOfModules && ModuleTypes.Num() > 0)
 				{
 					const int RandomModuleIndex = FMath::RandRange(0, ModuleTypes.Num() - 1);
-					TSubclassOf<AActor> Module = SelectRandomModule(Modules, DifficultyValue, FireMask, ModuleTypes[RandomModuleIndex]);
+					TSubclassOf<AActor> Module = SelectRandomModule(Modules, DifficultyValue * DifficultyMultiplierGun, FireMask, ModuleTypes[RandomModuleIndex]);
 					if (Module != nullptr)
 					{
 						switch (ModuleTypes[RandomModuleIndex])

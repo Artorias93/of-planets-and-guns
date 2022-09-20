@@ -225,21 +225,6 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 
 		// Spawn particle when impact to hit point
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitPartile, OutHit.Location, FRotator::ZeroRotator, true, EPSCPoolMethod::None, true);
-		
-		// Draw projectile trace
-		if (ProjectileTrace != nullptr)
-		{
-			FHitResult OutHit2;
-			const bool bIsHit2 = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), GetMuzzle()->GetComponentLocation(), OutHit.Location, ObjectTypesQuery, false,
-				ActorsToIgnore, EDrawDebugTrace::None, OutHit2, true, FLinearColor::Red, FLinearColor::Green, 5.f);
-
-			const FVector LookDirection = bIsHit2 ? OutHit2.ImpactPoint : OutHit2.TraceEnd;
-			const FRotator LookRotator = UKismetMathLibrary::FindLookAtRotation(GetMuzzle()->GetComponentLocation(), LookDirection);
-			const FTransform TracerTransform(LookRotator, GetMuzzle()->GetComponentLocation(), FVector(.3f, .3f, .3f));
-
-			// Spawn trace in the space
-			GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
-		}
 
 		// It should be implemented by a "Hittable interface, were the gun just check if the hitted actor has this interface, if yes, send the an hit event with the hitted actor as param"
 		if (AOPAG_ForceField* ForceField = Cast<AOPAG_ForceField>(OutHit.GetActor()))
@@ -273,6 +258,21 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 		{
 			Barrel->Detonate();
 		}
+	}
+
+	// Draw projectile trace
+	if (ProjectileTrace != nullptr)
+	{
+		FHitResult OutHit2;
+		const bool bIsHit2 = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), GetMuzzle()->GetComponentLocation(), OutHit.Location, ObjectTypesQuery, false,
+			ActorsToIgnore, EDrawDebugTrace::None, OutHit2, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+
+		const FVector LookDirection = bIsHit2 ? OutHit2.ImpactPoint : OutHit2.TraceEnd;
+		const FRotator LookRotator = UKismetMathLibrary::FindLookAtRotation(GetMuzzle()->GetComponentLocation(), LookDirection);
+		const FTransform TracerTransform(LookRotator, GetMuzzle()->GetComponentLocation(), FVector(.3f, .3f, .3f));
+
+		// Spawn trace in the space
+		GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
 	}
 }
 
