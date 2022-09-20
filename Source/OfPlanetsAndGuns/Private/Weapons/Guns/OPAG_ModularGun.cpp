@@ -560,7 +560,7 @@ bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSub
 		                 NewModuleEquippableFireTypes, GetParentActor() == GetWorld()->GetFirstPlayerController()->GetPawn());
 
 		const FName SocketName = GetSocketNameByModuleType(Module->GetType());
-		Module->AttachToComponent(Receiver, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+		Module->AttachToComponent(Receiver, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
 		return true;
 	}
 	return false;

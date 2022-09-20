@@ -369,6 +369,7 @@ private:
 	// Aim input
 	UFUNCTION() void SwitchToADSCamera();
 	UFUNCTION() void ResetFPSCamera();
+	void UpdateCamera(bool InADS);
 
 	// Active ability input
 	UFUNCTION() void ActiveDash();

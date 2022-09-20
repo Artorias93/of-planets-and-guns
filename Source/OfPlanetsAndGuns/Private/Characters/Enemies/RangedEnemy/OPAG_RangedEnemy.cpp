@@ -49,7 +49,7 @@ void AOPAG_RangedEnemy::BeginPlay()
 		if(Weapon->GetChildActor())
 		{
 			Weapon->AttachToComponent(GetMesh(),
-				FAttachmentTransformRules::SnapToTargetNotIncludingScale, "RightHandSocketGun");
+				FAttachmentTransformRules::SnapToTargetIncludingScale, "RightHandSocketGun");
 			EquippedWeapon = Cast<AOPAG_GunBase>(Weapon->GetChildActor());
 		}
 	}	
