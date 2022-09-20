@@ -80,26 +80,29 @@ void AOPAG_RangedEnemy::Attack()
 {
 	if(EquippedWeapon)
 	{
-		if(EquippedWeapon->CanShoot() && !GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
+		if (EquippedWeapon->CanShoot() && !GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
 		{
 			//The first 2 params are multiple "return values" passed by reference.
-			GetShootingDirection(StartLocation, Direction, ShootAccuracyTolerance);
+			//GetShootingDirection(StartLocation, Direction, ShootAccuracyTolerance);
 
-			//A random wait from the moment the enemy decides to shoot and when it actually shoots
-			const float ShotWaitTime = UKismetMathLibrary::RandomFloatInRange(ShotWaitTimeRandomIntervalBounds[0],
-				ShotWaitTimeRandomIntervalBounds[1]);
-
-			if(AimingLed)
+			if (AimingLed)
 				AimingLed->SetVisibility(true);
+			
+			float ShotWaitTime = UKismetMathLibrary::RandomFloatInRange(
+				ShotWaitTimeRandomIntervalBounds[0],
+				ShotWaitTimeRandomIntervalBounds[1]
+			);
+
+			GetShootingDirection(StartLocation, Direction, 0.0f);
 
 			GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &AOPAG_RangedEnemy::StartShooting,
-				ShotWaitTime);
+				ShotWaitTime);			
 		}
 	}
 }
 
 void AOPAG_RangedEnemy::StartShooting()
-{
+{	
 	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
 	
 	EquippedWeapon->Shoot(StartLocation, Direction, this);
@@ -144,18 +147,34 @@ void AOPAG_RangedEnemy::GetShootingDirection(FVector& Start, FVector& ShootDirec
 				//Gets Vector from player to enemy
 				const FVector PlayerToSelfVector = Player->GetActorLocation() - Start;
 
-				//Gets not normalized vector with shooting accuracy computations applied
-				const float DirectionVectorX =
-					PlayerToSelfVector.X + UKismetMathLibrary::RandomFloatInRange(
-						-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
-				const float DirectionVectorY = PlayerToSelfVector.Y;
-				const float DirectionVectorZ =
-					PlayerToSelfVector.Z + UKismetMathLibrary::RandomFloatInRange(
-						-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
-				const FVector DirectionVector = FVector(DirectionVectorX, DirectionVectorY, DirectionVectorZ);
-			
+				float EnemyToPlayerLenght = PlayerToSelfVector.Size();
+
+				// get the two tangent vectors to the one from the player to the enemy (as remaining axis)
+				FVector TangentVector1 = FVector::CrossProduct(PlayerToSelfVector, FVector::UpVector);
+				TangentVector1.Normalize();
+				FVector TangentVector2 = FVector::CrossProduct(PlayerToSelfVector, TangentVector1);
+				TangentVector2.Normalize();
+
+				float RandomAngle1 = UKismetMathLibrary::RandomFloatInRange(
+					-RandomAngleShotBounds,
+					RandomAngleShotBounds
+				);
+
+				float RandomAngle2 = UKismetMathLibrary::RandomFloatInRange(
+					-RandomAngleShotBounds,
+					RandomAngleShotBounds
+				);
+
+				float RandomFactor1 = FMath::Tan(((RandomAngle1 * PI) / 180)) * EnemyToPlayerLenght;
+				float RandomFactor2 = FMath::Tan(((RandomAngle2 * PI) / 180)) * EnemyToPlayerLenght;
+
+				TangentVector1 *= RandomFactor1;
+				TangentVector2 *= RandomFactor2;
+
+				FVector ShotDirectionResult = PlayerToSelfVector + TangentVector1 + TangentVector2;
+
 				//Gets normalized vector with shooting accuracy computations applied
-				ShootDirection = UKismetMathLibrary::Normal(DirectionVector, 0.0001f); //2nd param is tolerance
+				ShootDirection = ShotDirectionResult; //2nd param is tolerance
 			}
 		}
 	}
