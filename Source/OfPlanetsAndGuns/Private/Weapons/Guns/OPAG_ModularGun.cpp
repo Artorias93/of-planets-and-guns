@@ -737,7 +737,7 @@ EModuleRarity AOPAG_ModularGun::GetGunRarity() const
 		}
 	}
 	
-	int RarityAvg = FMath::RoundToInt(Result / 6);
+	int RarityAvg = FMath::RoundToInt(Result / 6.f);
 	const EModuleRarity Rarity = static_cast<EModuleRarity>(RarityAvg);
 	return Rarity;
 }
