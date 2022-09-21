@@ -45,10 +45,10 @@ protected:
 		float ExplosionPower = 900.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Normal Turret")
-	float TurretShootingAccuracyTolerance = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Normal Turret")
 	float ShootingTimer = .5f;
+
+	UPROPERTY(EditAnywhere, Category = "Normal Turret")
+	float RandomAngleShotBounds = 2.5f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Normal Turret")
 		float Damage;

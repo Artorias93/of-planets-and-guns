@@ -251,6 +251,7 @@ private:
 	FRotator AccumulatedRecoilDeviationBeforeGoingDown = FRotator::ZeroRotator;
 	float RandomRecoilYaw = .0f;
 	float LastTimelimeReverseRecoilValue = .0f;
+	float LookupScale = .0f;
 
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
@@ -368,6 +369,7 @@ private:
 	// Aim input
 	UFUNCTION() void SwitchToADSCamera();
 	UFUNCTION() void ResetFPSCamera();
+	void UpdateCamera(bool InADS);
 
 	// Active ability input
 	UFUNCTION() void ActiveDash();
