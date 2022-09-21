@@ -215,6 +215,10 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
 		ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
+	// Draw line trace when shoot
+	const FTransform TracerTransform = FTransform(GetMuzzle()->GetComponentRotation(), StartShootLocation, FVector(.3f, .3f, .3f));
+	GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
+
 	// If Actor is inherited by character base, invoke take damage
 	if (bIsHit)
 	{
@@ -259,21 +263,6 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 			Barrel->Detonate();
 		}
 	}
-
-	// Draw projectile trace
-	if (ProjectileTrace != nullptr)
-	{
-		FHitResult OutHit2;
-		const bool bIsHit2 = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), GetMuzzle()->GetComponentLocation(), OutHit.Location, ObjectTypesQuery, false,
-			ActorsToIgnore, EDrawDebugTrace::None, OutHit2, true, FLinearColor::Red, FLinearColor::Green, 5.f);
-
-		const FVector LookDirection = bIsHit2 ? OutHit2.ImpactPoint : OutHit2.TraceEnd;
-		const FRotator LookRotator = UKismetMathLibrary::FindLookAtRotation(GetMuzzle()->GetComponentLocation(), LookDirection);
-		const FTransform TracerTransform(LookRotator, GetMuzzle()->GetComponentLocation(), FVector(.3f, .3f, .3f));
-
-		// Spawn trace in the space
-		GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
-	}
 }
 
 USceneComponent* AOPAG_GunBase::GetMuzzle() const
@@ -291,11 +280,11 @@ void AOPAG_GunBase::ResetShootTimer()
 float AOPAG_GunBase::CalculateMultiplierByLevel() const
 {
 	int Level = GetLevel();
-	if (Level > 10 && Level < 24)
+	if (Level > 6 && Level <= 18)
 	{
 		return 2;
 	}
-	if (Level > 25)
+	if (Level > 18)
 	{
 		return 3;
 	}
