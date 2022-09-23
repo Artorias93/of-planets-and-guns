@@ -57,8 +57,8 @@ public:
 	// Particle effect
 	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UNiagaraSystem* NsActivationParticles;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UArrowComponent* PosDirActivationParticle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UArrowComponent* PosDirActParticle;
 
 	// Data tables
 	UPROPERTY(Category = "OPAG | Vendor| Tables", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))

@@ -215,8 +215,11 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
 		ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
-	// Draw line trace when shoot
-	const FTransform TracerTransform = FTransform(GetMuzzle()->GetComponentRotation(), StartShootLocation, FVector(.3f, .3f, .3f));
+	// Draw line trace when shoot	
+	FVector Offset = EffectiveDirection.GetSafeNormal() * 200.f;
+	FVector TraceStartLocation = StartShootLocation + Offset;
+
+	const FTransform TracerTransform = FTransform(EffectiveDirection.Rotation(), TraceStartLocation, FVector(.3f, .3f, .3f));
 	GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
 
 	// If Actor is inherited by character base, invoke take damage

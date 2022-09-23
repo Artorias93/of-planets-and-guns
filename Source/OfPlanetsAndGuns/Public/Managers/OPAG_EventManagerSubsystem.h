@@ -53,11 +53,17 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FColorAmmoChanged, const FLinearColo
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSoundSliderChanged, float, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 
 //Unused
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountDecrement);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateDashAmount, float, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateDashProgressBar, float, CurrentTimeProgress);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSwapGunTexture, EFireTypes, CurrentType);
+
 //Unused
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountDecrement);
@@ -128,11 +134,9 @@ class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSub
 
 public:
 
-	FVector C;
-
 	UPROPERTY(BlueprintAssignable, Category = Game)
 		FStartPlanet StartPlanet;
-	UPROPERTY(BlueprintAssignable, Category = Game)
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Game)
 		FLoadMainMenu LoadMainMenu;
 
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
@@ -194,6 +198,12 @@ public:
 		FDashAmountIncrement DashAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountDecrement DashAmountDecrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FUpdateDashAmount UpdateDashAmount;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FSwapGunTexture SwapGunTexture;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FUpdateDashProgressBar	UpdateDashProgressBar;
 
 	//////////
 	//Unused//
@@ -252,6 +262,17 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQualitySettingsChanged QualitySettingsChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged MasterSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged MusicSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged SFXSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged AmbientSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged SystemSliderChanged;
+	
 
 	// Player Enhanced
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")
