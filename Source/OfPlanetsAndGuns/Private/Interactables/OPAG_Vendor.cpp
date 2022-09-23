@@ -97,9 +97,9 @@ AOPAG_Vendor::AOPAG_Vendor()
 	if (ChildActor_Module2)
 		ChildActor_Module2->SetupAttachment(RootComponent);
 
-	PosDirActivationParticle = CreateDefaultSubobject<UArrowComponent>("ActivationParticle_PosDir");
-	if (PosDirActivationParticle)
-		PosDirActivationParticle->SetupAttachment(RootComponent);
+	PosDirActParticle = CreateDefaultSubobject<UArrowComponent>("ActivParticle_PosDir");
+	if (PosDirActParticle)
+		PosDirActParticle->SetupAttachment(RootComponent);
 }
 
 
@@ -134,9 +134,9 @@ void AOPAG_Vendor::BeginPlay()
 	FVector ParticlePos = FVector::ZeroVector;
 	FRotator ParticleRot = FRotator::ZeroRotator;
 	FVector ParticleSize = FVector::OneVector;
-	if (PosDirActivationParticle != nullptr) {
-		ParticlePos = PosDirActivationParticle->GetComponentLocation();
-		ParticleRot = PosDirActivationParticle->GetComponentRotation();
+	if (PosDirActParticle != nullptr) {
+		ParticlePos = PosDirActParticle->GetComponentLocation();
+		ParticleRot = PosDirActParticle->GetComponentRotation();
 	}
 	if (NsActivationParticles != nullptr) {
 		NcActivationParticles = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NsActivationParticles, ParticlePos, ParticleRot, ParticleSize, false, false);
