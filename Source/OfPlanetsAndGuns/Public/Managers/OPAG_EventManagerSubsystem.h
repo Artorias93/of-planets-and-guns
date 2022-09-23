@@ -134,11 +134,9 @@ class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSub
 
 public:
 
-	FVector C;
-
 	UPROPERTY(BlueprintAssignable, Category = Game)
 		FStartPlanet StartPlanet;
-	UPROPERTY(BlueprintAssignable, Category = Game)
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Game)
 		FLoadMainMenu LoadMainMenu;
 
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
