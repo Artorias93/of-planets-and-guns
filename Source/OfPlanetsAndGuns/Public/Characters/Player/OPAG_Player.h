@@ -55,6 +55,9 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	const class UOPAG_AttributeSetPlayer* AttributeSetPlayer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UOPAG_PlayerTelemetryComponent* PlayerTelemetryComp;
 	
 public:
 	AOPAG_Player();
@@ -278,6 +281,8 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
+	virtual void DisplayDebug(UCanvas* InCanvas, const FDebugDisplayInfo& InDebugDisplay, float& InYL, float& InYPos) override;
+
 	void HealthChanged(const FOnAttributeChangeData& Data);
 
 private:

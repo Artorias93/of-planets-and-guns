@@ -53,6 +53,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FColorAmmoChanged, const FLinearColo
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSoundSliderChanged, float, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 
 //Unused
@@ -263,6 +264,17 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQualitySettingsChanged QualitySettingsChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged MasterSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged MusicSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged SFXSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged AmbientSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged SystemSliderChanged;
+	
 
 	// Player Enhanced
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")

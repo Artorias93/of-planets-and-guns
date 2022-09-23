@@ -122,4 +122,7 @@ public:
 	void ShowOptionsView();
 	UFUNCTION()
 	void HideOptionsView();
+
+	UFUNCTION()
+	void GoToMenu();
 };

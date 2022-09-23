@@ -315,3 +315,13 @@ void AOPAG_GameplayHUD::HideOptionsView()
 		OptionsViewWidget->RemoveFromViewport();
 	}
 }
+
+void AOPAG_GameplayHUD::GoToMenu()
+{
+	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+
+	if (EMS)
+	{
+		EMS->LoadMainMenu.Broadcast();
+	}
+}
