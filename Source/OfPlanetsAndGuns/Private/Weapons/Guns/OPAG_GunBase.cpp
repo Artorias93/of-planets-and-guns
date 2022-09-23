@@ -200,7 +200,7 @@ int AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Directi
 
 void AOPAG_GunBase::StopShoot()
 {
-	GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, 0.2f, false);
+	GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, ReductionSpreadRadiusShootingTime, false);
 }
 
 void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
@@ -450,11 +450,11 @@ void AOPAG_GunBase::GunDropTimelineProgress(FVector Value)
 #pragma region ReductionSpreadRadiusShooting
 void AOPAG_GunBase::ResetReductionSpreadRadiusShooting()
 {
-	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting - .15f, 1.f, ReductionSpreadRadiusShootingMax);
+	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting - ReductionSpreadRadiusShootingTime, 1.f, ReductionSpreadRadiusShootingMax);
 
 	if (!bIsShoot && ReductionSpreadRadiusShooting != 1.f)
 	{
-		GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, 0.15f, false);
+		GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, ReductionSpreadRadiusShootingTime, false);
 	}
 }
 #pragma endregion ReductionSpreadRadiusShooting

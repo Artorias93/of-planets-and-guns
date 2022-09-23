@@ -34,6 +34,12 @@ public:
 		UTexture2D* RifleTexture2D;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		UTexture2D* SniperTexture2D;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+		UTexture2D* BurstTexture2D;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 		UTexture2D* HandgunTexture2D;
 	
 

@@ -185,7 +185,7 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// Check if player sees enemy (for health bar)
 	LookAtEnemy();
 
-	UpdateDashProgressBar();
+	// UpdateDashProgressBar();
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
@@ -406,6 +406,10 @@ void AOPAG_Player::InitDashTimeline()
 	DashTimeline->SetLooping(false);
 	DashTimeline->SetTimelineLength(AttributeSetPlayer->GetDashRestoreTime());
 	DashTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+	
+	OnDashTimelineProgress.BindUFunction(this, FName("DashTimelineProgress"));
+	DashTimeline->AddInterpFloat(RecoilReverseCurveFloat, OnDashTimelineProgress, FName("Dash"));
+
 	OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
 	DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
 }
@@ -1064,6 +1068,9 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		// Update ammo
 		PrimaryGun->SetAmmoCurrent(PrimaryGun->GetStatsTotal().ClipSize);
 		EMS->CurrentAmmoChanged.Broadcast(PrimaryGun->GetAmmoCurrent());
+
+		// Update current gun texture on Widget
+		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
 	}
 
 	// Spawn the old primary gun in scene
@@ -1303,6 +1310,12 @@ int AOPAG_Player::GetDashCount() const
 #pragma endregion GET
 
 #pragma region Timeline
+void AOPAG_Player::DashTimelineProgress(float Value)
+{
+	float TimeProgress = DashTimeline->GetPlaybackPosition() / DashTimeline->GetTimelineLength();
+	EMS->UpdateDashProgressBar.Broadcast(TimeProgress);
+}
+
 void AOPAG_Player::DashTimelineFinished()
 {
 	DashTimeline->SetTimelineLength(AttributeSetPlayer->GetDashRestoreTime());

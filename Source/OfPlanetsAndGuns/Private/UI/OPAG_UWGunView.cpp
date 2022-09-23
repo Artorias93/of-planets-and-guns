@@ -67,6 +67,16 @@ void UOPAG_UWGunView::SwapGun(EFireTypes CurrentType)
 		GunIcon->SetVisibility(ESlateVisibility::Visible);
 		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
 		break;
+	case EFireTypes::SingleShot:
+		GunIcon->SetBrushFromTexture(SniperTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::Burst3:
+		GunIcon->SetBrushFromTexture(BurstTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
 	case EFireTypes::Pistol:
 		HandgunIcon->SetVisibility(ESlateVisibility::Visible);
 		GunIcon->SetVisibility(ESlateVisibility::Hidden);

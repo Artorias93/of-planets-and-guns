@@ -45,4 +45,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerAttribute")
 	FGameplayAttributeData DashRestoreTime;
 	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetPlayer, DashRestoreTime)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerAttribute")
+	FGameplayAttributeData NextDashCooldown;
+	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetPlayer, NextDashCooldown)
 };

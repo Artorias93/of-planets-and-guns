@@ -263,6 +263,7 @@ private:
 	FOnTimelineFloat OnRecoilReverseTimelineProgress;
 	FOnTimelineEventStatic OnRecoilReverseTimelineFinished;
 
+	FOnTimelineFloat OnDashTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
 private:
@@ -388,6 +389,7 @@ private:
 	UFUNCTION() void RemovePassiveGunAbility(FGameplayTagContainer PassiveAbilityTagContainer);
 private:
 	// Timeline behavior | finished and progress
+	UFUNCTION() void DashTimelineProgress(float Value);
 	UFUNCTION() void DashTimelineFinished();
 	UFUNCTION() void RecoilTimelineProgress(float Value);
 	UFUNCTION() void RecoilTimelineFinished();

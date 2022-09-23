@@ -23,7 +23,7 @@ void UOPAG_HealthPotion::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		}
 
-		UOPAG_HealthPotionEffect* Effect = NewObject<UOPAG_HealthPotionEffect>(UOPAG_HealthPotionEffect::StaticClass());
+		UOPAG_HealthPotionEffect* Effect = NewObject<UOPAG_HealthPotionEffect>(PotionEffectClass);
 
 		FGameplayEffectSpec* GeSpec = new FGameplayEffectSpec(Effect, {}, 0.f);
 		ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, FGameplayEffectSpecHandle(GeSpec));

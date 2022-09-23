@@ -7,7 +7,7 @@ UOPAG_DashCooldown::UOPAG_DashCooldown()
 
 	// Initialize restoring time to player's attribute
 	FAttributeBasedFloat DashAttributeBasedFloat;
-	FGameplayEffectAttributeCaptureDefinition DashAttributeCaptureDefinition(UOPAG_AttributeSetPlayer::GetDashRestoreTimeAttribute(), 
+	FGameplayEffectAttributeCaptureDefinition DashAttributeCaptureDefinition(UOPAG_AttributeSetPlayer::GetNextDashCooldownAttribute(), 
 		EGameplayEffectAttributeCaptureSource::Source, false);
 	DashAttributeBasedFloat.BackingAttribute = DashAttributeCaptureDefinition;
 
