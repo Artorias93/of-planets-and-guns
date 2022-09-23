@@ -750,7 +750,7 @@ EModuleRarity AOPAG_ModularGun::GetGunRarity() const
 int AOPAG_ModularGun::GetLevel() const
 {
 	int Result = 0;
-	int Count = 0;
+	float Count = 0;
 	for (int i = 0; i < ModuleTypeCount(); i++)
 	{
 		AOPAG_ModuleBase* ModuleBase = GetModuleBySocketType(static_cast<EModuleTypes>(i));

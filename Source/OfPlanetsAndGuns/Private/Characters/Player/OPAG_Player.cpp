@@ -20,6 +20,7 @@
 #include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
+#include "Telemetry/OPAG_PlayerTelemetryComponent.h"
 #include "Items/OPAG_Drop.h"
 #include "Components/CapsuleComponent.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
@@ -37,6 +38,8 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include "GenericPlatform/GenericPlatformCrashContext.h"
 
+#include "DisplayDebugHelpers.h"
+
 AOPAG_Player::AOPAG_Player()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -44,6 +47,7 @@ AOPAG_Player::AOPAG_Player()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Player::OnOverlapBegin);
 
 	InventorySystemComp = CreateDefaultSubobject<UOPAG_InventorySystemComponent>("InventorySystemComp");
+	PlayerTelemetryComp = CreateDefaultSubobject<UOPAG_PlayerTelemetryComponent>("PlayerTelemetryComp");
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	if (SpringArm != nullptr)
@@ -227,6 +231,21 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
 			AttributeSetPlayer->GetShieldCapacityMax(),
 			bIsShieldBroken);
+	}
+}
+
+void AOPAG_Player::DisplayDebug(UCanvas* InCanvas, const FDebugDisplayInfo& InDebugDisplay, float& InYL, float& InYPos)
+{
+	Super::DisplayDebug(InCanvas, InDebugDisplay, InYL, InYPos);
+
+	static FName NAME_Telemetry = FName(TEXT("PlayerTelemetry"));
+
+	if (InDebugDisplay.IsDisplayOn(NAME_Telemetry))
+	{
+		if (PlayerTelemetryComp != nullptr)
+		{
+			PlayerTelemetryComp->DrawTelemetry(InCanvas, InYL, InYPos);
+		}
 	}
 }
 
