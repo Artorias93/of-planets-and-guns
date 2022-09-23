@@ -337,6 +337,9 @@ private:
 	UFUNCTION()
 	void OnPauseGame();
 
+	// Dash
+	void UpdateDashProgressBar();
+
 private:
 	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);
 
@@ -409,6 +412,7 @@ public:
 	// Getter dash
 	float GetDashLenght() const;
 	float GetDashSpeed() const;
+	int GetDashCount() const;
 
 public:
 	FORCEINLINE UCameraComponent* GetCurrentPlayerCamera() const { return CurrentCamera; }

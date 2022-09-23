@@ -58,6 +58,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 //Unused
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountDecrement);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateDashAmount, float, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateDashProgressBar, float, CurrentTimeProgress);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSwapGunTexture, EFireTypes, CurrentType);
+
 //Unused
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountDecrement);
@@ -194,6 +199,12 @@ public:
 		FDashAmountIncrement DashAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountDecrement DashAmountDecrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FUpdateDashAmount UpdateDashAmount;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FSwapGunTexture SwapGunTexture;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FUpdateDashProgressBar	UpdateDashProgressBar;
 
 	//////////
 	//Unused//
