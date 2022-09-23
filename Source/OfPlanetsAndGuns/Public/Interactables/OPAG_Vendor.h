@@ -15,6 +15,8 @@ class UTextRenderComponent;
 class UChildActorComponent;
 class UOPAG_EventManagerSubsystem;
 class UNiagaraSystem;
+class UNiagaraComponent;
+class UArrowComponent;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Vendor : public AActor
@@ -50,11 +52,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UTextRenderComponent* PriceTextRender_Module1;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UTextRenderComponent* PriceTextRender_Module2;
+		UTextRenderComponent* PriceTextRender_Module2;	
 
 	// Particle effect
 	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UNiagaraSystem* ActivationParticles;
+		UNiagaraSystem* NsActivationParticles;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UArrowComponent* PosDirActParticle;
 
 	// Data tables
 	UPROPERTY(Category = "OPAG | Vendor| Tables", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -77,6 +81,7 @@ private:
 
 	UPROPERTY(Category = "OPAG | Vendor| Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float DifficultyMultiplierGun = 1.f;
+	
 
 private:
 	UOPAG_EventManagerSubsystem* EMS;
@@ -85,6 +90,7 @@ private:
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
 	bool ShowingMerch;
+	UNiagaraComponent* NcActivationParticles;
 
 	void PopulateGunAndModuleArray();
 	void ActivationParticleEffect();

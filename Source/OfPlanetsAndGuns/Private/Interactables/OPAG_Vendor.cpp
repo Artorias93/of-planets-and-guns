@@ -8,6 +8,7 @@
 #include "Characters/Player/OPAG_Player.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "Components/ArrowComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include <Kismet/KismetMathLibrary.h>
 #include <Components/BoxComponent.h>
@@ -83,15 +84,22 @@ AOPAG_Vendor::AOPAG_Vendor()
 	ChildActor_Gun1 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Gun1");
 	if (ChildActor_Gun1)
 		ChildActor_Gun1->SetupAttachment(RootComponent);
+
 	ChildActor_Gun2 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Gun2");
 	if (ChildActor_Gun2)
 		ChildActor_Gun2->SetupAttachment(RootComponent);
+
 	ChildActor_Module1 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Module1");
 	if (ChildActor_Module1)
 		ChildActor_Module1->SetupAttachment(RootComponent);
+
 	ChildActor_Module2 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Module2");
 	if (ChildActor_Module2)
 		ChildActor_Module2->SetupAttachment(RootComponent);
+
+	PosDirActParticle = CreateDefaultSubobject<UArrowComponent>("ActivParticle_PosDir");
+	if (PosDirActParticle)
+		PosDirActParticle->SetupAttachment(RootComponent);
 }
 
 
@@ -121,6 +129,19 @@ void AOPAG_Vendor::BeginPlay()
 
 	BoxMoneyTrigger->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapBegin);
 	BoxMoneyTrigger->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapEnd);
+
+	// Start spawn particle system
+	FVector ParticlePos = FVector::ZeroVector;
+	FRotator ParticleRot = FRotator::ZeroRotator;
+	FVector ParticleSize = FVector::OneVector;
+	if (PosDirActParticle != nullptr) {
+		ParticlePos = PosDirActParticle->GetComponentLocation();
+		ParticleRot = PosDirActParticle->GetComponentRotation();
+	}
+	if (NsActivationParticles != nullptr) {
+		NcActivationParticles = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NsActivationParticles, ParticlePos, ParticleRot, ParticleSize, false, false);
+	}
+
 }
 
 void AOPAG_Vendor::Unlock(const float Difficulty) {
@@ -131,10 +152,8 @@ void AOPAG_Vendor::Unlock(const float Difficulty) {
 }
 
 void AOPAG_Vendor::ActivationParticleEffect() {
-	if (Pedestal == nullptr) return;
-	FVector EffectLocation = Pedestal->GetComponentLocation();
-	if (ActivationParticles != nullptr) {
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation);// , FRotator::MakeFromEuler(FVector(0, 0, 1)), FVector(50.0f));
+	if (NsActivationParticles != nullptr) {
+		NcActivationParticles->Activate();
 	}
 }
 

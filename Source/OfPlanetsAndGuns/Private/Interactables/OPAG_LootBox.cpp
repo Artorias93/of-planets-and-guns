@@ -59,6 +59,12 @@ void AOPAG_LootBox::BeginPlay()
 	DynamicMaterial = UMaterialInstanceDynamic::Create(Material, NULL);
 	Lid->SetMaterial(0, DynamicMaterial);
 	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 0.0f);
+
+	// Start spawn particle system
+	FVector CrateLocation = Crate->GetComponentLocation();
+	if (NsActivationParticles != nullptr) {
+		NcActivationParticles = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NsActivationParticles, CrateLocation,FRotator::ZeroRotator,FVector::OneVector,false,false);
+	}
 }
 
 void AOPAG_LootBox::Tick(float DeltaTime)
@@ -88,10 +94,8 @@ void AOPAG_LootBox::SetModules(FOPAG_GunModules& ModulesStruct)
 
 void AOPAG_LootBox::ActivationParticleEffect()
 {
-	if (Crate == nullptr) return;
-	FVector EffectLocation = Crate->GetComponentLocation();
-	if (ActivationParticles != nullptr) {
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ActivationParticles, EffectLocation);// FRotator::MakeFromEuler(FVector(0, 0, 1)), FVector(50.0f));
+	if (NsActivationParticles != nullptr) {
+		NcActivationParticles->Activate();
 	}
 }
 
