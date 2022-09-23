@@ -58,14 +58,16 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UNiagaraComponent* LaserBeam;
-
-	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
-	float ShootAccuracyTolerance = 0;
 	
 	FTimerHandle ShotTimerHandle;
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	float ShotWaitTimeRandomIntervalBounds[2] = {0.4f, 0.6f};
+
+	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta = (AllowPrivateAccess = true))
+	float RandomAngleShotBounds = 2.5f;
+
+
 
 	UPROPERTY()
 	AOPAG_GunBase* EquippedWeapon;

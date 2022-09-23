@@ -34,6 +34,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageCleared, const EStageType, Nex
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomEntered);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQualitySettingsChanged, int32, Value);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnteredRoomStreamingVolume, AOPAG_RoomStreamingVolume* const, Volume);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLeftRoomStreamingVolume);
 
@@ -53,11 +55,16 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 
+//Unused
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountDecrement);
-
+//Unused
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountDecrement);
+/////
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBoltsAmountChanged, int, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPotionsAmountChanged, int, CurrentValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountDecrement);
@@ -65,8 +72,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountDecrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLookedAtInteractable, bool, IsInteractable, FString, InteractText);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtInteractable);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_SevenParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, 
-const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShowGoldInGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHideGoldInGame);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_EightParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, 
+const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const FString, OtherModuleAbilityName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
 const int, EquippableTypes, const bool, CanBeEquipped);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
 
@@ -184,6 +194,9 @@ public:
 		FDashAmountIncrement DashAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountDecrement DashAmountDecrement;
+
+	//////////
+	//Unused//
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FPotionsAmountIncrement PotionsAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
@@ -192,6 +205,12 @@ public:
 		FBoltsAmountIncrement BoltsAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FBoltsAmountDecrement BoltsAmountDecrement;
+	/////////
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FBoltsAmountChanged BoltsAmountChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+		FPotionsAmountChanged PotionsAmountChanged;
 
 	//Gun stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
@@ -220,11 +239,19 @@ public:
 
 	//Game stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FShowGoldInGame ShowGoldInGame;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FHideGoldInGame HideGoldInGame;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FPauseGame PauseGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FResumeGame ResumeGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQuitGame QuitGame;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FQualitySettingsChanged QualitySettingsChanged;
 
 	// Player Enhanced
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")

@@ -44,4 +44,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BaseAttribute")
 	FGameplayAttributeData DamageTakenAmount;
 	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetBase, DamageTakenAmount)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BaseAttribute")
+	FGameplayAttributeData DamageMultiplier;
+	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetBase, DamageMultiplier)
 };

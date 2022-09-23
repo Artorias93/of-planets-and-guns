@@ -63,3 +63,12 @@ struct OFPLANETSANDGUNS_API FOPAG_SecondaryStatModifier : public FTableRowBase
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float MaxValue;
 };
+
+static int ModuleTypeCount()
+{
+	const FString enumName = "EModuleTypes";
+	UEnum* enumObj = FindObject<UEnum>(ANY_PACKAGE, *enumName);
+	int64 maxVal = enumObj->GetMaxEnumValue();
+
+	return maxVal + 1;
+}

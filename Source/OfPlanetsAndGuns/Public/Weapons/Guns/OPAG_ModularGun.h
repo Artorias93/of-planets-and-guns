@@ -79,6 +79,13 @@ protected:
 	TSubclassOf<AOPAG_ModuleBase> StandardSight;
 
 protected:
+	UPROPERTY(Category = "OPAG | Module | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystemComponent* GunDropHighlight;
+
+	UPROPERTY(Category = "OPAG | Module | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* GunDropHighlightParticle;
+
+protected:
 	FTimerHandle FlyRotationHandle;
 	TArray<FOPAG_SecondaryStatModifier*> ModuleSecondaryStatsModifiers;
 	TArray<FOPAG_ReloadStats*> AmmoReloadingMultipliers;
@@ -95,11 +102,11 @@ protected:
 
 	// Create and Attach module behavior
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const;
-	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const
+	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const
 	                  EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
 
 	// Ammo behavior
-	void UpdateAmmoWhenPickTheMagazine();
+	void UpdateAmmoOnModulePickup();
 	virtual void WaitReloadingTimer() override;
 	void PopulateAmmoTable();
 
@@ -122,6 +129,7 @@ public:
 	// Module
 	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules);
 	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules, const FOPAG_GunModuleStats& ModuleStats);
+	void CreateAndAttachAllModules(const FOPAG_GunModules& Modules, const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers);
 	bool AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModule, const EModuleRarity NewModuleRarity, const EModuleBrand NewModuleBrand, const
 	                  FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes, TSubclassOf<AOPAG_ModuleBase>& OldModuleClass, EModuleRarity
 	                  & OldModuleRarity, EModuleBrand& OldModuleBrand, FOPAG_GunStats& OldModuleStats, int& OldModuleEquippableFireTypes);
@@ -176,4 +184,10 @@ public:
 	//Setter
 	virtual void SetStatsTotal(const FOPAG_GunStats GunStats);
 	void SetAmmoParams(int NewAmmoCurrent, int NewAmmoMax);
+
+	EModuleRarity GetGunRarity() const;
+	virtual int GetLevel() const;
+
+	void LoadParticleFromRarity(EModuleRarity ModuleRarity);
+	void StartDropTimeline();
 };

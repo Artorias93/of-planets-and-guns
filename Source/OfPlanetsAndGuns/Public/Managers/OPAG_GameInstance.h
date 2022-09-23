@@ -107,6 +107,8 @@ public:
 		void OnResumeGame();
 	UFUNCTION()
 		void OnPlayerDeath();
+	UFUNCTION()
+		void OnQualitySettingsChanged(int32 Value);
 
 	UFUNCTION()
 		void SetAudioLibraries();

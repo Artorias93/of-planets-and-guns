@@ -15,9 +15,13 @@ class OFPLANETSANDGUNS_API UOPAG_AbilityCasterComponent : public UActorComponent
 	bool bSequenced = false;
 	
 public:
+
 	UOPAG_AbilityCasterComponent();
-	
+
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
+		float ZAxisGroundedAbilityRelativeOffset = 270;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Abilities")
 		TSubclassOf<class AOPAG_ForceField> ForceFieldAbilityClass;
 
@@ -52,5 +56,4 @@ protected:
 	
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
 		TArray<FTransform> GetAbilitySpawnTransforms(EAbilitySpawnPattern AbilitySpawnPattern, FTransform Origin);
-	
 };

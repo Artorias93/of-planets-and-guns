@@ -4,8 +4,10 @@
 #include "Interactables/OPAG_InteractableInterface.h"
 #include "GameFramework/Actor.h"
 #include "Weapons/Guns/OPAG_GunState.h"
-#include "Components/TimelineComponent.h"
 #include "OPAG_LootBox.generated.h"
+
+class UNiagaraSystem;
+class UMaterialInstanceDynamic;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_InteractableInterface
@@ -27,7 +29,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* LootSpawnPoint;
 
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot Manager")
 	UDataTable* LootChanceTable;
 
@@ -38,30 +39,16 @@ public:
 	float ThrowItems = 100.f;
 
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	int MinModules = 0;
+		int MinModules = 0;
 
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	int MaxModules = 3;
+		int MaxModules = 3;
 
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	int NumberOfModulesToSpawn = 1;
 
-	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	UTimelineComponent* DropTimeline;
-
-	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	class UCurveVector* CurveDropVector;
-
-	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	float DropCurveXFactor;
-
-	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
-	float DropCurveZFactor;
-
-	FOnTimelineVector OnDropTimelineProgress;
-	
-	UPROPERTY()
-	FVector DropTimelinePropertyName;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UNiagaraSystem* ActivationParticles;
 
 private:
 	TArray<TSubclassOf<AActor>> Items;   
@@ -73,9 +60,6 @@ private:
 	UPROPERTY()
 		AActor* SpawnedItem;
 
-	UPROPERTY()
-		FVector RandomDropDir;
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -84,6 +68,7 @@ public:
 	void SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList);
 	void Unlock();
 	void SetModules(FOPAG_GunModules& ModulesStruct);
+	UMaterialInstanceDynamic* DynamicMaterial; //////////////////////////////////////////////////////////////////////
 	
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent) void Interact();
 	virtual void Interact_Implementation() override;
@@ -96,8 +81,8 @@ public:
 
 	FString InteractString_Implementation() override;
 
-	UFUNCTION()
-	void DropTimelineProgress(FVector Value);
-
 	UFUNCTION() void SpawnItem();
+
+	UFUNCTION()
+	void ActivationParticleEffect();
 };

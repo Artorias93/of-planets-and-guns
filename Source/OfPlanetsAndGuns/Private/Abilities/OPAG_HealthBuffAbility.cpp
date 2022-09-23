@@ -15,6 +15,7 @@ void UOPAG_HealthBuffAbility::ActivateAbility(const FGameplayAbilitySpecHandle H
 		if (!bResult)
 		{
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+			return;
 		}
 
 		UOPAG_HealthBuffEffect* Effect = NewObject<UOPAG_HealthBuffEffect>(UOPAG_HealthBuffEffect::StaticClass());

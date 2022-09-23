@@ -61,14 +61,31 @@ void UOPAG_AbilityCasterComponent::CastAbility(EAbilityTypes AbilityType, AActor
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	
+
 	if (UClass* AbilityClass = GetAbilityClass(AbilityType))
 	{
-		TArray<FTransform> Transforms = GetAbilitySpawnTransforms(AbilitySpawnPattern, Caller->GetTransform());
-
+		TArray<FTransform> Transforms = GetAbilitySpawnTransforms(AbilitySpawnPattern, Caller->GetActorTransform());
+		
 		float IncreasingDelay = 0;
 		for (auto AbilityTranfrom : Transforms)
 		{
+			// if the requested ability is a spawn enemy ability, apply an offset in order to fix an undesired gap (otherwise enemies spawn in the middle of the ground, falling down)
+			if (AbilityType == EAbilityTypes::Spawn_DashingEnemy
+				|| AbilityType == EAbilityTypes::Spawn_MachineGunEnemy
+				|| AbilityType == EAbilityTypes::Spawn_MeleeEnemy
+				|| AbilityType == EAbilityTypes::Spawn_PillarEnemy
+				|| AbilityType == EAbilityTypes::Spawn_RangedEnemy
+				|| AbilityType == EAbilityTypes::Spawn_ShieldEnemy
+				|| AbilityType == EAbilityTypes::Spawn_SniperEnemy
+				)
+			{
+				FVector AbilityTransformPosition = AbilityTranfrom.GetLocation();
+				AbilityTransformPosition.Z += 30;
+
+				AbilityTranfrom.SetLocation(AbilityTransformPosition);
+			}
+
+
 			FTransform SpawnTransform = AbilityTranfrom;
 			AOPAG_AbilityBase* Ability = GetWorld()->SpawnActorDeferred<AOPAG_AbilityBase>(AbilityClass, SpawnTransform);
 
@@ -148,19 +165,19 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 	FTransform Transform2 = Origin;
 	FTransform Transform3 = Origin;
 	FTransform Transform4 = Origin;
-	FTransform Transform5 = Origin;
-
-	FVector Position1 = Transform1.GetLocation();
-	FVector Position2 = Transform1.GetLocation();
-	FVector Position3 = Transform1.GetLocation();
-	FVector Position4 = Transform1.GetLocation();
-	FVector Position5 = Transform1.GetLocation();
+	FTransform Transform5 = Origin;	
 
 	FRotator Rotation1 = Transform1.GetRotation().Rotator();
 	FRotator Rotation2 = Transform1.GetRotation().Rotator();
 	FRotator Rotation3 = Transform1.GetRotation().Rotator();
 	FRotator Rotation4 = Transform1.GetRotation().Rotator();
 	FRotator Rotation5 = Transform1.GetRotation().Rotator();
+
+	FVector Position1 = Transform1.GetTranslation();
+	FVector Position2 = Transform1.GetTranslation();
+	FVector Position3 = Transform1.GetTranslation();
+	FVector Position4 = Transform1.GetTranslation();
+	FVector Position5 = Transform1.GetTranslation();
 	
 	switch (AbilitySpawnPattern)
 	{
@@ -234,8 +251,8 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::GroundedFrontSingle:
 		
-		Position1.Z = 0;
-		Position1.X += 300;
+		Position1.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position1 += Transform1.TransformVector(FVector::ForwardVector) * 500;
 		
 		Transform1.SetLocation(Position1);
 
@@ -245,8 +262,8 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::GroundedLineBackSingle:
 		
-		Position1.Z = 0;
-		Position1.X -= 300;
+		Position1.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position1 -= Transform1.TransformVector(FVector::ForwardVector) * 500;
 		
 		Transform1.SetLocation(Position1);
 
@@ -256,15 +273,15 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::GroundedLineBackThree:
 
-		Position1.Z = 0;
-		Position2.Z = 0;
-		Position3.Z = 0;
+		Position1.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position2.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position3.Z -= ZAxisGroundedAbilityRelativeOffset;
 		
-		Position1.X -= 300;
+		Position1 -= Transform1.TransformVector(FVector::ForwardVector) * 500;
 		Position2 = Position1;
-		Position2.Y += 500;
+		Position2 += Transform1.TransformVector(FVector::RightVector) * 650;
 		Position3 = Position1;
-		Position3.Y -= 500;
+		Position3 -= Transform1.TransformVector(FVector::RightVector) * 650;
 		
 		Transform1.SetLocation(Position1);
 		Transform2.SetLocation(Position2);
@@ -278,15 +295,15 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::GroundedLineBackTwo:
 
-		Position1.Z = 0;
-		Position2.Z = 0;
-		Position3.Z = 0;
+		Position1.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position2.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position3.Z -= ZAxisGroundedAbilityRelativeOffset;
 		
-		Position1.X -= 300;
+		Position1 -= Transform1.TransformVector(FVector::ForwardVector) * 500;
 		Position2 = Position1;
-		Position2.Y += 300;
+		Position2 += Transform1.TransformVector(FVector::RightVector) * 650;
 		Position3 = Position1;
-		Position3.Y -= 300;
+		Position3 -= Transform1.TransformVector(FVector::RightVector) * 650;
 		
 		Transform2.SetLocation(Position2);
 		Transform3.SetLocation(Position3);
@@ -298,15 +315,15 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::GroundedLineFrontTwo:
 
-		Position1.Z = 0;
-		Position2.Z = 0;
-		Position3.Z = 0;
+		Position1.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position2.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position3.Z -= ZAxisGroundedAbilityRelativeOffset;
 		
-		Position1.X += 300;
+		Position1 += Transform1.TransformVector(FVector::ForwardVector) * 500;
 		Position2 = Position1;
-		Position2.Y += 300;
+		Position2 += Transform1.TransformVector(FVector::RightVector) * 650;
 		Position3 = Position1;
-		Position3.Y -= 300;
+		Position3 -= Transform1.TransformVector(FVector::RightVector) * 650;
 		
 		Transform2.SetLocation(Position2);
 		Transform3.SetLocation(Position3);
@@ -318,19 +335,19 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::GroundedTridentBackThree:
 
-		Position1.Z = 0;
-		Position2.Z = 0;
-		Position3.Z = 0;
+		Position1.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position2.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position3.Z -= ZAxisGroundedAbilityRelativeOffset;
 		
-		Position1.X -= 300;
+		Position1 -= Transform1.TransformVector(FVector::ForwardVector) * 500;
 		Position2 = Position1;
-		Position2.X -= 300;
-		Position2.Y += 300;
+		Position2 -= Transform1.TransformVector(FVector::ForwardVector) * 500;
+		Position2 += Transform1.TransformVector(FVector::RightVector) * 650;
 		Position3 = Position1;
-		Position3.X -= 300;
-		Position3.Y -= 300;
+		Position3 -= Transform1.TransformVector(FVector::ForwardVector) * 500;
+		Position3 -= Transform1.TransformVector(FVector::RightVector) * 650;
 		
-		Position1.X += 100;
+		Position1 -= Transform1.TransformVector(FVector::ForwardVector) * 800;
 
 		Transform1.SetLocation(Position1);
 		Transform2.SetLocation(Position2);
@@ -344,17 +361,19 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::GroundedTridentFrontThree:
 		
-		Position1.Z = 0;
-		Position2.Z = 0;
-		Position3.Z = 0;
+		Position1.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position2.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position3.Z -= ZAxisGroundedAbilityRelativeOffset;
 		
-		Position1.X += 300;
+		Position1 += Transform1.TransformVector(FVector::ForwardVector) * 500;
 		Position2 = Position1;
-		Position2.X -= 300;
-		Position2.Y += 300;
+		Position2 -= Transform1.TransformVector(FVector::ForwardVector) * 500;
+		Position2 += Transform1.TransformVector(FVector::RightVector) * 650;
 		Position3 = Position1;
-		Position3.X -= 300;
-		Position3.Y -= 300;
+		Position3 -= Transform1.TransformVector(FVector::ForwardVector) * 500;
+		Position3 -= Transform1.TransformVector(FVector::RightVector) * 650;
+
+		Position1 += Transform1.TransformVector(FVector::ForwardVector) * 800;
 
 		Transform1.SetLocation(Position1);
 		Transform2.SetLocation(Position2);
@@ -368,8 +387,8 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::SingleBackLeftCorner:
 
-		Position1.X -= 750;
-		Position1.Y -= 750;
+		Position1 -= Transform1.TransformVector(FVector::ForwardVector) * 750;
+		Position1 -= Transform1.TransformVector(FVector::RightVector) * 750;
 
 		Transform1.SetLocation(Position1);
 
@@ -379,8 +398,8 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::SingleBackRightCorner:
 
-		Position1.X -= 750;
-		Position1.Y += 750;
+		Position1 -= Transform1.TransformVector(FVector::ForwardVector) * 750;
+		Position1 += Transform1.TransformVector(FVector::RightVector) * 750;
 
 		Transform1.SetLocation(Position1);
 
@@ -390,8 +409,8 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::SingleFrontLeftCorner:
 
-		Position1.X += 750;
-		Position1.Y -= 750;
+		Position1 += Transform1.TransformVector(FVector::ForwardVector) * 750;
+		Position1 -= Transform1.TransformVector(FVector::RightVector) * 750;
 
 		Transform1.SetLocation(Position1);
 
@@ -401,8 +420,8 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	case EAbilitySpawnPattern::SingleFrontRightCorner:
 
-		Position1.X += 750;
-		Position1.Y += 750;
+		Position1 += Transform1.TransformVector(FVector::ForwardVector) * 750;
+		Position1 += Transform1.TransformVector(FVector::RightVector) * 750;
 
 		Transform1.SetLocation(Position1);
 
@@ -412,15 +431,15 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 	
 	case EAbilitySpawnPattern::GroundedLineFrontThree:
 
-		Position1.Z = 0;
-		Position2.Z = 0;
-		Position3.Z = 0;
+		Position1.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position2.Z -= ZAxisGroundedAbilityRelativeOffset;
+		Position3.Z -= ZAxisGroundedAbilityRelativeOffset;
 		
-		Position1.X += 300;
+		Position1 += Transform1.TransformVector(FVector::ForwardVector) * 500;
 		Position2 = Position1;
-		Position2.Y += 500;
+		Position2 += Transform1.TransformVector(FVector::RightVector) * 650;
 		Position3 = Position1;
-		Position3.Y -= 500;
+		Position3 -= Transform1.TransformVector(FVector::RightVector) * 650;
 		
 		Transform1.SetLocation(Position1);
 		Transform2.SetLocation(Position2);
@@ -438,4 +457,3 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 
 	return Transforms;
 }
-

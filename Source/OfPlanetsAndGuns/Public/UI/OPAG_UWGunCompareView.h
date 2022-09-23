@@ -1,18 +1,12 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-//#include "Weapons/Guns/OPAG_GunStats.h"
-#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_UWGunCompareView.generated.h"
 
-/**
- * 
- */
 class UImage;
 class UTextBlock;
+struct FOPAG_GunStats;
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWGunCompareView : public UUserWidget
@@ -33,7 +27,7 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunCompareView : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* AccuracyText;
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* RecoilText;
+		UTextBlock* StabilityText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ReloadingText;
 	UPROPERTY(meta = (BindWidget))
@@ -46,7 +40,7 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunCompareView : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* AccuracyAmount;
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* RecoilAmount;
+		UTextBlock* StabilityAmount;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ReloadingAmount;
 	UPROPERTY(meta = (BindWidget))
@@ -59,7 +53,7 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunCompareView : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* AccuracyDelta;
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* RecoilDelta;
+		UTextBlock* StabilityDelta;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ReloadingDelta;
 	UPROPERTY(meta = (BindWidget))

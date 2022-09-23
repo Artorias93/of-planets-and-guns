@@ -24,7 +24,7 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 				const FVector PlayerPos = Player->GetActorLocation();
 
 				FVector OutDir;
-				float OutLength;		
+				float OutLength;
 				(PlayerPos - EnemyPos).ToDirectionAndLength(OutDir, OutLength);
 
 				const FVector ChargePoint = EnemyPos + OutDir * (OutLength + ChargeDistanceBehindPlayer);
@@ -34,23 +34,33 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 
 				if(!UKismetSystemLibrary::BoxTraceSingle(GetWorld(), EnemyPos, ChargePoint,
 					BoxTraceHalfSize, FRotator::ZeroRotator, TraceTypeQuery1,
-					false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true))
+					false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true)) 
 				{
 					if(const UNavigationSystemV1* const NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
 					{
 						FNavLocation NavLocation;
 						if(NavSystem->ProjectPointToNavigation(ChargePoint, NavLocation, QueryingExtent))
 						{
-							UE_LOG(LogTemp, Warning, TEXT("%s"), *ChargePoint.ToString());
 							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE NOT FOUND"));
                             					
 							AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
                             
 							return EBTNodeResult::Succeeded;
-						}						
-					}					
+						}
+						else
+						{
+							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("EXTENT BOX STUFF"));
+						}
+					}
+					else
+					{
+						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("NAVIGATION NOT FOUND"));
+					}
 				}
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE FOUND"));
+				else
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE FOUND"));
+				}
 			}
 		}
 	}

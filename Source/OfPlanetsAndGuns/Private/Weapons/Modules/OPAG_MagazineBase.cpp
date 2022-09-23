@@ -3,7 +3,6 @@
 AOPAG_MagazineBase::AOPAG_MagazineBase()
 {
 	// Initialize Parameters
-	Rarity = EModuleRarity::Common;
 	Brand = EModuleBrand::Standard;
 	Type = EModuleTypes::Magazine;
 }

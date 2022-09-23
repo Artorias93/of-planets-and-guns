@@ -25,7 +25,4 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	// Shooting behavior
-	virtual void ShootLineTrace(FVector StartShootLocation, FVector Direction, const AOPAG_CharacterBase* ShooterCharacter) override;
 };

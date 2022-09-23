@@ -18,6 +18,7 @@ public:
 	UOPAG_InventorySystemComponent();
 
 	void AnalyzeItem(AOPAG_Drop* Target);
+	void SetGold(const int Value);
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,4 +34,11 @@ public:
 
 private:
 	AOPAG_Player* Owner;
+
+	FTimerHandle GoldShowTimerHandle;
+
+	float GoldShowTimer = 2.0f;
+
+	UFUNCTION()
+	void OnGoldShowFinished();
 };

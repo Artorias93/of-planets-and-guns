@@ -22,6 +22,11 @@ void UOPAG_InventorySystemComponent::BeginPlay()
 	}
 }
 
+void UOPAG_InventorySystemComponent::OnGoldShowFinished()
+{
+	Owner->EMS->HideGoldInGame.Broadcast();
+}
+
 void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 {
 	if (Target) {
@@ -30,20 +35,16 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 		case EDropType::Bolts:
 			BoltsAmount += Target->Amount;
 			if (Owner && Owner->EMS) {
-				Owner->EMS->BoltsAmountIncrement.Broadcast();
-				if(Owner->SMS)
+				//Owner->EMS->BoltsAmountIncrement.Broadcast();
+				Owner->EMS->BoltsAmountChanged.Broadcast(BoltsAmount);
+				if (Owner->SMS)
 					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 			}
 			Target->Destroy();
 			break;
 
 		case EDropType::Gold:
-			GoldAmount += Target->Amount;
-			if (Owner && Owner->EMS) {
-				Owner->EMS->GoldChanged.Broadcast(GoldAmount);
-				if (Owner->SMS)
-					Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
-			}
+			SetGold(Target->Amount);
 			Target->Destroy();
 			break;
 
@@ -57,10 +58,12 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 			break;
 
 		case EDropType::Potion:
-			if (PotionsAmount < 4) {
+			if (PotionsAmount < 4) 
+			{
 				PotionsAmount += Target->Amount;
 				if (Owner && Owner->EMS) {
-					Owner->EMS->PotionsAmountIncrement.Broadcast();
+					//Owner->EMS->PotionsAmountIncrement.Broadcast();
+					Owner->EMS->PotionsAmountChanged.Broadcast(PotionsAmount);
 					if (Owner->SMS)
 						Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 				}
@@ -71,5 +74,20 @@ void UOPAG_InventorySystemComponent::AnalyzeItem(AOPAG_Drop* Target)
 		default:
 			break;
 		}
+	}
+}
+
+void UOPAG_InventorySystemComponent::SetGold(const int Value)
+{
+	GoldAmount += Value;
+	if (Owner && Owner->EMS) {
+		Owner->EMS->GoldChanged.Broadcast(GoldAmount);
+		Owner->EMS->ShowGoldInGame.Broadcast();
+
+		GetWorld()->GetTimerManager().SetTimer(GoldShowTimerHandle, this,
+			&UOPAG_InventorySystemComponent::OnGoldShowFinished, GoldShowTimer, false);
+
+		if (Owner->SMS)
+			Owner->SMS->PlayAbiltySounds(Owner, EAbilitySoundAction::Ability_Ready);
 	}
 }

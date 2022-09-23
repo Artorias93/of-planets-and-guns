@@ -7,6 +7,7 @@
 #include "GameplayEffectTypes.h"
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
+#include "NiagaraComponent.h"
 #include "OPAG_PlayerState.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -36,6 +37,9 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UNiagaraComponent* DashNiagaraComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
@@ -204,6 +208,12 @@ private:
 	float RecoilYawMax = .01f;
 
 private:
+
+	//Footsteps "volume" for AI hearing perception [0,1]
+	UPROPERTY(Category="OPAG | Character | AI", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float FootstepsAILoudness = .5f;
+	
+private:
 	UPROPERTY() TEnumAsByte<ETimelineDirection::Type> RecoilTimelineDirection;
 	UPROPERTY() float Recoil = .0f;
 	UPROPERTY() float RecoilReverse = .0f;
@@ -223,6 +233,7 @@ private:
 	bool bRunning = false;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
+	bool bIsTryingToADSDuringReload = false;
 	bool bHasAlreadyLooked = false;
 	bool bIsShieldBroken = false;
 
@@ -237,8 +248,10 @@ private:
 	// Fire timers
 	float LastFireTime = .0f;
 	FRotator AccumulatedRecoilDeviation = FRotator::ZeroRotator;
-	FRotator CurrentDeltaRotation = FRotator::ZeroRotator;
+	FRotator AccumulatedRecoilDeviationBeforeGoingDown = FRotator::ZeroRotator;
 	float RandomRecoilYaw = .0f;
+	float LastTimelimeReverseRecoilValue = .0f;
+	float LookupScale = .0f;
 
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
@@ -280,7 +293,7 @@ private:
 	void InitUICounters();
 
 	// Mathematics utility
-	const FVector CalculateThrowForce() const;
+	FVector CalculateThrowForce() const;
 	
 	// Ability behavior
 	void InitializeAbilities();
@@ -320,6 +333,10 @@ private:
 	void RelocateComponets();
 	FVector GetViewLocation() const;
 
+	// Game Stuff
+	UFUNCTION()
+	void OnPauseGame();
+
 private:
 	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);
 
@@ -343,6 +360,7 @@ private:
 	UFUNCTION() void ReloadGun();
 	UFUNCTION() void IncrementPrimaryGunAmmo();
 	UFUNCTION() void InspectGun();
+	void StopInspectGun();
 
 	// Interact with items
 	UFUNCTION() void InteractWithItem();
@@ -351,6 +369,7 @@ private:
 	// Aim input
 	UFUNCTION() void SwitchToADSCamera();
 	UFUNCTION() void ResetFPSCamera();
+	void UpdateCamera(bool InADS);
 
 	// Active ability input
 	UFUNCTION() void ActiveDash();
@@ -369,16 +388,18 @@ private:
 
 public:
 	UFUNCTION() void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	bool GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
 	UFUNCTION() void SavePlayerState();
 	UFUNCTION() void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
 
 public:
 	// Callable in animation
-	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
-	UFUNCTION(BlueprintCallable) const bool GetIsRunning() const;
+	UFUNCTION(BlueprintCallable) bool GetIsADS() const;
+	UFUNCTION(BlueprintCallable) bool GetIsRunning() const;
 	UFUNCTION(BlueprintCallable) void AttachMagazineToHandNotify();
 	UFUNCTION(BlueprintCallable) void AttachMagazineToGunNotify();
-	UFUNCTION(BlueprintCosmetic) void CompleteInspectNotify();
+	UFUNCTION(BlueprintCallable) void CompleteInspectNotify();
+	UFUNCTION(BlueprintCallable) void FootstepsMakeNoiseNotify();
 
 public:
 	// Getter and setter for shield element

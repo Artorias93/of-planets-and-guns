@@ -12,7 +12,7 @@ UOPAG_TaskChangeChargeState::UOPAG_TaskChangeChargeState(FObjectInitializer cons
 
 EBTNodeResult::Type UOPAG_TaskChangeChargeState::ExecuteTask(UBehaviorTreeComponent& OwnerBTComponent, uint8* NodeMemory)
 {
-	if (const AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
+	if (AOPAG_AICBase* const AIController = Cast<AOPAG_AICBase>(OwnerBTComponent.GetAIOwner()))
 	{
 		if (AOPAG_ShieldEnemy* const ShieldEnemy = Cast<AOPAG_ShieldEnemy>(AIController->GetPawn()))
 		{
@@ -20,23 +20,24 @@ EBTNodeResult::Type UOPAG_TaskChangeChargeState::ExecuteTask(UBehaviorTreeCompon
 
 			if(bIsCharging)
 			{
-				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+				CollisionValues = ShieldEnemy->GetCapsuleComponent()->GetCollisionResponseToChannels();
+				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Overlap);
 				ShieldEnemy->GetShieldMesh()->AttachToComponent(ShieldEnemy->GetMesh(),
 					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "TopHeadSocket");
 				ShieldEnemy->TurnOnBoosters();
 				ShieldEnemy->GetCharacterMovement()->GravityScale = 0.f;
-				//Controller's rotation is not used anymore
-				//ShieldEnemy->bUseControllerRotationYaw = false;
+				ShieldEnemy->bUseControllerRotationYaw = true;
 			}
 			else
 			{
-				//Controller's rotation is not used anymore
-				//ShieldEnemy->bUseControllerRotationYaw = true;
+				ShieldEnemy->bUseControllerRotationYaw = false;
 				ShieldEnemy->GetCharacterMovement()->GravityScale = 1.f;
 				ShieldEnemy->TurnOffBoosters();
 				ShieldEnemy->GetShieldMesh()->AttachToComponent(ShieldEnemy->GetMesh(),
 					FAttachmentTransformRules::SnapToTargetNotIncludingScale, "LeftHandSocket");
-				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);				
+				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToChannels(CollisionValues);
+				//TODO: The previous line should do it before this, but doesn't and I don't know why.
+				ShieldEnemy->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 			}
 			return EBTNodeResult::Succeeded;
 		}

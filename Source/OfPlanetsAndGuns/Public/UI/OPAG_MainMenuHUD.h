@@ -1,37 +1,66 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
 #include "OPAG_MainMenuHUD.generated.h"
 
-/**
- * 
- */
+class ULevelSequence;
+class ULevelSequencePlayer;
+
+UENUM()
+enum EMenuScreen
+{
+	Start             UMETA(DisplayName = "Start"),
+	MainMenu          UMETA(DisplayName = "MainMenu"),
+	LevelSelection    UMETA(DisplayName = "LevelSelection"),
+	Level1            UMETA(DisplayName = "Level1"),
+	Options           UMETA(DisplayName = "Options"),
+	Exit              UMETA(DisplayName = "Exit"),
+	QuitGame          UMETA(DisplayName = "QuitGame"),
+	HowToPlay         UMETA(DisplayName = "HowToPlay")
+};
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_MainMenuHUD : public AHUD
 {
 	GENERATED_BODY()
 
-	void BindEvents();
+	//Variables
 	
-private:
 	UPROPERTY()
-		class UOPAG_UWMainMenuView* MainMenuViewWidget;
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UOPAG_UWMainMenuView> MainMenuViewWidgetClass;
+	ULevelSequencePlayer* StartLevelSequencePlayer;
 	UPROPERTY()
-		class UOPAG_UWHubView* HubViewWidget;
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UOPAG_UWHubView> HubViewWidgetClass;
+	ULevelSequencePlayer* LevelSelectionLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* Level1LevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* OptionsLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* OptionsToMenuLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* ExitLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* QuitGameLevelSequencePlayer;
+	UPROPERTY()
+	ULevelSequencePlayer* HowToPlayLevelSequencePlayer;
 
-protected:
-	virtual void BeginPlay() override;
+	//Functions
 
 public:
+	
 	virtual void DrawHUD() override;
-
+	
 	UFUNCTION()
-	void ShowHubView();
+	void SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const;
+
+protected:
+	
+	virtual void BeginPlay() override;
+
+private:
+	
+	UFUNCTION()
+	void StartLevel1();
+	UFUNCTION()
+	void AbortGame();
 };

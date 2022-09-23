@@ -36,9 +36,10 @@ void AOPAG_NormalTurret::Attack()
 {	
 	if (!GetWorldTimerManager().IsTimerActive(ShotTimerHandle))
 	{
-		GetShootingDirection(StartLocation, TurretShootDirection, 10.f);
+		GetShootingDirection(StartLocation, TurretShootDirection, 0.f);
+
 		GetWorldTimerManager().SetTimer(ShotTimerHandle, this, &AOPAG_NormalTurret::StartShooting,
-			.5f);
+			ShootingTimer);
 	}
 }
 
@@ -67,7 +68,8 @@ void AOPAG_NormalTurret::Death()
 
 void AOPAG_NormalTurret::StartShooting()
 {
-	GetWorldTimerManager().ClearTimer(ShotTimerHandle);
+	if (ShotTimerHandle.IsValid() && GetWorld())
+		GetWorld()->GetTimerManager().ClearTimer(ShotTimerHandle);
 
 	ShootLineTrace(StartLocation, TurretShootDirection);
 	
@@ -93,24 +95,40 @@ void AOPAG_NormalTurret::GetShootingDirection(FVector& Start, FVector& ShootDire
 	{
 		if (const AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 		{
-				//Gets Start location, in front of the gun
-				Start = Muzzle->GetComponentLocation();
+			//Gets Start location, in front of the gun
+			Start = Muzzle->GetComponentLocation();
 
-				//Gets Vector from player to enemy
-				const FVector PlayerToSelfVector = Player->GetActorLocation() - GetActorLocation();
+			//Gets Vector from player to enemy
+			const FVector PlayerToSelfVector = Player->GetActorLocation() - Start;
 
-				//Gets not normalized vector with shooting accuracy computations applied
-				const float DirectionVectorX =
-					PlayerToSelfVector.X + UKismetMathLibrary::RandomFloatInRange(
-						-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
-				const float DirectionVectorY = PlayerToSelfVector.Y;
-				const float DirectionVectorZ =
-					PlayerToSelfVector.Z + UKismetMathLibrary::RandomFloatInRange(
-						-ShootingAccuracyTolerance, ShootingAccuracyTolerance);
-				const FVector DirectionVector = FVector(DirectionVectorX, DirectionVectorY, DirectionVectorZ);
+			float EnemyToPlayerLenght = PlayerToSelfVector.Size();
 
-				//Gets normalized vector with shooting accuracy computations applied
-				ShootDirection = UKismetMathLibrary::Normal(DirectionVector, 0.0001f); //2nd param is tolerance
+			// get the two tangent vectors to the one from the player to the enemy (as remaining axis)
+			FVector TangentVector1 = FVector::CrossProduct(PlayerToSelfVector, FVector::UpVector);
+			TangentVector1.Normalize();
+			FVector TangentVector2 = FVector::CrossProduct(PlayerToSelfVector, TangentVector1);
+			TangentVector2.Normalize();
+
+			float RandomAngle1 = UKismetMathLibrary::RandomFloatInRange(
+				-RandomAngleShotBounds,
+				RandomAngleShotBounds
+			);
+
+			float RandomAngle2 = UKismetMathLibrary::RandomFloatInRange(
+				-RandomAngleShotBounds,
+				RandomAngleShotBounds
+			);
+
+			float RandomFactor1 = FMath::Tan(((RandomAngle1 * PI) / 180)) * EnemyToPlayerLenght;
+			float RandomFactor2 = FMath::Tan(((RandomAngle2 * PI) / 180)) * EnemyToPlayerLenght;
+
+			TangentVector1 *= RandomFactor1;
+			TangentVector2 *= RandomFactor2;
+
+			FVector ShotDirectionResult = PlayerToSelfVector + TangentVector1 + TangentVector2;
+
+			//Gets normalized vector with shooting accuracy computations applied
+			ShootDirection = ShotDirectionResult; //2nd param is tolerance
 		}
 	}
 }
@@ -122,7 +140,7 @@ void AOPAG_NormalTurret::ShootLineTrace(FVector StartShootLocation, FVector Dire
 	TArray<AActor*> ActorsToIgnore = GetAllActorsToIgnore();
 
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, StartShootLocation + Direction * 2000, ObjectTypesQuery, false,
-		ActorsToIgnore, EDrawDebugTrace::Persistent, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
+		ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
 	// If Actor is inheritance by character base, invoke take damage
 	if (bIsHit)

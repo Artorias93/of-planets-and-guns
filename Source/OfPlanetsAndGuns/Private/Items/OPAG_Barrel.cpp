@@ -40,6 +40,8 @@ void AOPAG_Barrel::Tick(float DeltaTime)
 
 void AOPAG_Barrel::Detonate()
 {
+	bIsDetonating = true;
+
 	DamageAllTargetsInRange();
 
 	const FVector EmitterSpawnLocation = BarrelMesh->GetComponentLocation();
@@ -66,22 +68,30 @@ void AOPAG_Barrel::DamageAllTargetsInRange()
 {
 	TArray<FHitResult> OutHits;
 	TArray<AActor*> ActorsToIgnore;
-	auto PC = GetWorld()->GetFirstPlayerController();
-	if (PC) ActorsToIgnore.Add(PC->GetPawn());
-	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMultiByProfile(GetWorld(), GetActorLocation(),
-		GetActorForwardVector() + GetActorLocation(), Radius, 0.f, TEXT("Pawn"), false, ActorsToIgnore,
-		EDrawDebugTrace::None, OutHits, true);
+	bool bHasHit = UKismetSystemLibrary::CapsuleTraceMulti(GetWorld(), GetActorLocation(), GetActorForwardVector() + GetActorLocation(),
+		Radius, .0f, ETraceTypeQuery::TraceTypeQuery_MAX, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 	if (bHasHit)
 	{
-		TArray<AOPAG_Enemy*> HitEnemies;
+		TArray<AOPAG_CharacterBase*> HitCharacters;
 		for (FHitResult OutHit : OutHits)
 		{
-			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(OutHit.Actor);
-			if (Enemy) HitEnemies.AddUnique(Enemy);
+			AOPAG_CharacterBase* Character = Cast<AOPAG_CharacterBase>(OutHit.GetActor());
+			if (Character) HitCharacters.AddUnique(Character);
 		}
-		for (AOPAG_Enemy* Enemy : HitEnemies)
+		for (AOPAG_CharacterBase* Character : HitCharacters)
 		{
-			Enemy->ReceiveDamage(Damage, this);
+			Character->ReceiveDamage(Damage, this);
+		}
+
+		TArray<AOPAG_Barrel*> HitBarrels;
+		for (FHitResult OutHit : OutHits)
+		{
+			AOPAG_Barrel* Other = Cast<AOPAG_Barrel>(OutHit.GetActor());
+			if(Other)	HitBarrels.AddUnique(Other);
+		}
+		for (AOPAG_Barrel* Other : HitBarrels)
+		{
+			if(Other != nullptr && !Other->IsDetonating())	Other->Detonate();
 		}
 	}
 }

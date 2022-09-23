@@ -35,8 +35,17 @@ void UOPAG_UWGunView::UpdateCurrentAmmoText(const int CurrentValue)
 
 void UOPAG_UWGunView::UpdateTotalAmmoText(const int CurrentValue)
 {
-	if (TotalAmmoText && CurrentValue >= 0) {
-		TotalAmmoText->SetText(FText::FromString(FString::FromInt(CurrentValue)));
+	if (TotalAmmoText && CurrentValue >= 0) 
+	{
+		//99999 is the default AmmoMax pistol value ( set in Blueprint )
+		if(CurrentValue >= 99999)
+		{
+			TotalAmmoText->SetText(FText::FromString("-"));
+		}
+		else
+		{
+			TotalAmmoText->SetText(FText::FromString(FString::FromInt(CurrentValue)));
+		}
 	}
 }
 
