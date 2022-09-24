@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "GameFramework/GameUserSettings.h"
 #include "UI/OPAG_MainMenuHUD.h"
 
@@ -27,7 +28,21 @@ void UOPAG_UWOptionsView::NativeConstruct()
 		GraphicsSlider->SetValue(OverallScalabilitySettingsValue);
 	}
 
-	//Prendere reference ad Audio manager subsystem e gettare i valori
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+
+	if (SMS) 
+	{
+		float MasterValue = 0.f; //Get  value from FMod
+		MasterSlider->SetValue(MasterValue);
+		float MusicValue = 0.f; //Get  value from FMod
+		MusicSlider->SetValue(MusicValue);
+		float SFXValue = 0.f; //Get  value from FMod
+		SFXSlider->SetValue(SFXValue);
+		float AmbientValue = 0.f; //Get  value from FMod
+		AmbientSlider->SetValue(AmbientValue);
+		float SystemValue = 0.f; //Get  value from FMod
+		SystemSlider->SetValue(SystemValue);
+	}
 
 	BackButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWOptionsView::BackButtonClicked);
 

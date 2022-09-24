@@ -36,6 +36,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWOptionsView : public UUserWidget
 
 	class UOPAG_EventManagerSubsystem* EMS;
 
+	class UOPAG_SoundManagerSubsystem* SMS;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 		FLinearColor RedColor;
