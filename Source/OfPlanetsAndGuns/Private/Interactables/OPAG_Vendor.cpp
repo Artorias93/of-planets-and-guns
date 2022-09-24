@@ -27,6 +27,7 @@ AOPAG_Vendor::AOPAG_Vendor()
 	PrimaryActorTick.bCanEverTick = true;
 	ShowingMerch = false;
 
+	// Collisions
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Collision"));
 	if (BoxCollision != nullptr)
 	{
@@ -44,6 +45,7 @@ AOPAG_Vendor::AOPAG_Vendor()
 		
 	}
 
+	// Meshes
 	Pedestal = CreateDefaultSubobject<UStaticMeshComponent>("Pedestal");
 	if (Pedestal != nullptr)
 	{
@@ -53,6 +55,7 @@ AOPAG_Vendor::AOPAG_Vendor()
 		Pedestal->SetupAttachment(RootComponent);
 	}
 
+	// TextRenderer
 	PriceTextRender_Gun1 = CreateDefaultSubobject<UTextRenderComponent>(TEXT("PriceTextRender_Gun1"));
 	if (PriceTextRender_Gun1)
 	{
@@ -81,6 +84,7 @@ AOPAG_Vendor::AOPAG_Vendor()
 		PriceTextRender_Module2->SetupAttachment(RootComponent);
 	}
 
+	// ChildActors
 	ChildActor_Gun1 = CreateDefaultSubobject<UChildActorComponent>("LootSpawnPoint_Gun1");
 	if (ChildActor_Gun1)
 		ChildActor_Gun1->SetupAttachment(RootComponent);
@@ -97,9 +101,24 @@ AOPAG_Vendor::AOPAG_Vendor()
 	if (ChildActor_Module2)
 		ChildActor_Module2->SetupAttachment(RootComponent);
 
-	PosDirActParticle = CreateDefaultSubobject<UArrowComponent>("ActivParticle_PosDir");
-	if (PosDirActParticle)
-		PosDirActParticle->SetupAttachment(RootComponent);
+	// Niagara Components
+	NcParticlesInteract = CreateDefaultSubobject<UNiagaraComponent>("ParticleInteract_NC");
+	if (NcParticlesInteract) {
+		NcParticlesInteract->SetupAttachment(RootComponent);
+		NcParticlesInteract->Activate(false);
+	}
+
+	NcParticlesPool = CreateDefaultSubobject<UNiagaraComponent>("ParticlesPool_NC");
+	if (NcParticlesPool) {
+		NcParticlesPool->SetupAttachment(RootComponent);
+		NcParticlesPool->Activate(false);
+	}
+		
+	NcParticlesSign = CreateDefaultSubobject<UNiagaraComponent>("ParticlesFloatingSign_NC");
+	if (NcParticlesSign) {
+		NcParticlesSign->SetupAttachment(RootComponent);
+		NcParticlesPool->Activate(false);
+	}
 }
 
 
@@ -130,30 +149,41 @@ void AOPAG_Vendor::BeginPlay()
 	BoxMoneyTrigger->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapBegin);
 	BoxMoneyTrigger->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapEnd);
 
-	// Start spawn particle system
-	FVector ParticlePos = FVector::ZeroVector;
-	FRotator ParticleRot = FRotator::ZeroRotator;
-	FVector ParticleSize = FVector::OneVector;
-	if (PosDirActParticle != nullptr) {
-		ParticlePos = PosDirActParticle->GetComponentLocation();
-		ParticleRot = PosDirActParticle->GetComponentRotation();
-	}
-	if (NsActivationParticles != nullptr) {
-		NcActivationParticles = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NsActivationParticles, ParticlePos, ParticleRot, ParticleSize, false, false);
+	// Niagara Interact
+	if (NcParticlesInteract != nullptr) {
+		NcParticlesInteract->Deactivate();
 	}
 
+	// Niagara Pool
+	if (NcParticlesPool != nullptr) {
+		NcParticlesPool->Deactivate();
+	}
+
+	// Niagara Ray
+	if (NcParticlesSign != nullptr) {
+		NcParticlesSign->Deactivate();
+	}
 }
 
 void AOPAG_Vendor::Unlock(const float Difficulty) {
 	ShowingMerch = true;
-	ActivationParticleEffect();
+	
 	PopulateGunAndModuleArray();	
 	SpawnItem(Difficulty);
+
+	// Activate Particle effects
+	if (NcParticlesPool != nullptr) {
+		NcParticlesPool->Activate();
+	}
+	if (NcParticlesSign != nullptr) {
+		NcParticlesSign->Activate();
+	}
+	ParticleEffectInteraction();
 }
 
-void AOPAG_Vendor::ActivationParticleEffect() {
-	if (NsActivationParticles != nullptr) {
-		NcActivationParticles->Activate();
+void AOPAG_Vendor::ParticleEffectInteraction() {
+	if (NcParticlesInteract != nullptr) {
+		NcParticlesInteract->Activate();
 	}
 }
 
@@ -390,7 +420,7 @@ void AOPAG_Vendor::AttachModulesToGun(AOPAG_ModularGun& Gun, const bool IsPowerf
 
 void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)
 {
-	ActivationParticleEffect();
+	ParticleEffectInteraction();
 	if (ChildActor_Gun1->GetChildActor() == Gun)
 	{
 		PriceTextRender_Gun1->SetVisibility(false);
@@ -404,7 +434,7 @@ void AOPAG_Vendor::DisableGunTextInVendor(AOPAG_ModularGun* Gun)
 
 void AOPAG_Vendor::DisableModuleTextInVendor(AOPAG_ModuleBase* Module)
 {
-	ActivationParticleEffect();
+	ParticleEffectInteraction();
 	if (ChildActor_Module1->GetChildActor() == Module)
 	{
 		PriceTextRender_Module1->SetVisibility(false);

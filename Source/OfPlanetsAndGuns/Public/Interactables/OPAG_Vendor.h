@@ -54,11 +54,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UTextRenderComponent* PriceTextRender_Module2;	
 
-	// Particle effect
+	// Particle effects
+	//UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	//	UNiagaraSystem* NsActivationParticles;
 	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UNiagaraSystem* NsActivationParticles;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UArrowComponent* PosDirActParticle;
+		UNiagaraComponent* NcParticlesInteract;
+	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UNiagaraComponent* NcParticlesPool;
+	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UNiagaraComponent* NcParticlesSign;
 
 	// Data tables
 	UPROPERTY(Category = "OPAG | Vendor| Tables", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -90,10 +94,9 @@ private:
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
 	bool ShowingMerch;
-	UNiagaraComponent* NcActivationParticles;
 
 	void PopulateGunAndModuleArray();
-	void ActivationParticleEffect();
+	void ParticleEffectInteraction();
 
 protected:
 	virtual void BeginPlay() override;
