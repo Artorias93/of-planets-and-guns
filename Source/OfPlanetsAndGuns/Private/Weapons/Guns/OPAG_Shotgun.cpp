@@ -70,7 +70,7 @@ void AOPAG_Shotgun::ShootLineTrace(FVector StartShootLocation, FVector Direction
 						//Check for head shot
 						const bool IsHeadshot = OutHit.GetComponent()->ComponentHasTag("Head");
 						const float MultiplierByLevel = CalculateMultiplierByLevel();
-						Character->ReceiveDamage(CalculateDamage(IsHeadshot, MultiplierByLevel) / ConsecutiveProjectile, GetParentActor());
+						Character->ReceiveDamage(CalculateDamage(IsHeadshot, MultiplierByLevel) / ConsecutiveProjectile, GetParentActor(), IsHeadshot);
 					}
 				}
 			}

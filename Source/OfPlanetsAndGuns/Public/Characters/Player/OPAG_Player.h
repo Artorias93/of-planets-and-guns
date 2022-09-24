@@ -282,7 +282,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic) override;
 	virtual void DisplayDebug(UCanvas* InCanvas, const FDebugDisplayInfo& InDebugDisplay, float& InYL, float& InYPos) override;
 
 	void HealthChanged(const FOnAttributeChangeData& Data);

@@ -33,7 +33,7 @@ public:
 	UPROPERTY()
 	class UOPAG_SoundManagerSubsystem* SMS;
 	
-	virtual void ReceiveDamage(const float Damage, AActor* const Causer);
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic);
 	virtual void ReceiveDamage(AActor* Throwable);
 
 	// Ability system

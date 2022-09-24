@@ -28,7 +28,7 @@ public:
 
 	void UpdateAcceleration(float const NewAcceleration) const;
 	
-	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic) override;
 
 	virtual void Attack();
 
@@ -77,6 +77,8 @@ protected:
 	UFUNCTION() void SpawnFXFinished();
 
 	UFUNCTION() void ResetHealthBarHidden();
+
+	UFUNCTION() void SpawnTextDamage(float Damage, bool bCrit);
 
 	//virtual void GetShootingDirection(FVector& StartLocation, FVector& Direction, float const ShootingAccuracyTolerance /* = 0 */) override;
 	
@@ -132,6 +134,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "OPAG AI", meta=(AllowPrivateAccess = true))
 	UMaterialInstance* SpawnMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "OPAG AI")
+	TSubclassOf<class AOPAG_TextDamage> TextDamageClass;
 
 	TArray<UMaterial*> NormalMaterials;
 	UMaterialInstanceDynamic* ActiveMaterial;

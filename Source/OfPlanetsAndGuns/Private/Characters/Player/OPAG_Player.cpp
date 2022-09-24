@@ -187,7 +187,7 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// UpdateDashProgressBar();
 }
 
-void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
+void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic)
 {
 	check(AttributeSetPlayer);
 
@@ -206,7 +206,12 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 
 	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
 	{
-		Super::ReceiveDamage(Damage, Causer);
+		Super::ReceiveDamage(Damage, Causer, bCritic);
+		
+		if (!bIsShieldBroken) {
+			bIsShieldBroken = true;
+			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
+		}
 		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Damage);
 		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 		return;
