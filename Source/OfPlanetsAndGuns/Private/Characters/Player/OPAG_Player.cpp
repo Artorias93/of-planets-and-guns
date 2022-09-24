@@ -1480,14 +1480,20 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 		bAreCountersAlreadyInitialized = false;
 		InitUICounters();
 
-		if (StateToApply.PrimaryGun.GunClass)
+
+
+		UClass* GunClass = StateToApply.PrimaryGun.GunClass.LoadSynchronous();
+
+		if (GunClass)
 		{
-			PrimaryGunComponent->SetChildActorClass(StateToApply.PrimaryGun.GunClass);
+			SwapGuns();
+			PrimaryGunComponent->SetChildActorClass(nullptr);
+			PrimaryGunComponent->SetChildActorClass(GunClass);
 			if (PrimaryGunComponent->GetChildActor())
 			{
-				SwapGuns();
 
 				PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
+
 				PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules, StateToApply.PrimaryGun.AttachedModuleStats);
 
 				AttachDefaultGuns();
