@@ -378,6 +378,15 @@ TArray<AActor*> AOPAG_GunBase::CheckWhatActorsIgnoreLinetrace()
 	Objects.Add(GetParentActor());
 	Objects.Add(this);
 	
+	TArray<AActor*> Drops;
+	TArray<AActor*> Modules;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_Drop::StaticClass(), Drops);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_ModuleBase::StaticClass(), Modules);
+
+	Objects.Append(Drops);
+	Objects.Append(Modules);
+
 	if (const AOPAG_Player* const Player = Cast<AOPAG_Player>(GetParentActor()))
 	{
 		if (Player->GetShield() != nullptr)
