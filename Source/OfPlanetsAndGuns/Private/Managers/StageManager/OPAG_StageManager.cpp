@@ -434,6 +434,9 @@ void AOPAG_StageManager::OnRoomSpawned(AOPAG_RoomManager* const RoomManager)
 		{
 			if (i < Exits.Num())
 			{
+				checkf(Exits[i] != nullptr, TEXT("Exit cannot be configured as nullptr. Fix exits for %s"), 
+					*RoomManager->GetLevel()->GetFullName());
+				if (!Exits[i]) break;
 				AddRoom(CurrentNode->NextRoomIDs[i], Exits[i]);
 			}
 			else break;

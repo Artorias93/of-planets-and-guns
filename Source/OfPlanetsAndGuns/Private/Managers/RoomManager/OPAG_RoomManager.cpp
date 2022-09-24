@@ -126,7 +126,9 @@ void AOPAG_RoomManager::CloseExits(bool bIsLastRoom, bool bHasSafeRoom) const
 {
 	for (const AOPAG_RoomAttachPoint* Exit : Exits)
 	{
-		if (Exit->bIsOpen) continue;
+		checkf(Exit != nullptr, TEXT("Exit cannot be configured as nullptr. Fix exits for %s"),
+			*GetLevel()->GetFullName());
+		if (!Exit || Exit->bIsOpen) continue;
 
 		if (bIsLastRoom || bHasSafeRoom)
 		{
