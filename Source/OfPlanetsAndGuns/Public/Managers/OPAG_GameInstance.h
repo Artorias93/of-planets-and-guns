@@ -45,18 +45,29 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main Menu")
 		TSoftObjectPtr<UWorld> MainMenuLevel;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Audio Libraries")
 		UDataTable* WeaponsAudioLibrary;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Audio Libraries")
 		UDataTable* EnviromentAudioLibrary;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Audio Libraries")
 		UDataTable* AbilitiesAudioLibrary;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Audio Libraries")
 		UDataTable* CharacterAudioLibrary;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Audio Libraries")
 		UDataTable* UIAudioLibrary;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Audio Libraries")
 		UDataTable* SoundtracksAudioLibrary;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Buses")
+		class UFMODBus* AudioMasterBus;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Buses")
+		class UFMODBus* AudioMusicBus;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Buses")
+		class UFMODBus* AudioSFXBus;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Buses")
+		class UFMODBus* AudioAmbientBus;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Buses")
+		class UFMODBus* AudioSystemBus;
 
 private:
 	void BindEvents();

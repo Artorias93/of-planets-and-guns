@@ -13,6 +13,7 @@
 void UOPAG_GameInstance::BindEvents()
 {
 	UOPAG_EventManagerSubsystem* EMS = GetSubsystem<UOPAG_EventManagerSubsystem>();
+	UOPAG_SoundManagerSubsystem* SMS = GetSubsystem<UOPAG_SoundManagerSubsystem>();
 	EMS->StageManagerInit.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerInitialized);
 	EMS->StageManagerReady.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerReady);
 	EMS->StageLoaded.AddDynamic(this, &UOPAG_GameInstance::OnStageLoaded);
@@ -31,6 +32,7 @@ void UOPAG_GameInstance::BindEvents()
 
 	EMS->RequestPlayerState.AddDynamic(this, &UOPAG_GameInstance::SendPlayerState);
 	EMS->SavePlayerState.AddDynamic(this, &UOPAG_GameInstance::SavePlayerState);
+	
 }
 
 void UOPAG_GameInstance::LoadPlanetTable()
@@ -271,12 +273,20 @@ float UOPAG_GameInstance::GetStageDifficulty()
 void UOPAG_GameInstance::SetAudioLibraries()
 {
 	UOPAG_SoundManagerSubsystem* SMS = GetSubsystem<UOPAG_SoundManagerSubsystem>();
+	
 	SMS->WeaponsAudioLibrary = WeaponsAudioLibrary;
 	SMS->AbilitiesAudioLibrary = AbilitiesAudioLibrary;
 	SMS->EnviromentAudioLibrary = EnviromentAudioLibrary;
 	SMS->CharacterAudioLibrary = CharacterAudioLibrary;
 	SMS->UIAudioLibrary = UIAudioLibrary;
 	SMS->SoundtracksAudioLibrary = SoundtracksAudioLibrary;
+	SMS->AudioMasterBus = AudioMasterBus;
+	SMS->AudioAmbientBus = AudioAmbientBus;
+	SMS->AudioMusicBus = AudioMusicBus;
+	SMS->AudioSFXBus = AudioSFXBus;
+	SMS->AudioSystemBus = AudioSystemBus;
+
+	SMS->BindEvents();
 }
 
 void UOPAG_GameInstance::OnPlayerDeath()

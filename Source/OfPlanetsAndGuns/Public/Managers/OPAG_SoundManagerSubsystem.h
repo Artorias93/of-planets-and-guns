@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
-#include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Weapons/Guns/OPAG_GunBase.h"
 #include "FMODEvent.h"
@@ -107,6 +106,31 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio Libraries")
 		UDataTable* SoundtracksAudioLibrary;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Buses | MasterBus")
+		UFMODBus* AudioMasterBus;
+	UPROPERTY(EditAnywhere, Category = "Buses | MasterBus", meta = (ClampMin = "-80", ClampMax = "10"))
+		float MasterBusVolume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Buses | MusicBus")
+		UFMODBus* AudioMusicBus;
+	UPROPERTY(EditAnywhere, Category = "Buses | MusicBus", meta = (ClampMin = "-80", ClampMax = "10"))
+		float MusicBusVolume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Buses | SFXBus")
+		UFMODBus* AudioSFXBus;
+	UPROPERTY(EditAnywhere, Category = "Buses | SFXBus", meta = (ClampMin = "-80", ClampMax = "10"))
+		float SFXBusVolume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Buses | AmbientBus")
+		UFMODBus* AudioAmbientBus;
+	UPROPERTY(EditAnywhere, Category = "Buses | AmbientBus", meta = (ClampMin = "-80", ClampMax = "10"))
+		float AmbientBusVolume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Buses | SystemMasterBus")
+		UFMODBus* AudioSystemBus;
+	UPROPERTY(EditAnywhere, Category = "Buses | SystemMasterBus", meta = (ClampMin = "-80", ClampMax = "10"))
+		float SystemBusVolume;
+
 	UPROPERTY(EditAnywhere, Category = "FMOD")
 		class UFMODAudioComponent* AudioComponent;
 	UPROPERTY(EditAnywhere, Category = "FMOD | Zipline")
@@ -115,10 +139,15 @@ public:
 		float Intensity = 0.0f;
 
 
-
+	/*
+		float MaxVolume = dbtoLinear(-80);
+		float MinVolume = dbtoLinear(10);
+	*/
 	FFMODEventInstance InstanceUI;
 	FFMODEventInstance InstanceAmbient;
 	FFMODEventInstance InstanceSoundtrack;
+
+	class UOPAG_EventManagerSubsystem* EMS;
 
 public: 
 	UFUNCTION(BlueprintCallable)
@@ -143,6 +172,29 @@ public:
 		void StopAmbient();
 	UFUNCTION(BlueprintCallable)
 		void SetIntensity(float value);
+	UFUNCTION()
+		void BindEvents();
+	UFUNCTION()
+		void MasterSliderChanged(const float& value);
+	UFUNCTION()
+		void MusicSliderChanged(const float& value);
+	UFUNCTION()
+		void SFXSliderChanged(const float& value);
+	UFUNCTION()
+		void AmbientSliderChanged(const float& value);
+	UFUNCTION()
+		void SystemSliderChanged(const float& value);
+
+	UFUNCTION()
+		float getMasterBusVolume() const;
+	UFUNCTION()
+		float getMusicBusVolume() const;
+	UFUNCTION()
+		float getAmbientBusVolume() const;
+	UFUNCTION()
+		float getSFXBusVolume() const;
+	UFUNCTION()
+		float getSystemBusVolume() const;
 private:
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponsFireSound(AOPAG_GunBase* weapon);

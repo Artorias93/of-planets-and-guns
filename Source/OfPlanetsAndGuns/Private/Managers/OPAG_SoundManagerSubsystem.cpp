@@ -1,6 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
 #include "Managers/OPAG_SoundManagerSubsystem.h"
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_EventManagerSubsystem.h"
+
+void UOPAG_SoundManagerSubsystem::BindEvents(){
+	EMS = GetWorld()->GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	//if (AudioMasterBus)
+		 //setto volume iniziale
+	/*
+	EMS->MasterSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::MasterSliderChanged);
+	EMS->MusicSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::MusicSliderChanged);
+	EMS->SFXSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SFXSliderChanged);
+	EMS->AmbientSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::AmbientSliderChanged);
+	EMS->SystemSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SystemSliderChanged); //UI
+	*/
+}
+
 
 void UOPAG_SoundManagerSubsystem::PlayWeaponSounds(AOPAG_GunBase* weapon, EWeaponSoundAction action) {
 	switch (action)
@@ -326,4 +341,47 @@ void UOPAG_SoundManagerSubsystem::StopSound() {
 		ZiplineAudioComponent->Stop();
 		ZiplineAudioComponent->Release();
 	}	
+}
+
+void UOPAG_SoundManagerSubsystem::MasterSliderChanged(const float &value) {
+	//il value è tra 0 e 1, posso fare che è il t di un Lerp che va tra DBtoLinear(-80) e DbtoLinear(10)
+	//e faccio BusVolume = Lerp(DBtoLinear(-80),DbtoLinear(10), value)
+	// MasterBuss.setvolume(bussVolume)
+}
+
+void UOPAG_SoundManagerSubsystem::MusicSliderChanged(const float &value) {
+
+}
+
+void UOPAG_SoundManagerSubsystem::SFXSliderChanged(const float &value) {
+
+}
+
+void UOPAG_SoundManagerSubsystem::AmbientSliderChanged(const float &value) {
+
+}
+
+void UOPAG_SoundManagerSubsystem::SystemSliderChanged(const float &value) {
+
+}
+
+float UOPAG_SoundManagerSubsystem::getMasterBusVolume()const {
+	//return valore volume tra 0 e 1
+	return 0;
+}
+
+float UOPAG_SoundManagerSubsystem::getMusicBusVolume()const {
+	return 0;
+}
+
+float UOPAG_SoundManagerSubsystem::getAmbientBusVolume()const {
+	return 0;
+}
+
+float UOPAG_SoundManagerSubsystem::getSFXBusVolume()const {
+	return 0;
+}
+
+float UOPAG_SoundManagerSubsystem::getSystemBusVolume()const {
+	return 0;
 }
