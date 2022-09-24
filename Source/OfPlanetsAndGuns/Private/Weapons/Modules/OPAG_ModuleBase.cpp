@@ -72,6 +72,7 @@ void AOPAG_ModuleBase::BeginPlay()
 	if (GetParentActor() == nullptr)
 	{
 		ModuleMesh->SetWorldScale3D(FVector(2.f, 2.f, 2.f));
+		GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModuleBase::FlyRotationTimer_Implementation, .01f, true);
 	}
 }
 

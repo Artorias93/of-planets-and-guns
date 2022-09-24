@@ -208,11 +208,6 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
 	{
 		Super::ReceiveDamage(Damage, Causer);
-		
-		if (!bIsShieldBroken) {
-			bIsShieldBroken = true;
-			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
-		}
 		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Damage);
 		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 		return;
@@ -233,6 +228,16 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
 			AttributeSetPlayer->GetShieldCapacityMax(),
 			bIsShieldBroken);
+
+		// Update shield damage opacity on HUD
+		const float CurrentOpacityAmount = (AttributeSetPlayer->GetShieldCapacityMax() - AttributeSetPlayer->GetShieldCapacity())
+			/ AttributeSetPlayer->GetShieldCapacityMax();
+		EMS->UpdateShieldDamage.Broadcast(CurrentOpacityAmount);
+
+		if (AttributeSetPlayer->GetShieldCapacity() <= 0 && !bIsShieldBroken) {
+			bIsShieldBroken = true;
+			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
+		}
 	}
 }
 
@@ -942,7 +947,6 @@ void AOPAG_Player::InteractWithItem()
 				IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
 			}
 		}
-		//UE_LOG(LogTemp, Log);
 		if (IOPAG_InteractableInterface::Execute_CanBuy(InteractableObject))
 		{
 			InventorySystemComp->GoldAmount -= IOPAG_InteractableInterface::Execute_GetPriceTotal(InteractableObject);

@@ -14,6 +14,7 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
+#include "UI/OPAG_PlayerStatus.h"
 
 
 void AOPAG_GameplayHUD::DrawHUD() 
@@ -113,6 +114,16 @@ void AOPAG_GameplayHUD::BeginPlay()
 	if (OptionsViewWidgetClass)
 	{
 		OptionsViewWidget = CreateWidget<UOPAG_UWOptionsView>(GetWorld(), OptionsViewWidgetClass);
+	}
+
+	if (PlayerStatusViewWidgetClass != nullptr)
+	{
+		PlayerStatusViewWidget = CreateWidget<UOPAG_PlayerStatus>(GetWorld(), PlayerStatusViewWidgetClass);
+
+		if (PlayerStatusViewWidget)
+		{
+			PlayerStatusViewWidget->AddToViewport(0);
+		}
 	}
 }
 

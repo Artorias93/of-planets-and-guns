@@ -121,6 +121,11 @@ void AOPAG_ModularGun::BeginPlay()
 	GunDropHighlight->Deactivate();
 	GunDropHighlight->bAutoActivate = false;
 
+	if (GetParentActor() == nullptr)
+	{
+		GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModularGun::FlyRotationTimer_Implementation, .01f, true);
+	}
+
 	// Working, but not sure if needed
 
 	/*EModuleRarity GunRarity = GetGunRarity();	

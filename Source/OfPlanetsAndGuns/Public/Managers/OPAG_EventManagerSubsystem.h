@@ -127,6 +127,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableModuleTextInVendor, AOPAG_Mo
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivePassiveAbilityEffect, TSubclassOf<UGameplayAbility>, PassiveAbilityClass);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemovePassiveAbilityEffect, FGameplayTagContainer, PassiveAbilityTagContainer);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateShieldDamage, const float, OpacityAmount);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
@@ -272,6 +274,9 @@ public:
 		FSoundSliderChanged AmbientSliderChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FSoundSliderChanged SystemSliderChanged;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "OPAG | Events | UI")
+	FUpdateShieldDamage UpdateShieldDamage;
 	
 
 	// Player Enhanced
