@@ -23,6 +23,7 @@ void UOPAG_UWGunView::BindEvents()
 		EMS->TotalAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateTotalAmmoText);
 		EMS->CurrentAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateCurrentAmmoText);
 		EMS->ColorAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateAmmoColor);
+		EMS->SwapGunTexture.AddDynamic(this, &UOPAG_UWGunView::SwapGun);
 	}
 }
 
@@ -51,9 +52,36 @@ void UOPAG_UWGunView::UpdateTotalAmmoText(const int CurrentValue)
 
 void UOPAG_UWGunView::UpdateAmmoColor(const FLinearColor ColorParam)
 {
-	if (TotalAmmoText && CurrentAmmoText && AmmoSeparatorText) {
+	if (TotalAmmoText && CurrentAmmoText) {
 		CurrentAmmoText->SetColorAndOpacity(ColorParam);
 		TotalAmmoText->SetColorAndOpacity(ColorParam);
-		AmmoSeparatorText->SetColorAndOpacity(ColorParam);
+	}
+}
+
+void UOPAG_UWGunView::SwapGun(EFireTypes CurrentType)
+{
+	switch (CurrentType)
+	{
+	case EFireTypes::FullyAutomatic:
+		GunIcon->SetBrushFromTexture(RifleTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::SingleShot:
+		GunIcon->SetBrushFromTexture(SniperTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::Burst3:
+		GunIcon->SetBrushFromTexture(BurstTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::Pistol:
+		HandgunIcon->SetVisibility(ESlateVisibility::Visible);
+		GunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	default:
+		break;
 	}
 }

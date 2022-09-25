@@ -200,7 +200,7 @@ int AOPAG_GunBase::Shoot(const FVector StartShootLocation, const FVector Directi
 
 void AOPAG_GunBase::StopShoot()
 {
-	GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, 0.2f, false);
+	GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, ReductionSpreadRadiusShootingTime, false);
 }
 
 void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter)
@@ -215,8 +215,11 @@ void AOPAG_GunBase::ShootLineTrace(const FVector StartShootLocation, const FVect
 	const bool bIsHit = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), StartShootLocation, EffectiveDirection, ObjectTypesQuery, false,
 		ActorsToIgnore, EDrawDebugTrace::None, OutHit, true, FLinearColor::Red, FLinearColor::Green, 5.f);
 
-	// Draw line trace when shoot
-	const FTransform TracerTransform = FTransform(GetMuzzle()->GetComponentRotation(), StartShootLocation, FVector(.3f, .3f, .3f));
+	// Draw line trace when shoot	
+	FVector Offset = EffectiveDirection.GetSafeNormal() * 200.f;
+	FVector TraceStartLocation = StartShootLocation + Offset;
+
+	const FTransform TracerTransform = FTransform(EffectiveDirection.Rotation(), TraceStartLocation, FVector(.3f, .3f, .3f));
 	GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
 
 	// If Actor is inherited by character base, invoke take damage
@@ -375,6 +378,15 @@ TArray<AActor*> AOPAG_GunBase::CheckWhatActorsIgnoreLinetrace()
 	Objects.Add(GetParentActor());
 	Objects.Add(this);
 	
+	TArray<AActor*> Drops;
+	TArray<AActor*> Modules;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_Drop::StaticClass(), Drops);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOPAG_ModuleBase::StaticClass(), Modules);
+
+	Objects.Append(Drops);
+	Objects.Append(Modules);
+
 	if (const AOPAG_Player* const Player = Cast<AOPAG_Player>(GetParentActor()))
 	{
 		if (Player->GetShield() != nullptr)
@@ -447,11 +459,11 @@ void AOPAG_GunBase::GunDropTimelineProgress(FVector Value)
 #pragma region ReductionSpreadRadiusShooting
 void AOPAG_GunBase::ResetReductionSpreadRadiusShooting()
 {
-	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting - .15f, 1.f, ReductionSpreadRadiusShootingMax);
+	ReductionSpreadRadiusShooting = FMath::Clamp(ReductionSpreadRadiusShooting - ReductionSpreadRadiusShootingTime, 1.f, ReductionSpreadRadiusShootingMax);
 
 	if (!bIsShoot && ReductionSpreadRadiusShooting != 1.f)
 	{
-		GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, 0.15f, false);
+		GetWorld()->GetTimerManager().SetTimer(ResetReductionSpreadRadiusShootingHandle, this, &AOPAG_GunBase::ResetReductionSpreadRadiusShooting, ReductionSpreadRadiusShootingTime, false);
 	}
 }
 #pragma endregion ReductionSpreadRadiusShooting

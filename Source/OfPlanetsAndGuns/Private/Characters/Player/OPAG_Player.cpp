@@ -20,6 +20,7 @@
 #include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
+#include "Telemetry/OPAG_PlayerTelemetryComponent.h"
 #include "Items/OPAG_Drop.h"
 #include "Components/CapsuleComponent.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
@@ -37,6 +38,8 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include "GenericPlatform/GenericPlatformCrashContext.h"
 
+#include "DisplayDebugHelpers.h"
+
 AOPAG_Player::AOPAG_Player()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -44,6 +47,7 @@ AOPAG_Player::AOPAG_Player()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Player::OnOverlapBegin);
 
 	InventorySystemComp = CreateDefaultSubobject<UOPAG_InventorySystemComponent>("InventorySystemComp");
+	PlayerTelemetryComp = CreateDefaultSubobject<UOPAG_PlayerTelemetryComponent>("PlayerTelemetryComp");
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	if (SpringArm != nullptr)
@@ -182,6 +186,8 @@ void AOPAG_Player::Tick(float DeltaTime)
 
 	// Check if player sees enemy (for health bar)
 	LookAtEnemy();
+
+	// UpdateDashProgressBar();
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
@@ -204,11 +210,6 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
 	{
 		Super::ReceiveDamage(Damage, Causer);
-		
-		if (!bIsShieldBroken) {
-			bIsShieldBroken = true;
-			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
-		}
 		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Damage);
 		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 		return;
@@ -229,6 +230,31 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
 		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
 			AttributeSetPlayer->GetShieldCapacityMax(),
 			bIsShieldBroken);
+
+		// Update shield damage opacity on HUD
+		const float CurrentOpacityAmount = (AttributeSetPlayer->GetShieldCapacityMax() - AttributeSetPlayer->GetShieldCapacity())
+			/ AttributeSetPlayer->GetShieldCapacityMax();
+		EMS->UpdateShieldDamage.Broadcast(CurrentOpacityAmount);
+
+		if (AttributeSetPlayer->GetShieldCapacity() <= 0 && !bIsShieldBroken) {
+			bIsShieldBroken = true;
+			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
+		}
+	}
+}
+
+void AOPAG_Player::DisplayDebug(UCanvas* InCanvas, const FDebugDisplayInfo& InDebugDisplay, float& InYL, float& InYPos)
+{
+	Super::DisplayDebug(InCanvas, InDebugDisplay, InYL, InYPos);
+
+	static FName NAME_Telemetry = FName(TEXT("PlayerTelemetry"));
+
+	if (InDebugDisplay.IsDisplayOn(NAME_Telemetry))
+	{
+		if (PlayerTelemetryComp != nullptr)
+		{
+			PlayerTelemetryComp->DrawTelemetry(InCanvas, InYL, InYPos);
+		}
 	}
 }
 
@@ -305,6 +331,7 @@ void AOPAG_Player::BroadcastEvents()
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->GetAmmoMax());
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 	EMS->RequestPlayerState.Broadcast();
+	EMS->UpdateDashAmount.Broadcast(AttributeSetPlayer->GetDashCount());
 }
 
 void AOPAG_Player::BindEvents()
@@ -384,8 +411,12 @@ void AOPAG_Player::InitDefaultValues()
 void AOPAG_Player::InitDashTimeline()
 {
 	DashTimeline->SetLooping(false);
-	DashTimeline->SetTimelineLength(DashRestoreTime);
+	DashTimeline->SetTimelineLength(AttributeSetPlayer->GetDashRestoreTime());
 	DashTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
+	
+	OnDashTimelineProgress.BindUFunction(this, FName("DashTimelineProgress"));
+	DashTimeline->AddInterpFloat(RecoilReverseCurveFloat, OnDashTimelineProgress, FName("Dash"));
+
 	OnDashTimelineFinished.BindUFunction(this, FName("DashTimelineFinished"));
 	DashTimeline->SetTimelineFinishedFunc(OnDashTimelineFinished);
 }
@@ -493,7 +524,8 @@ void AOPAG_Player::ActiveDash()
 			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Movement_Dash);
 			AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), AttributeSetPlayer->GetDashCount() - 1);
 
-			EMS->DashAmountDecrement.Broadcast();
+			EMS->UpdateDashAmount.Broadcast(AttributeSetPlayer->GetDashCount());
+			// UpdateDashProgressBar();
 
 			if (bIsFirstDash)
 			{
@@ -586,7 +618,6 @@ void AOPAG_Player::SwapGuns()
 			//Mesh1P->SetRelativeLocation(MeshHandOffset);
 			Mesh1P->GetAnimInstance()->Montage_Play(SwapHandgunMontageToPlay, 1.f, EMontagePlayReturnType::MontageLength, 0, true);
 			SMS->PlayWeaponSounds(CurrentGun, EWeaponSoundAction::Pickup);
-			
 		}
 		else
 		{
@@ -609,6 +640,9 @@ void AOPAG_Player::SwapGuns()
 		// Switch current ammo color
 		FLinearColor NewColor = CurrentGun->GetAmmoCurrent() == 0 ? FLinearColor::Red : FLinearColor::White;
 		EMS->ColorAmmoChanged.Broadcast(NewColor);
+
+		// Update current gun texture on Widget
+		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
 	}
 }
 
@@ -869,6 +903,19 @@ void AOPAG_Player::OnPauseGame()
 	EMS->GoldChanged.Broadcast(GetInventorySystemComponent()->GoldAmount);
 }
 
+void AOPAG_Player::UpdateDashProgressBar()
+{
+	FGameplayTagContainer TempTagsContainer;
+	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
+	float TimeRemaning;
+	float Duration;
+	bool bCheckResult = GetCooldownRemainingForTag(TempTagsContainer, TimeRemaning, Duration);
+	if(!bCheckResult)	return;
+
+	float TimeProgress = (Duration - TimeRemaning) / Duration;
+	EMS->UpdateDashProgressBar.Broadcast(TimeProgress);
+}
+
 void AOPAG_Player::RelocateComponets()
 {
 	// Update the Pitch separately so that it is only applied to the camera.
@@ -902,7 +949,6 @@ void AOPAG_Player::InteractWithItem()
 				IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
 			}
 		}
-		//UE_LOG(LogTemp, Log);
 		if (IOPAG_InteractableInterface::Execute_CanBuy(InteractableObject))
 		{
 			InventorySystemComp->GoldAmount -= IOPAG_InteractableInterface::Execute_GetPriceTotal(InteractableObject);
@@ -1028,6 +1074,9 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 		// Update ammo
 		PrimaryGun->SetAmmoCurrent(PrimaryGun->GetStatsTotal().ClipSize);
 		EMS->CurrentAmmoChanged.Broadcast(PrimaryGun->GetAmmoCurrent());
+
+		// Update current gun texture on Widget
+		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
 	}
 
 	// Spawn the old primary gun in scene
@@ -1259,15 +1308,26 @@ float AOPAG_Player::GetDashSpeed() const
 	return DashSpeed;
 }
 
+int AOPAG_Player::GetDashCount() const
+{
+	return AttributeSetPlayer->GetDashCount();
+}
+
 #pragma endregion GET
 
 #pragma region Timeline
+void AOPAG_Player::DashTimelineProgress(float Value)
+{
+	float TimeProgress = DashTimeline->GetPlaybackPosition() / DashTimeline->GetTimelineLength();
+	EMS->UpdateDashProgressBar.Broadcast(TimeProgress);
+}
+
 void AOPAG_Player::DashTimelineFinished()
 {
 	DashTimeline->SetTimelineLength(AttributeSetPlayer->GetDashRestoreTime());
 	AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetDashCountAttribute(), AttributeSetPlayer->GetDashCount() + 1);
 	
-	EMS->DashAmountIncrement.Broadcast();
+	EMS->UpdateDashAmount.Broadcast(AttributeSetPlayer->GetDashCount());
 
 	if (AttributeSetPlayer->GetDashCount() < AttributeSetPlayer->GetDashMaxCount())
 	{
@@ -1426,14 +1486,20 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 		bAreCountersAlreadyInitialized = false;
 		InitUICounters();
 
-		if (StateToApply.PrimaryGun.GunClass)
+
+
+		UClass* GunClass = StateToApply.PrimaryGun.GunClass.LoadSynchronous();
+
+		if (GunClass)
 		{
-			PrimaryGunComponent->SetChildActorClass(StateToApply.PrimaryGun.GunClass);
+			SwapGuns();
+			PrimaryGunComponent->SetChildActorClass(nullptr);
+			PrimaryGunComponent->SetChildActorClass(GunClass);
 			if (PrimaryGunComponent->GetChildActor())
 			{
-				SwapGuns();
 
 				PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
+
 				PrimaryGun->CreateAndAttachAllModules(StateToApply.PrimaryGun.AttachedModules, StateToApply.PrimaryGun.AttachedModuleStats);
 
 				AttachDefaultGuns();

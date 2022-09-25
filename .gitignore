@@ -90,7 +90,11 @@ FMOD/restore/
 FMOD/fmod.log
 FMOD/fmod_editor.log
 
+
 #don't ignore fmod binaries
 !Plugins/FMODStudio/Binaries/
 !Plugins/FMODStudio/Binaries/*
 Plugins/FMODStudio/Binaries/Win64/*.pdb
+Plugins/FMODStudio/Binaries/UE4Editor-FMODStudio.dll
+Plugins/FMODStudio/Binaries/UE4Editor-FMODStudioEditor.dll
+

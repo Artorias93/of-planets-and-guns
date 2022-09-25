@@ -34,6 +34,10 @@ class OFPLANETSANDGUNS_API UOPAG_UWOptionsView : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		UButton* BackButton;
 
+	class UOPAG_EventManagerSubsystem* EMS;
+
+	class UOPAG_SoundManagerSubsystem* SMS;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 		FLinearColor RedColor;
@@ -45,4 +49,15 @@ public:
 		void BackButtonClicked();
 	UFUNCTION()
 		void GraphicsSliderChanged(float CurrentValue);
+
+	UFUNCTION()
+		void MasterSliderChanged(float CurrentValue);
+	UFUNCTION()
+		void MusicSliderChanged(float CurrentValue);
+	UFUNCTION()
+		void SFXSliderChanged(float CurrentValue);
+	UFUNCTION()
+		void AmbientSliderChanged(float CurrentValue);
+	UFUNCTION()
+		void SystemSliderChanged(float CurrentValue);
 };

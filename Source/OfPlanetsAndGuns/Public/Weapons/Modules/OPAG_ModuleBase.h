@@ -51,25 +51,42 @@ protected:
 	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float PriceMuliplierPercentage = 1.f;
 
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UParticleSystemComponent* ModuleDropHighlight;
 
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	class UParticleSystem* ModuleDropHighlightParticle;	
+	UPROPERTY(Category = "OPAG | Module | Settings | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	class UParticleSystem* ModuleDropHighlightParticleInUse;
 
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY()
+	class UParticleSystem* ModuleDropHighlightParticleCommon;	
+
+	UPROPERTY()
+	class UParticleSystem* ModuleDropHighlightParticleUncommon;
+
+	UPROPERTY()
+	class UParticleSystem* ModuleDropHighlightParticleRare;
+
+	UPROPERTY()
+	class UParticleSystem* ModuleDropHighlightParticleEpic;
+
+	UPROPERTY()
+	class UParticleSystem* ModuleDropHighlightParticleLegendary;
+
+	UPROPERTY(Category = "OPAG | Module | Settings | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UTimelineComponent* ModuleDropTimeline;
 
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	class UCurveVector* CurveModuleDropVector;
 
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ModuleDropCurveXFactor = 200;
 
-	UPROPERTY(Category = "OPAG | Module | Settings", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Module | Settings | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ModuleDropCurveZFactor = 100;
 
 	FOnTimelineVector OnModuleDropTimelineProgress;
+
+	FOnTimelineEventStatic OnModuleDropTimelineFinished;
 	
 	UPROPERTY()
 	FVector ModuleDropTimelinePropertyName;
@@ -122,7 +139,7 @@ public:
 	EModuleBrand GetBrand() const;
 	FOPAG_GunStats GetStats() const;
 	int GetEquippableFireTypes() const;
-	void LoadParticleFromRarity(EModuleRarity ModuleRarity);
+	void SelectParticleFromRarity(EModuleRarity ModuleRarity);
 
 	//Setter
 	void SetParameters(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats,
@@ -136,5 +153,12 @@ public:
 public:
 	FORCEINLINE USphereComponent* GetModuleSphereComponent() { return Sphere; }
 	void StartDropTimeline();
-
+	UFUNCTION()
+	void ActivateHighlightParticle();
+	UFUNCTION()
+	void ModuleDropTimelineFinished();
+	UFUNCTION()
+	void InitDropTimeline();
+	UFUNCTION()
+	void LoadDropParticleAssets();
 };

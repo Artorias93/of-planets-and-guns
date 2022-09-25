@@ -15,18 +15,37 @@ struct FOPAG_GunModules : public FTableRowBase
 {
 	GENERATED_BODY()
 
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSoftClassPtr<AOPAG_ModuleBase> Barrel;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AOPAG_ModuleBase> Barrel;
+		TSoftClassPtr<AOPAG_ModuleBase> Stock;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AOPAG_ModuleBase> Stock;
+		TSoftClassPtr<AOPAG_ModuleBase> Grip;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AOPAG_ModuleBase> Grip;
+		TSoftClassPtr<AOPAG_ModuleBase> Magazine;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AOPAG_ModuleBase> Magazine;
+		TSoftClassPtr<AOPAG_ModuleBase> Sight;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AOPAG_ModuleBase> Sight;
+		TSoftClassPtr<AOPAG_ModuleBase> Accessory;
+};
+
+USTRUCT(BlueprintType)
+struct FOPAG_GunModuleNames : public FTableRowBase
+{
+	GENERATED_BODY()
+
+		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Barrel;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AOPAG_ModuleBase> Accessory;
+		FName Stock;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Grip;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Magazine;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Sight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FName Accessory;
 };
 
 USTRUCT(BlueprintType)
@@ -56,7 +75,7 @@ struct FOPAG_GunState : public FTableRowBase
 	GENERATED_BODY()
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<AOPAG_GunBase> GunClass;
+		TSoftClassPtr<AOPAG_GunBase> GunClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FOPAG_GunModules AttachedModules;

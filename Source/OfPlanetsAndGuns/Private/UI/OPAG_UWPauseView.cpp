@@ -46,7 +46,9 @@ void UOPAG_UWPauseView::OptionsButtonClicked()
 
 void UOPAG_UWPauseView::ExitButtonClicked()
 {
-
+	AOPAG_GameplayHUD* MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	if (MyHUD)
+		MyHUD->GoToMenu();
 }
 
 void UOPAG_UWPauseView::UpdateGoldValue(const int Value)

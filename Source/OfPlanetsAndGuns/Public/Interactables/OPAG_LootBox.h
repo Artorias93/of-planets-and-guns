@@ -7,6 +7,7 @@
 #include "OPAG_LootBox.generated.h"
 
 class UNiagaraSystem;
+class UNiagaraComponent;
 class UMaterialInstanceDynamic;
 
 UCLASS()
@@ -47,18 +48,18 @@ public:
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	int NumberOfModulesToSpawn = 1;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UNiagaraSystem* ActivationParticles;
+	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
+	UNiagaraSystem* NsActivationParticles;
+
 
 private:
 	TArray<TSubclassOf<AActor>> Items;   
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
-
 	class UOPAG_SoundManagerSubsystem* SMS = nullptr;
+	UPROPERTY() AActor* SpawnedItem;
+	UNiagaraComponent* NcActivationParticles;
 
-	UPROPERTY()
-		AActor* SpawnedItem;
 
 protected:
 	virtual void BeginPlay() override;

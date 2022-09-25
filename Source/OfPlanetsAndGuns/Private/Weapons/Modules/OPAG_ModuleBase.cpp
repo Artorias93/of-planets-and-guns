@@ -8,6 +8,7 @@
 #include "Curves/CurveVector.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "EngineUtils.h"
 
 AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
@@ -42,6 +43,8 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 	{
 		CurveModuleDropVector = CurveVector.Object;
 	}
+
+	LoadDropParticleAssets();
 }
 
 void AOPAG_ModuleBase::BeginPlay()
@@ -53,28 +56,23 @@ void AOPAG_ModuleBase::BeginPlay()
 
 	// This method is call for activate physical behavior when module is in the scene
 	CheckIfPhysical();
+
 	Sphere->SetSimulatePhysics(false);
-	
-	ModuleDropTimeline->SetLooping(false);
-	ModuleDropTimeline->SetTimelineLengthMode(ETimelineLengthMode::TL_TimelineLength);
 
-	OnModuleDropTimelineProgress.BindUFunction(this, FName("ModuleDropTimelineProgress"));
-	ModuleDropTimeline->AddInterpVector(CurveModuleDropVector, OnModuleDropTimelineProgress, FName("ModuleDropTimelinePropertyName"));	
+	InitDropTimeline();
 
-	LoadParticleFromRarity(GetRarity());
+	SelectParticleFromRarity(GetRarity());
 
-	if (ModuleDropHighlightParticle != nullptr)
+	if (ModuleDropHighlightParticleInUse != nullptr)
 	{
-		ModuleDropHighlight->SetTemplate(ModuleDropHighlightParticle);
+		ModuleDropHighlight->SetTemplate(ModuleDropHighlightParticleInUse);
+		ModuleDropHighlight->SetWorldScale3D(FVector(0.1f, 0.1f, 0.1f));		
+	}
 
-		if (GetParentActor() == nullptr)
-		{
-			ModuleDropHighlight->Activate();
-			ModuleDropHighlight->SetVisibility(true);
-			ModuleDropHighlight->bAutoActivate = true;
-
-			ModuleMesh->SetWorldScale3D(FVector(2, 2, 2));			
-		}
+	if (GetParentActor() == nullptr)
+	{
+		ModuleMesh->SetWorldScale3D(FVector(2.f, 2.f, 2.f));
+		GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModuleBase::FlyRotationTimer_Implementation, .01f, true);
 	}
 }
 
@@ -150,30 +148,32 @@ int AOPAG_ModuleBase::GetEquippableFireTypes() const
 {
 	return EquippableFireTypes;
 }
-void AOPAG_ModuleBase::LoadParticleFromRarity(EModuleRarity ModuleRarity)
+void AOPAG_ModuleBase::SelectParticleFromRarity(EModuleRarity ModuleRarity)
 {
-
 	switch (ModuleRarity)
 	{
 	case EModuleRarity::Common:
-		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Common.P_Modules_Common'"), NULL, LOAD_None, NULL);
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleCommon;
 		break;
 
 	case EModuleRarity::Uncommon:
-		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Uncommon.P_Modules_Uncommon'"), NULL, LOAD_None, NULL);
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleUncommon;
 		break;
 
 	case EModuleRarity::Rare:
-		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Rare.P_Modules_Rare'"), NULL, LOAD_None, NULL);
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleRare;
 		break;
 
 	case EModuleRarity::Epic:
-		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Epic.P_Modules_Epic'"), NULL, LOAD_None, NULL);
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleEpic;
 		break;
 
 	case EModuleRarity::Legendary:
-		ModuleDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Legendary.P_Modules_Legendary'"), NULL, LOAD_None, NULL);
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleLegendary;
 		break;
+
+	default:
+		ModuleDropHighlightParticleInUse = nullptr;
 	}
 }
 #pragma endregion Get
@@ -351,5 +351,63 @@ void AOPAG_ModuleBase::StartDropTimeline()
 	RandomDropDir.Y = FMath::Cos(RandomAngle);
 
 	ModuleDropTimeline->PlayFromStart();
+}
+
+void AOPAG_ModuleBase::ActivateHighlightParticle()
+{
+	if (GetParentActor() == nullptr)
+	{
+		ModuleDropHighlight->Activate();
+		ModuleDropHighlight->SetVisibility(true);
+		ModuleDropHighlight->bAutoActivate = true;		
+	}
+}
+
+void AOPAG_ModuleBase::ModuleDropTimelineFinished()
+{
+	ActivateHighlightParticle();
+}
+
+void AOPAG_ModuleBase::InitDropTimeline()
+{
+	ModuleDropTimeline->SetLooping(false);
+
+	OnModuleDropTimelineProgress.BindUFunction(this, FName("ModuleDropTimelineProgress"));
+	ModuleDropTimeline->AddInterpVector(CurveModuleDropVector, OnModuleDropTimelineProgress, FName("ModuleDropTimelinePropertyName"));
+
+	OnModuleDropTimelineFinished.BindUFunction(this, FName("ModuleDropTimelineFinished"));
+	ModuleDropTimeline->SetTimelineFinishedFunc(OnModuleDropTimelineFinished);
+}
+void AOPAG_ModuleBase::LoadDropParticleAssets()
+{
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectCommon(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_common_v2.P_Modules_common_v2'"));
+	if (ParticleEffectCommon.Succeeded())
+	{
+		ModuleDropHighlightParticleCommon = ParticleEffectCommon.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectUncommon(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_uncommon_v2.P_Modules_uncommon_v2'"));
+	if (ParticleEffectUncommon.Succeeded())
+	{
+		ModuleDropHighlightParticleUncommon = ParticleEffectUncommon.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectRare(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_rare_v2.P_Modules_rare_v2'"));
+	if (ParticleEffectRare.Succeeded())
+	{
+		ModuleDropHighlightParticleRare = ParticleEffectRare.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectEpic(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_epic_v2.P_Modules_epic_v2'"));
+	if (ParticleEffectEpic.Succeeded())
+	{
+		ModuleDropHighlightParticleEpic = ParticleEffectEpic.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectLegendary(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_legendary_v2.P_Modules_legendary_v2'"));
+	if (ParticleEffectLegendary.Succeeded())
+	{
+		ModuleDropHighlightParticleLegendary = ParticleEffectLegendary.Object;
+	}
 }
 #pragma endregion Drop

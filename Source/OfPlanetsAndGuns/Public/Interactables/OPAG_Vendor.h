@@ -15,6 +15,8 @@ class UTextRenderComponent;
 class UChildActorComponent;
 class UOPAG_EventManagerSubsystem;
 class UNiagaraSystem;
+class UNiagaraComponent;
+class UArrowComponent;
 
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_Vendor : public AActor
@@ -50,11 +52,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UTextRenderComponent* PriceTextRender_Module1;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UTextRenderComponent* PriceTextRender_Module2;
+		UTextRenderComponent* PriceTextRender_Module2;	
 
-	// Particle effect
+	// Particle effects
+	//UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	//	UNiagaraSystem* NsActivationParticles;
 	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UNiagaraSystem* ActivationParticles;
+		UNiagaraComponent* NcParticlesInteract;
+	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UNiagaraComponent* NcParticlesPool;
+	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UNiagaraComponent* NcParticlesSign;
 
 	// Data tables
 	UPROPERTY(Category = "OPAG | Vendor| Tables", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -77,6 +85,7 @@ private:
 
 	UPROPERTY(Category = "OPAG | Vendor| Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float DifficultyMultiplierGun = 1.f;
+	
 
 private:
 	UOPAG_EventManagerSubsystem* EMS;
@@ -87,7 +96,7 @@ private:
 	bool ShowingMerch;
 
 	void PopulateGunAndModuleArray();
-	void ActivationParticleEffect();
+	void ParticleEffectInteraction();
 
 protected:
 	virtual void BeginPlay() override;
