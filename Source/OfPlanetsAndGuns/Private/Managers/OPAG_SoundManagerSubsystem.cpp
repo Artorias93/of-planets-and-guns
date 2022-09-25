@@ -3,17 +3,26 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 
+void UOPAG_SoundManagerSubsystem::Init() {
+	BindEvents();
+	
+	audioResult = FMOD::System_Create(&audioSystem);
+	if (audioSystem) {
+		audioResult = audioSystem->init(2, FMOD_INIT_NORMAL, 0);
+		SetMasterVolume(dBToLinear(0));
+	}
+	//Settare lista dei bus
+}
+
+
 void UOPAG_SoundManagerSubsystem::BindEvents(){
 	EMS = GetWorld()->GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
-	//if (AudioMasterBus)
-		 //setto volume iniziale
-	/*
-	EMS->MasterSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::MasterSliderChanged);
+	EMS->MasterSliderChanged.AddDynamic(this,&UOPAG_SoundManagerSubsystem::MasterSliderChanged);
 	EMS->MusicSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::MusicSliderChanged);
 	EMS->SFXSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SFXSliderChanged);
 	EMS->AmbientSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::AmbientSliderChanged);
 	EMS->SystemSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SystemSliderChanged); //UI
-	*/
+	
 }
 
 
@@ -343,25 +352,37 @@ void UOPAG_SoundManagerSubsystem::StopSound() {
 	}	
 }
 
-void UOPAG_SoundManagerSubsystem::MasterSliderChanged(const float &value) {
+float  UOPAG_SoundManagerSubsystem::dBToLinear(const float &dbValue) {
+	return pow(10.0f, dbValue / 20.0f);
+}
+
+
+void UOPAG_SoundManagerSubsystem::MasterSliderChanged(float value) {
 	//il value è tra 0 e 1, posso fare che è il t di un Lerp che va tra DBtoLinear(-80) e DbtoLinear(10)
+	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	SetMasterVolume(newVolume);
 	//e faccio BusVolume = Lerp(DBtoLinear(-80),DbtoLinear(10), value)
 	// MasterBuss.setvolume(bussVolume)
 }
 
-void UOPAG_SoundManagerSubsystem::MusicSliderChanged(const float &value) {
+void UOPAG_SoundManagerSubsystem::SetMasterVolume(const float & newValue) {
+	if (masterChannel)
+		masterChannel->setVolume(newValue);
+}
+
+void UOPAG_SoundManagerSubsystem::MusicSliderChanged(float value) {
 
 }
 
-void UOPAG_SoundManagerSubsystem::SFXSliderChanged(const float &value) {
+void UOPAG_SoundManagerSubsystem::SFXSliderChanged(float value) {
 
 }
 
-void UOPAG_SoundManagerSubsystem::AmbientSliderChanged(const float &value) {
+void UOPAG_SoundManagerSubsystem::AmbientSliderChanged(float value) {
 
 }
 
-void UOPAG_SoundManagerSubsystem::SystemSliderChanged(const float &value) {
+void UOPAG_SoundManagerSubsystem::SystemSliderChanged(float value) {
 
 }
 

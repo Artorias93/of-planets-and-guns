@@ -6,6 +6,7 @@
 #include "Weapons/Guns/OPAG_GunBase.h"
 #include "FMODEvent.h"
 #include "FMODBlueprintStatics.h"
+#include <fmod_studio.hpp>
 #include "OPAG_SoundManagerSubsystem.generated.h"
 
 USTRUCT(Blueprintable)
@@ -139,10 +140,9 @@ public:
 		float Intensity = 0.0f;
 
 
-	/*
-		float MaxVolume = dbtoLinear(-80);
-		float MinVolume = dbtoLinear(10);
-	*/
+
+
+
 	FFMODEventInstance InstanceUI;
 	FFMODEventInstance InstanceAmbient;
 	FFMODEventInstance InstanceSoundtrack;
@@ -172,18 +172,18 @@ public:
 		void StopAmbient();
 	UFUNCTION(BlueprintCallable)
 		void SetIntensity(float value);
+	
+
 	UFUNCTION()
-		void BindEvents();
+		void MasterSliderChanged(float value);
 	UFUNCTION()
-		void MasterSliderChanged(const float& value);
+		void MusicSliderChanged(float value);
 	UFUNCTION()
-		void MusicSliderChanged(const float& value);
+		void SFXSliderChanged(float value);
 	UFUNCTION()
-		void SFXSliderChanged(const float& value);
+		void AmbientSliderChanged(float value);
 	UFUNCTION()
-		void AmbientSliderChanged(const float& value);
-	UFUNCTION()
-		void SystemSliderChanged(const float& value);
+		void SystemSliderChanged(float value);
 
 	UFUNCTION()
 		float getMasterBusVolume() const;
@@ -195,12 +195,30 @@ public:
 		float getSFXBusVolume() const;
 	UFUNCTION()
 		float getSystemBusVolume() const;
+	
+	UFUNCTION()
+		void Init();
 private:
+	UFUNCTION()
+		float dBToLinear(const float& dB);
+	UFUNCTION()
+		void SetMasterVolume(const float& newValue);
+	UFUNCTION()
+		void BindEvents();
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponsFireSound(AOPAG_GunBase* weapon);
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponsReloadSound(AOPAG_GunBase* weapon);
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponsPickupSound(AOPAG_GunBase* weapon);
+private:
+	FMOD_RESULT audioResult;
+	FMOD::System* audioSystem;
+	FMOD::Channel* masterChannel;
+
+	
+	float const maxVolumeDB = 10;
+	float const minVolumeDB = -80;
+	float const startingVolumeDB = 0;
 
 };

@@ -13,7 +13,6 @@
 void UOPAG_GameInstance::BindEvents()
 {
 	UOPAG_EventManagerSubsystem* EMS = GetSubsystem<UOPAG_EventManagerSubsystem>();
-	UOPAG_SoundManagerSubsystem* SMS = GetSubsystem<UOPAG_SoundManagerSubsystem>();
 	EMS->StageManagerInit.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerInitialized);
 	EMS->StageManagerReady.AddDynamic(this, &UOPAG_GameInstance::OnStageManagerReady);
 	EMS->StageLoaded.AddDynamic(this, &UOPAG_GameInstance::OnStageLoaded);
@@ -128,7 +127,9 @@ void UOPAG_GameInstance::Init()
 	bNextStageIsSafe = false;
 
 	BindEvents();
+
 	SetAudioLibraries();
+;
 
 	LoadPlanetTable();
 	CurrentPlanet = Planets[0];
@@ -286,7 +287,7 @@ void UOPAG_GameInstance::SetAudioLibraries()
 	SMS->AudioSFXBus = AudioSFXBus;
 	SMS->AudioSystemBus = AudioSystemBus;
 
-	SMS->BindEvents();
+	SMS->Init();
 }
 
 void UOPAG_GameInstance::OnPlayerDeath()
