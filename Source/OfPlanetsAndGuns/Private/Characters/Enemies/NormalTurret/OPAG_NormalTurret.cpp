@@ -3,6 +3,8 @@
 #include "Characters/Player/OPAG_Player.h"
 #include <Kismet/KismetMathLibrary.h>
 #include <Kismet/GameplayStatics.h>
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "DrawDebugHelpers.h"
 
 AOPAG_NormalTurret::AOPAG_NormalTurret()
@@ -30,6 +32,8 @@ AOPAG_NormalTurret::AOPAG_NormalTurret()
 
 		LaserBeam->SetVisibility(false);
 	}
+	if(!SMS)
+		SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 }
 
 void AOPAG_NormalTurret::Attack()
@@ -73,7 +77,8 @@ void AOPAG_NormalTurret::StartShooting()
 
 	ShootLineTrace(StartLocation, TurretShootDirection);
 	
-	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+	//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+	SMS->PlayTurretSounds(this);
 
 	// activate shoot effect
 	UGameplayStatics::SpawnEmitterAttached(

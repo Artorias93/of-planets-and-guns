@@ -87,6 +87,17 @@ enum class ESoundtrackType : uint8
 };
 ENUM_CLASS_FLAGS(ESoundtrackType);
 
+UENUM(BlueprintType, meta = (Bitflags))
+enum class EBusNames : uint8
+{
+	MASTER = 0x00,
+	MUSIC = 0x01,
+	AMBIENT = 0x02,
+	SFX = 0x03,
+	UI = 0x04,
+};
+ENUM_CLASS_FLAGS(EBusNames);
+
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_SoundManagerSubsystem : public UGameInstanceSubsystem
@@ -153,6 +164,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponSounds(AOPAG_GunBase* weapon, EWeaponSoundAction action);
 	UFUNCTION(BlueprintCallable)
+		void PlayTurretSounds(AActor* actor);
+	UFUNCTION(BlueprintCallable)
 		void PlayAbiltySounds(const AActor* actor , EAbilitySoundAction ability);
 	UFUNCTION(BlueprintCallable)
 		void PlayEnviromentSounds(AActor* actor, EEnviromentSoundAction event);
@@ -186,24 +199,21 @@ public:
 		void SystemSliderChanged(float value);
 
 	UFUNCTION()
-		float getMasterBusVolume() const;
+		float getMasterBusVolume();
 	UFUNCTION()
-		float getMusicBusVolume() const;
+		float getMusicBusVolume();
 	UFUNCTION()
-		float getAmbientBusVolume() const;
+		float getAmbientBusVolume();
 	UFUNCTION()
-		float getSFXBusVolume() const;
+		float getSFXBusVolume();
 	UFUNCTION()
-		float getSystemBusVolume() const;
+		float getSystemBusVolume();
 	
 	UFUNCTION()
 		void Init();
 private:
-	UFUNCTION()
+		void SetBusVolume(EBusNames busName, const float& newValue);
 		float dBToLinear(const float& dB);
-	UFUNCTION()
-		void SetMasterVolume(const float& newValue);
-	UFUNCTION()
 		void BindEvents();
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponsFireSound(AOPAG_GunBase* weapon);
@@ -212,13 +222,16 @@ private:
 	UFUNCTION(BlueprintCallable)
 		void PlayWeaponsPickupSound(AOPAG_GunBase* weapon);
 private:
+	/*
 	FMOD_RESULT audioResult;
 	FMOD::System* audioSystem;
 	FMOD::Channel* masterChannel;
-
+	*/
+	FMOD::Studio::System* studioSystem;
+	TMap<const char*, FMOD::Studio::Bus*> busses;
 	
-	float const maxVolumeDB = 10;
-	float const minVolumeDB = -80;
+	float const maxVolumeDB = 10.;
+	float const minVolumeDB = -80.;
 	float const startingVolumeDB = 0;
 
 };

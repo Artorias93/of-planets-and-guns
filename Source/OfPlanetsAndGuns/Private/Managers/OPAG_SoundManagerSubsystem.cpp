@@ -3,15 +3,14 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 
+/*
+	CORE
+*/
+
 void UOPAG_SoundManagerSubsystem::Init() {
 	BindEvents();
-	
-	audioResult = FMOD::System_Create(&audioSystem);
-	if (audioSystem) {
-		audioResult = audioSystem->init(2, FMOD_INIT_NORMAL, 0);
-		SetMasterVolume(dBToLinear(0));
-	}
-	//Settare lista dei bus
+	studioSystem = IFMODStudioModule::Get().GetStudioSystem(EFMODSystemContext::Runtime);
+	SetBusVolume(EBusNames::MASTER, dBToLinear(0));
 }
 
 
@@ -22,10 +21,132 @@ void UOPAG_SoundManagerSubsystem::BindEvents(){
 	EMS->SFXSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SFXSliderChanged);
 	EMS->AmbientSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::AmbientSliderChanged);
 	EMS->SystemSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SystemSliderChanged); //UI
-	
 }
 
 
+void UOPAG_SoundManagerSubsystem::SetIntensity(float value) {
+	if (value > 0)
+		Intensity += value;
+	else
+		Intensity = 0;
+	//InstanceSoundtrack.Instance->setParameterByName(TCHAR_TO_UTF8(*FName("Intensity").ToString()), Intensity , true);
+	UFMODBlueprintStatics::EventInstanceSetParameter(InstanceSoundtrack, FName("Intensity"), Intensity);
+}
+
+
+void UOPAG_SoundManagerSubsystem::StopSound() {
+	if (ZiplineAudioComponent) {
+		ZiplineAudioComponent->Stop();
+		ZiplineAudioComponent->Release();
+	}	
+}
+
+float  UOPAG_SoundManagerSubsystem::dBToLinear(const float &dbValue) {
+	return pow(10.0f, dbValue / 20.0f);
+}
+
+void UOPAG_SoundManagerSubsystem::SetBusVolume(EBusNames busName, const float& newValue) {
+	switch (busName)
+	{
+	case EBusNames::MASTER:
+		FMOD::Studio::Bus* masterBus;
+		studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/").ToString()), &masterBus);
+		masterBus->setVolume(newValue);
+		break;
+	case EBusNames::MUSIC:
+		FMOD::Studio::Bus* musicBus;
+		studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/Music").ToString()), &musicBus);
+		musicBus->setVolume(newValue);
+		break;
+	case EBusNames::AMBIENT:
+		FMOD::Studio::Bus* ambientBus;
+		studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/Ambient").ToString()), &ambientBus);
+		ambientBus->setVolume(newValue);
+	case EBusNames::SFX:
+		FMOD::Studio::Bus* sfxBus;
+		studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/SFX").ToString()), &sfxBus);
+		sfxBus->setVolume(newValue);
+		break;
+	case EBusNames::UI:
+		FMOD::Studio::Bus* uiBus;
+		studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/UI").ToString()), &uiBus);
+		uiBus->setVolume(newValue);
+		break;
+	default:
+		break;
+	}
+}
+
+void UOPAG_SoundManagerSubsystem::MasterSliderChanged(float value) {
+	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	SetBusVolume(EBusNames::MASTER , newVolume);
+}
+
+
+void UOPAG_SoundManagerSubsystem::MusicSliderChanged(float value) {
+	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	SetBusVolume(EBusNames::MUSIC, newVolume);
+}
+
+void UOPAG_SoundManagerSubsystem::SFXSliderChanged(float value) {
+	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	SetBusVolume(EBusNames::SFX, newVolume);
+}
+
+void UOPAG_SoundManagerSubsystem::AmbientSliderChanged(float value) {
+	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	SetBusVolume(EBusNames::AMBIENT, newVolume);
+}
+
+void UOPAG_SoundManagerSubsystem::SystemSliderChanged(float value) {
+	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	SetBusVolume(EBusNames::UI, newVolume);
+}
+
+float UOPAG_SoundManagerSubsystem::getMasterBusVolume(){
+	//return valore volume tra 0 e 1
+	FMOD::Studio::Bus* masterBus;
+	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/").ToString()), &masterBus);
+	float* currentVol = nullptr;
+	masterBus->getVolume(currentVol);
+	return (*currentVol * 100)/ dBToLinear(maxVolumeDB);
+}
+
+float UOPAG_SoundManagerSubsystem::getMusicBusVolume(){
+	FMOD::Studio::Bus* musicBus;
+	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/Music").ToString()), &musicBus);
+	float* currentVol = nullptr;
+	musicBus->getVolume(currentVol);
+	return (*currentVol * 100) / dBToLinear(maxVolumeDB);
+}
+
+float UOPAG_SoundManagerSubsystem::getAmbientBusVolume(){
+	FMOD::Studio::Bus* ambientBus;
+	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/Ambient").ToString()), &ambientBus);
+	float* currentVol = nullptr;
+	ambientBus->getVolume(currentVol);
+	return (*currentVol * 100) / dBToLinear(maxVolumeDB);
+}
+
+float UOPAG_SoundManagerSubsystem::getSFXBusVolume(){
+	FMOD::Studio::Bus* sfxBus;
+	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/SFX").ToString()), &sfxBus);
+	float* currentVol = nullptr;
+	sfxBus->getVolume(currentVol);
+	return (*currentVol * 100) / dBToLinear(maxVolumeDB);
+}
+
+float UOPAG_SoundManagerSubsystem::getSystemBusVolume(){
+	FMOD::Studio::Bus* uiBus;
+	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/UI").ToString()), &uiBus);
+	float* currentVol = nullptr;
+	uiBus->getVolume(currentVol);
+	return (*currentVol * 100) / dBToLinear(maxVolumeDB);
+}
+
+/*
+	PLAY SOUND
+*/
 void UOPAG_SoundManagerSubsystem::PlayWeaponSounds(AOPAG_GunBase* weapon, EWeaponSoundAction action) {
 	switch (action)
 	{
@@ -42,6 +163,18 @@ void UOPAG_SoundManagerSubsystem::PlayWeaponSounds(AOPAG_GunBase* weapon, EWeapo
 		break;
 	}
 
+}
+
+void UOPAG_SoundManagerSubsystem::PlayTurretSounds(AActor* weapon) {
+	FVector position = weapon->GetActorLocation();
+	FAudioEvent* libraryRow = nullptr;
+	if (WeaponsAudioLibrary) {
+		libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("Single_Fire"), "", false);
+	}
+	if (libraryRow) {
+		UFMODEvent* currentEvent = libraryRow->AudioContent;
+		AudioComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, weapon->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, true, true, true);
+	}
 }
 
 void UOPAG_SoundManagerSubsystem::PlayAbiltySounds(const AActor* actor, EAbilitySoundAction ability) {
@@ -321,16 +454,6 @@ void UOPAG_SoundManagerSubsystem::PlaySoundTrack(ESoundtrackType type) {
 		}
 	}
 }
-
-void UOPAG_SoundManagerSubsystem::SetIntensity(float value) {
-	if (value > 0)
-		Intensity += value;
-	else
-		Intensity = 0;
-	//InstanceSoundtrack.Instance->setParameterByName(TCHAR_TO_UTF8(*FName("Intensity").ToString()), Intensity , true);
-	UFMODBlueprintStatics::EventInstanceSetParameter(InstanceSoundtrack, FName("Intensity"), Intensity);
-}
-
 void UOPAG_SoundManagerSubsystem::StopSoundtrack() {
 	if (InstanceSoundtrack.Instance->isValid()) {
 		InstanceSoundtrack.Instance->stop(FMOD_STUDIO_STOP_MODE::FMOD_STUDIO_STOP_ALLOWFADEOUT);
@@ -343,66 +466,4 @@ void UOPAG_SoundManagerSubsystem::StopAmbient() {
 		InstanceAmbient.Instance->stop(FMOD_STUDIO_STOP_MODE::FMOD_STUDIO_STOP_ALLOWFADEOUT);
 		InstanceAmbient.Instance->release();
 	}
-}
-
-void UOPAG_SoundManagerSubsystem::StopSound() {
-	if (ZiplineAudioComponent) {
-		ZiplineAudioComponent->Stop();
-		ZiplineAudioComponent->Release();
-	}	
-}
-
-float  UOPAG_SoundManagerSubsystem::dBToLinear(const float &dbValue) {
-	return pow(10.0f, dbValue / 20.0f);
-}
-
-
-void UOPAG_SoundManagerSubsystem::MasterSliderChanged(float value) {
-	//il value è tra 0 e 1, posso fare che è il t di un Lerp che va tra DBtoLinear(-80) e DbtoLinear(10)
-	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
-	SetMasterVolume(newVolume);
-	//e faccio BusVolume = Lerp(DBtoLinear(-80),DbtoLinear(10), value)
-	// MasterBuss.setvolume(bussVolume)
-}
-
-void UOPAG_SoundManagerSubsystem::SetMasterVolume(const float & newValue) {
-	if (masterChannel)
-		masterChannel->setVolume(newValue);
-}
-
-void UOPAG_SoundManagerSubsystem::MusicSliderChanged(float value) {
-
-}
-
-void UOPAG_SoundManagerSubsystem::SFXSliderChanged(float value) {
-
-}
-
-void UOPAG_SoundManagerSubsystem::AmbientSliderChanged(float value) {
-
-}
-
-void UOPAG_SoundManagerSubsystem::SystemSliderChanged(float value) {
-
-}
-
-float UOPAG_SoundManagerSubsystem::getMasterBusVolume()const {
-	//return valore volume tra 0 e 1
-	return 0;
-}
-
-float UOPAG_SoundManagerSubsystem::getMusicBusVolume()const {
-	return 0;
-}
-
-float UOPAG_SoundManagerSubsystem::getAmbientBusVolume()const {
-	return 0;
-}
-
-float UOPAG_SoundManagerSubsystem::getSFXBusVolume()const {
-	return 0;
-}
-
-float UOPAG_SoundManagerSubsystem::getSystemBusVolume()const {
-	return 0;
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/Enemies/OPAG_Enemy.h"
+
 #include <../../../FX/Niagara/Source/Niagara/Public/NiagaraComponent.h>
 #include "OPAG_NormalTurret.generated.h"
 
@@ -80,4 +81,6 @@ protected:
 		FVector StartLocation = FVector::ZeroVector;
 	UPROPERTY()
 		FVector TurretShootDirection = FVector::ZeroVector;
+
+	class UOPAG_SoundManagerSubsystem* SMS = nullptr;
 };
