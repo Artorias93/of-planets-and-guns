@@ -406,7 +406,6 @@ void AOPAG_GunBase::Reload()
 	bIsReloading = true;
 	GetWorld()->GetTimerManager().SetTimer(ReloadHandle, this, 
 		&AOPAG_GunBase::WaitReloadingTimer, GetReloadTime(), false);
-	//UGameplayStatics::PlaySound2D(GetWorld(), ReloadSound);
 }
 
 void AOPAG_GunBase::StopReloading()
@@ -424,6 +423,9 @@ void AOPAG_GunBase::WaitReloadingTimer()
 
 	AmmoCurrent = GetStatsTotal().ClipSize;
 	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
+
+	// Update ammo ui color | false -> is base and true -> is unload
+	EMS->ColorAmmoChanged.Broadcast(false, AmmoMax < 30);
 }
 #pragma endregion Reload
 

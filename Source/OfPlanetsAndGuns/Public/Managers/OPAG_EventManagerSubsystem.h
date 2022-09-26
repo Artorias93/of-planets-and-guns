@@ -49,7 +49,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FShieldChanged, float, CurrentValue, float, MaxValue, bool, IsBroken);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FColorAmmoChanged, const FLinearColor, ColorParam);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FColorAmmoChanged, bool, bIsAmmoCurrentUnload, bool, bIsAmmoMaxUnload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);

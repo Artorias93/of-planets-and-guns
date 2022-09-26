@@ -636,8 +636,7 @@ void AOPAG_Player::SwapGuns()
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 
 		// Switch current ammo color
-		FLinearColor NewColor = CurrentGun->GetAmmoCurrent() == 0 ? FLinearColor::Red : FLinearColor::White;
-		EMS->ColorAmmoChanged.Broadcast(NewColor);
+		EMS->ColorAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent() == 0, CurrentGun->GetAmmoMax() < 30);
 
 		// Update current gun texture on Widget
 		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
@@ -661,9 +660,6 @@ void AOPAG_Player::ReloadGun()
 		const float ReloadAnimationLength = ReloadMontageToPlay->GetPlayLength();
 		const float ReloadTime = PrimaryGun->GetReloadTime();
 		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, ReloadAnimationLength / ReloadTime, EMontagePlayReturnType::MontageLength, 0, true);
-		
-		// Update gun ui color
-		EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
 
 		// Update last fire time
 		LastFireTime = GetGameTimeSinceCreation() + ReloadTime;
@@ -763,13 +759,13 @@ void AOPAG_Player::Shoot()
 	// Update Ammo
 	CurrentGun->DecrementAmmoCurrent(AmmoConsumate);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
+
 	if (CurrentGun->GetAmmoCurrent() == 0)
 	{
 		// Update ui gun icon -> set linear color to red
-		EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
+		EMS->ColorAmmoChanged.Broadcast(true, CurrentGun->GetAmmoMax() < 30);
 
-		// Auto-reload
-		ReloadGun();
+		ReloadGun(); // Auto-reload
 	}
 }
 
@@ -1003,7 +999,7 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 			AOPAG_MagazineBase* Magazine = Cast<AOPAG_MagazineBase>(Module);
 			if (Magazine) 
 			{
-				EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
+				EMS->ColorAmmoChanged.Broadcast(false, CurrentGun->GetAmmoMax() < 30);
 			}
 
 			Module->Destroy();

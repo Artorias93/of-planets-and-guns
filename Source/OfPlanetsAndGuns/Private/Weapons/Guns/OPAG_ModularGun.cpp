@@ -726,6 +726,9 @@ void AOPAG_ModularGun::WaitReloadingTimer()
 	}
 	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
 	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+
+	// Update ammo ui color | false -> is base and true -> is unload
+	EMS->ColorAmmoChanged.Broadcast(false, AmmoMax < 30);
 }
 #pragma endregion Ammo System
 

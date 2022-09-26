@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
+#include <UObject/NoExportTypes.h>
 #include "OPAG_UWGunView.generated.h"
 
 class UTextBlock;
@@ -30,25 +31,37 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunView : public UUserWidget
 		UTextBlock* TotalAmmoText;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Textures")
 		UTexture2D* RifleTexture2D;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Textures")
 		UTexture2D* SniperTexture2D;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Textures")
 		UTexture2D* BurstTexture2D;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-		UTexture2D* HandgunTexture2D;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Textures")
+		UTexture2D* ShotgunTexture2D;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Textures")
+		UTexture2D* HandgunTexture2D;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Colors")
+		FLinearColor AmmoCurrentColorBase;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Colors")
+		FLinearColor AmmoMaxColorBase;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Colors")
+		FLinearColor AmmoColorUnload;
+	
 public:
 	void NativeConstruct();
 
 	UFUNCTION() void UpdateCurrentAmmoText(const int CurrentValue);
 	UFUNCTION() void UpdateTotalAmmoText(const int CurrentValue); 
-	UFUNCTION() void UpdateAmmoColor(const FLinearColor ColorParam);
+	UFUNCTION() void UpdateAmmoColor(bool bIsAmmoCurrentUnload, bool bIsAmmoMaxUnload);
 	UFUNCTION() void SwapGun(EFireTypes CurrentType);
 
 };
