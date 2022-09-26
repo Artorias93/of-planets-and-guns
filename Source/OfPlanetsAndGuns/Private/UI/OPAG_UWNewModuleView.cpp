@@ -128,6 +128,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 		{
 			FString abilityDescription = OtherModuleAbilityName;
 
+			AbilityText->SetFont(AbilityTextFont);
 			AbilityText->SetText(FText::FromString("Ability: \n" + abilityDescription));
 			AbilityBox->AddChild(AbilityText);
 		}

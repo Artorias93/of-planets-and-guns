@@ -66,6 +66,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FLinearColor ForegroundRed;
 
+	//UI Font
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateFontInfo AbilityTextFont;
+
 
 	UFUNCTION()
 	void UpdateModuleValues(const FOPAG_GunStats& CurrentModuleStats,const FOPAG_GunStats& OtherModuleStats, 
