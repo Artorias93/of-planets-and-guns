@@ -67,7 +67,6 @@ AOPAG_Player::AOPAG_Player()
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	if (Mesh1P)
 	{
-		Mesh1P->SetOnlyOwnerSee(true);
 		Mesh1P->bCastDynamicShadow = false;
 		Mesh1P->CastShadow = false;
 		Mesh1P->SetupAttachment(Camera);
