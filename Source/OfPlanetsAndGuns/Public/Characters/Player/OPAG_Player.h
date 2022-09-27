@@ -26,6 +26,7 @@ class UChildActorComponent;
 class AOPAG_GunBase;
 class AOPAG_ModularGun;
 class UAnimBlueprintGeneratedClass;
+class AOPAG_DroneBase;
 
 
 UCLASS()
@@ -50,6 +51,9 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UChildActorComponent* SecondaryGunComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UChildActorComponent* DroneComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UOPAG_InventorySystemComponent* InventorySystemComp;
@@ -271,6 +275,7 @@ private:
 	FTimerHandle ShootingHanlde;
 	FTimerHandle RechargeShieldPlayerHandle;
 	FTimerHandle ShieldPlayerCooldownHandle;
+	FTimerHandle DestroyDroneHandle;
 
 protected:
 	virtual void BeginPlay() override;
@@ -335,6 +340,7 @@ private:
 	// Timer
 	void RechargeShieldTimer();
 	void ShieldCooldownTimer();
+	void DestroyDroneTimer();
 
 	// Animation corrections
 	void RelocateComponets();
@@ -417,6 +423,9 @@ public:
 	// Getter and setter for shield element
 	void SetShield(AActor* NewShield);
 	AActor* GetShield() const;
+
+	// Set Drone
+	void SetDrone(TSubclassOf<AOPAG_DroneBase> DroneClass, float TimeBeforeDestroy);
 
 	// Getter dash
 	float GetDashLenght() const;

@@ -32,12 +32,11 @@
 #include <AbilitySystemBlueprintLibrary.h>
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include <Animation/AnimBlueprintGeneratedClass.h>
-
 #include "NiagaraComponent.h"
 #include "Abilities/OPAG_HealthBuffAbility.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "GenericPlatform/GenericPlatformCrashContext.h"
-
+#include "Weapons/Drones/OPAG_DroneBase.h"
 #include "DisplayDebugHelpers.h"
 
 AOPAG_Player::AOPAG_Player()
@@ -86,6 +85,13 @@ AOPAG_Player::AOPAG_Player()
 		SecondaryGunComponent->SetupAttachment(RootComponent);
 	}
 
+	DroneComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("DroneComponent"));
+	if (DroneComponent != nullptr)
+	{
+		DroneComponent->SetRelativeLocation(FVector(54.f, -35.f, 44.f));
+		DroneComponent->SetupAttachment(RootComponent);
+	}
+
 	DashTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DashTimeline"));
 	RecoilTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RecoilTimeline"));
 	RecoilReverseTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RecoilReverseTimeline"));
@@ -95,8 +101,6 @@ AOPAG_Player::AOPAG_Player()
 	{
 		DashNiagaraComponent->SetupAttachment(Camera);
 	}
-
-	
 }
 
 void AOPAG_Player::BeginPlay()
@@ -1424,6 +1428,14 @@ AActor* AOPAG_Player::GetShield() const
 }
 #pragma endregion Shield
 
+#pragma region Drone
+void AOPAG_Player::SetDrone(TSubclassOf<AOPAG_DroneBase> DroneClass, float TimeBeforeDestroy)
+{
+	DroneComponent->SetChildActorClass(DroneClass);
+	GetWorld()->GetTimerManager().SetTimer(DestroyDroneHandle, this, &AOPAG_Player::DestroyDroneTimer, TimeBeforeDestroy, false);
+}
+#pragma endregion Drone
+
 #pragma region Timer
 void AOPAG_Player::RechargeShieldTimer()
 {
@@ -1455,6 +1467,16 @@ void AOPAG_Player::ShieldCooldownTimer()
 		GetWorld()->GetTimerManager().SetTimer(RechargeShieldPlayerHandle, this, &AOPAG_Player::RechargeShieldTimer, AttributeSetPlayer->GetShieldRechargePeriod(), true);
 		//UE_LOG(LogTemp, Warning, TEXT("Complete Shield Recharge Cooldown"));
 	}
+}
+
+void AOPAG_Player::DestroyDroneTimer()
+{
+	AOPAG_DroneBase* CurrentDrone = Cast<AOPAG_DroneBase>(DroneComponent->GetChildActor());
+	if(CurrentDrone == nullptr)	return;
+
+	CurrentDrone->DestroyDrone();
+	DroneComponent->DestroyChildActor();
+	DroneComponent->SetChildActorClass(nullptr);
 }
 #pragma endregion Timer
 
