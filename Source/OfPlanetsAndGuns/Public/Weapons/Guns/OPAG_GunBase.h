@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "OPAG_GunStats.h"
+#include "Components/TimelineComponent.h"
 #include "OPAG_GunBase.generated.h"
 
 class USkeletalMeshComponent;
@@ -90,7 +91,16 @@ protected:
 	float RecoilSpeed = 1.f;
 
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	float ReductionSpreadRadiusShootingTime = .15f;
+
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesQuery;
+
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AActor> ProjectileTrace;
+
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UMaterialInterface* BulletConcreteDecal;
 
 protected:
 	UPROPERTY(Category = "OPAG | Gun | Emitter", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -107,6 +117,30 @@ protected:
 	USoundBase* ReloadSound;
 
 protected:
+	UPROPERTY(Category = "OPAG | Gun | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UTimelineComponent* GunDropTimeline;
+
+	UPROPERTY(Category = "OPAG | Gun | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		class UCurveVector* CurveGunDropVector;
+
+	UPROPERTY(Category = "OPAG | Gun | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float GunDropCurveXFactor = 200;
+
+	UPROPERTY(Category = "OPAG | Gun | Drop", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float GunDropCurveZFactor = 100;
+
+	FOnTimelineVector OnGunDropTimelineProgress;
+
+	UPROPERTY()
+		FVector GunDropTimelinePropertyName;
+
+	UPROPERTY()
+		FVector RandomDropDir;
+
+	UPROPERTY()
+		FVector GunSpawnLocation;
+
+protected:
 	UOPAG_EventManagerSubsystem* EMS;
 
 protected:
@@ -119,6 +153,7 @@ protected:
 protected:
 	FTimerHandle ResetShootHandle;
 	FTimerHandle ReloadHandle;
+	FTimerHandle ResetReductionSpreadRadiusShootingHandle;
 
 	UPROPERTY()
 	UOPAG_SoundManagerSubsystem* SMS;
@@ -143,16 +178,17 @@ public:
 
 	// Main system for shooting
 	virtual int Shoot(const FVector StartShootLocation, const FVector Direction, const AOPAG_CharacterBase* ShooterCharacter);
+	virtual void StopShoot();
 
 	// Reload system
 	virtual void Reload();
+	void StopReloading();
 
 	// Subsystem shooting
 	UFUNCTION(BlueprintCallable) float CalculateSpreadRadius() const;
 
 	// Camera behavior
 	UCameraComponent* GetADSCamera() const;
-	void ResetReductionSpreadRadiusShooting();
 
 	// Checking
 	bool CanShoot() const;
@@ -168,14 +204,20 @@ protected:
 	// Reload
 	virtual void WaitReloadingTimer();
 
+	//ReductionSpreadRadiusShooting
+	void ResetReductionSpreadRadiusShooting();
+
 	// Subsystem for shooting
-	float CalculateDamage(const bool IsHeadshot) const;
+	float CalculateMultiplierByLevel() const;
+	float CalculateDamage(const bool IsHeadshot, const float MultiplierByLevel) const;
 	void AddCritToDamage(float& Damage) const;
 	float CalculateSpread() const;
 	FVector2D CalculateRandPointInCircle() const;
 	FVector ApplyNoise(const FVector Direction) const;
 	FVector ApplyWeaponRange(const FVector StartLocation, const FVector Direction) const;
 	TArray<AActor*> CheckWhatActorsIgnoreLinetrace();
+
+	UFUNCTION() void GunDropTimelineProgress(FVector Value);
 
 public:
 	// Getter
@@ -187,6 +229,7 @@ public:
 	float GetReloadTime() const;
 	float GetRecoilStrength() const;
 	float GetRecoilSpeed() const;
+	virtual int GetLevel() const;
 
 	//Setter
 	virtual void SetStatsTotal(const FOPAG_GunStats GunStats);

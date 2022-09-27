@@ -49,15 +49,21 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FShieldChanged, float, CurrentValue, float, MaxValue, bool, IsBroken);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FColorAmmoChanged, const FLinearColor, ColorParam);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FColorAmmoChanged, bool, bIsAmmoCurrentUnload, bool, bIsAmmoMaxUnload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSoundSliderChanged, float, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAmmoPickedUp);
 
 //Unused
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashAmountDecrement);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateDashAmount, float, CurrentValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateDashProgressBar, float, CurrentTimeProgress);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSwapGunTexture, EFireTypes, CurrentType);
+
 //Unused
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountIncrement);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPotionsAmountDecrement);
@@ -71,6 +77,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBoltsAmountDecrement);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FLookedAtInteractable, bool, IsInteractable, FString, InteractText);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtInteractable);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShowGoldInGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHideGoldInGame);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_EightParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, 
 const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const FString, OtherModuleAbilityName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
@@ -118,6 +127,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FDisableModuleTextInVendor, AOPAG_Mo
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivePassiveAbilityEffect, TSubclassOf<UGameplayAbility>, PassiveAbilityClass);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemovePassiveAbilityEffect, FGameplayTagContainer, PassiveAbilityTagContainer);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateShieldDamage, const float, OpacityAmount);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
@@ -125,11 +136,9 @@ class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSub
 
 public:
 
-	FVector C;
-
 	UPROPERTY(BlueprintAssignable, Category = Game)
 		FStartPlanet StartPlanet;
-	UPROPERTY(BlueprintAssignable, Category = Game)
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Game)
 		FLoadMainMenu LoadMainMenu;
 
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
@@ -191,6 +200,12 @@ public:
 		FDashAmountIncrement DashAmountIncrement;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FDashAmountDecrement DashAmountDecrement;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FUpdateDashAmount UpdateDashAmount;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FSwapGunTexture SwapGunTexture;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
+	FUpdateDashProgressBar	UpdateDashProgressBar;
 
 	//////////
 	//Unused//
@@ -236,13 +251,33 @@ public:
 
 	//Game stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FShowGoldInGame ShowGoldInGame;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FHideGoldInGame HideGoldInGame;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FPauseGame PauseGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FResumeGame ResumeGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQuitGame QuitGame;
+
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FQualitySettingsChanged QualitySettingsChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged MasterSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged MusicSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged SFXSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged AmbientSliderChanged;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FSoundSliderChanged SystemSliderChanged;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "OPAG | Events | UI")
+	FUpdateShieldDamage UpdateShieldDamage;
+	
 
 	// Player Enhanced
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "Enhanced Player")

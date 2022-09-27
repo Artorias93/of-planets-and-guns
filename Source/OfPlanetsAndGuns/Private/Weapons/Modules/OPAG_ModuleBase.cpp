@@ -5,7 +5,10 @@
 #include "Characters/Player/OPAG_Player.h"
 #include <Kismet/GameplayStatics.h>
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
-#include "Components/PointLightComponent.h"
+#include "Curves/CurveVector.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "EngineUtils.h"
 
 AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
@@ -28,86 +31,54 @@ AOPAG_ModuleBase::AOPAG_ModuleBase()
 		Sphere->SetSimulatePhysics(false);
 	}
 
-	ModuleHighlightUp = CreateDefaultSubobject<UPointLightComponent>(TEXT("HighlightUp"));
-	if (ModuleHighlightUp)
+	ModuleDropHighlight = CreateDefaultSubobject<UParticleSystemComponent>("HightLight Particle");
 	{
-		ModuleHighlightUp->SetupAttachment(Sphere);
-
-		ModuleHighlightUp->SetVisibility(false);
-		ModuleHighlightUp->SetAttenuationRadius(0);
-		ModuleHighlightUp->SetIntensity(0);
-		ModuleHighlightUp->CastShadows = false;
-
+		ModuleDropHighlight->SetupAttachment(Sphere);
 	}
 
-	ModuleHighlightDown = CreateDefaultSubobject<UPointLightComponent>(TEXT("HighlightDown"));
-	if (ModuleHighlightDown)
+	ModuleDropTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("ModuleDropTimeline"));
+	
+	static ConstructorHelpers::FObjectFinder<UCurveVector> CurveVector (TEXT("'/Game/OfPlanetsAndGuns/Interactables/Curve_Drop_Vector.Curve_Drop_Vector'"));
+	if (CurveVector.Succeeded())
 	{
-		ModuleHighlightDown->SetupAttachment(Sphere);
-
-		ModuleHighlightDown->SetVisibility(false);
-		ModuleHighlightDown->SetAttenuationRadius(0);
-		ModuleHighlightDown->SetIntensity(0);
-		ModuleHighlightDown->CastShadows = false;
-		
+		CurveModuleDropVector = CurveVector.Object;
 	}
+
+	LoadDropParticleAssets();
 }
 
 void AOPAG_ModuleBase::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
 
-	// Generate rarity of module
-	SelectRarity();
-	
+	ModuleDropHighlight->Deactivate();
+	ModuleDropHighlight->bAutoActivate = false;
+
 	// This method is call for activate physical behavior when module is in the scene
 	CheckIfPhysical();
-	Sphere->SetSimulatePhysics(false);
-	
-	FLinearColor LightColor = GetColorFromRarity(Level);
 
-	ModuleHighlightUp->SetLightColor(LightColor);
-	ModuleHighlightDown->SetLightColor(LightColor);
+	Sphere->SetSimulatePhysics(false);
+
+	InitDropTimeline();
+
+	SelectParticleFromRarity(GetRarity());
+
+	if (ModuleDropHighlightParticleInUse != nullptr)
+	{
+		ModuleDropHighlight->SetTemplate(ModuleDropHighlightParticleInUse);
+		ModuleDropHighlight->SetWorldScale3D(FVector(0.1f, 0.1f, 0.1f));		
+	}
 
 	if (GetParentActor() == nullptr)
-	{		
-		ModuleHighlightUp->SetVisibility(true);
-		ModuleHighlightUp->SetAttenuationRadius(0);
-		ModuleHighlightUp->SetIntensity(0);
-
-		ModuleHighlightDown->SetVisibility(true);
-		ModuleHighlightDown->SetAttenuationRadius(0);
-		ModuleHighlightDown->SetIntensity(0);
-
-		FVector RelativeLocation = ModuleHighlightUp->GetRelativeLocation();
-		RelativeLocation.Z -= 30;
-		ModuleHighlightUp->SetRelativeLocation(RelativeLocation);
-
-		RelativeLocation = ModuleHighlightDown->GetRelativeLocation();
-		RelativeLocation.Z += 20;
-		ModuleHighlightDown->SetRelativeLocation(RelativeLocation);
-
-		ModuleMesh->SetWorldScale3D(FVector(2, 2, 2));
+	{
+		ModuleMesh->SetWorldScale3D(FVector(2.f, 2.f, 2.f));
+		GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModuleBase::FlyRotationTimer_Implementation, .01f, true);
 	}
 }
 
 void AOPAG_ModuleBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// Need to disable the physics into the Tick to make it apply effectively, probably it's set true after begin play when droped on enemy killed
-	Sphere->SetSimulatePhysics(false);
-
-	// animation to let light grow and intensify
-	if (GetParentActor() == nullptr && CurrentHighlightIncreaseSizeFactor < HighlightIncreaseSizeFactor)
-	{
-		CurrentHighlightIncreaseSizeFactor += DeltaTime;
-		ModuleHighlightUp->SetAttenuationRadius(CurrentHighlightIncreaseSizeFactor * RadiusIncreaseFactor);
-		ModuleHighlightUp->SetIntensity(CurrentHighlightIncreaseSizeFactor * IntensityIncreaseFactor);
-
-		ModuleHighlightDown->SetAttenuationRadius(CurrentHighlightIncreaseSizeFactor * RadiusIncreaseFactor);
-		ModuleHighlightDown->SetIntensity(CurrentHighlightIncreaseSizeFactor * IntensityIncreaseFactor);
-	}
 }
 
 #pragma region Get
@@ -144,7 +115,23 @@ EModuleTypes AOPAG_ModuleBase::GetType() const
 
 EModuleRarity AOPAG_ModuleBase::GetRarity() const
 {
-	return Rarity;
+	if (Level == 2)
+	{
+		return EModuleRarity::Uncommon;
+	}
+	if (Level == 3)
+	{
+		return EModuleRarity::Rare;
+	}
+	if (Level == 4)
+	{
+		return EModuleRarity::Epic;
+	}
+	if (Level >= 5)
+	{
+		return EModuleRarity::Legendary;
+	}
+	return EModuleRarity::Common;
 }
 
 EModuleBrand AOPAG_ModuleBase::GetBrand() const
@@ -161,41 +148,39 @@ int AOPAG_ModuleBase::GetEquippableFireTypes() const
 {
 	return EquippableFireTypes;
 }
-FLinearColor AOPAG_ModuleBase::GetColorFromRarity(int Value)
+void AOPAG_ModuleBase::SelectParticleFromRarity(EModuleRarity ModuleRarity)
 {
-	FLinearColor Color = FLinearColor(1, 1, 1);
-
-	switch (Value)
+	switch (ModuleRarity)
 	{
-	case 1:
-		Color = FLinearColor(1, 1, 1);	// White
+	case EModuleRarity::Common:
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleCommon;
 		break;
 
-	case 2:
-		Color = FLinearColor(0, 255, 0.05);	// Green
+	case EModuleRarity::Uncommon:
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleUncommon;
 		break;
 
-	case 3:
-		Color = FLinearColor(0, 0.09, 1);	// Blue
+	case EModuleRarity::Rare:
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleRare;
 		break;
 
-	case 4:
-		Color = FLinearColor(1, 0, 0.08);	// Purple
+	case EModuleRarity::Epic:
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleEpic;
 		break;
 
-	case 5:
-		Color = FLinearColor(1, 0.5, 0);	// Gold
+	case EModuleRarity::Legendary:
+		ModuleDropHighlightParticleInUse = ModuleDropHighlightParticleLegendary;
 		break;
+
+	default:
+		ModuleDropHighlightParticleInUse = nullptr;
 	}
-
-	return Color;
 }
 #pragma endregion Get
 
 #pragma region Set
-void AOPAG_ModuleBase::SetParameters(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
+void AOPAG_ModuleBase::SetParameters(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int NewEquippableFireTypes)
 {
-	Rarity = NewRarity;
 	Brand = NewBrand;
 	Stats = NewStats;
 	EquippableFireTypes = NewEquippableFireTypes;
@@ -269,8 +254,7 @@ bool AOPAG_ModuleBase::CanInteract_Implementation()
 
 void AOPAG_ModuleBase::ApplyForce_Implementation(const FVector Force)
 {
-	//ModuleMesh->SetSimulatePhysics(true);
-	ModuleMesh->AddForce(Force, NAME_None, true);
+	
 }
 
 void AOPAG_ModuleBase::ApplyFly_Implementation()
@@ -281,7 +265,7 @@ void AOPAG_ModuleBase::ApplyFly_Implementation()
 
 void AOPAG_ModuleBase::FlyRotationTimer_Implementation()
 {
-	// on every frame change rotationg for a smooth rotating actor
+	// on every frame change rotating for a smooth rotating actor
 	FRotator NewRotation = FRotator(0, 1, 0);
 	FQuat QuatRotation = FQuat(NewRotation);
 	ModuleMesh->AddWorldRotation(QuatRotation, false, 0, ETeleportType::None);
@@ -289,7 +273,8 @@ void AOPAG_ModuleBase::FlyRotationTimer_Implementation()
 
 const float AOPAG_ModuleBase::GetPriceTotal_Implementation()
 {
-	return PriceBase * (1 + PriceMuliplierPercentage * (Level - 1));
+	return 20 * Level; // Temporary
+	// return PriceBase * (1 + PriceMuliplierPercentage * (Level - 1));
 }
 
 bool AOPAG_ModuleBase::CanBuy_Implementation()
@@ -313,19 +298,19 @@ bool AOPAG_ModuleBase::CanBuy_Implementation()
 #pragma endregion Interface
 
 #pragma region Attachment
-void AOPAG_ModuleBase::OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand,const FOPAG_GunStats NewStats,
+void AOPAG_ModuleBase::OnAttach(const EModuleBrand NewBrand,const FOPAG_GunStats NewStats,
 	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
 	// when it's attached to the gun, scale it to original dimension
 	ModuleMesh->SetWorldScale3D(FVector(1, 1, 1));
 
-	SetParameters(NewRarity, NewBrand, NewStats, NewEquippableFireTypes);
+	SetParameters(NewBrand, NewStats, NewEquippableFireTypes);
 }
 
 void AOPAG_ModuleBase::OnDetach()
 {
-}
 
+}
 #pragma endregion Attachment
 
 #pragma region Physics
@@ -346,28 +331,83 @@ void AOPAG_ModuleBase::CheckIfPhysical() const
 }
 #pragma endregion Physics
 
-#pragma region Other
-void AOPAG_ModuleBase::SelectRarity()
+#pragma region Drop
+void AOPAG_ModuleBase::ModuleDropTimelineProgress(FVector Value)
 {
-	if (GetLevel() <= 10)
+	FVector NewLocation = SpawnLocation;
+	NewLocation.X += RandomDropDir.X * Value.X * ModuleDropCurveXFactor;
+	NewLocation.Y += RandomDropDir.Y * Value.X * ModuleDropCurveXFactor;
+	NewLocation.Z += Value.Z * ModuleDropCurveZFactor;
+
+	SetActorLocation(NewLocation);
+}
+void AOPAG_ModuleBase::StartDropTimeline()
+{
+	SpawnLocation = GetActorLocation();
+
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDropDir.X = FMath::Sin(RandomAngle);
+	RandomDropDir.Y = FMath::Cos(RandomAngle);
+
+	ModuleDropTimeline->PlayFromStart();
+}
+
+void AOPAG_ModuleBase::ActivateHighlightParticle()
+{
+	if (GetParentActor() == nullptr)
 	{
-		Rarity = EModuleRarity::Common;
-	}
-	else if (GetLevel() <= 20)
-	{
-		Rarity = EModuleRarity::Uncommon;
-	}
-	else if (GetLevel() <= 30)
-	{
-		Rarity = EModuleRarity::Rare;
-	}
-	else if (GetLevel() <= 40)
-	{
-		Rarity = EModuleRarity::Epic;
-	}
-	else if (GetLevel() > 41)
-	{
-		Rarity = EModuleRarity::Legendary;
+		ModuleDropHighlight->Activate();
+		ModuleDropHighlight->SetVisibility(true);
+		ModuleDropHighlight->bAutoActivate = true;		
 	}
 }
-#pragma endregion Other
+
+void AOPAG_ModuleBase::ModuleDropTimelineFinished()
+{
+	ActivateHighlightParticle();
+}
+
+void AOPAG_ModuleBase::InitDropTimeline()
+{
+	ModuleDropTimeline->SetLooping(false);
+
+	OnModuleDropTimelineProgress.BindUFunction(this, FName("ModuleDropTimelineProgress"));
+	ModuleDropTimeline->AddInterpVector(CurveModuleDropVector, OnModuleDropTimelineProgress, FName("ModuleDropTimelinePropertyName"));
+
+	OnModuleDropTimelineFinished.BindUFunction(this, FName("ModuleDropTimelineFinished"));
+	ModuleDropTimeline->SetTimelineFinishedFunc(OnModuleDropTimelineFinished);
+}
+void AOPAG_ModuleBase::LoadDropParticleAssets()
+{
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectCommon(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_common_v2.P_Modules_common_v2'"));
+	if (ParticleEffectCommon.Succeeded())
+	{
+		ModuleDropHighlightParticleCommon = ParticleEffectCommon.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectUncommon(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_uncommon_v2.P_Modules_uncommon_v2'"));
+	if (ParticleEffectUncommon.Succeeded())
+	{
+		ModuleDropHighlightParticleUncommon = ParticleEffectUncommon.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectRare(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_rare_v2.P_Modules_rare_v2'"));
+	if (ParticleEffectRare.Succeeded())
+	{
+		ModuleDropHighlightParticleRare = ParticleEffectRare.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectEpic(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_epic_v2.P_Modules_epic_v2'"));
+	if (ParticleEffectEpic.Succeeded())
+	{
+		ModuleDropHighlightParticleEpic = ParticleEffectEpic.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleEffectLegendary(TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_legendary_v2.P_Modules_legendary_v2'"));
+	if (ParticleEffectLegendary.Succeeded())
+	{
+		ModuleDropHighlightParticleLegendary = ParticleEffectLegendary.Object;
+	}
+}
+#pragma endregion Drop

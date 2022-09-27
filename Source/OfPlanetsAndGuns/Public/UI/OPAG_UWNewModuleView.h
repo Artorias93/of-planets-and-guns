@@ -28,6 +28,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWNewModuleView : public UUserWidget
 		UTextBlock* ModuleTypeText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ModuleNameText;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* EquippableText;
 
 	UPROPERTY(meta = (BindWidget))
 		UListView* StatsListView;
@@ -37,6 +39,11 @@ class OFPLANETSANDGUNS_API UOPAG_UWNewModuleView : public UUserWidget
 
 	UPROPERTY(meta = (BindWidget))
 		UHorizontalBox* EquippableTypesBox;
+
+	UPROPERTY(meta = (BindWidget))
+		UImage* ModuleBackground; 
+	UPROPERTY(meta = (BindWidget))
+		UImage* ModuleForeground;
 
 public:
 	//Weapons textures
@@ -48,6 +55,21 @@ public:
 		UTexture2D* ShotgunIconTexture;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UTexture2D* SingleShotIconTexture;
+
+	//UI Colors
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FLinearColor BackgroundBlue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FLinearColor ForegroundBlue;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FLinearColor BackgroundRed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FLinearColor ForegroundRed;
+
+	//UI Font
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateFontInfo AbilityTextFont;
+
 
 	UFUNCTION()
 	void UpdateModuleValues(const FOPAG_GunStats& CurrentModuleStats,const FOPAG_GunStats& OtherModuleStats, 

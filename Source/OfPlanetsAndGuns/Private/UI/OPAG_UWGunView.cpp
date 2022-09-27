@@ -23,6 +23,7 @@ void UOPAG_UWGunView::BindEvents()
 		EMS->TotalAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateTotalAmmoText);
 		EMS->CurrentAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateCurrentAmmoText);
 		EMS->ColorAmmoChanged.AddDynamic(this, &UOPAG_UWGunView::UpdateAmmoColor);
+		EMS->SwapGunTexture.AddDynamic(this, &UOPAG_UWGunView::SwapGun);
 	}
 }
 
@@ -35,16 +36,64 @@ void UOPAG_UWGunView::UpdateCurrentAmmoText(const int CurrentValue)
 
 void UOPAG_UWGunView::UpdateTotalAmmoText(const int CurrentValue)
 {
-	if (TotalAmmoText && CurrentValue >= 0) {
-		TotalAmmoText->SetText(FText::FromString(FString::FromInt(CurrentValue)));
+	if (TotalAmmoText && CurrentValue >= 0) 
+	{
+		//99999 is the default AmmoMax pistol value ( set in Blueprint )
+		if(CurrentValue >= 99999)
+		{
+			TotalAmmoText->SetText(FText::FromString("-"));
+		}
+		else
+		{
+			TotalAmmoText->SetText(FText::FromString(FString::FromInt(CurrentValue)));
+		}
 	}
 }
 
-void UOPAG_UWGunView::UpdateAmmoColor(const FLinearColor ColorParam)
+void UOPAG_UWGunView::UpdateAmmoColor(bool bIsAmmoCurrentUnload, bool bIsAmmoMaxUnload)
 {
-	if (TotalAmmoText && CurrentAmmoText && AmmoSeparatorText) {
-		CurrentAmmoText->SetColorAndOpacity(ColorParam);
-		TotalAmmoText->SetColorAndOpacity(ColorParam);
-		AmmoSeparatorText->SetColorAndOpacity(ColorParam);
+	if (TotalAmmoText != nullptr) 
+	{
+		FLinearColor CurrentColor = bIsAmmoCurrentUnload ? AmmoColorUnload : AmmoCurrentColorBase;
+		CurrentAmmoText->SetColorAndOpacity(CurrentColor);
+		
+	}
+	if (CurrentAmmoText != nullptr)
+	{
+		FLinearColor CurrentColor = bIsAmmoMaxUnload ? AmmoColorUnload : AmmoMaxColorBase;
+		TotalAmmoText->SetColorAndOpacity(CurrentColor);
+	}
+}
+
+void UOPAG_UWGunView::SwapGun(EFireTypes CurrentType)
+{
+	switch (CurrentType)
+	{
+	case EFireTypes::FullyAutomatic:
+		GunIcon->SetBrushFromTexture(RifleTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::SingleShot:
+		GunIcon->SetBrushFromTexture(SniperTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::Burst3:
+		GunIcon->SetBrushFromTexture(BurstTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::Shotgun:
+		GunIcon->SetBrushFromTexture(ShotgunTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::Pistol:
+		HandgunIcon->SetVisibility(ESlateVisibility::Visible);
+		GunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	default:
+		break;
 	}
 }

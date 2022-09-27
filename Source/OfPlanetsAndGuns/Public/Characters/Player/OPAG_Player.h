@@ -7,6 +7,7 @@
 #include "GameplayEffectTypes.h"
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
+#include "NiagaraComponent.h"
 #include "OPAG_PlayerState.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -38,6 +39,9 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 	UCameraComponent* Camera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UNiagaraComponent* DashNiagaraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -51,6 +55,9 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	const class UOPAG_AttributeSetPlayer* AttributeSetPlayer;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UOPAG_PlayerTelemetryComponent* PlayerTelemetryComp;
 	
 public:
 	AOPAG_Player();
@@ -229,6 +236,7 @@ private:
 	bool bRunning = false;
 	bool bIsInADS = false;
 	bool bIsPreADS = false;
+	bool bIsTryingToADSDuringReload = false;
 	bool bHasAlreadyLooked = false;
 	bool bIsShieldBroken = false;
 
@@ -243,8 +251,10 @@ private:
 	// Fire timers
 	float LastFireTime = .0f;
 	FRotator AccumulatedRecoilDeviation = FRotator::ZeroRotator;
-	FRotator CurrentDeltaRotation = FRotator::ZeroRotator;
+	FRotator AccumulatedRecoilDeviationBeforeGoingDown = FRotator::ZeroRotator;
 	float RandomRecoilYaw = .0f;
+	float LastTimelimeReverseRecoilValue = .0f;
+	float LookupScale = .0f;
 
 private:
 	FOnTimelineFloat OnRecoilTimelineProgress;
@@ -253,6 +263,7 @@ private:
 	FOnTimelineFloat OnRecoilReverseTimelineProgress;
 	FOnTimelineEventStatic OnRecoilReverseTimelineFinished;
 
+	FOnTimelineFloat OnDashTimelineProgress;
 	FOnTimelineEventStatic OnDashTimelineFinished;
 
 private:
@@ -271,6 +282,8 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
+	virtual void DisplayDebug(UCanvas* InCanvas, const FDebugDisplayInfo& InDebugDisplay, float& InYL, float& InYPos) override;
+
 	void HealthChanged(const FOnAttributeChangeData& Data);
 
 private:
@@ -286,7 +299,7 @@ private:
 	void InitUICounters();
 
 	// Mathematics utility
-	const FVector CalculateThrowForce() const;
+	FVector CalculateThrowForce() const;
 	
 	// Ability behavior
 	void InitializeAbilities();
@@ -330,6 +343,9 @@ private:
 	UFUNCTION()
 	void OnPauseGame();
 
+	// Dash
+	void UpdateDashProgressBar();
+
 private:
 	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);
 
@@ -353,6 +369,7 @@ private:
 	UFUNCTION() void ReloadGun();
 	UFUNCTION() void IncrementPrimaryGunAmmo();
 	UFUNCTION() void InspectGun();
+	void StopInspectGun();
 
 	// Interact with items
 	UFUNCTION() void InteractWithItem();
@@ -361,6 +378,7 @@ private:
 	// Aim input
 	UFUNCTION() void SwitchToADSCamera();
 	UFUNCTION() void ResetFPSCamera();
+	void UpdateCamera(bool InADS);
 
 	// Active ability input
 	UFUNCTION() void ActiveDash();
@@ -371,6 +389,7 @@ private:
 	UFUNCTION() void RemovePassiveGunAbility(FGameplayTagContainer PassiveAbilityTagContainer);
 private:
 	// Timeline behavior | finished and progress
+	UFUNCTION() void DashTimelineProgress(float Value);
 	UFUNCTION() void DashTimelineFinished();
 	UFUNCTION() void RecoilTimelineProgress(float Value);
 	UFUNCTION() void RecoilTimelineFinished();
@@ -385,11 +404,11 @@ public:
 
 public:
 	// Callable in animation
-	UFUNCTION(BlueprintCallable) const bool GetIsADS() const;
-	UFUNCTION(BlueprintCallable) const bool GetIsRunning() const;
+	UFUNCTION(BlueprintCallable) bool GetIsADS() const;
+	UFUNCTION(BlueprintCallable) bool GetIsRunning() const;
 	UFUNCTION(BlueprintCallable) void AttachMagazineToHandNotify();
 	UFUNCTION(BlueprintCallable) void AttachMagazineToGunNotify();
-	UFUNCTION(BlueprintCosmetic) void CompleteInspectNotify();
+	UFUNCTION(BlueprintCallable) void CompleteInspectNotify();
 	UFUNCTION(BlueprintCallable) void FootstepsMakeNoiseNotify();
 
 public:
@@ -400,6 +419,7 @@ public:
 	// Getter dash
 	float GetDashLenght() const;
 	float GetDashSpeed() const;
+	int GetDashCount() const;
 
 public:
 	FORCEINLINE UCameraComponent* GetCurrentPlayerCamera() const { return CurrentCamera; }

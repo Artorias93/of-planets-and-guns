@@ -18,14 +18,25 @@ class OFPLANETSANDGUNS_API UOPAG_UWOptionsView : public UUserWidget
 	GENERATED_BODY()
 
 	UPROPERTY(meta = (BindWidget))
+		USlider* MasterSlider;
+	UPROPERTY(meta = (BindWidget))
 		USlider* MusicSlider;
 	UPROPERTY(meta = (BindWidget))
 		USlider* SFXSlider;
+	UPROPERTY(meta = (BindWidget))
+		USlider* AmbientSlider;
+	UPROPERTY(meta = (BindWidget))
+		USlider* SystemSlider;
+
 	UPROPERTY(meta = (BindWidget))
 		USlider* GraphicsSlider;
 
 	UPROPERTY(meta = (BindWidget))
 		UButton* BackButton;
+
+	class UOPAG_EventManagerSubsystem* EMS;
+
+	class UOPAG_SoundManagerSubsystem* SMS;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
@@ -38,4 +49,15 @@ public:
 		void BackButtonClicked();
 	UFUNCTION()
 		void GraphicsSliderChanged(float CurrentValue);
+
+	UFUNCTION()
+		void MasterSliderChanged(float CurrentValue);
+	UFUNCTION()
+		void MusicSliderChanged(float CurrentValue);
+	UFUNCTION()
+		void SFXSliderChanged(float CurrentValue);
+	UFUNCTION()
+		void AmbientSliderChanged(float CurrentValue);
+	UFUNCTION()
+		void SystemSliderChanged(float CurrentValue);
 };

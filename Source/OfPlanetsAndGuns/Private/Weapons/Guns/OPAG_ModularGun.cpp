@@ -19,6 +19,8 @@
 #include "Interactables/OPAG_Vendor.h"
 #include "Characters/Player/OPAG_InventorySystemComponent.h"
 #include "Weapons/Throwables/OPAG_Throwable.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AOPAG_ModularGun::AOPAG_ModularGun()
 {
@@ -30,6 +32,11 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	Magazine = CreateDefaultSubobject<UChildActorComponent>(TEXT("Magazine"));
 	Sight = CreateDefaultSubobject<UChildActorComponent>(TEXT("Sight"));
 	Accessory = CreateDefaultSubobject<UChildActorComponent>(TEXT("Accessory"));
+
+	GunDropHighlight = CreateDefaultSubobject<UParticleSystemComponent>("HightLight Particle");
+	{
+		GunDropHighlight->SetupAttachment(RootComponent);
+	}
 }
 
 const float AOPAG_ModularGun::GetPriceTotal_Implementation()
@@ -108,15 +115,38 @@ void AOPAG_ModularGun::BeginPlay()
 
 	CreateAndAttachAllModules(GetStandardModulesStruct());
 	PopulateAmmoTable();
-	CheckIfPhysical();
 
 	AmmoCurrent = GetStatsTotal().ClipSize;
+
+	GunDropHighlight->Deactivate();
+	GunDropHighlight->bAutoActivate = false;
+
+	if (GetParentActor() == nullptr)
+	{
+		GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModularGun::FlyRotationTimer_Implementation, .01f, true);
+	}
+
+	// Working, but not sure if needed
+
+	/*EModuleRarity GunRarity = GetGunRarity();	
+	LoadParticleFromRarity(GunRarity);
+
+	if (GunDropHighlightParticle)
+	{		
+		GunDropHighlight->SetTemplate(GunDropHighlightParticle);
+
+		if (GetParentActor() == nullptr)
+		{
+			GunDropHighlight->Activate();
+			GunDropHighlight->SetVisibility(true);
+			GunDropHighlight->bAutoActivate = true;
+		}
+	}	*/
 }
 
 void AOPAG_ModularGun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AOPAG_ModularGun::PopulateAmmoTable()
@@ -129,16 +159,6 @@ void AOPAG_ModularGun::PopulateAmmoTable()
 	if (AmmoReloadingMultipliersTable)
 	{
 		AmmoReloadingMultipliersTable->GetAllRows(Context, AmmoReloadingMultipliers);
-	}
-
-}
-
-void AOPAG_ModularGun::CheckIfPhysical() const
-{
-	// Control if module has parent gun -> is attached
-	if (GetParentActor() == nullptr)
-	{
-		//Receiver->SetSimulatePhysics(true);
 	}
 }
 
@@ -342,26 +362,30 @@ void AOPAG_ModularGun::DetachModule(UChildActorComponent* ChildModule, const FVe
 	const FRotator SpawnRotator = FRotator::ZeroRotator;
 	AActor* TempActor = GetWorld()->SpawnActor(TempModuleClass, &SpawnLocation, &SpawnRotator);
 	AOPAG_ModuleBase* TempModule = Cast<AOPAG_ModuleBase>(TempActor);
-	TempModule->ApplyForce_Implementation(Force);
 
-	// If the module isn't the standard, so is important attach the standard 
-	switch (TempModule->GetType())
+	if (TempModule)
 	{
-	case EModuleTypes::Barrel:
-		CreateModule(ChildModule, StandardBarrel);
-		break;
-	case EModuleTypes::Stock:
-		CreateModule(ChildModule, StandardStock);
-		break;
-	case EModuleTypes::Grip:
-		CreateModule(ChildModule, StandardGrip);
-		break;
-	case EModuleTypes::Magazine:
-		CreateModule(ChildModule, StandardMagazine);
-		break;
-	case EModuleTypes::Sight:
-		CreateModule(ChildModule, StandardSight);
-		break;
+		TempModule->StartDropTimeline();
+
+		// If the module isn't the standard, so is important attach the standard 
+		switch (TempModule->GetType())
+		{
+		case EModuleTypes::Barrel:
+			CreateModule(ChildModule, StandardBarrel);
+			break;
+		case EModuleTypes::Stock:
+			CreateModule(ChildModule, StandardStock);
+			break;
+		case EModuleTypes::Grip:
+			CreateModule(ChildModule, StandardGrip);
+			break;
+		case EModuleTypes::Magazine:
+			CreateModule(ChildModule, StandardMagazine);
+			break;
+		case EModuleTypes::Sight:
+			CreateModule(ChildModule, StandardSight);
+			break;
+		}
 	}
 }
 
@@ -458,12 +482,23 @@ USceneComponent* AOPAG_ModularGun::GetMuzzle() const
 #pragma region Create and Attach Modules
 void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules)
 {
-	if (Modules.Barrel) CreateModule(Barrel, Modules.Barrel);
-	if (Modules.Stock) CreateModule(Stock, Modules.Stock);
-	if (Modules.Grip) CreateModule(Grip, Modules.Grip);
-	if (Modules.Magazine) CreateModule(Magazine, Modules.Magazine);
-	if (Modules.Sight) CreateModule(Sight, Modules.Sight);
-	if (Modules.Accessory) CreateModule(Accessory, Modules.Accessory);
+	TSubclassOf<AOPAG_ModuleBase> ModuleClass = Modules.Barrel.LoadSynchronous();
+	if (IsValid(ModuleClass)) CreateModule(Barrel, ModuleClass);
+
+	ModuleClass = Modules.Stock.LoadSynchronous();
+	if (IsValid(ModuleClass)) CreateModule(Stock, ModuleClass);
+
+	ModuleClass = Modules.Grip.LoadSynchronous();
+	if (IsValid(ModuleClass)) CreateModule(Grip, ModuleClass);
+
+	ModuleClass = Modules.Magazine.LoadSynchronous();
+	if (IsValid(ModuleClass)) CreateModule(Magazine, ModuleClass);
+
+	ModuleClass = Modules.Sight.LoadSynchronous();
+	if (IsValid(ModuleClass)) CreateModule(Sight, ModuleClass);
+
+	ModuleClass = Modules.Accessory.LoadSynchronous();
+	if (IsValid(ModuleClass)) CreateModule(Accessory, ModuleClass);
 
 	// Update Stats
 	UpdateStatsTotal();
@@ -475,17 +510,36 @@ void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules
 	CreateAndAttachAllModules(Modules);
 	AOPAG_ModuleBase* Module = nullptr;
 	Module = Cast<AOPAG_ModuleBase>(Barrel->GetChildActor());
-	if (Module && Modules.Barrel) Module->SetStats(ModuleStats.BarrelStats);
+	if (IsValid(Module)) Module->SetStats(ModuleStats.BarrelStats);
 	Module = Cast<AOPAG_ModuleBase>(Stock->GetChildActor());
-	if (Module && Modules.Stock) Module->SetStats(ModuleStats.StockStats);
+	if (IsValid(Module)) Module->SetStats(ModuleStats.StockStats);
 	Module = Cast<AOPAG_ModuleBase>(Grip->GetChildActor());
-	if (Module && Modules.Grip) Module->SetStats(ModuleStats.GripStats);
+	if (IsValid(Module)) Module->SetStats(ModuleStats.GripStats);
 	Module = Cast<AOPAG_ModuleBase>(Magazine->GetChildActor());
-	if (Module && Modules.Magazine) Module->SetStats(ModuleStats.MagazineStats);
+	if (IsValid(Module)) Module->SetStats(ModuleStats.MagazineStats);
 	Module = Cast<AOPAG_ModuleBase>(Sight->GetChildActor());
-	if (Module && Modules.Sight) Module->SetStats(ModuleStats.SightStats);
+	if (IsValid(Module)) Module->SetStats(ModuleStats.SightStats);
 	Module = Cast<AOPAG_ModuleBase>(Accessory->GetChildActor());
-	if (Module && Modules.Accessory) Module->SetStats(ModuleStats.AccessoryStats);
+	if (IsValid(Module)) Module->SetStats(ModuleStats.AccessoryStats);
+}
+
+void AOPAG_ModularGun::CreateAndAttachAllModules(const FOPAG_GunModules& Modules,
+	const TArray<FOPAG_SecondaryStatModifier*>& StatModifiers)
+{
+	CreateAndAttachAllModules(Modules);
+	AOPAG_ModuleBase* Module = nullptr;
+	Module = Cast<AOPAG_ModuleBase>(Barrel->GetChildActor());
+	if (IsValid(Module)) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Stock->GetChildActor());
+	if (IsValid(Module)) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Grip->GetChildActor());
+	if (IsValid(Module)) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Magazine->GetChildActor());
+	if (IsValid(Module)) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Sight->GetChildActor());
+	if (IsValid(Module)) Module->SetStats(StatModifiers);
+	Module = Cast<AOPAG_ModuleBase>(Accessory->GetChildActor());
+	if (IsValid(Module)) Module->SetStats(StatModifiers);
 }
 
 // Is important when generate the basic gun 
@@ -501,7 +555,7 @@ void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSub
 			const FOPAG_GunStats ModuleStats = Base->GetStats();
 			const int ModuleEquippableFireTypes = Base->GetEquippableFireTypes();
 
-			AttachModule(ModuleSlot, Module, ModuleRarity, ModuleBrand, 
+			AttachModule(ModuleSlot, Module, ModuleBrand, 
 				ModuleStats, ModuleEquippableFireTypes);
 		}
 	}
@@ -510,7 +564,7 @@ void AOPAG_ModularGun::CreateModule(UChildActorComponent* ModuleSlot, const TSub
 // Set child create the object in scene and set the actor's child
 // After this is important set the specific params of module (when invoke set child... the module has the default params, not the values in scene)
 bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule,
-	const EModuleRarity NewModuleRarity, const EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, 
+	const EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, 
 	const int NewModuleEquippableFireTypes) const
 {
 	ModuleSlot->SetChildActorClass(NewModule);
@@ -518,11 +572,11 @@ bool AOPAG_ModularGun::AttachModule(UChildActorComponent* ModuleSlot, const TSub
 	AOPAG_ModuleBase* Module = GetModule(ModuleSlot);
 	if (Module)
 	{
-		Module->OnAttach(NewModuleRarity, NewModuleBrand, NewModuleStats, 
+		Module->OnAttach(NewModuleBrand, NewModuleStats, 
 		                 NewModuleEquippableFireTypes, GetParentActor() == GetWorld()->GetFirstPlayerController()->GetPawn());
 
 		const FName SocketName = GetSocketNameByModuleType(Module->GetType());
-		Module->AttachToComponent(Receiver, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+		Module->AttachToComponent(Receiver, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
 		return true;
 	}
 	return false;
@@ -596,7 +650,7 @@ bool AOPAG_ModularGun::AddNewModule(const TSubclassOf<AOPAG_ModuleBase> NewModul
 		// Call the attach module method for set child actor with socket
 		if (ModuleSlot)
 		{
-			const bool Result = AttachModule(ModuleSlot, NewModule, NewModuleRarity, NewModuleBrand, NewModuleStats, 
+			const bool Result = AttachModule(ModuleSlot, NewModule, NewModuleBrand, NewModuleStats, 
 				NewModuleEquippableFireTypes);
 
 			// Update Stats
@@ -672,6 +726,9 @@ void AOPAG_ModularGun::WaitReloadingTimer()
 	}
 	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
 	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+
+	// Update ammo ui color | false -> is base and true -> is unload
+	EMS->ColorAmmoChanged.Broadcast(false, AmmoMax < 30);
 }
 #pragma endregion Ammo System
 
@@ -686,3 +743,80 @@ bool AOPAG_ModularGun::HasSight() const
 	return Sight->GetChildActor() != nullptr;
 }
 #pragma endregion Checks
+
+EModuleRarity AOPAG_ModularGun::GetGunRarity() const
+{
+	int Level = GetLevel();
+	if (Level == 2)
+	{
+		return EModuleRarity::Uncommon;
+	}
+	if (Level == 3)
+	{
+		return EModuleRarity::Rare;
+	}
+	if (Level == 4)
+	{
+		return EModuleRarity::Epic;
+	}
+	if (Level >= 5)
+	{
+		return EModuleRarity::Legendary;
+	}
+	return EModuleRarity::Common;
+}
+
+int AOPAG_ModularGun::GetLevel() const
+{
+	int Result = 0;
+	float Count = 0;
+	for (int i = 0; i < ModuleTypeCount(); i++)
+	{
+		AOPAG_ModuleBase* ModuleBase = GetModuleBySocketType(static_cast<EModuleTypes>(i));
+		if (ModuleBase != nullptr)
+		{
+			Result += ModuleBase->GetLevel();
+			Count++;
+		}
+	}
+	return FMath::RoundToInt(Result / Count);
+}
+
+void AOPAG_ModularGun::LoadParticleFromRarity(EModuleRarity ModuleRarity)
+{
+
+	switch (ModuleRarity)
+	{
+	case EModuleRarity::Common:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Common.P_Modules_Common'"), NULL, LOAD_None, NULL);
+		break;
+
+	case EModuleRarity::Uncommon:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Uncommon.P_Modules_Uncommon'"), NULL, LOAD_None, NULL);
+		break;
+
+	case EModuleRarity::Rare:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Rare.P_Modules_Rare'"), NULL, LOAD_None, NULL);
+		break;
+
+	case EModuleRarity::Epic:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Epic.P_Modules_Epic'"), NULL, LOAD_None, NULL);
+		break;
+
+	case EModuleRarity::Legendary:
+		GunDropHighlightParticle = LoadObject<UParticleSystem>(NULL, TEXT("'/Game/OfPlanetsAndGuns/Effects/Modules/P_Modules_Legendary.P_Modules_Legendary'"), NULL, LOAD_None, NULL);
+		break;
+	}
+}
+
+void AOPAG_ModularGun::StartDropTimeline()
+{
+	GunSpawnLocation = GetActorLocation();
+
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomDropDir.X = FMath::Sin(RandomAngle);
+	RandomDropDir.Y = FMath::Cos(RandomAngle);
+
+	GunDropTimeline->PlayFromStart();
+}

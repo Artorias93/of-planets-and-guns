@@ -55,7 +55,9 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 	{
 		TArray<AActor*> ActorsToIgnore;
 		FHitResult HitResult;
-		const bool bResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(), Owner->GetActorLocation(), Owner->GetActorLocation() + (-Owner->GetActorUpVector() * 5000), TraceTypeQuery1, true, ActorsToIgnore, EDrawDebugTrace::Persistent, HitResult, true);
+		const bool bResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(),
+			Owner->GetActorLocation(), Owner->GetActorLocation() + (-Owner->GetActorUpVector() * 5000),
+			TraceTypeQuery1, true, ActorsToIgnore, EDrawDebugTrace::None, HitResult, true);
 		
 		if (bResult)
 		{
@@ -77,6 +79,11 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 					AOPAG_Drop* DropObj = GetWorld()->SpawnActor<AOPAG_Drop>(Drop->DropClass, 
 						SpawnLocation, FRotator::ZeroRotator);
 
+					if (DropObj != nullptr)
+					{
+						DropObj->StartDropTimeline();
+					}
+
 					/*if (DropObj)
 					{
 						//DropObj->Sphere->SetSimulatePhysics(true);
@@ -90,7 +97,6 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 				const AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 				if (Player != nullptr)
 				{
-
 					const AOPAG_ModularGun* PrimaryGun = Player->GetPrimaryGun();
 					if (PrimaryGun != nullptr)
 					{
@@ -108,7 +114,8 @@ void UOPAG_LootDropSystemComponent::DropLoot()
 							if (ModuleObj)
 							{
 								ModuleObj->SetStats(PrimaryGun->GetSecondaryStatsModifiers());
-								ModuleObj->GetModuleSphereComponent()->SetSimulatePhysics(true);
+								ModuleObj->GetModuleSphereComponent()->SetSimulatePhysics(false);
+								ModuleObj->StartDropTimeline();
 							}
 						}
 					}

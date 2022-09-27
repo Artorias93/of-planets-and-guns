@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_UWPlayerStatsView.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -10,9 +7,12 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Blueprint/WidgetTree.h"
+#include "Characters/Player/OPAG_Player.h"
+#include "Characters/Player/OPAG_AttributeSetPlayer.h"
 
 void UOPAG_UWPlayerStatsView::NativeConstruct() {
 	Super::NativeConstruct();
+
 	BindEvents();
 }
 
@@ -23,9 +23,8 @@ void UOPAG_UWPlayerStatsView::BindEvents()
 	if (EMS) {
 		EMS->HealthChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateHealthBar);
 		EMS->ShieldChanged.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateShieldBar);
-
-		EMS->DashAmountIncrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::IncrementDashAmount);
-		EMS->DashAmountDecrement.AddDynamic(this, &UOPAG_UWPlayerStatsView::DecrementDashAmount);
+		EMS->UpdateDashAmount.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashAmount);
+		EMS->UpdateDashProgressBar.AddDynamic(this, &UOPAG_UWPlayerStatsView::UpdateDashProgressCooldown);
 	}
 }
 
@@ -56,27 +55,14 @@ void UOPAG_UWPlayerStatsView::UpdateShieldBar(const float CurrentValue, const fl
 	}
 }
 
-void UOPAG_UWPlayerStatsView::IncrementDashAmount()
+void UOPAG_UWPlayerStatsView::UpdateDashAmount(float CurrentValue)
 {
-	UImage* const NewDashIcon = WidgetTree->ConstructWidget<UImage>();
-
-	if (DashIconTexture) {
-		NewDashIcon->SetBrushFromTexture(DashIconTexture);
-	}
-
-	if (NewDashIcon)
-		DashBox->AddChild(NewDashIcon);
-
-	UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(DashBox->GetSlots()[(DashBox->GetChildrenCount() - 1)]);
-
-	if (MyBoxSlot) {
-		MyBoxSlot->SetPadding(FMargin(5, 5, 5, 5));
-	}
+	CurrentDashCount->SetText(FText::FromString(FString::FromInt(FMath::RoundToInt(CurrentValue))));
 }
 
-void UOPAG_UWPlayerStatsView::DecrementDashAmount()
+void UOPAG_UWPlayerStatsView::UpdateDashProgressCooldown(float TimeProgress)
 {
-	if (DashBox->GetChildrenCount() > 0) {
-		DashBox->RemoveChildAt((DashBox->GetChildrenCount() - 1));
-	}
+	DashProgressBar->SetPercent(TimeProgress);
+
+	if(DashProgressBar->Percent >= 1.f)	DashProgressBar->SetPercent(.0f);
 }

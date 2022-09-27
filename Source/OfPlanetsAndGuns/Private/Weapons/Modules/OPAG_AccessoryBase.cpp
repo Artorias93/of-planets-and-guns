@@ -8,7 +8,6 @@ AOPAG_AccessoryBase::AOPAG_AccessoryBase()
  	PrimaryActorTick.bCanEverTick = true;
 
 	// Initialize Parameters
-	Rarity = EModuleRarity::Common;
 	Brand = EModuleBrand::Standard;
 	Type = EModuleTypes::Accessory;
 }
@@ -25,10 +24,10 @@ void AOPAG_AccessoryBase::Tick(float DeltaTime)
 
 }
 
-void AOPAG_AccessoryBase::OnAttach(const EModuleRarity NewRarity, const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
+void AOPAG_AccessoryBase::OnAttach(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
                                    NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
-	Super::OnAttach(NewRarity, NewBrand, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
+	Super::OnAttach(NewBrand, NewStats, NewEquippableFireTypes, bIsAttachedToPlayer);
 
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	check(EMS);

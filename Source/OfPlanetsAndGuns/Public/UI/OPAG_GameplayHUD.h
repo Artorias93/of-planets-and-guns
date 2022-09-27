@@ -8,6 +8,8 @@
 enum class EModuleRarity : uint8;
 struct FOPAG_GunStats;
 
+class UOPAG_PlayerStatus;
+
 UCLASS()
 class OFPLANETSANDGUNS_API AOPAG_GameplayHUD : public AHUD
 {
@@ -73,6 +75,10 @@ private:
 		class UOPAG_UWOptionsView* OptionsViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWOptionsView> OptionsViewWidgetClass;
+	UPROPERTY() 
+		UOPAG_PlayerStatus* PlayerStatusViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_PlayerStatus> PlayerStatusViewWidgetClass;
 
 public:
 	virtual void DrawHUD() override;
@@ -122,4 +128,7 @@ public:
 	void ShowOptionsView();
 	UFUNCTION()
 	void HideOptionsView();
+
+	UFUNCTION()
+	void GoToMenu();
 };
