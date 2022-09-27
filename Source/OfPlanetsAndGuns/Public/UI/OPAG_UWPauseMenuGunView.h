@@ -12,6 +12,7 @@
 
 class UImage;
 class UTextBlock;
+class UHorizontalBox;
 struct FOPAG_GunStats;
 
 UCLASS()
@@ -27,19 +28,6 @@ class OFPLANETSANDGUNS_API UOPAG_UWPauseMenuGunView : public UUserWidget
 		UTextBlock* GunType;
 
 	UPROPERTY(meta = (BindWidget))
-		UTextBlock* DamageText;
-	UPROPERTY(meta = (BindWidget))
-		UTextBlock* FireRateText;
-	UPROPERTY(meta = (BindWidget))
-		UTextBlock* AccuracyText;
-	UPROPERTY(meta = (BindWidget))
-		UTextBlock* StabilityText;
-	UPROPERTY(meta = (BindWidget))
-		UTextBlock* ReloadingText;
-	UPROPERTY(meta = (BindWidget))
-		UTextBlock* ClipSizeText;
-
-	UPROPERTY(meta = (BindWidget))
 		UTextBlock* DamageAmount;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* FireRateAmount;
@@ -51,6 +39,9 @@ class OFPLANETSANDGUNS_API UOPAG_UWPauseMenuGunView : public UUserWidget
 		UTextBlock* ReloadingAmount;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ClipSizeAmount;
+
+	UPROPERTY(meta = (BindWidget))
+		UHorizontalBox* StatsHorizontalBox;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
 		FLinearColor RedColor;
@@ -65,7 +56,7 @@ public:
 
 	void NativeConstruct();
 
-	void UpdateSingleStat(UTextBlock* StatText, UTextBlock* StatAmount, float Value);
+	void UpdateSingleStat(UTextBlock* StatAmount, float Value);
 	
 	void BindEvents();
 };
