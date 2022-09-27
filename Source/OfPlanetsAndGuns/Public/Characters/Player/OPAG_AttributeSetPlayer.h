@@ -23,8 +23,12 @@ public:
 	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetPlayer, ShieldCapacityMax)
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerAttribute")
-	FGameplayAttributeData ShieldRechargeRate;
-	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetPlayer, ShieldRechargeRate)
+	FGameplayAttributeData ShieldRechargeAmount;
+	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetPlayer, ShieldRechargeAmount)
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerAttribute")
+	FGameplayAttributeData ShieldRechargePeriod;
+	ATTRIBUTE_ACCESSORS(UOPAG_AttributeSetPlayer, ShieldRechargePeriod)
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerAttribute")
 	FGameplayAttributeData ShieldCooldown;

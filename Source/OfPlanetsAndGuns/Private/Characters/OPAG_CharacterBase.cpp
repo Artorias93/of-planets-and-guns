@@ -17,7 +17,7 @@ AOPAG_CharacterBase::AOPAG_CharacterBase()
 	PrimaryActorTick.bCanEverTick = false;
 	
 	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComp");
-	BasicShot = UOPAG_BasicShot::StaticClass();
+	SufferDamage = UOPAG_BasicShot::StaticClass();
 }
 
 //Binds functionality to input
@@ -43,7 +43,7 @@ void AOPAG_CharacterBase::BeginPlay()
 	{
 		BaseAttributeSet = AbilitySystemComp->GetSet<UOPAG_AttributeSetBase>();
 
-		InitializeAbility(BasicShot, 0);
+		InitializeAbility(SufferDamage, 0);
 	}
 }
 
@@ -114,7 +114,7 @@ void AOPAG_CharacterBase::ReceiveDamage(const float Damage, AActor* const Causer
 		AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
 
 		//TODO: Rename BasicShot in AbilityTakeDamage
-		AbilitySystemComp->TryActivateAbilityByClass(BasicShot);
+		AbilitySystemComp->TryActivateAbilityByClass(SufferDamage);
 
 		const FGameplayTag HitGameplayTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.ranged.hitEvent"));
 		FGameplayEventData HitEventData = FGameplayEventData();

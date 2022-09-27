@@ -269,7 +269,7 @@ private:
 
 private:
 	FTimerHandle ShootingHanlde;
-	FTimerHandle RestartShieldPlayerHandle;
+	FTimerHandle RechargeShieldPlayerHandle;
 	FTimerHandle ShieldPlayerCooldownHandle;
 
 protected:
@@ -333,7 +333,7 @@ private:
 	void PickupGun(AOPAG_ModularGun* Gun);
 
 	// Timer
-	void ResetShieldTimer();
+	void RechargeShieldTimer();
 	void ShieldCooldownTimer();
 
 	// Animation corrections

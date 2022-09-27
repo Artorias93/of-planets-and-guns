@@ -64,7 +64,7 @@ public:
 	class UInputMappingContext* MappingContext;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterBase")
-	TSubclassOf<UGameplayAbility> BasicShot;
+	TSubclassOf<UGameplayAbility> SufferDamage;
 
 public:
 	UPROPERTY(Category = "Movement", VisibleAnywhere, BlueprintReadWrite)
