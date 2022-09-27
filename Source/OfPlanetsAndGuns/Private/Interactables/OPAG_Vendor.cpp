@@ -347,8 +347,8 @@ void AOPAG_Vendor::SpawnItem(const float RoomDifficulty)
 			NewModule->SetStats(PrimaryGun->GetSecondaryStatsModifiers());
 		}
 
-		FVector newModuleScale(2.f, 2.f, 2.f);
-		NewModule->SetActorScale3D(newModuleScale);
+		/*FVector newModuleScale(2.f, 2.f, 2.f);
+		NewModule->SetActorScale3D(newModuleScale);*/
 		TempModulesTextRender[i]->SetVisibility(true);
 		TempModulesTextRender[i]->SetText(
 			FText::FromString(FString::SanitizeFloat(IOPAG_InteractableInterface::Execute_GetPriceTotal(NewModule), 0) + "$")

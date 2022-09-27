@@ -12,23 +12,24 @@
 
 AOPAG_ModuleBase::AOPAG_ModuleBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
-
-	ModuleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
-	if (ModuleMesh)
-	{
-		ModuleMesh->SetCollisionProfileName(TEXT("Weapon"));
-		RootComponent = ModuleMesh;
-		ModuleMesh->SetSimulatePhysics(false);
-	}
+	PrimaryActorTick.bCanEverTick = true;	
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	if (Sphere)
 	{
 		Sphere->SetSphereRadius(32.f);
-		Sphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
-		Sphere->SetupAttachment(ModuleMesh);
+		Sphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));		
 		Sphere->SetSimulatePhysics(false);
+
+		RootComponent = Sphere;
+	}
+
+	ModuleMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ModuleMesh"));
+	if (ModuleMesh)
+	{
+		ModuleMesh->SetCollisionProfileName(TEXT("Weapon"));		
+		ModuleMesh->SetSimulatePhysics(false);
+		ModuleMesh->SetupAttachment(Sphere);
 	}
 
 	ModuleDropHighlight = CreateDefaultSubobject<UParticleSystemComponent>("HightLight Particle");
@@ -69,9 +70,10 @@ void AOPAG_ModuleBase::BeginPlay()
 		ModuleDropHighlight->SetWorldScale3D(FVector(0.1f, 0.1f, 0.1f));		
 	}
 
-	if (GetParentActor() == nullptr)
+	// Scale the module mesh only when is detached or when it's listed into the Vendor
+	if (GetParentActor() == nullptr || Cast<AOPAG_Vendor>(GetParentActor()) != nullptr)
 	{
-		ModuleMesh->SetWorldScale3D(FVector(2.f, 2.f, 2.f));
+		ModuleMesh->SetRelativeScale3D(FVector(2.f, 2.f, 2.f));
 		GetWorld()->GetTimerManager().SetTimer(FlyRotationHandle, this, &AOPAG_ModuleBase::FlyRotationTimer_Implementation, .01f, true);
 	}
 }
@@ -302,7 +304,7 @@ void AOPAG_ModuleBase::OnAttach(const EModuleBrand NewBrand,const FOPAG_GunStats
 	const int NewEquippableFireTypes, const bool bIsAttachedToPlayer)
 {
 	// when it's attached to the gun, scale it to original dimension
-	ModuleMesh->SetWorldScale3D(FVector(1, 1, 1));
+	ModuleMesh->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
 
 	SetParameters(NewBrand, NewStats, NewEquippableFireTypes);
 }
