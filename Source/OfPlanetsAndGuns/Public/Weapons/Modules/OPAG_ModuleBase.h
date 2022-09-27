@@ -118,6 +118,11 @@ public:
 	const float GetPriceTotal_Implementation() override;
 	FString InteractString_Implementation() override;
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool InVendor();
+	virtual bool InVendor_Implementation() override;
+	//bool InVendor_Implementation() override;
+
 	// Attach module to gun
 	virtual void OnAttach(const EModuleBrand NewBrand, const FOPAG_GunStats NewStats, const int
 	                      NewEquippableFireTypes, const bool bIsAttachedToPlayer);
@@ -150,6 +155,9 @@ public:
 	UFUNCTION()
 	void ModuleDropTimelineProgress(FVector Value);
 	
+
+	
+
 public:
 	FORCEINLINE USphereComponent* GetModuleSphereComponent() { return Sphere; }
 	void StartDropTimeline();

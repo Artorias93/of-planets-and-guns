@@ -121,7 +121,8 @@ public:
 	void ApplyFly_Implementation() override;
 	void FlyRotationTimer_Implementation() override;
 	bool CanBuy_Implementation() override;
-	const float GetPriceTotal_Implementation() override;	
+	const float GetPriceTotal_Implementation() override;
+	bool InVendor_Implementation() override;
 
 	// Increment ammo system
 	void IncrementAmmo();

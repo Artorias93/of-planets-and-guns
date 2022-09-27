@@ -41,6 +41,9 @@ public:
 	void FlyRotationTimer();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool InVendor();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	bool CanBuy();
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)

@@ -238,7 +238,35 @@ void AOPAG_ModuleBase::SetStats(const FOPAG_GunStats NewStats)
 #pragma region Interface
 FString AOPAG_ModuleBase::InteractString_Implementation()
 {
-	return "Pick up module [E]";
+	// get player current weapon type
+	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (Player == nullptr) { return ""; }
+	const int FireMask = 1 << (int)Player->GetPrimaryGun()->GetFireType();
+
+	// is module compatible?
+	if (GetParentActor() == nullptr) {
+		if (FireMask & EquippableFireTypes) {
+			return "Swap module [E]";
+		}
+		else {
+			return "Incompatible";
+		}
+	}
+
+	// Vendor: player can afford module?
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	if (Vendor != nullptr) 
+	{
+		if (!(FireMask & EquippableFireTypes)) {
+			return "Incompatible";
+		} else if (Player->GetInventorySystemComponent()->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this)) {
+			return "Buy module [E]";
+		} else {
+			return "Insufficient Credit";
+		}
+	}
+
+	return "ERROR";
 }
 
 void AOPAG_ModuleBase::Interact_Implementation()
@@ -248,8 +276,16 @@ void AOPAG_ModuleBase::Interact_Implementation()
 
 bool AOPAG_ModuleBase::CanInteract_Implementation()
 {
+	// You can interact only if module ...
+	// ... has no parent
 	if (GetParentActor() == nullptr)
 		return true;
+
+	// ... is in vendor
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	if (Vendor != nullptr) {
+		return true;
+	}
 
 	return false;
 }
@@ -282,16 +318,13 @@ const float AOPAG_ModuleBase::GetPriceTotal_Implementation()
 bool AOPAG_ModuleBase::CanBuy_Implementation()
 {
 	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	if (Player == nullptr)
-	{
-		return false;
-	}
+	if (Player == nullptr) return false;
 
 	// Equippable fire type check
 	const int FireMask = 1 << (int)Player->GetPrimaryGun()->GetFireType();
 
-	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
-	if (Vendor != nullptr && FireMask & EquippableFireTypes && Player->GetInventorySystemComponent()->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
+	// Check if module compatible and affordable
+	if ( (FireMask & EquippableFireTypes) && Player->GetInventorySystemComponent()->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this))
 	{
 		return true;
 	}
@@ -343,6 +376,13 @@ void AOPAG_ModuleBase::ModuleDropTimelineProgress(FVector Value)
 
 	SetActorLocation(NewLocation);
 }
+
+bool AOPAG_ModuleBase::InVendor_Implementation()
+{
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	return Vendor != nullptr;
+}
+
 void AOPAG_ModuleBase::StartDropTimeline()
 {
 	SpawnLocation = GetActorLocation();

@@ -943,37 +943,46 @@ void AOPAG_Player::InteractWithItem()
 	if (InteractableObject && 
 		InteractableObject->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
 	{
-		if (IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
-		{
-			if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+		if (IOPAG_InteractableInterface::Execute_InVendor(InteractableObject) ){
+			if (IOPAG_InteractableInterface::Execute_CanBuy(InteractableObject))
 			{
-				InteractWithModule(Module);
-			}
-			else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
-			{
-				PickupGun(Gun);
-			}
-			else
-			{
-				IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
-			}
-		}
-		if (IOPAG_InteractableInterface::Execute_CanBuy(InteractableObject))
-		{
-			InventorySystemComp->GoldAmount -= IOPAG_InteractableInterface::Execute_GetPriceTotal(InteractableObject);
-			EMS->GoldChanged.Broadcast(InventorySystemComp->GoldAmount);
+				InventorySystemComp->GoldAmount -= IOPAG_InteractableInterface::Execute_GetPriceTotal(InteractableObject);
+				EMS->GoldChanged.Broadcast(InventorySystemComp->GoldAmount);
 
-			if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
-			{
-				EMS->DisableModuleTextInVendor.Broadcast(Module);
-				InteractWithModule(Module);
-			}
-			else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
-			{
-				EMS->DisableGunTextInVendor.Broadcast(Gun);
-				PickupGun(Gun);
+				if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+				{
+					EMS->DisableModuleTextInVendor.Broadcast(Module);
+					InteractWithModule(Module);
+				}
+				else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
+				{
+					EMS->DisableGunTextInVendor.Broadcast(Gun);
+					PickupGun(Gun);
+				}
 			}
 		}
+		else {
+			// pickup interactable
+			if (IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
+			{
+				if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+				{
+					InteractWithModule(Module);
+				}
+				else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
+				{
+					PickupGun(Gun);
+				}
+				else
+				{
+					IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
+				}
+			}
+		}
+
+		
+
+
 	}
 }
 
@@ -1216,9 +1225,12 @@ void AOPAG_Player::UpdateComparison() {
 	}
 
 	else if (InteractableObject != nullptr) {
-		AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject);
-		if (Gun && ( IOPAG_InteractableInterface::Execute_CanInteract(Gun) || IOPAG_InteractableInterface::Execute_CanBuy(Gun) )) {
 
+		// if looking at gun && gun is interactable (aka not owned by enemy) ...
+		AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject);
+		if (Gun && IOPAG_InteractableInterface::Execute_CanInteract(Gun) ) 
+		{
+			// ... broadcast both current & looked guns info
 			const FOPAG_GunStats OtherGunStats = Gun->GetStatsTotal();
 			const FString OtherGunName = (Gun->GetGunName()).ToString();
 			const FString OtherGunFireType = AOPAG_ModularGun::GetFireTypeName((Gun->GetFireType()));
@@ -1228,8 +1240,9 @@ void AOPAG_Player::UpdateComparison() {
 			PreviousLookedAtModule = InteractableObject;
 		}
 
+		// if looking at module && module is interactable (aka not owned by enemy) ...
 		AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject);
-		if (Module && (IOPAG_InteractableInterface::Execute_CanInteract(Module) || IOPAG_InteractableInterface::Execute_CanBuy(Module)))
+		if (Module && IOPAG_InteractableInterface::Execute_CanInteract(Module) )
 		{
 			FOPAG_GunStats CurrentModuleStats;
 			AOPAG_ModuleBase* CurrentModule = PrimaryGun->GetModuleBySocketType(Module->GetType());
