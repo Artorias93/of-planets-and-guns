@@ -24,6 +24,9 @@ void UOPAG_UWHowToPlayView::NativeConstruct()
 		PagesList[i]->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
+	//Collapsing the prev button (because on the first page)
+	PreviousButton->SetVisibility(ESlateVisibility::Collapsed);
+
 	//Binding delegates
 	PreviousButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWHowToPlayView::PreviousButtonClicked);
 	NextButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWHowToPlayView::NextButtonClicked);
@@ -36,6 +39,24 @@ void UOPAG_UWHowToPlayView::PreviousButtonClicked()
 		return;
 
 	CurrentPage--;
+
+	if(CurrentPage == 0)
+	{
+		PreviousButton->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		PreviousButton->SetVisibility(ESlateVisibility::Visible);
+	}
+			
+	if(CurrentPage == PagesList.Num() - 1)
+	{
+		NextButton->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{		
+		NextButton->SetVisibility(ESlateVisibility::Visible);
+	}
 	
 	for(int i = 0; i < PagesList.Num(); i++)
 	{
@@ -54,6 +75,24 @@ void UOPAG_UWHowToPlayView::NextButtonClicked()
 	 	return;
 
 	CurrentPage++;
+
+	if(CurrentPage == 0)
+	{
+		PreviousButton->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		PreviousButton->SetVisibility(ESlateVisibility::Visible);
+	}
+			
+	if(CurrentPage == PagesList.Num() - 1)
+	{
+		NextButton->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{		
+		NextButton->SetVisibility(ESlateVisibility::Visible);
+	}
 		
 	for(int i = 0; i < PagesList.Num(); i++)
 	{
