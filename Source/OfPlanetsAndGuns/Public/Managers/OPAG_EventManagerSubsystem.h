@@ -51,6 +51,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FShieldChanged, float, CurrentVal
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FColorAmmoChanged, bool, bIsAmmoCurrentUnload, bool, bIsAmmoMaxUnload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FPauseMenuGunChanged, const FOPAG_GunStats, GunStats, 
+const FString, GunName, const FString, GunFireType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSoundSliderChanged, float, CurrentValue);
@@ -257,6 +259,9 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FPauseGame PauseGame;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FPauseMenuGunChanged PauseMenuGunChanged;
+
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FResumeGame ResumeGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)

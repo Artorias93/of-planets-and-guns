@@ -895,6 +895,13 @@ FVector AOPAG_Player::GetViewLocation() const
 void AOPAG_Player::OnPauseGame()
 {
 	EMS->GoldChanged.Broadcast(GetInventorySystemComponent()->GoldAmount);
+
+	AOPAG_ModularGun* MyGun = GetPrimaryGun();
+	if (MyGun) 
+	{
+		EMS->PauseMenuGunChanged.Broadcast(MyGun->GetStatsTotal(), MyGun->GetGunName().ToString(), MyGun->GetFireTypeName(MyGun->GetFireType()));
+	}
+
 }
 
 void AOPAG_Player::UpdateDashProgressBar()
