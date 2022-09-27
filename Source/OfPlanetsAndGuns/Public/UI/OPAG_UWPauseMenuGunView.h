@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Weapons/Guns/OPAG_GunStats.h"
 #include "OPAG_UWPauseMenuGunView.generated.h"
 
 /**
@@ -12,8 +13,6 @@
 
 class UImage;
 class UTextBlock;
-class UHorizontalBox;
-struct FOPAG_GunStats;
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWPauseMenuGunView : public UUserWidget

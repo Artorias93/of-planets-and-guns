@@ -12,7 +12,7 @@ enum class PlayerStateLoadType : uint8
 };
 
 USTRUCT(BlueprintType)
-struct FOPAG_PlayerState : public FTableRowBase
+struct OFPLANETSANDGUNS_API FOPAG_PlayerState : public FTableRowBase
 {
 	GENERATED_BODY();
 

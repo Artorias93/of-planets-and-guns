@@ -10,6 +10,7 @@
 #include "NiagaraComponent.h"
 #include "OPAG_PlayerState.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include "Managers/OPAG_Settings.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Guns/OPAG_GunState.h"
 #include "OPAG_Player.generated.h"
@@ -401,6 +402,7 @@ public:
 	bool GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
 	UFUNCTION() void SavePlayerState();
 	UFUNCTION() void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
+	UFUNCTION() void ApplySettings(const FOPAG_Settings& SettingsToApply);
 
 public:
 	// Callable in animation

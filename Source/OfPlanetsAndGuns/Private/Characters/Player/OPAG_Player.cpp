@@ -328,6 +328,7 @@ void AOPAG_Player::BroadcastEvents()
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->GetAmmoMax());
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 	EMS->RequestPlayerState.Broadcast();
+	EMS->RequestSettings.Broadcast();
 	EMS->UpdateDashAmount.Broadcast(AttributeSetPlayer->GetDashCount());
 }
 
@@ -335,6 +336,7 @@ void AOPAG_Player::BindEvents()
 {
 	EMS->RequestSavePlayerState.AddDynamic(this, &AOPAG_Player::SavePlayerState);
 	EMS->ApplyPlayerState.AddDynamic(this, &AOPAG_Player::ApplyPlayerState);
+	EMS->ApplySettings.AddDynamic(this, &AOPAG_Player::ApplySettings);
 
 	EMS->PlacePlayerAtStart.AddDynamic(this, &AOPAG_Player::TeleportPlayerToStart);
 
@@ -793,7 +795,7 @@ void AOPAG_Player::MoveRight(const FInputActionValue& Value)
 
 void AOPAG_Player::Lookup(const FInputActionValue& Value)
 {
-	LookupScale = Value[1];
+	LookupScale = Value[1] * GetWorld()->GetDeltaSeconds() * (bIsInADS ? ADSSensitivity : HipSensitivity);
 	if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale > .0f)
 	{
 		AccumulatedRecoilDeviation.Pitch -= LookupScale;
@@ -805,17 +807,17 @@ void AOPAG_Player::Lookup(const FInputActionValue& Value)
 	}
 	if (LookupScale != 0.0f)
 	{
-		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
+		AddControllerPitchInput(LookupScale);
 
 	}
 }
 
 void AOPAG_Player::Turn(const FInputActionValue& Value)
 {
-	const float TurnScale = Value[0];
+	const float TurnScale = Value[0] * GetWorld()->GetDeltaSeconds() * (bIsInADS ? ADSSensitivity : HipSensitivity);
 	if (TurnScale != 0.0f)
 	{
-		AddControllerYawInput(TurnScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
+		AddControllerYawInput(TurnScale);
 	}
 }
 
@@ -1514,6 +1516,27 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 			}
 		}
 	}
+}
+
+void AOPAG_Player::ApplySettings(const FOPAG_Settings& SettingsToApply)
+{
+	bool ShouldSaveWithDefaults = false;
+	FOPAG_Settings NewSettings;
+	if (SettingsToApply.HipSensitivity == 0.f)
+	{
+		NewSettings.HipSensitivity = HipSensitivity;
+		ShouldSaveWithDefaults = true;
+	}
+	if (SettingsToApply.ADSSensitivity == 0.f)
+	{
+		NewSettings.ADSSensitivity = ADSSensitivity;
+		ShouldSaveWithDefaults = true;
+	}
+
+	HipSensitivity = SettingsToApply.HipSensitivity;
+	ADSSensitivity = SettingsToApply.ADSSensitivity;
+
+	if (ShouldSaveWithDefaults) EMS->SaveSettings.Broadcast(NewSettings);
 }
 #pragma endregion Player State
 

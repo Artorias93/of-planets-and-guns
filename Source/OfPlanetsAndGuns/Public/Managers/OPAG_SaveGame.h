@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OPAG_Settings.h"
 #include "Characters/Player/OPAG_PlayerState.h"
 #include "GameFramework/SaveGame.h"
 #include "OPAG_SaveGame.generated.h"
@@ -21,6 +22,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Player State")
 		FOPAG_PlayerState PlayerState;
+
+	UPROPERTY(VisibleAnywhere, Category = "Settings")
+		FOPAG_Settings Settings;
 
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 		FString SaveSlotName;

@@ -31,6 +31,9 @@ void UOPAG_GameInstance::BindEvents()
 
 	EMS->RequestPlayerState.AddDynamic(this, &UOPAG_GameInstance::SendPlayerState);
 	EMS->SavePlayerState.AddDynamic(this, &UOPAG_GameInstance::SavePlayerState);
+
+	EMS->RequestSettings.AddDynamic(this, &UOPAG_GameInstance::SendSettings);
+	EMS->SaveSettings.AddDynamic(this, &UOPAG_GameInstance::SaveSettings);
 }
 
 void UOPAG_GameInstance::LoadPlanetTable()
@@ -83,10 +86,11 @@ void UOPAG_GameInstance::SplitStageGens()
 void UOPAG_GameInstance::LoadSaveGameState()
 {
 	// Retrieve and cast the USaveGame object to UOPAG_SaveGame.
-	if (UOPAG_SaveGame* LoadedGame = Cast<UOPAG_SaveGame>(UGameplayStatics::LoadGameFromSlot(
+	if (UOPAG_SaveGame* LoadedSaveGameInstance = Cast<UOPAG_SaveGame>(UGameplayStatics::LoadGameFromSlot(
 		PlayerSaveSlotName, 0)))
 	{
-		PlayerState = LoadedGame->PlayerState;
+		PlayerState = LoadedSaveGameInstance->PlayerState;
+		Settings = LoadedSaveGameInstance->Settings;
 		PlayerState.LoadType = PlayerStateLoadType::SAVE_FILE;
 
 		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(GetWorld(),
@@ -102,6 +106,7 @@ void UOPAG_GameInstance::SaveGameState()
 
 		// Set data on the savegame object.
 		SaveGameInstance->PlayerState = PlayerState;
+		SaveGameInstance->Settings = Settings;
 
 		// Start async save process.
 		UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, 
@@ -131,6 +136,8 @@ void UOPAG_GameInstance::Init()
 	LoadPlanetTable();
 	CurrentPlanet = Planets[0];
 	LoadGenerationTable();
+
+	LoadSaveGameState();
 }
 
 void UOPAG_GameInstance::LoadMainMenu()
@@ -175,7 +182,26 @@ void UOPAG_GameInstance::SendPlayerState()
 		LoadSaveGameState();
 
 	if (PlayerState.LoadType != PlayerStateLoadType::NOT_LOADED)
+	{
 		GetEventManager()->ApplyPlayerState.Broadcast(PlayerState);
+	}
+}
+
+void UOPAG_GameInstance::SaveSettings(FOPAG_Settings NewSettings)
+{
+	Settings = NewSettings;
+	SaveGameState();
+}
+
+void UOPAG_GameInstance::SendSettings()
+{
+	if (PlayerState.LoadType == PlayerStateLoadType::NOT_LOADED)
+		LoadSaveGameState();
+
+	if (PlayerState.LoadType != PlayerStateLoadType::NOT_LOADED)
+	{
+		GetEventManager()->ApplySettings.Broadcast(Settings);
+	}
 }
 
 void UOPAG_GameInstance::OnStageManagerInitialized(const UWorld* const World)
@@ -253,6 +279,32 @@ void UOPAG_GameInstance::OnResumeGame()
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
+void UOPAG_GameInstance::OnPlayerDeath()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+}
+
+void UOPAG_GameInstance::OnQualitySettingsChanged(int32 Value)
+{
+	UGameUserSettings* GameUserSettings = Cast<UGameUserSettings>(GEngine->GetGameUserSettings());
+
+	if (GameUserSettings)
+	{
+		GameUserSettings->SetOverallScalabilityLevel(Value);
+		GameUserSettings->ApplySettings(false);
+	}
+}
+
+void UOPAG_GameInstance::SetAudioLibraries()
+{
+	UOPAG_SoundManagerSubsystem* SMS = GetSubsystem<UOPAG_SoundManagerSubsystem>();
+	SMS->WeaponsAudioLibrary = WeaponsAudioLibrary;
+	SMS->AbilitiesAudioLibrary = AbilitiesAudioLibrary;
+	SMS->EnviromentAudioLibrary = EnviromentAudioLibrary;
+	SMS->CharacterAudioLibrary = CharacterAudioLibrary;
+	SMS->UIAudioLibrary = UIAudioLibrary;
+}
+
 UOPAG_EventManagerSubsystem* UOPAG_GameInstance::GetEventManager() const
 {
 	return GetSubsystem<UOPAG_EventManagerSubsystem>();
@@ -266,31 +318,4 @@ UOPAG_SoundManagerSubsystem* UOPAG_GameInstance::GetSoundManager() const
 float UOPAG_GameInstance::GetStageDifficulty()
 {
 	return CurrentDifficulty;
-}
-
-void UOPAG_GameInstance::SetAudioLibraries()
-{
-	UOPAG_SoundManagerSubsystem* SMS = GetSubsystem<UOPAG_SoundManagerSubsystem>();
-	SMS->WeaponsAudioLibrary = WeaponsAudioLibrary;
-	SMS->AbilitiesAudioLibrary = AbilitiesAudioLibrary;
-	SMS->EnviromentAudioLibrary = EnviromentAudioLibrary;
-	SMS->CharacterAudioLibrary = CharacterAudioLibrary;
-	SMS->UIAudioLibrary = UIAudioLibrary;
-}
-
-void UOPAG_GameInstance::OnPlayerDeath()
-{
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
-}
-
-void UOPAG_GameInstance::OnQualitySettingsChanged(int32 Value)
-{
-	UGameUserSettings* GameUserSettings = Cast<UGameUserSettings>(GEngine->GetGameUserSettings());
-
-	if (GameUserSettings) 
-	{
-		GameUserSettings->SetOverallScalabilityLevel(Value);
-		GameUserSettings->SaveSettings();
-		GameUserSettings->ApplySettings(false);
-	}
 }
