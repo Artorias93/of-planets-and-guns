@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Managers/OPAG_Settings.h"
 #include "OPAG_UWOptionsView.generated.h"
 
 /**
@@ -50,6 +51,8 @@ public:
 public:
 	void NativeConstruct();
 
+	UFUNCTION()
+		void LoadSettings(const FOPAG_Settings& Settings);
 	UFUNCTION()
 		void BackButtonClicked();
 	UFUNCTION()
