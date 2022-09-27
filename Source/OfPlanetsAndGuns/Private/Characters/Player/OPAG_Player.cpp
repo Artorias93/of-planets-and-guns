@@ -85,13 +85,6 @@ AOPAG_Player::AOPAG_Player()
 		SecondaryGunComponent->SetupAttachment(RootComponent);
 	}
 
-	DroneComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("DroneComponent"));
-	if (DroneComponent != nullptr)
-	{
-		DroneComponent->SetRelativeLocation(FVector(54.f, -35.f, 44.f));
-		DroneComponent->SetupAttachment(RootComponent);
-	}
-
 	DashTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DashTimeline"));
 	RecoilTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RecoilTimeline"));
 	RecoilReverseTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("RecoilReverseTimeline"));
@@ -1429,9 +1422,12 @@ AActor* AOPAG_Player::GetShield() const
 #pragma endregion Shield
 
 #pragma region Drone
-void AOPAG_Player::SetDrone(TSubclassOf<AOPAG_DroneBase> DroneClass, float TimeBeforeDestroy)
+void AOPAG_Player::SpawnDrone(TSubclassOf<AOPAG_DroneBase> DroneClass, float TimeBeforeDestroy)
 {
-	DroneComponent->SetChildActorClass(DroneClass);
+	const FVector SpawnLocation = GetActorLocation() + (GetActorForwardVector() * 350.f);
+	const FRotator SpawnRotation = GetActorForwardVector().Rotation();
+	CurrentSpwanedDrone = Cast<AOPAG_DroneBase>(GetWorld()->SpawnActor(DroneClass, &SpawnLocation, &SpawnRotation));
+
 	GetWorld()->GetTimerManager().SetTimer(DestroyDroneHandle, this, &AOPAG_Player::DestroyDroneTimer, TimeBeforeDestroy, false);
 }
 #pragma endregion Drone
@@ -1471,12 +1467,10 @@ void AOPAG_Player::ShieldCooldownTimer()
 
 void AOPAG_Player::DestroyDroneTimer()
 {
-	AOPAG_DroneBase* CurrentDrone = Cast<AOPAG_DroneBase>(DroneComponent->GetChildActor());
-	if(CurrentDrone == nullptr)	return;
+	if(CurrentSpwanedDrone == nullptr)	return;
 
-	CurrentDrone->DestroyDrone();
-	DroneComponent->DestroyChildActor();
-	DroneComponent->SetChildActorClass(nullptr);
+	CurrentSpwanedDrone->DestroyDrone();
+	CurrentSpwanedDrone = nullptr;
 }
 #pragma endregion Timer
 

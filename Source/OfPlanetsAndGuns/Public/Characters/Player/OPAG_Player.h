@@ -53,9 +53,6 @@ class OFPLANETSANDGUNS_API AOPAG_Player : public AOPAG_CharacterBase
 	UChildActorComponent* SecondaryGunComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* DroneComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UOPAG_InventorySystemComponent* InventorySystemComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -216,7 +213,6 @@ private:
 	float RecoilYawMax = .01f;
 
 private:
-
 	//Footsteps "volume" for AI hearing perception [0,1]
 	UPROPERTY(Category="OPAG | Character | AI", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float FootstepsAILoudness = .5f;
@@ -276,6 +272,9 @@ private:
 	FTimerHandle RechargeShieldPlayerHandle;
 	FTimerHandle ShieldPlayerCooldownHandle;
 	FTimerHandle DestroyDroneHandle;
+
+private:
+	AOPAG_DroneBase* CurrentSpwanedDrone;
 
 protected:
 	virtual void BeginPlay() override;
@@ -425,7 +424,7 @@ public:
 	AActor* GetShield() const;
 
 	// Set Drone
-	void SetDrone(TSubclassOf<AOPAG_DroneBase> DroneClass, float TimeBeforeDestroy);
+	void SpawnDrone(TSubclassOf<AOPAG_DroneBase> DroneClass, float TimeBeforeDestroy);
 
 	// Getter dash
 	float GetDashLenght() const;

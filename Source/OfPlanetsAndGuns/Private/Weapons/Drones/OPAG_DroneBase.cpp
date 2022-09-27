@@ -7,6 +7,10 @@
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Characters/Player/OPAG_Player.h"
+#include <Components/TimelineComponent.h>
+#include "Managers/OPAG_GameInstance.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 
 AOPAG_DroneBase::AOPAG_DroneBase()
 {
@@ -54,14 +58,19 @@ AOPAG_DroneBase::AOPAG_DroneBase()
 	{
 		SpawnParticleSystemComponent->SetupAttachment(RootComponent);
 	}
+
+	SpawnTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("SpawnTimeline"));
 }
 
 // Called when the game starts or when spawned
 void AOPAG_DroneBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 	
-	GetWorld()->GetTimerManager().SetTimer(SpawnFinishedHandle, this, &AOPAG_DroneBase::SpawnFinishedTimer, 1.f, false);
+	InitTimeline();
+	
 	GetWorld()->GetTimerManager().SetTimer(ShootingHandle, this, &AOPAG_DroneBase::FiendEnemisTimer, .5f, true);
 }
 
@@ -70,79 +79,19 @@ void AOPAG_DroneBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	IdleMovement(DeltaTime);
+	CheckPlayerDistance();
+	FollowPlayer(DeltaTime);
 }
 
-void AOPAG_DroneBase::FiendEnemisTimer()
+void AOPAG_DroneBase::InitTimeline()
 {
-	TArray<FHitResult> OutHits;
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(GetParentActor());
-	bool bResult = UKismetSystemLibrary::SphereTraceMulti(GetWorld(), GetActorLocation(), GetActorLocation(), VisibilityRange, 
-		ETraceTypeQuery::TraceTypeQuery_MAX, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
-	if (bResult)
-	{
-		TArray<AOPAG_Enemy*> EnemiesTarget;
-		for (FHitResult HitResult : OutHits)
-		{
-			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(HitResult.Actor);
-			if (Enemy != nullptr)
-			{
-				EnemiesTarget.AddUnique(Enemy);
-			}
-		}
-		if(EnemiesTarget.Num() > 0)	ShootingEnemies(EnemiesTarget);
-	}
-}
+	SpawnTimeline->SetLooping(false);
 
-void AOPAG_DroneBase::ShootingEnemies(TArray<AOPAG_Enemy*> EnemiesTarget)
-{
-	int SelectRandomicEnemyIndex = 0;
-	const FVector StartLocation = GetActorLocation(); //+ (GetActorForwardVector() * 80.f);
-	
-	for (int i = 0; i < 2; i++)
-	{
-		// Select new target enemy on list 
-		SelectRandomicEnemyIndex = FMath::RandRange(0, EnemiesTarget.Num() - 1);
-		AOPAG_Enemy* TargetEnemy = EnemiesTarget[SelectRandomicEnemyIndex];
+	OnSpawnTimelineProgress.BindUFunction(this, FName("SpawnTimelineProgress"));
+	SpawnTimeline->AddInterpVector(SpawnCurveVector, OnSpawnTimelineProgress, FName("SpawnTimelinePropertyName"));
 
-		// Calculate effective direction 
-		const FVector TargetEnemyLocation = TargetEnemy->GetActorLocation();
-		const FVector EffectiveDirection = CalculateEffectiveDirection(StartLocation, TargetEnemyLocation);
-		
-		// Calculate projectile's location and rotation
-		const FVector TraceStartLocation = StartLocation;
-		const FRotator EffectiveRotation = EffectiveDirection.Rotation();
-
-		// Start shoot and emitter
-		Shoot(TargetEnemy, TraceStartLocation, EffectiveRotation);
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzlePartile, GetActorTransform());
-	}
-}
-
-void AOPAG_DroneBase::Shoot(AOPAG_Enemy* Enemy, const FVector TraceStartLocation, const FRotator EffectiveRotation)
-{
-	const FTransform TracerTransform = FTransform(EffectiveRotation, TraceStartLocation, FVector(.3f, .3f, .3f));
-	GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
-	
-	float EffectiveDamage = CalculateDamage();
-	Enemy->ReceiveDamage(EffectiveDamage, GetParentActor());
-}
-
-float AOPAG_DroneBase::CalculateDamage() const
-{
-	const float DamageRandomnessAmount = Damage * 0.01f * DamageRandomnessPercentage;
-	float AdjustedDamage = (Damage + FMath::RandRange(-DamageRandomnessAmount, DamageRandomnessAmount)) * MultiplierByLevel;
-	return AdjustedDamage;
-}
-
-void AOPAG_DroneBase::SpawnFinishedTimer()
-{
-	if (SpawnParticleSystemComponent != nullptr) 
-	{
-		SpawnParticleSystemComponent->Deactivate();
-		SpawnParticleSystemComponent->DestroyComponent();
-	}
+	OnSpawnTimelineFinished.BindUFunction(this, FName("SpawnTimelineFinished"));
+	SpawnTimeline->SetTimelineFinishedFunc(OnSpawnTimelineFinished);
 }
 
 void AOPAG_DroneBase::IdleMovement(float DeltaTime)
@@ -155,6 +104,83 @@ void AOPAG_DroneBase::IdleMovement(float DeltaTime)
 
 	if(BoxCollision->GetRelativeRotation().Roll < -25.f)	bIsReverse = true;
 	if(BoxCollision->GetRelativeRotation().Roll > 25.f) bIsReverse = false;
+}
+
+void AOPAG_DroneBase::DestroyDrone()
+{
+	if(ExplosionParticle == nullptr)	return;
+	
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorTransform());
+	DroneMesh->SetHiddenInGame(true);
+}
+
+#pragma region Shoot
+void AOPAG_DroneBase::FiendEnemisTimer()
+{
+	TArray<FHitResult> OutHits;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetParentActor());
+	bool bResult = UKismetSystemLibrary::SphereTraceMulti(GetWorld(), GetActorLocation(), GetActorLocation(), VisibilityRange,
+		ETraceTypeQuery::TraceTypeQuery_MAX, true, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
+	if (bResult)
+	{
+		TArray<AOPAG_Enemy*> EnemiesTarget;
+		for (FHitResult HitResult : OutHits)
+		{
+			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(HitResult.Actor);
+			if (Enemy != nullptr)
+			{
+				EnemiesTarget.AddUnique(Enemy);
+			}
+		}
+		if (EnemiesTarget.Num() > 0)	ShootingEnemies(EnemiesTarget);
+		else  bIsShooting = false;
+	}
+}
+
+void AOPAG_DroneBase::ShootingEnemies(TArray<AOPAG_Enemy*> EnemiesTarget)
+{
+	// Check shooting
+	bIsShooting = true;
+
+	// Select randomize enemy
+	int SelectRandomicEnemyIndex = FMath::RandRange(0, EnemiesTarget.Num() - 1);
+	TargetEnemy = EnemiesTarget[SelectRandomicEnemyIndex];
+
+	// Start Location
+	const FVector StartLocation = GetActorLocation() + (GetActorForwardVector() * 80.f);
+
+	// Calculate effective direction 
+	const FVector TargetEnemyLocation = TargetEnemy->GetActorLocation();
+	const FVector EffectiveDirection = CalculateEffectiveDirection(StartLocation, TargetEnemyLocation);
+
+	// Calculate projectile's location and rotation
+	const FVector TraceStartLocation = StartLocation;
+	const FRotator EffectiveRotation = EffectiveDirection.Rotation();
+
+	for (int i = 0; i < 2; i++)
+	{
+		Shoot(TargetEnemy, TraceStartLocation, EffectiveRotation);
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzlePartile, GetActorTransform());
+	}
+}
+
+void AOPAG_DroneBase::Shoot(AOPAG_Enemy* Enemy, const FVector TraceStartLocation, const FRotator EffectiveRotation)
+{
+	const FTransform TracerTransform = FTransform(EffectiveRotation, TraceStartLocation, FVector(.3f, .3f, .3f));
+	GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
+
+	float EffectiveDamage = CalculateDamage();
+	Enemy->ReceiveDamage(EffectiveDamage, GetParentActor());
+
+	// Implement sound ---
+}
+
+float AOPAG_DroneBase::CalculateDamage() const
+{
+	const float DamageRandomnessAmount = Damage * 0.01f * DamageRandomnessPercentage;
+	float AdjustedDamage = (Damage + FMath::RandRange(-DamageRandomnessAmount, DamageRandomnessAmount)) * MultiplierByLevel;
+	return AdjustedDamage;
 }
 
 const FVector AOPAG_DroneBase::CalculateEffectiveDirection(const FVector StartLocation, const FVector EnemyLocation) const
@@ -178,11 +204,76 @@ const FVector AOPAG_DroneBase::CalculateEffectiveDirection(const FVector StartLo
 	const FVector EffectiveDirection = EnemyToSelfVector + TangentVector1 + TangentVector2;
 	return EffectiveDirection;
 }
+#pragma endregion Shoot
 
-void AOPAG_DroneBase::DestroyDrone()
+#pragma region Movement
+void AOPAG_DroneBase::FollowPlayer(float DeltaTime)
 {
-	if(ExplosionParticle == nullptr)	return;
-	
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorTransform());
-	DroneMesh->SetHiddenInGame(true);
+	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (Player == nullptr || !bIsFollowing)	return;
+
+	const FVector PlayerLocation = Player->GetActorLocation();
+	const FVector OffesetLocation = PlayerLocation + (Player->GetActorUpVector() * 80.f) + (-Player->GetActorForwardVector() * 80.f);
+	const FVector InterpMovement = FMath::VInterpConstantTo(GetActorLocation(), OffesetLocation, DeltaTime, MovementSpeed);
+	BoxCollision->SetWorldLocation(InterpMovement);
+
+	const FRotator TargetRotation = !bIsShooting ? (-Player->GetActorForwardVector()).Rotation() :
+		(-TargetEnemy->GetActorForwardVector()).Rotation();
+	const FRotator IterpRotation = FMath::RInterpConstantTo(GetActorRotation(), TargetRotation, DeltaTime, RotationSpeed);
+	BoxCollision->SetWorldRotation(IterpRotation);
+
+	// New Check Distance
+	float PlayerDistanceToSelf = FVector::Distance(OffesetLocation, GetActorLocation());
+	if (PlayerDistanceToSelf < 20.f)
+	{
+		BoxCollision->SetWorldRotation(Player->GetActorForwardVector().Rotation());
+		bIsFollowing = false;
+	}
 }
+
+void AOPAG_DroneBase::CheckPlayerDistance()
+{
+	AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (Player != nullptr && !bIsFollowing)
+	{
+		float PlayerDistanceToSelf = FVector::Distance(Player->GetActorLocation(), GetActorLocation());
+		if (PlayerDistanceToSelf > PlayerDistanceToSelfMax)
+		{
+			bIsFollowing = true;
+		}
+	}
+}
+#pragma endregion Movement
+
+#pragma region Spawn methods
+void AOPAG_DroneBase::StartSpawnTimeline()
+{
+	SpawnLocation = GetActorLocation();
+	BoxCollision->SetSimulatePhysics(true);
+
+	// Find a random angle in order to determine the direction where the module will drop
+	float RandomAngle = FMath::DegreesToRadians(FMath::RandRange(0, 360));
+	RandomSpawnDirection.X = FMath::Sin(RandomAngle);
+	RandomSpawnDirection.Y = FMath::Cos(RandomAngle);
+
+	SpawnTimeline->PlayFromStart();
+}
+
+void AOPAG_DroneBase::SpawnTimelineProgress(FVector Value)
+{
+	FVector NewLocation = SpawnLocation;
+	NewLocation.X += RandomSpawnDirection.X * Value.X * SpawCurveXFactor;
+	NewLocation.Y += RandomSpawnDirection.Y * Value.X * SpawCurveXFactor;
+	NewLocation.Z += Value.Z * SpawCurveZFactor;
+
+	SetActorLocation(NewLocation);
+}
+
+void AOPAG_DroneBase::SpawnTimelineFinished()
+{
+	SpawnParticleSystemComponent->Deactivate();
+	SpawnParticleSystemComponent->DestroyComponent();
+
+	BoxCollision->SetSimulatePhysics(false);
+}
+#pragma endregion Spawn methods

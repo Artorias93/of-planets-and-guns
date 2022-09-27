@@ -31,7 +31,7 @@ void UOPAG_SpawnDroneAbility::ActivateAbility(const FGameplayAbilitySpecHandle H
 		float TimeBeforeDestroy = Accessory->GetTimeBeforeDestroyDrone();
 		if (DroneClass != nullptr)
 		{
-			Player->SetDrone(DroneClass, TimeBeforeDestroy);
+			Player->SpawnDrone(DroneClass, TimeBeforeDestroy);
 		}
 	}
 	EndAbility(Handle, ActorInfo, ActivationInfo, false, false);
