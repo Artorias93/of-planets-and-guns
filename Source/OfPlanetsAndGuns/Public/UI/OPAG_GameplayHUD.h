@@ -41,15 +41,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWLoadingScreenView> LoadingScreenViewWidgetClass;
 
-	//OLD VERSION 
-	/*
-	UPROPERTY()
-		class UOPAG_UWModuleView* ModuleViewWidget;
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UOPAG_UWModuleView> ModuleViewWidgetClass;
-	*/
-
-	//NEW VERSION
 	UPROPERTY()
 		class UOPAG_UWNewModuleView* ModuleViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
@@ -75,6 +66,10 @@ private:
 		class UOPAG_UWOptionsView* OptionsViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWOptionsView> OptionsViewWidgetClass;
+	UPROPERTY()
+		class UOPAG_UWPauseMenuGunView* PauseMenuGunViewWidget;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+		TSubclassOf<UOPAG_UWPauseMenuGunView> PauseMenuGunViewWidgetClass;
 	UPROPERTY() 
 		UOPAG_PlayerStatus* PlayerStatusViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
