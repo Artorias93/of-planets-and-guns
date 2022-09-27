@@ -32,6 +32,11 @@ class OFPLANETSANDGUNS_API UOPAG_UWOptionsView : public UUserWidget
 		USlider* GraphicsSlider;
 
 	UPROPERTY(meta = (BindWidget))
+		USlider* AimSensSlider;
+	UPROPERTY(meta = (BindWidget))
+		USlider* AdsAimSensSlider;
+
+	UPROPERTY(meta = (BindWidget))
 		UButton* BackButton;
 
 	class UOPAG_EventManagerSubsystem* EMS;
