@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
+#include "Managers/OPAG_SoundManagerSubsystem.h"
 #include "Managers/StageManager/OPAG_StageGeneration.h"
 #include "InputActionValue.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -35,6 +36,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomEntered);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRoomCleared);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FQualitySettingsChanged, int32, Value);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUIButtonPressed, EUISoundAction , Action);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnteredRoomStreamingVolume, AOPAG_RoomStreamingVolume* const, Volume);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLeftRoomStreamingVolume);
@@ -274,6 +276,9 @@ public:
 		FSoundSliderChanged AmbientSliderChanged;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FSoundSliderChanged SystemSliderChanged;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FUIButtonPressed UIButtonPressed;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "OPAG | Events | UI")
 	FUpdateShieldDamage UpdateShieldDamage;

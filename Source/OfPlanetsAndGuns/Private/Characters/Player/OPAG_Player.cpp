@@ -136,8 +136,8 @@ void AOPAG_Player::BeginPlay()
 	// 
 	InitDashValues();
 	InitUICounters();
-	SMS->PlayAmbient();
 	SMS->PlaySoundTrack(ESoundtrackType::Gameplay);
+	SMS->PlayAmbient();
 }
 
 void AOPAG_Player::Death()
@@ -1002,6 +1002,7 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 			OldModuleRarity, OldModuleBrand, OldModuleStats, OldModuleEquippable);
 		if (bResult)
 		{
+			SMS->PlayAbiltySounds(PrimaryGun, EAbilitySoundAction::Module_PickUp);
 			AOPAG_MagazineBase* Magazine = Cast<AOPAG_MagazineBase>(Module);
 			if (Magazine) 
 			{
@@ -1424,6 +1425,7 @@ void AOPAG_Player::ResetShieldTimer()
 			EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(),
 				AttributeSetPlayer->GetShieldCapacityMax(),
 				bIsShieldBroken);
+			SMS->PlayAbiltySounds(this, EAbilitySoundAction::Shield_Charged);
 			return;
 		}
 

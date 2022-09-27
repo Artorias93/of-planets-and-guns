@@ -32,15 +32,15 @@ void UOPAG_UWOptionsView::NativeConstruct()
 
 	if (SMS) 
 	{
-		float MasterValue = 0.f; //Get  value from FMod
+		float MasterValue = SMS->GetBusVolume(EBusNames::MASTER); //Get  value from FMod
 		MasterSlider->SetValue(MasterValue);
-		float MusicValue = 0.f; //Get  value from FMod
+		float MusicValue = SMS->GetBusVolume(EBusNames::MUSIC); //Get  value from FMod
 		MusicSlider->SetValue(MusicValue);
-		float SFXValue = 0.f; //Get  value from FMod
+		float SFXValue = SMS->GetBusVolume(EBusNames::SFX); //Get  value from FMod
 		SFXSlider->SetValue(SFXValue);
-		float AmbientValue = 0.f; //Get  value from FMod
+		float AmbientValue = SMS->GetBusVolume(EBusNames::AMBIENT); //Get  value from FMod
 		AmbientSlider->SetValue(AmbientValue);
-		float SystemValue = 0.f; //Get  value from FMod
+		float SystemValue = SMS->GetBusVolume(EBusNames::UI); //Get  value from FMod
 		SystemSlider->SetValue(SystemValue);
 	}
 

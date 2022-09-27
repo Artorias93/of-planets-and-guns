@@ -39,6 +39,8 @@ enum class EAbilitySoundAction : uint8
 	GL_Reload = 0x02,
 	Ability_Ready = 0x03,
 	Shield_Bullets = 0x04,
+	Shield_Charged = 0x05, 
+	Module_PickUp = 0x06
 };
 ENUM_CLASS_FLAGS(EAbilitySoundAction);
 
@@ -199,15 +201,8 @@ public:
 		void SystemSliderChanged(float value);
 
 	UFUNCTION()
-		float getMasterBusVolume();
-	UFUNCTION()
-		float getMusicBusVolume();
-	UFUNCTION()
-		float getAmbientBusVolume();
-	UFUNCTION()
-		float getSFXBusVolume();
-	UFUNCTION()
-		float getSystemBusVolume();
+		float GetBusVolume(EBusNames bussName);
+
 	
 	UFUNCTION()
 		void Init();

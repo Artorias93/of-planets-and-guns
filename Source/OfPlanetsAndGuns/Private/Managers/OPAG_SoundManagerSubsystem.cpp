@@ -20,7 +20,8 @@ void UOPAG_SoundManagerSubsystem::BindEvents(){
 	EMS->MusicSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::MusicSliderChanged);
 	EMS->SFXSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SFXSliderChanged);
 	EMS->AmbientSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::AmbientSliderChanged);
-	EMS->SystemSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SystemSliderChanged); //UI
+	EMS->SystemSliderChanged.AddDynamic(this, &UOPAG_SoundManagerSubsystem::SystemSliderChanged);
+	EMS->UIButtonPressed.AddDynamic(this, &UOPAG_SoundManagerSubsystem::PlayUISounds);
 }
 
 
@@ -103,46 +104,46 @@ void UOPAG_SoundManagerSubsystem::SystemSliderChanged(float value) {
 	SetBusVolume(EBusNames::UI, newVolume);
 }
 
-float UOPAG_SoundManagerSubsystem::getMasterBusVolume(){
+float UOPAG_SoundManagerSubsystem::GetBusVolume(EBusNames busName){
 	//return valore volume tra 0 e 1
-	FMOD::Studio::Bus* masterBus;
-	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/").ToString()), &masterBus);
-	float* currentVol = nullptr;
-	masterBus->getVolume(currentVol);
-	return (*currentVol * 100)/ dBToLinear(maxVolumeDB);
+	FMOD::Studio::Bus* bus = nullptr;
+	float* currentVol = new float(0);
+	if (studioSystem) {
+		switch (busName)
+		{
+		case EBusNames::MASTER:
+			studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/").ToString()), &bus);
+			break;
+		case EBusNames::MUSIC:
+			studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/Music").ToString()), &bus);
+			break;
+		case EBusNames::AMBIENT:
+			studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/Ambient").ToString()), &bus);
+			break;
+		case EBusNames::SFX:
+			studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/SFX").ToString()), &bus);
+			break;
+		case EBusNames::UI:
+			studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/UI").ToString()), &bus);
+			break;
+		default:
+			break;
+		}
+	}
+	if (bus) {
+		bus->getVolume(currentVol);
+	}
+	float returnValue;
+	if (currentVol) {
+		//returnValue = *currentVol;
+		returnValue = (*currentVol - dBToLinear(minVolumeDB)) / dBToLinear(maxVolumeDB) - dBToLinear(minVolumeDB);
+	}
+	//return (*currentVol * 100)/ dBToLinear(maxVolumeDB);
+	delete currentVol;
+	UE_LOG(LogTemp, Warning, TEXT("Text, %f "), returnValue);
+	return returnValue;
 }
 
-float UOPAG_SoundManagerSubsystem::getMusicBusVolume(){
-	FMOD::Studio::Bus* musicBus;
-	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/Music").ToString()), &musicBus);
-	float* currentVol = nullptr;
-	musicBus->getVolume(currentVol);
-	return (*currentVol * 100) / dBToLinear(maxVolumeDB);
-}
-
-float UOPAG_SoundManagerSubsystem::getAmbientBusVolume(){
-	FMOD::Studio::Bus* ambientBus;
-	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/Ambient").ToString()), &ambientBus);
-	float* currentVol = nullptr;
-	ambientBus->getVolume(currentVol);
-	return (*currentVol * 100) / dBToLinear(maxVolumeDB);
-}
-
-float UOPAG_SoundManagerSubsystem::getSFXBusVolume(){
-	FMOD::Studio::Bus* sfxBus;
-	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/SFX").ToString()), &sfxBus);
-	float* currentVol = nullptr;
-	sfxBus->getVolume(currentVol);
-	return (*currentVol * 100) / dBToLinear(maxVolumeDB);
-}
-
-float UOPAG_SoundManagerSubsystem::getSystemBusVolume(){
-	FMOD::Studio::Bus* uiBus;
-	studioSystem->getBus(TCHAR_TO_UTF8(*FName("bus:/UI").ToString()), &uiBus);
-	float* currentVol = nullptr;
-	uiBus->getVolume(currentVol);
-	return (*currentVol * 100) / dBToLinear(maxVolumeDB);
-}
 
 /*
 	PLAY SOUND
@@ -197,6 +198,12 @@ void UOPAG_SoundManagerSubsystem::PlayAbiltySounds(const AActor* actor, EAbility
 			break;
 		case EAbilitySoundAction::Shield_Bullets:
 			libraryRow = AbilitiesAudioLibrary->FindRow<FAudioEvent>(*FString("Ability_Shield_Bullet"), "", false);
+			break;
+		case EAbilitySoundAction::Shield_Charged:
+			libraryRow = AbilitiesAudioLibrary->FindRow<FAudioEvent>(*FString("Ability_Shield_Charged"), "", false);
+			break;
+		case EAbilitySoundAction::Module_PickUp:
+			libraryRow = AbilitiesAudioLibrary->FindRow<FAudioEvent>(*FString("Module_Pickup"), "", false);
 			break;
 		default:
 			libraryRow = nullptr;
@@ -432,8 +439,10 @@ void UOPAG_SoundManagerSubsystem::PlayAmbient() {
 }
 void UOPAG_SoundManagerSubsystem::PlaySoundTrack(ESoundtrackType type) {
 	if (SoundtracksAudioLibrary) {
-		//if (InstanceSoundtrack.Instance->isValid())
-			//StopSoundtrack();
+		if (InstanceSoundtrack.Instance->isValid()) {
+			StopAmbient();
+			StopSoundtrack();
+		}
 		FAudioEvent* libraryRow;
 		switch (type)
 		{
@@ -441,7 +450,7 @@ void UOPAG_SoundManagerSubsystem::PlaySoundTrack(ESoundtrackType type) {
 			libraryRow = SoundtracksAudioLibrary->FindRow<FAudioEvent>(*FString("Soundtrack_Gameplay"), "", false);
 			break;
 		case ESoundtrackType::Menu:
-			libraryRow = nullptr;
+			libraryRow = SoundtracksAudioLibrary->FindRow<FAudioEvent>(*FString("SoundTrack_Menu"), "", false);
 			break;
 		default:
 			libraryRow = nullptr;
@@ -450,7 +459,8 @@ void UOPAG_SoundManagerSubsystem::PlaySoundTrack(ESoundtrackType type) {
 		if (libraryRow) {
 			UFMODEvent* currentEvent = libraryRow->AudioContent;		
 			InstanceSoundtrack = UFMODBlueprintStatics::PlayEvent2D(GetWorld(), currentEvent, true);
-			UFMODBlueprintStatics::EventInstanceSetParameter(InstanceSoundtrack, FName("Intensity"), Intensity);
+			if(type== ESoundtrackType::Gameplay)
+				UFMODBlueprintStatics::EventInstanceSetParameter(InstanceSoundtrack, FName("Intensity"), Intensity);
 		}
 	}
 }
