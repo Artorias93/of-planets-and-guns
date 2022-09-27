@@ -171,7 +171,7 @@ void AOPAG_DroneBase::Shoot(AOPAG_Enemy* Enemy, const FVector TraceStartLocation
 	GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
 
 	float EffectiveDamage = CalculateDamage();
-	Enemy->ReceiveDamage(EffectiveDamage, GetParentActor());
+	Enemy->ReceiveDamage(EffectiveDamage, GetParentActor(), false); // temporarily crits set to false
 
 	// Implement sound ---
 }
