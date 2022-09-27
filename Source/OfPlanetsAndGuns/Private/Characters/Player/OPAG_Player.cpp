@@ -184,6 +184,8 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// Check if player sees enemy (for health bar)
 	LookAtEnemy();
 
+	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), AttributeSetPlayer->GetHealth());
+
 	// UpdateDashProgressBar();
 }
 
