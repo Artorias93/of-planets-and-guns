@@ -170,6 +170,12 @@ void AOPAG_GameplayHUD::HidePauseView() {
 		PauseMenuGunViewWidget->RemoveFromViewport();
 	}
 
+	if (OptionsViewWidget) 
+	{
+		if (OptionsViewWidget->IsInViewport())
+			OptionsViewWidget->RemoveFromViewport();
+	}
+
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 
 	if (EMS) 
