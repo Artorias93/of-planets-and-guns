@@ -92,7 +92,7 @@ void AOPAG_ShieldEnemy::OnAttackNotify(FName FunctionName, const FBranchingPoint
 		{
 			if(AOPAG_Player* const Player = Cast<AOPAG_Player>(AIController->GetFocusActor()))
 			{
-				Player->ReceiveDamage(ShieldWeaponDamage, this);
+				Player->ReceiveDamage(ShieldWeaponDamage, this, false);
 			}
 		}
 	}	
@@ -124,7 +124,7 @@ void AOPAG_ShieldEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAct
 {
 	if(AOPAG_Player* const OverlapPlayer = Cast<AOPAG_Player>(OtherActor))
 	{
-		OverlapPlayer->ReceiveDamage(ChargeDamage, this);
+		OverlapPlayer->ReceiveDamage(ChargeDamage, this, false);
 	}
 }
 

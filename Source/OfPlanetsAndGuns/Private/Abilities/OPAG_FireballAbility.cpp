@@ -47,7 +47,7 @@ void AOPAG_FireballAbility::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, 
 {
 	if (AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor))
 	{
-		Player->ReceiveDamage(AbilityDamage, this);
+		Player->ReceiveDamage(AbilityDamage, this, false);
 	}
 
 	UGameplayStatics::SpawnEmitterAttached(

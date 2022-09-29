@@ -50,11 +50,18 @@ void UOPAG_UWGunView::UpdateTotalAmmoText(const int CurrentValue)
 	}
 }
 
-void UOPAG_UWGunView::UpdateAmmoColor(const FLinearColor ColorParam)
+void UOPAG_UWGunView::UpdateAmmoColor(bool bIsAmmoCurrentUnload, bool bIsAmmoMaxUnload)
 {
-	if (TotalAmmoText && CurrentAmmoText) {
-		CurrentAmmoText->SetColorAndOpacity(ColorParam);
-		TotalAmmoText->SetColorAndOpacity(ColorParam);
+	if (TotalAmmoText != nullptr) 
+	{
+		FLinearColor CurrentColor = bIsAmmoCurrentUnload ? AmmoColorUnload : AmmoCurrentColorBase;
+		CurrentAmmoText->SetColorAndOpacity(CurrentColor);
+		
+	}
+	if (CurrentAmmoText != nullptr)
+	{
+		FLinearColor CurrentColor = bIsAmmoMaxUnload ? AmmoColorUnload : AmmoMaxColorBase;
+		TotalAmmoText->SetColorAndOpacity(CurrentColor);
 	}
 }
 
@@ -74,6 +81,11 @@ void UOPAG_UWGunView::SwapGun(EFireTypes CurrentType)
 		break;
 	case EFireTypes::Burst3:
 		GunIcon->SetBrushFromTexture(BurstTexture2D);
+		GunIcon->SetVisibility(ESlateVisibility::Visible);
+		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
+		break;
+	case EFireTypes::Shotgun:
+		GunIcon->SetBrushFromTexture(ShotgunTexture2D);
 		GunIcon->SetVisibility(ESlateVisibility::Visible);
 		HandgunIcon->SetVisibility(ESlateVisibility::Hidden);
 		break;

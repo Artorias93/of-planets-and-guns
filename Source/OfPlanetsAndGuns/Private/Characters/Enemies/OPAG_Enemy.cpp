@@ -19,6 +19,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "UI/OPAG_EnemyHealthBar.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include "Characters/Enemies/OPAG_TextDamage.h"
 
 
 
@@ -135,9 +136,9 @@ void AOPAG_Enemy::UpdateAcceleration(float const NewAcceleration) const
 	GetCharacterMovement()->MaxAcceleration = NewAcceleration;
 }
 
-void AOPAG_Enemy::ReceiveDamage(const float Damage, AActor* const Causer)
+void AOPAG_Enemy::ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic)
 {
-	Super::ReceiveDamage(Damage, this);
+	Super::ReceiveDamage(Damage, this, bCritic);
 	
 	//Triggers the damage sense on the AI controlled pawn
 	UAISense_Damage::ReportDamageEvent(GetWorld(), this,
@@ -154,6 +155,7 @@ void AOPAG_Enemy::ReceiveDamage(const float Damage, AActor* const Causer)
 		const float HealthPercent = BaseAttributeSet->GetHealth() / BaseAttributeSet->GetMaxHealth();
 		EnemyHealthBar->GetProgressBar()->SetPercent(HealthPercent);
 	}
+	SpawnTextDamage(Damage, bCritic);
 	SetHealthBarVisible();
 }
 
@@ -317,6 +319,19 @@ void AOPAG_Enemy::ResetHealthBarHidden()
 	}
 }
 
+void AOPAG_Enemy::SpawnTextDamage(float Damage, bool bCrit)
+{
+	if (TextDamageClass)
+	{
+		FTransform SpawnTransform = FTransform(GetActorRotation(), GetActorLocation(), FVector(1.f, 1.f, 1.f));
 
+		AOPAG_TextDamage* TextDamage = GetWorld()->SpawnActorDeferred<AOPAG_TextDamage>(TextDamageClass, SpawnTransform);
 
+		if (TextDamage)
+		{
+			TextDamage->Init(Damage, bCrit);
+			UGameplayStatics::FinishSpawningActor(TextDamage, SpawnTransform);
+		}
+	}
+}
 #pragma endregion

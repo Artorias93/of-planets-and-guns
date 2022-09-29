@@ -32,12 +32,11 @@
 #include <AbilitySystemBlueprintLibrary.h>
 #include "Characters/Enemies/OPAG_Enemy.h"
 #include <Animation/AnimBlueprintGeneratedClass.h>
-
 #include "NiagaraComponent.h"
 #include "Abilities/OPAG_HealthBuffAbility.h"
 #include "Characters/OPAG_CharacterBase.h"
 #include "GenericPlatform/GenericPlatformCrashContext.h"
-
+#include "Weapons/Drones/OPAG_DroneBase.h"
 #include "DisplayDebugHelpers.h"
 
 AOPAG_Player::AOPAG_Player()
@@ -67,7 +66,6 @@ AOPAG_Player::AOPAG_Player()
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	if (Mesh1P)
 	{
-		Mesh1P->SetOnlyOwnerSee(true);
 		Mesh1P->bCastDynamicShadow = false;
 		Mesh1P->CastShadow = false;
 		Mesh1P->SetupAttachment(Camera);
@@ -96,8 +94,6 @@ AOPAG_Player::AOPAG_Player()
 	{
 		DashNiagaraComponent->SetupAttachment(Camera);
 	}
-
-	
 }
 
 void AOPAG_Player::BeginPlay()
@@ -187,59 +183,69 @@ void AOPAG_Player::Tick(float DeltaTime)
 	// Check if player sees enemy (for health bar)
 	LookAtEnemy();
 
+	UE_LOG(LogTemp, Warning, TEXT("Health: %f"), AttributeSetPlayer->GetHealth());
+
 	// UpdateDashProgressBar();
 }
 
-void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer)
+void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic)
 {
 	check(AttributeSetPlayer);
-
-	if (AttributeSetPlayer->GetShieldCapacity() < AttributeSetPlayer->GetShieldCapacityMax())
-	{
-		// Restart Shield
-		GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
-		GetWorld()->GetTimerManager().ClearTimer(ShieldPlayerCooldownHandle);
-		GetWorld()->GetTimerManager().SetTimer(ShieldPlayerCooldownHandle, this, &AOPAG_Player::ShieldCooldownTimer, AttributeSetPlayer->GetShieldCooldown(), false);
-
-		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
-	}
 
 	//Shows damage indicator widget
 	EMS->DamagedBy.Broadcast(Causer);
 
-	if (AttributeSetPlayer->GetShieldCapacity() <= 0 || bIsShieldBroken)
+	if (bIsShieldBroken)
 	{
-		Super::ReceiveDamage(Damage, Causer);
+		Super::ReceiveDamage(Damage, Causer, bCritic);
 		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Damage);
+
 		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
-		return;
 	}
-	if (AbilitySystemComp && BaseAttributeSet)
-	{		
+	else
+	{
+		if (AbilitySystemComp == nullptr && BaseAttributeSet == nullptr)	return;
+
+		// Update damage on attribute set table for activating shield ability
 		AbilitySystemComp->SetNumericAttributeBase(BaseAttributeSet->GetDamageTakenAmountAttribute(), Damage);
 
+		// Prepare to activate ability
 		AbilitySystemComp->TryActivateAbilityByClass(PlayerShieldAbility);
 
+		// Initialize shield ability tag and set this tag to event data
 		const FGameplayTag HitGameplayTag = FGameplayTag::RequestGameplayTag(TEXT("char.ability.shield.hitEvent"));
 		FGameplayEventData HitEventData = FGameplayEventData();
 		HitEventData.Target = this;
 
+		// Effective ability activation
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, HitGameplayTag, HitEventData);
-		//UE_LOG(LogTemp, Warning, TEXT("Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
+
 		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Hit);
-		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
+		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(),
 			AttributeSetPlayer->GetShieldCapacityMax(),
 			bIsShieldBroken);
 
 		// Update shield damage opacity on HUD
+		// Use the shield changed event for update the shield view
+		// Remove 
 		const float CurrentOpacityAmount = (AttributeSetPlayer->GetShieldCapacityMax() - AttributeSetPlayer->GetShieldCapacity())
 			/ AttributeSetPlayer->GetShieldCapacityMax();
 		EMS->UpdateShieldDamage.Broadcast(CurrentOpacityAmount);
 
-		if (AttributeSetPlayer->GetShieldCapacity() <= 0 && !bIsShieldBroken) {
+		if (AttributeSetPlayer->GetShieldCapacity() <= 0) {
 			bIsShieldBroken = true;
 			SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Shield_Broken);
 		}
+	}
+
+	if (AttributeSetPlayer->GetShieldCapacity() < AttributeSetPlayer->GetShieldCapacityMax())
+	{
+		// Restart Shield
+		GetWorld()->GetTimerManager().ClearTimer(RechargeShieldPlayerHandle);
+		GetWorld()->GetTimerManager().ClearTimer(ShieldPlayerCooldownHandle);
+		GetWorld()->GetTimerManager().SetTimer(ShieldPlayerCooldownHandle, this, &AOPAG_Player::ShieldCooldownTimer, AttributeSetPlayer->GetShieldCooldown(), false);
+		
+		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 	}
 }
 
@@ -331,6 +337,7 @@ void AOPAG_Player::BroadcastEvents()
 	EMS->TotalAmmoChanged.Broadcast(CurrentGun->GetAmmoMax());
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 	EMS->RequestPlayerState.Broadcast();
+	EMS->RequestSettings.Broadcast();
 	EMS->UpdateDashAmount.Broadcast(AttributeSetPlayer->GetDashCount());
 }
 
@@ -338,6 +345,7 @@ void AOPAG_Player::BindEvents()
 {
 	EMS->RequestSavePlayerState.AddDynamic(this, &AOPAG_Player::SavePlayerState);
 	EMS->ApplyPlayerState.AddDynamic(this, &AOPAG_Player::ApplyPlayerState);
+	EMS->ApplySettings.AddDynamic(this, &AOPAG_Player::ApplySettings);
 
 	EMS->PlacePlayerAtStart.AddDynamic(this, &AOPAG_Player::TeleportPlayerToStart);
 
@@ -638,8 +646,7 @@ void AOPAG_Player::SwapGuns()
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 
 		// Switch current ammo color
-		FLinearColor NewColor = CurrentGun->GetAmmoCurrent() == 0 ? FLinearColor::Red : FLinearColor::White;
-		EMS->ColorAmmoChanged.Broadcast(NewColor);
+		EMS->ColorAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent() == 0, CurrentGun->GetAmmoMax() < 30);
 
 		// Update current gun texture on Widget
 		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
@@ -663,9 +670,6 @@ void AOPAG_Player::ReloadGun()
 		const float ReloadAnimationLength = ReloadMontageToPlay->GetPlayLength();
 		const float ReloadTime = PrimaryGun->GetReloadTime();
 		Mesh1P->GetAnimInstance()->Montage_Play(ReloadMontageToPlay, ReloadAnimationLength / ReloadTime, EMontagePlayReturnType::MontageLength, 0, true);
-		
-		// Update gun ui color
-		EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
 
 		// Update last fire time
 		LastFireTime = GetGameTimeSinceCreation() + ReloadTime;
@@ -765,13 +769,13 @@ void AOPAG_Player::Shoot()
 	// Update Ammo
 	CurrentGun->DecrementAmmoCurrent(AmmoConsumate);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
+
 	if (CurrentGun->GetAmmoCurrent() == 0)
 	{
 		// Update ui gun icon -> set linear color to red
-		EMS->ColorAmmoChanged.Broadcast(FLinearColor::Red);
+		EMS->ColorAmmoChanged.Broadcast(true, CurrentGun->GetAmmoMax() < 30);
 
-		// Auto-reload
-		ReloadGun();
+		ReloadGun(); // Auto-reload
 	}
 }
 
@@ -800,7 +804,7 @@ void AOPAG_Player::MoveRight(const FInputActionValue& Value)
 
 void AOPAG_Player::Lookup(const FInputActionValue& Value)
 {
-	LookupScale = Value[1];
+	LookupScale = Value[1] * GetWorld()->GetDeltaSeconds() * (bIsInADS ? ADSSensitivity : HipSensitivity);
 	if (AccumulatedRecoilDeviation.Pitch > .0f && LookupScale > .0f)
 	{
 		AccumulatedRecoilDeviation.Pitch -= LookupScale;
@@ -812,17 +816,17 @@ void AOPAG_Player::Lookup(const FInputActionValue& Value)
 	}
 	if (LookupScale != 0.0f)
 	{
-		AddControllerPitchInput(LookupScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
+		AddControllerPitchInput(LookupScale);
 
 	}
 }
 
 void AOPAG_Player::Turn(const FInputActionValue& Value)
 {
-	const float TurnScale = Value[0];
+	const float TurnScale = Value[0] * GetWorld()->GetDeltaSeconds() * (bIsInADS ? ADSSensitivity : HipSensitivity);
 	if (TurnScale != 0.0f)
 	{
-		AddControllerYawInput(TurnScale * (bIsInADS ? ADSSensitivity : HipSensitivity));
+		AddControllerYawInput(TurnScale);
 	}
 }
 
@@ -901,6 +905,13 @@ FVector AOPAG_Player::GetViewLocation() const
 void AOPAG_Player::OnPauseGame()
 {
 	EMS->GoldChanged.Broadcast(GetInventorySystemComponent()->GoldAmount);
+
+	AOPAG_ModularGun* MyGun = GetPrimaryGun();
+	if (MyGun) 
+	{
+		EMS->PauseMenuGunChanged.Broadcast(MyGun->GetStatsTotal(), MyGun->GetGunName().ToString(), MyGun->GetFireTypeName(MyGun->GetFireType()));
+	}
+
 }
 
 void AOPAG_Player::UpdateDashProgressBar()
@@ -934,37 +945,46 @@ void AOPAG_Player::InteractWithItem()
 	if (InteractableObject && 
 		InteractableObject->GetClass()->ImplementsInterface(UOPAG_InteractableInterface::StaticClass()))
 	{
-		if (IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
-		{
-			if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+		if (IOPAG_InteractableInterface::Execute_InVendor(InteractableObject) ){
+			if (IOPAG_InteractableInterface::Execute_CanBuy(InteractableObject))
 			{
-				InteractWithModule(Module);
-			}
-			else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
-			{
-				PickupGun(Gun);
-			}
-			else
-			{
-				IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
-			}
-		}
-		if (IOPAG_InteractableInterface::Execute_CanBuy(InteractableObject))
-		{
-			InventorySystemComp->GoldAmount -= IOPAG_InteractableInterface::Execute_GetPriceTotal(InteractableObject);
-			EMS->GoldChanged.Broadcast(InventorySystemComp->GoldAmount);
+				InventorySystemComp->GoldAmount -= IOPAG_InteractableInterface::Execute_GetPriceTotal(InteractableObject);
+				EMS->GoldChanged.Broadcast(InventorySystemComp->GoldAmount);
 
-			if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
-			{
-				EMS->DisableModuleTextInVendor.Broadcast(Module);
-				InteractWithModule(Module);
-			}
-			else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
-			{
-				EMS->DisableGunTextInVendor.Broadcast(Gun);
-				PickupGun(Gun);
+				if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+				{
+					EMS->DisableModuleTextInVendor.Broadcast(Module);
+					InteractWithModule(Module);
+				}
+				else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
+				{
+					EMS->DisableGunTextInVendor.Broadcast(Gun);
+					PickupGun(Gun);
+				}
 			}
 		}
+		else {
+			// pickup interactable
+			if (IOPAG_InteractableInterface::Execute_CanInteract(InteractableObject))
+			{
+				if (AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject))
+				{
+					InteractWithModule(Module);
+				}
+				else if (AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject))
+				{
+					PickupGun(Gun);
+				}
+				else
+				{
+					IOPAG_InteractableInterface::Execute_Interact(InteractableObject);
+				}
+			}
+		}
+
+		
+
+
 	}
 }
 
@@ -1006,7 +1026,7 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 			AOPAG_MagazineBase* Magazine = Cast<AOPAG_MagazineBase>(Module);
 			if (Magazine) 
 			{
-				EMS->ColorAmmoChanged.Broadcast(FLinearColor::White);
+				EMS->ColorAmmoChanged.Broadcast(false, CurrentGun->GetAmmoMax() < 30);
 			}
 
 			Module->Destroy();
@@ -1208,9 +1228,12 @@ void AOPAG_Player::UpdateComparison() {
 	}
 
 	else if (InteractableObject != nullptr) {
-		AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject);
-		if (Gun && ( IOPAG_InteractableInterface::Execute_CanInteract(Gun) || IOPAG_InteractableInterface::Execute_CanBuy(Gun) )) {
 
+		// if looking at gun && gun is interactable (aka not owned by enemy) ...
+		AOPAG_ModularGun* Gun = Cast<AOPAG_ModularGun>(InteractableObject);
+		if (Gun && IOPAG_InteractableInterface::Execute_CanInteract(Gun) ) 
+		{
+			// ... broadcast both current & looked guns info
 			const FOPAG_GunStats OtherGunStats = Gun->GetStatsTotal();
 			const FString OtherGunName = (Gun->GetGunName()).ToString();
 			const FString OtherGunFireType = AOPAG_ModularGun::GetFireTypeName((Gun->GetFireType()));
@@ -1220,8 +1243,9 @@ void AOPAG_Player::UpdateComparison() {
 			PreviousLookedAtModule = InteractableObject;
 		}
 
+		// if looking at module && module is interactable (aka not owned by enemy) ...
 		AOPAG_ModuleBase* Module = Cast<AOPAG_ModuleBase>(InteractableObject);
-		if (Module && (IOPAG_InteractableInterface::Execute_CanInteract(Module) || IOPAG_InteractableInterface::Execute_CanBuy(Module)))
+		if (Module && IOPAG_InteractableInterface::Execute_CanInteract(Module) )
 		{
 			FOPAG_GunStats CurrentModuleStats;
 			AOPAG_ModuleBase* CurrentModule = PrimaryGun->GetModuleBySocketType(Module->GetType());
@@ -1413,14 +1437,25 @@ AActor* AOPAG_Player::GetShield() const
 }
 #pragma endregion Shield
 
+#pragma region Drone
+void AOPAG_Player::SpawnDrone(TSubclassOf<AOPAG_DroneBase> DroneClass, float TimeBeforeDestroy)
+{
+	const FVector SpawnLocation = GetActorLocation() + (GetActorForwardVector() * 350.f);
+	const FRotator SpawnRotation = GetActorForwardVector().Rotation();
+	CurrentSpwanedDrone = Cast<AOPAG_DroneBase>(GetWorld()->SpawnActor(DroneClass, &SpawnLocation, &SpawnRotation));
+
+	GetWorld()->GetTimerManager().SetTimer(DestroyDroneHandle, this, &AOPAG_Player::DestroyDroneTimer, TimeBeforeDestroy, false);
+}
+#pragma endregion Drone
+
 #pragma region Timer
-void AOPAG_Player::ResetShieldTimer()
+void AOPAG_Player::RechargeShieldTimer()
 {
 	if (AbilitySystemComp != nullptr && AttributeSetPlayer != nullptr)
 	{
 		if (AttributeSetPlayer->GetShieldCapacity() >= AttributeSetPlayer->GetShieldCapacityMax())
 		{
-			GetWorld()->GetTimerManager().ClearTimer(RestartShieldPlayerHandle);
+			GetWorld()->GetTimerManager().ClearTimer(RechargeShieldPlayerHandle);
 			bIsShieldBroken = false;
 			EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(),
 				AttributeSetPlayer->GetShieldCapacityMax(),
@@ -1429,14 +1464,12 @@ void AOPAG_Player::ResetShieldTimer()
 			return;
 		}
 
-		const float NewShieldCapicityValue = FMath::Clamp(AttributeSetPlayer->GetShieldCapacity() + AttributeSetPlayer->GetShieldRechargeRate(), 0.f, AttributeSetPlayer->GetShieldCapacityMax());
+		const float NewShieldCapicityValue = FMath::Clamp(AttributeSetPlayer->GetShieldCapacity() + AttributeSetPlayer->GetShieldRechargeAmount(), 0.f, AttributeSetPlayer->GetShieldCapacityMax());
 		AbilitySystemComp->SetNumericAttributeBase(AttributeSetPlayer->GetShieldCapacityAttribute(), NewShieldCapicityValue);
 	
 		EMS->ShieldChanged.Broadcast(AttributeSetPlayer->GetShieldCapacity(), 
 			AttributeSetPlayer->GetShieldCapacityMax(),
 			bIsShieldBroken);
-
-		//UE_LOG(LogTemp, Warning, TEXT("Current Shield Capacity: %f"), AttributeSetPlayer->GetShieldCapacity());
 	}
 }
 
@@ -1444,9 +1477,17 @@ void AOPAG_Player::ShieldCooldownTimer()
 {
 	if (AttributeSetPlayer != nullptr)
 	{
-		GetWorld()->GetTimerManager().SetTimer(RestartShieldPlayerHandle, this, &AOPAG_Player::ResetShieldTimer, 1.f, true);
+		GetWorld()->GetTimerManager().SetTimer(RechargeShieldPlayerHandle, this, &AOPAG_Player::RechargeShieldTimer, AttributeSetPlayer->GetShieldRechargePeriod(), true);
 		//UE_LOG(LogTemp, Warning, TEXT("Complete Shield Recharge Cooldown"));
 	}
+}
+
+void AOPAG_Player::DestroyDroneTimer()
+{
+	if(CurrentSpwanedDrone == nullptr)	return;
+
+	CurrentSpwanedDrone->DestroyDrone();
+	CurrentSpwanedDrone = nullptr;
 }
 #pragma endregion Timer
 
@@ -1516,6 +1557,27 @@ void AOPAG_Player::ApplyPlayerState(const FOPAG_PlayerState& StateToApply)
 			}
 		}
 	}
+}
+
+void AOPAG_Player::ApplySettings(const FOPAG_Settings& SettingsToApply)
+{
+	bool ShouldSaveWithDefaults = false;
+	FOPAG_Settings NewSettings;
+	if (SettingsToApply.HipSensitivity == 0.f)
+	{
+		NewSettings.HipSensitivity = HipSensitivity;
+		ShouldSaveWithDefaults = true;
+	}
+	if (SettingsToApply.ADSSensitivity == 0.f)
+	{
+		NewSettings.ADSSensitivity = ADSSensitivity;
+		ShouldSaveWithDefaults = true;
+	}
+
+	HipSensitivity = SettingsToApply.HipSensitivity;
+	ADSSensitivity = SettingsToApply.ADSSensitivity;
+
+	if (ShouldSaveWithDefaults) EMS->SaveSettings.Broadcast(NewSettings);
 }
 #pragma endregion Player State
 

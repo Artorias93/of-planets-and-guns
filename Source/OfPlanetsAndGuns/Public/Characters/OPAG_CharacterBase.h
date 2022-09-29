@@ -33,7 +33,7 @@ public:
 	UPROPERTY()
 	class UOPAG_SoundManagerSubsystem* SMS;
 	
-	virtual void ReceiveDamage(const float Damage, AActor* const Causer);
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic);
 	virtual void ReceiveDamage(AActor* Throwable);
 
 	// Ability system
@@ -64,7 +64,7 @@ public:
 	class UInputMappingContext* MappingContext;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CharacterBase")
-	TSubclassOf<UGameplayAbility> BasicShot;
+	TSubclassOf<UGameplayAbility> SufferDamage;
 
 public:
 	UPROPERTY(Category = "Movement", VisibleAnywhere, BlueprintReadWrite)

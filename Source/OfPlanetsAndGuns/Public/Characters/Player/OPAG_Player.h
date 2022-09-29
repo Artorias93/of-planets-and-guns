@@ -10,6 +10,7 @@
 #include "NiagaraComponent.h"
 #include "OPAG_PlayerState.h"
 #include "Characters/OPAG_CharacterBase.h"
+#include "Managers/OPAG_Settings.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Guns/OPAG_GunState.h"
 #include "OPAG_Player.generated.h"
@@ -25,6 +26,7 @@ class UChildActorComponent;
 class AOPAG_GunBase;
 class AOPAG_ModularGun;
 class UAnimBlueprintGeneratedClass;
+class AOPAG_DroneBase;
 
 
 UCLASS()
@@ -211,7 +213,6 @@ private:
 	float RecoilYawMax = .01f;
 
 private:
-
 	//Footsteps "volume" for AI hearing perception [0,1]
 	UPROPERTY(Category="OPAG | Character | AI", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float FootstepsAILoudness = .5f;
@@ -268,8 +269,12 @@ private:
 
 private:
 	FTimerHandle ShootingHanlde;
-	FTimerHandle RestartShieldPlayerHandle;
+	FTimerHandle RechargeShieldPlayerHandle;
 	FTimerHandle ShieldPlayerCooldownHandle;
+	FTimerHandle DestroyDroneHandle;
+
+private:
+	AOPAG_DroneBase* CurrentSpwanedDrone;
 
 protected:
 	virtual void BeginPlay() override;
@@ -281,7 +286,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	virtual void ReceiveDamage(const float Damage, AActor* const Causer) override;
+	virtual void ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic) override;
 	virtual void DisplayDebug(UCanvas* InCanvas, const FDebugDisplayInfo& InDebugDisplay, float& InYL, float& InYPos) override;
 
 	void HealthChanged(const FOnAttributeChangeData& Data);
@@ -332,8 +337,9 @@ private:
 	void PickupGun(AOPAG_ModularGun* Gun);
 
 	// Timer
-	void ResetShieldTimer();
+	void RechargeShieldTimer();
 	void ShieldCooldownTimer();
+	void DestroyDroneTimer();
 
 	// Animation corrections
 	void RelocateComponets();
@@ -401,6 +407,7 @@ public:
 	bool GetCooldownRemainingForTag(FGameplayTagContainer CooldownTags, float& TimeRemaining, float& CooldownDuration);
 	UFUNCTION() void SavePlayerState();
 	UFUNCTION() void ApplyPlayerState(const FOPAG_PlayerState& StateToApply);
+	UFUNCTION() void ApplySettings(const FOPAG_Settings& SettingsToApply);
 
 public:
 	// Callable in animation
@@ -415,6 +422,9 @@ public:
 	// Getter and setter for shield element
 	void SetShield(AActor* NewShield);
 	AActor* GetShield() const;
+
+	// Set Drone
+	void SpawnDrone(TSubclassOf<AOPAG_DroneBase> DroneClass, float TimeBeforeDestroy);
 
 	// Getter dash
 	float GetDashLenght() const;

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OPAG_Settings.h"
 #include "Characters/Player/OPAG_PlayerState.h"
 #include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
@@ -34,6 +35,7 @@ class OFPLANETSANDGUNS_API UOPAG_GameInstance : public UGameInstance
 	const UWorld* CurrentWorld;
 
 	FOPAG_PlayerState PlayerState;
+	FOPAG_Settings Settings;
 
 	const char* PlayerSaveSlotName = "PlayerSaveSlot";
 
@@ -96,6 +98,10 @@ public:
 		void SavePlayerState(FOPAG_PlayerState NewPlayerState);
 	UFUNCTION(BlueprintCallable)
 		void SendPlayerState();
+	UFUNCTION(BlueprintCallable)
+		void SaveSettings(FOPAG_Settings NewSettings);
+	UFUNCTION(BlueprintCallable)
+		void SendSettings();
 
 	UFUNCTION()
 		void OnStageManagerInitialized(const UWorld* const World);

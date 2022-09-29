@@ -89,6 +89,6 @@ void AOPAG_TornadoAbility::DealDamage(AActor* TargetActor)
 	DamageTimer = DamageOverTimeFrequency;
 	if (AOPAG_Player* Player = Cast<AOPAG_Player>(TargetActor))
 	{
-		Player->ReceiveDamage(AbilityDamage, this);
+		Player->ReceiveDamage(AbilityDamage, this, false);
 	}
 }

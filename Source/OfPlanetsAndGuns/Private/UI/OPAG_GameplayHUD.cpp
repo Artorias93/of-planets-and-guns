@@ -4,13 +4,13 @@
 #include "UI/OPAG_UWPlayerStatsView.h"
 #include "UI/OPAG_UWPauseView.h"
 #include "UI/OPAG_UWLoadingScreenView.h"
-//#include "UI/OPAG_UWModuleView.h"
 #include "UI/OPAG_UWNewModuleView.h"
 #include "UI/OPAG_UWGunCompareView.h"
 #include "UI/OPAG_UWInteractView.h"
 #include "UI/OPAG_UWDamageIndicatorView.h"
 #include "UI/OPAG_UWGameOverView.h"
 #include "UI/OPAG_UWOptionsView.h"
+#include "UI/OPAG_UWPauseMenuGunView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -125,6 +125,11 @@ void AOPAG_GameplayHUD::BeginPlay()
 			PlayerStatusViewWidget->AddToViewport(0);
 		}
 	}
+
+	if (PauseMenuGunViewWidgetClass != nullptr)
+	{
+		PauseMenuGunViewWidget = CreateWidget<UOPAG_UWPauseMenuGunView>(GetWorld(), PauseMenuGunViewWidgetClass);
+	}
 }
 
 void AOPAG_GameplayHUD::ShowPauseView() 
@@ -142,6 +147,11 @@ void AOPAG_GameplayHUD::ShowPauseView()
 	{
 		PauseViewWidget->AddToViewport(2);
 	}
+
+	if (PauseMenuGunViewWidget) 
+	{
+		PauseMenuGunViewWidget->AddToViewport(3);
+	}
 }
 
 void AOPAG_GameplayHUD::HidePauseView() {
@@ -157,6 +167,13 @@ void AOPAG_GameplayHUD::HidePauseView() {
 	if (PauseViewWidget) 
 	{
 		PauseViewWidget->RemoveFromViewport();
+		PauseMenuGunViewWidget->RemoveFromViewport();
+	}
+
+	if (OptionsViewWidget) 
+	{
+		if (OptionsViewWidget->IsInViewport())
+			OptionsViewWidget->RemoveFromViewport();
 	}
 
 	const UOPAG_EventManagerSubsystem* const EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();

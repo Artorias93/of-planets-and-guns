@@ -8,7 +8,7 @@
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "Characters/Player/OPAG_PlayerState.h"
-#include "Characters/Player/OPAG_PlayerState.h"
+#include "OPAG_Settings.h"
 #include "Abilities/OPAG_AbilityTypes.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
@@ -47,12 +47,17 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestSavePlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestPlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSavePlayerState, FOPAG_PlayerState, PlayerState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FApplyPlayerState, const FOPAG_PlayerState&, PlayerState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRequestSettings);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSaveSettings, FOPAG_Settings, Settings);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FApplySettings, const FOPAG_Settings&, Settings);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FShieldChanged, float, CurrentValue, float, MaxValue, bool, IsBroken);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FColorAmmoChanged, const FLinearColor, ColorParam);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FColorAmmoChanged, bool, bIsAmmoCurrentUnload, bool, bIsAmmoMaxUnload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FPauseMenuGunChanged, const FOPAG_GunStats, GunStats, 
+const FString, GunName, const FString, GunFireType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSoundSliderChanged, float, CurrentValue);
@@ -175,7 +180,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
 		FLoadingProgress LoadingProgress;
 
-	//Player stuff
+	//Saving/Loading save stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FRequestSavePlayerState RequestSavePlayerState;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
@@ -184,6 +189,15 @@ public:
 		FSavePlayerState SavePlayerState;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FApplyPlayerState ApplyPlayerState;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Settings)
+		FRequestSettings RequestSettings;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Settings)
+		FSaveSettings SaveSettings;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Settings)
+		FApplySettings ApplySettings;
+
+
+	//Player stuff
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
 		FPlayerDied PlayerDied;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Player)
@@ -259,6 +273,9 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FPauseGame PauseGame;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+		FPauseMenuGunChanged PauseMenuGunChanged;
+
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FResumeGame ResumeGame;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)

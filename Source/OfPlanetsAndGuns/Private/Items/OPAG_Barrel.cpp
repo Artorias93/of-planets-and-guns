@@ -80,7 +80,7 @@ void AOPAG_Barrel::DamageAllTargetsInRange()
 		}
 		for (AOPAG_CharacterBase* Character : HitCharacters)
 		{
-			Character->ReceiveDamage(Damage, this);
+			Character->ReceiveDamage(Damage, this, false);
 		}
 
 		TArray<AOPAG_Barrel*> HitBarrels;

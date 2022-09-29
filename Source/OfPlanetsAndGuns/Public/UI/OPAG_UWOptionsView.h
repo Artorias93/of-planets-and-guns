@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Managers/OPAG_Settings.h"
 #include "OPAG_UWOptionsView.generated.h"
 
 /**
@@ -32,6 +33,11 @@ class OFPLANETSANDGUNS_API UOPAG_UWOptionsView : public UUserWidget
 		USlider* GraphicsSlider;
 
 	UPROPERTY(meta = (BindWidget))
+		USlider* AimSensSlider;
+	UPROPERTY(meta = (BindWidget))
+		USlider* AdsAimSensSlider;
+
+	UPROPERTY(meta = (BindWidget))
 		UButton* BackButton;
 
 	class UOPAG_EventManagerSubsystem* EMS;
@@ -45,6 +51,8 @@ public:
 public:
 	void NativeConstruct();
 
+	UFUNCTION()
+		void LoadSettings(const FOPAG_Settings& Settings);
 	UFUNCTION()
 		void BackButtonClicked();
 	UFUNCTION()

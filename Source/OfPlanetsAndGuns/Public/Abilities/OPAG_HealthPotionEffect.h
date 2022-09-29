@@ -17,12 +17,12 @@ class OFPLANETSANDGUNS_API UOPAG_HealthPotionEffect : public UGameplayEffect
 	UOPAG_HealthPotionEffect();
 
 private:
-	UPROPERTY(Category = "OPAG | Ability | Potion", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	/*UPROPERTY(Category = "OPAG | Ability | Potion", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float HealthModifierMagnitudeAmount = 5.f;
 
 	UPROPERTY(Category = "OPAG | Ability | Potion", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float HealthMagnitudeAmount = .25f;
 
 	UPROPERTY(Category = "OPAG | Ability | Potion", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float HealthPeriodAmount = .025f;
+	float HealthPeriodAmount = .025f;*/
 };

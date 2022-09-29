@@ -39,6 +39,12 @@ AOPAG_ModularGun::AOPAG_ModularGun()
 	}
 }
 
+bool AOPAG_ModularGun::InVendor_Implementation()
+{
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	return Vendor != nullptr;
+}
+
 const float AOPAG_ModularGun::GetPriceTotal_Implementation()
 {
 	float PriceTotal = .0f;
@@ -88,7 +94,27 @@ void AOPAG_ModularGun::ApplyFly_Implementation()
 
 FString AOPAG_ModularGun::InteractString_Implementation()
 {
-	return "Swap gun [E]";
+	if (GetParentActor() == nullptr) {
+		return "Swap gun [E]";
+	}
+
+	// Vendor: can player afford gun?
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	if (Vendor != nullptr)
+	{
+		AOPAG_Player* Player = Cast<AOPAG_Player>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+		if (Player == nullptr) { return ""; }
+
+		if (Player->GetInventorySystemComponent()->GoldAmount >= IOPAG_InteractableInterface::Execute_GetPriceTotal(this)) {
+			return "Buy gun [E]";
+		}
+		else {
+			return "Insufficient Credit";
+		}
+	}
+
+	return "ERROR";
+	
 }
 
 void AOPAG_ModularGun::ApplyForce_Implementation(const FVector Force)
@@ -103,8 +129,16 @@ void AOPAG_ModularGun::Interact_Implementation()
 
 bool AOPAG_ModularGun::CanInteract_Implementation()
 {
+	// You can interact only if gun ...
+	// ... has no parent
 	if (GetParentActor() == nullptr)
 		return true;
+
+	// ... is in vendor
+	AOPAG_Vendor* Vendor = Cast<AOPAG_Vendor>(GetParentActor());
+	if (Vendor != nullptr) {
+		return true;
+	}
 
 	return false;
 }
@@ -726,6 +760,9 @@ void AOPAG_ModularGun::WaitReloadingTimer()
 	}
 	EMS->CurrentAmmoChanged.Broadcast(AmmoCurrent);
 	EMS->TotalAmmoChanged.Broadcast(AmmoMax);
+
+	// Update ammo ui color | false -> is base and true -> is unload
+	EMS->ColorAmmoChanged.Broadcast(false, AmmoMax < 30);
 }
 #pragma endregion Ammo System
 

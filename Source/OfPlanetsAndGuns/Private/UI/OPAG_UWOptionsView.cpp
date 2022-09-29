@@ -19,6 +19,8 @@ void UOPAG_UWOptionsView::NativeConstruct()
 	//BindEvents();
 	
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
+	EMS->ApplySettings.AddDynamic(this, &UOPAG_UWOptionsView::LoadSettings);
+	EMS->RequestSettings.Broadcast();
 
 	UGameUserSettings* GameUserSettings = Cast<UGameUserSettings>(GEngine->GetGameUserSettings());
 
@@ -55,9 +57,23 @@ void UOPAG_UWOptionsView::NativeConstruct()
 	SystemSlider->OnValueChanged.AddUniqueDynamic(this, &UOPAG_UWOptionsView::SystemSliderChanged);
 }
 
+void UOPAG_UWOptionsView::LoadSettings(const FOPAG_Settings& Settings)
+{
+	AimSensSlider->SetValue(Settings.HipSensitivity);
+	AdsAimSensSlider->SetValue(Settings.ADSSensitivity);
+}
+
 void UOPAG_UWOptionsView::BackButtonClicked()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Back Button Clicked"));
+
+	FOPAG_Settings NewSettings;
+	NewSettings.HipSensitivity = AimSensSlider->GetValue();
+	NewSettings.ADSSensitivity = AdsAimSensSlider->GetValue();
+
+	EMS->ApplySettings.Broadcast(NewSettings);
+	EMS->SaveSettings.Broadcast(NewSettings);
+
 	if (AOPAG_GameplayHUD* const MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
 		MyHUD->HideOptionsView();
