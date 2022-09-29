@@ -227,6 +227,10 @@ private:
 	
 	float const maxVolumeDB = 10.;
 	float const minVolumeDB = -80.;
+
+	float const maxVolumeLinear = 1.5;
+	float const minVolumeLinear = 0;
+
 	float const startingVolumeDB = 0;
 
 };

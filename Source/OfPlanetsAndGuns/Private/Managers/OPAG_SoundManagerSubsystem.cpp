@@ -10,7 +10,13 @@
 void UOPAG_SoundManagerSubsystem::Init() {
 	BindEvents();
 	studioSystem = IFMODStudioModule::Get().GetStudioSystem(EFMODSystemContext::Runtime);
-	SetBusVolume(EBusNames::MASTER, dBToLinear(0));
+	//SetBusVolume(EBusNames::MASTER, dBToLinear(0));
+	SetBusVolume(EBusNames::MASTER, 1);
+	SetBusVolume(EBusNames::MUSIC, 0.6);
+	SetBusVolume(EBusNames::AMBIENT, 0.7);
+	SetBusVolume(EBusNames::SFX, 0.7);
+	SetBusVolume(EBusNames::UI, 1);
+
 }
 
 
@@ -79,28 +85,37 @@ void UOPAG_SoundManagerSubsystem::SetBusVolume(EBusNames busName, const float& n
 }
 
 void UOPAG_SoundManagerSubsystem::MasterSliderChanged(float value) {
-	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	//float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	float newVolume = FMath::Lerp(minVolumeLinear, maxVolumeLinear, value);
+
 	SetBusVolume(EBusNames::MASTER , newVolume);
 }
 
 
 void UOPAG_SoundManagerSubsystem::MusicSliderChanged(float value) {
-	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	//float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	float newVolume = FMath::Lerp(minVolumeLinear, maxVolumeLinear, value);
 	SetBusVolume(EBusNames::MUSIC, newVolume);
 }
 
 void UOPAG_SoundManagerSubsystem::SFXSliderChanged(float value) {
-	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	//float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	float newVolume = FMath::Lerp(minVolumeLinear, maxVolumeLinear, value);
+
 	SetBusVolume(EBusNames::SFX, newVolume);
 }
 
 void UOPAG_SoundManagerSubsystem::AmbientSliderChanged(float value) {
-	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	//float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	float newVolume = FMath::Lerp(minVolumeLinear, maxVolumeLinear, value);
+
 	SetBusVolume(EBusNames::AMBIENT, newVolume);
 }
 
 void UOPAG_SoundManagerSubsystem::SystemSliderChanged(float value) {
-	float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	//float newVolume = FMath::Lerp(dBToLinear(minVolumeDB), dBToLinear(maxVolumeDB), value);
+	float newVolume = FMath::Lerp(minVolumeLinear, maxVolumeLinear, value);
+
 	SetBusVolume(EBusNames::UI, newVolume);
 }
 
@@ -136,7 +151,8 @@ float UOPAG_SoundManagerSubsystem::GetBusVolume(EBusNames busName){
 	float returnValue;
 	if (currentVol) {
 		//returnValue = *currentVol;
-		returnValue = (*currentVol - dBToLinear(minVolumeDB)) / dBToLinear(maxVolumeDB) - dBToLinear(minVolumeDB);
+		//returnValue = (*currentVol - dBToLinear(minVolumeDB)) / dBToLinear(maxVolumeDB) - dBToLinear(minVolumeDB);
+		returnValue = (*currentVol - minVolumeLinear) / maxVolumeLinear - minVolumeLinear;
 	}
 	//return (*currentVol * 100)/ dBToLinear(maxVolumeDB);
 	delete currentVol;
