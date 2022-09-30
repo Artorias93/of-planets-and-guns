@@ -150,6 +150,7 @@ void UOPAG_GameInstance::LoadMainMenu()
 void UOPAG_GameInstance::LoadPlanet(int PlanetIndex)
 {
 	CurrentPlanet = Planets[PlanetIndex];
+	CurrentStage = 0;
 	if (PlayerState.LoadType == PlayerStateLoadType::PREVIOUS_STAGE) PlayerState.LoadType = PlayerStateLoadType::SAVE_FILE;
 	StartStage(EStageType::Stage);
 }

@@ -40,7 +40,7 @@ void AOPAG_StageManager::StartStageGeneration(const FOPAG_StageGeneration GenDat
 	//loop until the weight has reached the target
 	if (BaseGenerationData.StageType == EStageType::Stage)
 	{
-		while (BaseGenerationData.TargetWeight > TotalWeight)
+		while (BaseGenerationData.TargetWeight > TotalWeight || RoomsToAppend.Num() > 0)
 		{
 			FindRoomToSpawn(RoomsToAppend.Num() > 0 ? RoomsToAppend[0] : -1, PreviousRoomTurn);
 		}
@@ -72,6 +72,8 @@ void AOPAG_StageManager::LoadDataTables()
 	const FString Context;
 	if (BaseGenerationData.RoomTable) BaseGenerationData.RoomTable->GetAllRows(Context, Rooms);
 	checkf(Rooms.Num() > 0, TEXT("Room table can't be empty"));
+	if (BaseGenerationData.SpecialRoomTable) BaseGenerationData.SpecialRoomTable->GetAllRows(Context, SpecialRooms);
+	checkf(SpecialRooms.Num() > 0, TEXT("Special room table can't be empty"));
 	if (BaseGenerationData.BridgeTable) BaseGenerationData.BridgeTable->GetAllRows(Context, Bridges);
 	checkf(Bridges.Num() > 0, TEXT("Bridge table can't be empty"));
 	if (BaseGenerationData.DoubleRoomChanceTable) BaseGenerationData.DoubleRoomChanceTable->GetAllRows(Context, DoubleExitChances);
@@ -150,36 +152,37 @@ void AOPAG_StageManager::FindRoomToSpawn(const int32 Previous, uint8& PreviousRo
 	{
 		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
 			"Pretending to remove room from special table", EMessageSeverity::Info);
+		RoomLoadingCounter++;
+
 	}
-	//else
+	else
 	{
 		const auto OffsetIndex = Rooms.Find(RandomRoomOffset);
 		if (OffsetIndex >= 0)
 			Rooms.RemoveAt(OffsetIndex);
-		if (RandomRoom->ID < SpecialRoomID) //check is temp for special room
-		{
-			TotalWeight += RandomRoom->RoomOffset.Weight;
-			RoomLoadingCounter++;
-			if (RandomRoom->RoomOffset.ExitCount > 1) DoubleExitRoomCounter++;
-			if (TotalWeight >= BaseGenerationData.TargetWeight) FinalRoom = RandomRoom->ID;
-		}
+		
+		TotalWeight += RandomRoom->RoomOffset.Weight;
+		RoomLoadingCounter++;
+		if (RandomRoom->RoomOffset.ExitCount > 1) DoubleExitRoomCounter++;
+		if (TotalWeight >= BaseGenerationData.TargetWeight) FinalRoom = RandomRoom->ID;
 	}
 
 	if (StartingRoom == -1) StartingRoom = RandomRoom->ID;
 
 
-	if (RandomRoom->ID != FinalRoom && RandomRoom->RoomOffset.ExitCount > 0)
+	if (RandomRoom->RoomOffset.ExitCount > 0)
 	{
 		if (RandomRoom->ID < SpecialRoomID)
 		{
-			AddRandomBridge(PathingItem);
+			if (RandomRoom->ID != FinalRoom)
+				AddRandomBridge(PathingItem);
 			if (RandomRoom->RoomOffset.ExitCount > 1)
 			{
-				if (SafeRoom < 0) //can add more check for some rng
+				if (SafeRoom < 0 && RandomRoom->ID != FinalRoom) //can add more check for some rng
 				{
 					SafeRoom = RandomRoom->ID;
 				}
-				else if (SpecialRoomBridges.Num() == 0) //Not deleting any endbridges from this array. this means that this will be true only at the first entry.
+				else //not checking  anymore --> if (SpecialRoomBridges.Num() == 0) //Not deleting any endbridges from this array. this means that this will be true only at the first entry.
 				{
 					SpecialRoomBridges.Add(AddRandomBridge(PathingItem, true));
 				}
@@ -321,10 +324,20 @@ FOPAG_RoomOffset* AOPAG_StageManager::GetRandomRoom(bool bIsNotFirst, const uint
 
 FOPAG_RoomOffset* AOPAG_StageManager::GetRandomSpecialRoom(const uint8& PreviousRoomTurn)
 {
-	//should have special room logic here instead of call to random room
-	UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this, 
-		"Pretending to get special room", EMessageSeverity::Info);
-	return GetRandomRoom(true, PreviousRoomTurn);
+
+	TArray<FOPAG_RoomOffset*> InputRooms = SpecialRooms;
+	TArray<FOPAG_RoomOffset*> FilteredRooms;
+
+	FilterRoomsByExitType(InputRooms, FilteredRooms, PreviousRoomTurn);
+	if (FilteredRooms.Num() == 0)
+	{
+		UOPAG_UtilityFunctionLibrary::ScreenLogWithSeverityColor(this,
+			FString::Printf(TEXT("%i - ExitType filter was empty! (Special Room)"), StagePathing.Num()),
+			EMessageSeverity::Error);
+		FilteredRooms = InputRooms;
+	}
+
+	return FilteredRooms[FMath::RandRange(0, FilteredRooms.Num() - 1)];
 }
 
 bool AOPAG_StageManager::IsRoomDouble()

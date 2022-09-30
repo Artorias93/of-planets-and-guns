@@ -63,24 +63,30 @@ protected:
 	float BaseCritChance = 5.f;
 
 protected:
-	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), AdvancedDisplay)
 	float SpreadMultiplier = 1.f;
 
+	//Max crosshair width
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float SpreadMax = 12.f;
 
+	//How close you are to perfect accuracy while in ADS [0-1]
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ClampMin = 0.f, ClampMax = 1.f))
 	float AccuracyQualityInADS = 0.75f;
 
+	//Projectile Max distance
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ProjectileRange = 2000.f;
 
+	//Cone width
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ShootConeLength = 100.f;
 
+	//Crosshair width when moving
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ReductionSpreadRadius = 10;
 
+	//Crosshair max width when shooting
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ReductionSpreadRadiusShootingMax = 10.f;
 
@@ -208,17 +214,6 @@ protected:
 	void ResetReductionSpreadRadiusShooting();
 
 	// Subsystem for shooting
-	/*
-	* TOOLTIP PER LE STATISTICHE SHOOTING
-	* Spread Multiplier: Inutile
-	* Spread Max: Larghezza Crosshair base
-	* Accuracy Quality in ADS: Quanto è vicino all'Accuracy perfetta quando sei in mira [0-1]
-	* Projectile Range: distanza Max proiettili
-	* Shoot Cone Length: Larghezza cono
-	* Reduction Spread Radius: Larghezza Crosshair quando ci si muove
-	* Reduction Spread Radius Shooting Max: Larghezza Max Crosshair quando si spara
-	*/
-
 	float CalculateMultiplierByLevel() const;
 	float CalculateDamage(const bool IsHeadshot, const float MultiplierByLevel) const;
 	void AddCritToDamage(float& Damage) const;
