@@ -12,7 +12,7 @@ void UOPAG_SoundManagerSubsystem::Init() {
 	studioSystem = IFMODStudioModule::Get().GetStudioSystem(EFMODSystemContext::Runtime);
 	//SetBusVolume(EBusNames::MASTER, dBToLinear(0));
 	SetBusVolume(EBusNames::MASTER, 1);
-	SetBusVolume(EBusNames::MUSIC, 0.6);
+	SetBusVolume(EBusNames::MUSIC, 0.65);
 	SetBusVolume(EBusNames::AMBIENT, 0.7);
 	SetBusVolume(EBusNames::SFX, 0.7);
 	SetBusVolume(EBusNames::UI, 1);
@@ -38,6 +38,9 @@ void UOPAG_SoundManagerSubsystem::SetIntensity(float value) {
 		Intensity = 0;
 	//InstanceSoundtrack.Instance->setParameterByName(TCHAR_TO_UTF8(*FName("Intensity").ToString()), Intensity , true);
 	UFMODBlueprintStatics::EventInstanceSetParameter(InstanceSoundtrack, FName("Intensity"), Intensity);
+	float intensityToLog = UFMODBlueprintStatics::EventInstanceGetParameter(InstanceSoundtrack, FName("Intensity"));
+	UE_LOG(LogTemp, Warning, TEXT("Intensity %f"), intensityToLog);
+
 }
 
 

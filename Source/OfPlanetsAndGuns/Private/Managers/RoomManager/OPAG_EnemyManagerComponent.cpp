@@ -170,7 +170,7 @@ void UOPAG_EnemyManagerComponent::SpawnWave()
 				EnemiesToSpawnNextWave -= SpawnedEnemies.Num();
 				EnemiesInRoom.Append(SpawnedEnemies);
 				if(SMS)
-					SMS->SetIntensity(10.f);
+					SMS->SetIntensity(15.f);
 			}
 		}
 	}
