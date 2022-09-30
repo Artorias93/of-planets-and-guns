@@ -56,4 +56,7 @@ protected:
 	
 	UFUNCTION(CallInEditor, Category = "Ability Caster")
 		TArray<FTransform> GetAbilitySpawnTransforms(EAbilitySpawnPattern AbilitySpawnPattern, FTransform Origin);
+
+private:
+	void LoadAbilitiesAssets();
 };

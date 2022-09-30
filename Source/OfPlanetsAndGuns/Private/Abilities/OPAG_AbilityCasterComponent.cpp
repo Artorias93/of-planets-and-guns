@@ -17,35 +17,13 @@
 UOPAG_AbilityCasterComponent::UOPAG_AbilityCasterComponent()
 {
 	PrimaryComponentTick.bStartWithTickEnabled = false;
+
+	//LoadAbilitiesAssets();
 }
 
 void UOPAG_AbilityCasterComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	FString ForceFieldClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_ForceField.BP_ForceField_C'";
-	FString SpawnEnemyClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_SpawnEnemy.BP_SpawnEnemy_C'";
-	FString TornadoClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_TornadoAbility.BP_TornadoAbility_C'";
-	FString CrackClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_CrackAbility.BP_CrackAbility_C'";
-	FString RayClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_RayAbility.BP_RayAbility_C'";
-	FString SupernovaClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_SupernovaAbility.BP_SupernovaAbility_C'";
-	FString FireballClassPath = "Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_FireballAbility.BP_FireballAbility_C'";
-
-	const TCHAR* ForceFieldClass= *ForceFieldClassPath;
-	const TCHAR* SpawnEnemyClass = *SpawnEnemyClassPath;
-	const TCHAR* TornadoClass = *TornadoClassPath;
-	const TCHAR* CrackClass = *CrackClassPath;
-	const TCHAR* RayClass = *RayClassPath;
-	const TCHAR* SupernovaClass = *SupernovaClassPath;
-	const TCHAR* FireballClass = *FireballClassPath;
-
-	ForceFieldAbilityClass = LoadObject<UClass>(nullptr, ForceFieldClass);
-	SpawnEnemyAbilityClass = LoadObject<UClass>(nullptr, SpawnEnemyClass);
-	TornadoAbilityClass = LoadObject<UClass>(nullptr, TornadoClass);
-	CrackAbilityClass = LoadObject<UClass>(nullptr, CrackClass);
-	RayAbilityClass = LoadObject<UClass>(nullptr, RayClass);
-	SupernovaAbilityClass = LoadObject<UClass>(nullptr, SupernovaClass);
-	FireballAbilityClass = LoadObject<UClass>(nullptr, FireballClass);
 
 	EMS = GetWorld()->GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	check(EMS);
@@ -456,4 +434,49 @@ TArray<FTransform> UOPAG_AbilityCasterComponent::GetAbilitySpawnTransforms(EAbil
 	}
 
 	return Transforms;
+}
+
+void UOPAG_AbilityCasterComponent::LoadAbilitiesAssets()
+{
+	static ConstructorHelpers::FObjectFinder<UClass> ForceFieldAbilityBP (TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_ForceField.BP_ForceField_C'"));
+	if (ForceFieldAbilityBP.Succeeded())
+	{
+		ForceFieldAbilityClass = ForceFieldAbilityBP.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UClass> SpawnEnemyAbilityBP (TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_SpawnEnemy.BP_SpawnEnemy_C'"));
+	if (SpawnEnemyAbilityBP.Succeeded())
+	{
+		SpawnEnemyAbilityClass = SpawnEnemyAbilityBP.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UClass> TornadoAbilityBP (TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_TornadoAbility.BP_TornadoAbility_C'"));
+	if (TornadoAbilityBP.Succeeded())
+	{
+		TornadoAbilityClass = TornadoAbilityBP.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UClass> CrackAbilityBP (TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_CrackAbility.BP_CrackAbility_C'"));
+	if (CrackAbilityBP.Succeeded())
+	{
+		CrackAbilityClass = CrackAbilityBP.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UClass> RayAbilityBP(TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_RayAbility.BP_RayAbility_C'"));
+	if (RayAbilityBP.Succeeded())
+	{
+		RayAbilityClass = RayAbilityBP.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UClass> SupernovaAbilityBP(TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_SupernovaAbility.BP_SupernovaAbility_C'"));
+	if (SupernovaAbilityBP.Succeeded())
+	{
+		SupernovaAbilityClass = SupernovaAbilityBP.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UClass> FireballAbilityBP(TEXT("Class'/Game/OfPlanetsAndGuns/Characters/MageEnemy/BP_FireballAbility.BP_FireballAbility_C'"));
+	if (FireballAbilityBP.Succeeded())
+	{
+		FireballAbilityClass = FireballAbilityBP.Object;
+	}
 }
