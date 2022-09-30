@@ -127,7 +127,7 @@ void AOPAG_DroneBase::FiendEnemisTimer()
 		TArray<AOPAG_Enemy*> EnemiesTarget;
 		for (FHitResult HitResult : OutHits)
 		{
-			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(HitResult.Actor);
+			AOPAG_Enemy* Enemy = Cast<AOPAG_Enemy>(HitResult.GetActor());
 			if (Enemy != nullptr)
 			{
 				EnemiesTarget.AddUnique(Enemy);

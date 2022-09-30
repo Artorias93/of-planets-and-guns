@@ -11,6 +11,7 @@
  * 
  */
 
+class UHorizontalBox;
 class UImage;
 class UTextBlock;
 
