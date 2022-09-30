@@ -21,6 +21,7 @@ class OFPLANETSANDGUNS_API AOPAG_LootBox : public AActor, public IOPAG_Interacta
 public:	
 	AOPAG_LootBox();
 	
+	// Meshes
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* Lid;
 
@@ -50,6 +51,9 @@ public:
 
 	UPROPERTY(Category = LootBox, EditAnywhere, BlueprintReadWrite)
 	UNiagaraSystem* NsActivationParticles;
+
+	UPROPERTY(Category = LootBox, EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UNiagaraComponent* NcParticlesSign;
 
 
 private:
