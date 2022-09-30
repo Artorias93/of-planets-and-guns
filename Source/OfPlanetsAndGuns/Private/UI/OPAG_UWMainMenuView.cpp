@@ -14,6 +14,7 @@ void UOPAG_UWMainMenuView::BindEvents()
 	OptionsButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWMainMenuView::OptionsButtonClicked);
 	QuitButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWMainMenuView::QuitButtonClicked);
 	HowToPlayButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWMainMenuView::HowToPlayButtonClicked);
+	CreditsButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWMainMenuView::CreditsButtonClicked);
 }
 
 void UOPAG_UWMainMenuView::NewRunButtonClicked()
@@ -36,7 +37,6 @@ void UOPAG_UWMainMenuView::QuitButtonClicked()
 {
 	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
-		//MyHUD->HideMainMenu();
 		MyHUD->SequencePlaySelection(MainMenu, Exit);
 	}	
 }
@@ -45,7 +45,14 @@ void UOPAG_UWMainMenuView::HowToPlayButtonClicked()
 {
 	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
-		//MyHUD->HideMainMenu();
 		MyHUD->SequencePlaySelection(MainMenu, HowToPlay);
+	}	
+}
+
+void UOPAG_UWMainMenuView::CreditsButtonClicked()
+{
+	if (const AOPAG_MainMenuHUD* const MyHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		MyHUD->SequencePlaySelection(MainMenu, Credits);
 	}	
 }

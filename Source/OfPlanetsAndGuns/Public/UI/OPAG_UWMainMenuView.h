@@ -26,6 +26,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWMainMenuView : public UUserWidget
 	UButton* QuitButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* HowToPlayButton;
+	UPROPERTY(meta = (BindWidget))
+	UButton* CreditsButton;
 
 public:
 	UFUNCTION()
@@ -36,6 +38,8 @@ public:
 	void QuitButtonClicked();
 	UFUNCTION()
 	void HowToPlayButtonClicked();
+	UFUNCTION()
+	void CreditsButtonClicked();
 
 	void NativeConstruct();
 };
