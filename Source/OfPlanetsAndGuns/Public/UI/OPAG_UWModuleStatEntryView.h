@@ -32,4 +32,6 @@ protected:
 		FLinearColor GreenColor;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FLinearColor RedColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FLinearColor NeutralColor;
 };

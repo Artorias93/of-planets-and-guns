@@ -161,24 +161,36 @@ void UOPAG_UWNewModuleView::AddStatEntry(FString StatName, float OldStat, float 
 {
 	float Delta = NewStat - OldStat;
 
-	if (Delta != 0) 
-	{
-		UOPAG_ModuleStatItem* item = NewObject<UOPAG_ModuleStatItem>(UOPAG_ModuleStatItem::StaticClass());
-		item->Init(StatName, FString::Printf(TEXT("%.2f"), OldStat), FString::Printf(TEXT("%.2f"), NewStat), Delta < 0, bIsInverted);
-		StatsListView->AddItem(item);
-		item->MarkPendingKill();
-	}
+	EDeltaSign DeltaSign;
+	if(Delta < 0) DeltaSign = Negative;
+	else if (Delta>0) DeltaSign = Positive;
+	else DeltaSign = Zero;
+	
+	UOPAG_ModuleStatItem* item = NewObject<UOPAG_ModuleStatItem>(UOPAG_ModuleStatItem::StaticClass());
+	item->Init(StatName, FString::Printf(TEXT("%.2f"), NewStat),
+		Delta!=0 ? FString::Printf(TEXT("%.2f"), Delta) : FString(TEXT("-")),
+		DeltaSign,
+		bIsInverted);
+	StatsListView->AddItem(item);
+	item->MarkPendingKill();
 }
 
 void UOPAG_UWNewModuleView::AddStatEntry(FString StatName, int OldStat, int NewStat, bool bIsInverted)
 {
 	int Delta = NewStat - OldStat;
 
-	if (Delta != 0)
-	{
-		UOPAG_ModuleStatItem* item = NewObject<UOPAG_ModuleStatItem>(UOPAG_ModuleStatItem::StaticClass());
-		item->Init(StatName, FString::FromInt(NewStat), FString::FromInt(Delta), Delta < 0, bIsInverted);
-		StatsListView->AddItem(item);
-		item->MarkPendingKill();
-	}
+	EDeltaSign DeltaSign;
+	if(Delta < 0) DeltaSign = Negative;
+	else if (Delta>0) DeltaSign = Positive;
+	else DeltaSign = Zero;
+	
+	UOPAG_ModuleStatItem* item = NewObject<UOPAG_ModuleStatItem>(UOPAG_ModuleStatItem::StaticClass());
+	item->Init(
+		StatName,
+		FString::Printf(TEXT("%d"), NewStat), 
+		Delta!=0 ? FString::Printf(TEXT("%d"), Delta) : FString(TEXT("-")),
+		DeltaSign,
+		bIsInverted);
+	StatsListView->AddItem(item);
+	item->MarkPendingKill();
 }

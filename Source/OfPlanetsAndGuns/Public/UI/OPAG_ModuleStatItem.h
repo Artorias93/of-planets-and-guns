@@ -6,6 +6,13 @@
 #include "UObject/NoExportTypes.h"
 #include "OPAG_ModuleStatItem.generated.h"
 
+enum EDeltaSign
+{
+	Negative,
+	Positive,
+	Zero
+};
+
 /**
  * 
  */
@@ -18,12 +25,13 @@ public:
 	
 	UOPAG_ModuleStatItem();
 
-	void Init(FString _Name, FString _Value, FString _Delta, bool _bIsNegative, bool _bIsInverted);
+	void Init(FString _Name, FString _Value, FString _Delta, EDeltaSign _eDeltaSign, bool _bIsInverted);
 
 	FString Name;
 	FString Value;
 	FString Delta;
 
-	bool bIsNegative;
+	// bool bIsNegative;
+	EDeltaSign DeltaSign;
 	bool bIsInverted;
 };
