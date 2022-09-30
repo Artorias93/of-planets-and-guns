@@ -39,6 +39,8 @@ class OFPLANETSANDGUNS_API UOPAG_UWOptionsView : public UUserWidget
 
 	UPROPERTY(meta = (BindWidget))
 		UButton* BackButton;
+	UPROPERTY(meta = (BindWidget))
+	UButton* MappingButton;
 
 	class UOPAG_EventManagerSubsystem* EMS;
 
@@ -55,6 +57,8 @@ public:
 		void LoadSettings(const FOPAG_Settings& Settings);
 	UFUNCTION()
 		void BackButtonClicked();
+	UFUNCTION()
+		void MappingButtonClicked();
 	UFUNCTION()
 		void GraphicsSliderChanged(float CurrentValue);
 

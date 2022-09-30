@@ -65,8 +65,6 @@ void UOPAG_UWOptionsView::LoadSettings(const FOPAG_Settings& Settings)
 
 void UOPAG_UWOptionsView::BackButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Back Button Clicked"));
-
 	FOPAG_Settings NewSettings;
 	NewSettings.HipSensitivity = AimSensSlider->GetValue();
 	NewSettings.ADSSensitivity = AdsAimSensSlider->GetValue();
@@ -81,7 +79,19 @@ void UOPAG_UWOptionsView::BackButtonClicked()
 	}
 	if(const AOPAG_MainMenuHUD* const MenuHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("In cast body"));
+		MenuHUD->SequencePlaySelection(Options, MainMenu);
+	}
+}
+
+void UOPAG_UWOptionsView::MappingButtonClicked()
+{
+	if (AOPAG_GameplayHUD* const MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
+		MyHUD->HideOptionsView();
+		return;
+	}
+	if(const AOPAG_MainMenuHUD* const MenuHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	{
 		MenuHUD->SequencePlaySelection(Options, MainMenu);
 	}
 }
