@@ -311,7 +311,10 @@ void AOPAG_ModuleBase::FlyRotationTimer_Implementation()
 
 const float AOPAG_ModuleBase::GetPriceTotal_Implementation()
 {
-	return 20 * Level; // Temporary
+	constexpr float level1Price = 30.f;
+	constexpr float level5Price = 200.f;
+	constexpr float levels = 5.f;
+	return level1Price + (level5Price - level1Price) / levels * Level; // Temporary
 	// return PriceBase * (1 + PriceMuliplierPercentage * (Level - 1));
 }
 
