@@ -208,6 +208,17 @@ protected:
 	void ResetReductionSpreadRadiusShooting();
 
 	// Subsystem for shooting
+	/*
+	* TOOLTIP PER LE STATISTICHE SHOOTING
+	* Spread Multiplier: Inutile
+	* Spread Max: Larghezza Crosshair base
+	* Accuracy Quality in ADS: Quanto è vicino all'Accuracy perfetta quando sei in mira [0-1]
+	* Projectile Range: distanza Max proiettili
+	* Shoot Cone Length: Larghezza cono
+	* Reduction Spread Radius: Larghezza Crosshair quando ci si muove
+	* Reduction Spread Radius Shooting Max: Larghezza Max Crosshair quando si spara
+	*/
+
 	float CalculateMultiplierByLevel() const;
 	float CalculateDamage(const bool IsHeadshot, const float MultiplierByLevel) const;
 	void AddCritToDamage(float& Damage) const;
