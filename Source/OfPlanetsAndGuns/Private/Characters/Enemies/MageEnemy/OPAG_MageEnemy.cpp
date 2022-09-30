@@ -93,8 +93,6 @@ void AOPAG_MageEnemy::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 		{
 			if (AOPAG_AICBase* AIController = Cast<AOPAG_AICBase>(GetController()))
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, TEXT("Enemy wave has been cleared"));
-
 				AIController->SetBlackboardEntryAsBool("bNewWave", true);
 				EMS->CastedEnemyWaveCleared.Broadcast();
 			}

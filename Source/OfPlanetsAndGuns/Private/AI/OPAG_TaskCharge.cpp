@@ -40,26 +40,12 @@ EBTNodeResult::Type UOPAG_TaskCharge::ExecuteTask(UBehaviorTreeComponent& OwnerB
 					{
 						FNavLocation NavLocation;
 						if(NavSystem->ProjectPointToNavigation(ChargePoint, NavLocation, QueryingExtent))
-						{
-							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE NOT FOUND"));
-                            					
-							AIController->GetBlackboardComponent()->SetValueAsVector(BBKeyTargetLocation.SelectedKeyName, ChargePoint);
-                            
+						{                            					
+							AIController->GetBlackboardComponent()->SetValueAsVector(
+								BBKeyTargetLocation.SelectedKeyName, ChargePoint);
 							return EBTNodeResult::Succeeded;
 						}
-						else
-						{
-							GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("EXTENT BOX STUFF"));
-						}
 					}
-					else
-					{
-						GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("NAVIGATION NOT FOUND"));
-					}
-				}
-				else
-				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("OBSTACLE FOUND"));
 				}
 			}
 		}
