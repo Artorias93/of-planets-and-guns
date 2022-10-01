@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_UWOptionsView.h"
 #include "UI/OPAG_GameplayHUD.h"
 #include "Components/Slider.h"
@@ -46,10 +43,17 @@ void UOPAG_UWOptionsView::NativeConstruct()
 		SystemSlider->SetValue(SystemValue);
 	}
 
+	if (MappingViewWidgetClass)
+	{
+		MappingViewWidget = CreateWidget<UOPAG_UWInputMappingView>(GetWorld(), MappingViewWidgetClass);
+	}
+
+	//Buttons delegates
 	BackButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWOptionsView::BackButtonClicked);
+	MappingButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWOptionsView::MappingButtonClicked);
 
+	//Sliders delegates
 	GraphicsSlider->OnValueChanged.AddUniqueDynamic(this, &UOPAG_UWOptionsView::GraphicsSliderChanged);
-
 	MasterSlider->OnValueChanged.AddUniqueDynamic(this, &UOPAG_UWOptionsView::MasterSliderChanged);
 	MusicSlider->OnValueChanged.AddUniqueDynamic(this, &UOPAG_UWOptionsView::MusicSliderChanged);
 	SFXSlider->OnValueChanged.AddUniqueDynamic(this, &UOPAG_UWOptionsView::SFXSliderChanged);
@@ -85,15 +89,18 @@ void UOPAG_UWOptionsView::BackButtonClicked()
 
 void UOPAG_UWOptionsView::MappingButtonClicked()
 {
-	if (AOPAG_GameplayHUD* const MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
-	{
-		MyHUD->HideOptionsView();
-		return;
-	}
-	if(const AOPAG_MainMenuHUD* const MenuHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
-	{
-		MenuHUD->SequencePlaySelection(Options, MainMenu);
-	}
+	UE_LOG(LogTemp, Warning, TEXT("Adding to viewport"));
+	MappingViewWidget->AddToViewport(999);
+	
+	// if (AOPAG_GameplayHUD* const MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	// {
+	// 	MyHUD->HideOptionsView();
+	// 	return;
+	// }
+	// if(const AOPAG_MainMenuHUD* const MenuHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
+	// {
+	// 	MenuHUD->SequencePlaySelection(Options, MainMenu);
+	// }
 }
 
 void UOPAG_UWOptionsView::GraphicsSliderChanged(float CurrentValue)

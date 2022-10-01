@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "OPAG_UWInputMappingView.h"
 #include "Blueprint/UserWidget.h"
 #include "Managers/OPAG_Settings.h"
 #include "OPAG_UWOptionsView.generated.h"
@@ -17,6 +18,11 @@ UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWOptionsView : public UUserWidget
 {
 	GENERATED_BODY()
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UOPAG_UWInputMappingView> MappingViewWidgetClass;
+	UPROPERTY()
+	UOPAG_UWInputMappingView* MappingViewWidget;
 
 	UPROPERTY(meta = (BindWidget))
 		USlider* MasterSlider;
