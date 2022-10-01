@@ -60,8 +60,12 @@ private:
 		TSubclassOf<UOPAG_UWInteractView> InteractViewWidgetClass;
 	UPROPERTY()
 		class UOPAG_UWDamageIndicatorView* DamageIndicatorViewWidget;
+	UPROPERTY()
+	UOPAG_UWDamageIndicatorView* ShieldDamageIndicatorViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWDamageIndicatorView> DamageIndicatorViewWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UOPAG_UWDamageIndicatorView> ShieldDamageIndicatorViewWidgetClass;
 	UPROPERTY()
 		class UOPAG_UWOptionsView* OptionsViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
@@ -116,6 +120,8 @@ public:
 
 	UFUNCTION()
 	void ShowDamageIndicatorView(AActor* const CurrentThreatActor);
+	UFUNCTION()
+	void ShowShieldDamageIndicatorView(AActor* const CurrentThreatActor);
 	UFUNCTION()
 	void HideDamageIndicatorView();
 

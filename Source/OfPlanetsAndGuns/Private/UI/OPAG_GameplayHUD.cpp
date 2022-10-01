@@ -37,6 +37,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 		EMS->LookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::ShowInteractView);
 		EMS->UnlookedAtInteractable.AddDynamic(this, &AOPAG_GameplayHUD::HideInteractView);
 		EMS->DamagedBy.AddDynamic(this, &AOPAG_GameplayHUD::ShowDamageIndicatorView);
+		EMS->ShieldDamagedBy.AddDynamic(this, &AOPAG_GameplayHUD::ShowShieldDamageIndicatorView);
 	}
 }
 
@@ -321,11 +322,35 @@ void AOPAG_GameplayHUD::ShowDamageIndicatorView(AActor* const CurrentThreatActor
 	}
 }
 
+void AOPAG_GameplayHUD::ShowShieldDamageIndicatorView(AActor* const CurrentThreatActor)
+{
+	// This widget can be instantiated multiple times
+
+	if (ShieldDamageIndicatorViewWidgetClass)
+	{
+		ShieldDamageIndicatorViewWidget = CreateWidget<UOPAG_UWDamageIndicatorView>(GetWorld(), ShieldDamageIndicatorViewWidgetClass);
+	}
+	
+	if(ShieldDamageIndicatorViewWidget)
+	{
+		if(!ShieldDamageIndicatorViewWidget->IsVisible())
+		{
+			ShieldDamageIndicatorViewWidget->AddToViewport(1);
+		}
+
+		ShieldDamageIndicatorViewWidget->SetCurrentThreatActor(CurrentThreatActor);
+	}
+}
+
 void AOPAG_GameplayHUD::HideDamageIndicatorView()
 {
 	if (DamageIndicatorViewWidget) 
 	{
 		DamageIndicatorViewWidget->RemoveFromViewport();
+	}
+	if (ShieldDamageIndicatorViewWidget) 
+	{
+		ShieldDamageIndicatorViewWidget->RemoveFromViewport();
 	}
 }
 

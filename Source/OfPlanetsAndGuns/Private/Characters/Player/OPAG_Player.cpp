@@ -195,18 +195,19 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer, bool 
 {
 	check(AttributeSetPlayer);
 
-	//Shows damage indicator widget
-	EMS->DamagedBy.Broadcast(Causer);
-
 	if (bIsShieldBroken)
 	{
+		//Shows damage direction indicator widget (red)
+		EMS->DamagedBy.Broadcast(Causer);
+		
 		Super::ReceiveDamage(Damage, Causer, bCritic);
 		SMS->PlayCharacterSounds(this, ECharacterSoundAction::Player_Damage);
-
-		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 	}
 	else
 	{
+		//Shows damage direction indicator widget (blue)
+		EMS->ShieldDamagedBy.Broadcast(Causer);
+		
 		if (AbilitySystemComp == nullptr && BaseAttributeSet == nullptr)	return;
 
 		// Update damage on attribute set table for activating shield ability
@@ -229,7 +230,7 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer, bool 
 			bIsShieldBroken);
 
 		// Update shield damage opacity on HUD
-		// Use the shield changed event for update the shield view
+		// Use the shield changed event to update the shield view
 		// Remove 
 		const float CurrentOpacityAmount = (AttributeSetPlayer->GetShieldCapacityMax() - AttributeSetPlayer->GetShieldCapacity())
 			/ AttributeSetPlayer->GetShieldCapacityMax();
@@ -247,8 +248,6 @@ void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer, bool 
 		GetWorld()->GetTimerManager().ClearTimer(RechargeShieldPlayerHandle);
 		GetWorld()->GetTimerManager().ClearTimer(ShieldPlayerCooldownHandle);
 		GetWorld()->GetTimerManager().SetTimer(ShieldPlayerCooldownHandle, this, &AOPAG_Player::ShieldCooldownTimer, AttributeSetPlayer->GetShieldCooldown(), false);
-		
-		//UE_LOG(LogTemp, Warning, TEXT("Start Shield Recharge Cooldown"));
 	}
 }
 
