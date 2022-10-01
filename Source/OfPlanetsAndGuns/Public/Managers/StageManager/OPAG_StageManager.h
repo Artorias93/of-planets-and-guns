@@ -25,6 +25,7 @@ class OFPLANETSANDGUNS_API AOPAG_StageManager : public AActor
 	// Room Data
 
 	TArray<FOPAG_RoomOffset*> Rooms;
+	TArray<FOPAG_RoomOffset*> SpecialRooms;
 	TArray<FOPAG_RoomOffset*> Bridges;
 	TArray<FOPAG_DoubleExitChance*> DoubleExitChances;
 

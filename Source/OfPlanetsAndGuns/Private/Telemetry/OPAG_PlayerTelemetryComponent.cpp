@@ -15,6 +15,12 @@
 
 #pragma optimize("", off)
 
+static TAutoConsoleVariable<bool> ConsoleVarTelemetry(
+	TEXT("showdebug PlayerTelemetry"),
+	false,
+	TEXT("Toggles display of Player telemetry."),
+	ECVF_Default);
+
 static TAutoConsoleVariable<FString> ConsoleVarTelemetryList(
 	TEXT("PlayerTelemetry.List"),
 	TEXT(""),
@@ -23,7 +29,7 @@ static TAutoConsoleVariable<FString> ConsoleVarTelemetryList(
 
 static TAutoConsoleVariable<FString> ConsoleVarTelemetryStats(
 	TEXT("PlayerTelemetry.Stats"),
-	TEXT("None"),
+	TEXT("Weapon"),
 	TEXT("Get Weapon or specific Module stats"),
 	ECVF_Default);
 

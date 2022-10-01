@@ -63,24 +63,30 @@ protected:
 	float BaseCritChance = 5.f;
 
 protected:
-	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"), AdvancedDisplay)
 	float SpreadMultiplier = 1.f;
 
+	//Max crosshair width
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float SpreadMax = 12.f;
 
+	//How close you are to perfect accuracy while in ADS [0-1]
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ClampMin = 0.f, ClampMax = 1.f))
 	float AccuracyQualityInADS = 0.75f;
 
+	//Projectile Max distance
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ProjectileRange = 2000.f;
 
+	//Cone width
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ShootConeLength = 100.f;
 
+	//Crosshair width when moving
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ReductionSpreadRadius = 10;
 
+	//Crosshair max width when shooting
 	UPROPERTY(Category = "OPAG | Gun | Shooting", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float ReductionSpreadRadiusShootingMax = 10.f;
 

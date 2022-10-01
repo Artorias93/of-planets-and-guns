@@ -55,8 +55,6 @@ public:
 		UTextRenderComponent* PriceTextRender_Module2;	
 
 	// Particle effects
-	//UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	//	UNiagaraSystem* NsActivationParticles;
 	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UNiagaraComponent* NcParticlesInteract;
 	UPROPERTY(Category = "OPAG | Vendor| Particles", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))

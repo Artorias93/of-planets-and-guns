@@ -12,41 +12,37 @@ void UOPAG_UWModuleStatEntryView::NativeOnListItemObjectSet(UObject* ListItemObj
 	{
 		Name->SetText(FText::FromString(Item->Name));
 		Value->SetText(FText::FromString(Item->Value));
-		if(Item->bIsNegative)
+		if(Item->DeltaSign == EDeltaSign::Positive)
+			Delta->SetText(FText::FromString("(+" + Item->Delta + ")"));
+		else if(Item->DeltaSign == EDeltaSign::Negative)
 			Delta->SetText(FText::FromString("(" + Item->Delta + ")"));
 		else
-			Delta->SetText(FText::FromString("(+" + Item->Delta + ")"));
+			Delta->SetText(FText::FromString(Item->Delta));
 
-		if (Item->bIsNegative) 
+		if(Item->bIsInverted)
 		{
-			if (Item->bIsInverted)
-			{
-				Name->SetColorAndOpacity(GreenColor);
-				//Value->SetColorAndOpacity(GreenColor);
-				Delta->SetColorAndOpacity(GreenColor);
-			}
-			else 
-			{
-				Name->SetColorAndOpacity(RedColor);
-				//Value->SetColorAndOpacity(RedColor);
-				Delta->SetColorAndOpacity(RedColor);
-			}
+			FLinearColor temp = GreenColor;
+			GreenColor = RedColor;
+			RedColor = temp;
 		}
 
-		else 
+		if (Item->DeltaSign == EDeltaSign::Negative) 
 		{
-			if (Item->bIsInverted)
-			{
-				Name->SetColorAndOpacity(RedColor);
-				//Value->SetColorAndOpacity(RedColor);
-				Delta->SetColorAndOpacity(RedColor);
-			}
-			else
-			{
-				Name->SetColorAndOpacity(GreenColor);
-				//Value->SetColorAndOpacity(GreenColor);
-				Delta->SetColorAndOpacity(GreenColor);
-			}
+			Name->SetColorAndOpacity(RedColor);
+			//Value->SetColorAndOpacity(RedColor);
+			Delta->SetColorAndOpacity(RedColor);
+		}
+		else if (Item->DeltaSign == EDeltaSign::Positive) 
+		{
+			Name->SetColorAndOpacity(GreenColor);
+			//Value->SetColorAndOpacity(GreenColor);
+			Delta->SetColorAndOpacity(GreenColor);
+		}
+		else
+		{
+			Name->SetColorAndOpacity(NeutralColor);
+			//Value->SetColorAndOpacity(GreenColor);
+			Delta->SetColorAndOpacity(NeutralColor);
 		}
 	}
 }

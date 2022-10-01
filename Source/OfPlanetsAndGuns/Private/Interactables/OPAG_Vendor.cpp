@@ -117,7 +117,7 @@ AOPAG_Vendor::AOPAG_Vendor()
 	NcParticlesSign = CreateDefaultSubobject<UNiagaraComponent>("ParticlesFloatingSign_NC");
 	if (NcParticlesSign) {
 		NcParticlesSign->SetupAttachment(RootComponent);
-		NcParticlesPool->Activate(false);
+		NcParticlesSign->Activate(false);
 	}
 }
 
@@ -150,17 +150,13 @@ void AOPAG_Vendor::BeginPlay()
 	BoxMoneyTrigger->OnComponentBeginOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapBegin);
 	BoxMoneyTrigger->OnComponentEndOverlap.AddDynamic(this, &AOPAG_Vendor::OnOverlapEnd);
 
-	// Niagara Interact
+	// Niagara Particles
 	if (NcParticlesInteract != nullptr) {
 		NcParticlesInteract->Deactivate();
 	}
-
-	// Niagara Pool
 	if (NcParticlesPool != nullptr) {
 		NcParticlesPool->Deactivate();
 	}
-
-	// Niagara Ray
 	if (NcParticlesSign != nullptr) {
 		NcParticlesSign->Deactivate();
 	}

@@ -150,6 +150,7 @@ void UOPAG_GameInstance::LoadMainMenu()
 void UOPAG_GameInstance::LoadPlanet(int PlanetIndex)
 {
 	CurrentPlanet = Planets[PlanetIndex];
+	CurrentStage = 0;
 	if (PlayerState.LoadType == PlayerStateLoadType::PREVIOUS_STAGE) PlayerState.LoadType = PlayerStateLoadType::SAVE_FILE;
 	StartStage(EStageType::Stage);
 }
@@ -200,10 +201,7 @@ void UOPAG_GameInstance::SendSettings()
 	if (PlayerState.LoadType == PlayerStateLoadType::NOT_LOADED)
 		LoadSaveGameState();
 
-	if (PlayerState.LoadType != PlayerStateLoadType::NOT_LOADED)
-	{
-		GetEventManager()->ApplySettings.Broadcast(Settings);
-	}
+	GetEventManager()->ApplySettings.Broadcast(Settings);
 }
 
 void UOPAG_GameInstance::OnStageManagerInitialized(const UWorld* const World)

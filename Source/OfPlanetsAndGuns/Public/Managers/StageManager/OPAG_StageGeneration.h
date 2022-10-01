@@ -35,6 +35,8 @@ struct FOPAG_StageGeneration : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Data")
 		UDataTable* RoomTable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Data")
+		UDataTable* SpecialRoomTable;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Data")
 		UDataTable* BridgeTable;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Room Data")
 		UDataTable* DoubleRoomChanceTable;

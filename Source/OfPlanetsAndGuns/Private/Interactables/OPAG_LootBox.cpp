@@ -20,6 +20,7 @@ AOPAG_LootBox::AOPAG_LootBox()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Meshes
 	Crate = CreateDefaultSubobject<UStaticMeshComponent>("Crate");
 	if (Crate)
 		RootComponent = Crate;
@@ -28,10 +29,16 @@ AOPAG_LootBox::AOPAG_LootBox()
 	if (Lid)
 		Lid->SetupAttachment(RootComponent);
 		
-
+	// Particle system
 	LootSpawnPoint = CreateDefaultSubobject<UStaticMeshComponent>("LootSpawnPoint");
 	if (LootSpawnPoint)
 		LootSpawnPoint->SetupAttachment(RootComponent);
+
+	NcParticlesSign = CreateDefaultSubobject<UNiagaraComponent>("ParticlesFloatingSign_NC");
+	if (NcParticlesSign) {
+		NcParticlesSign->SetupAttachment(RootComponent);
+		//NcParticlesSign->Activate(false);
+	}
 }
 
 bool AOPAG_LootBox::WillChangeInteractStateDynamically_Implementation()
@@ -65,6 +72,11 @@ void AOPAG_LootBox::BeginPlay()
 	if (NsActivationParticles != nullptr) {
 		NcActivationParticles = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NsActivationParticles, CrateLocation,FRotator::ZeroRotator,FVector::OneVector,false,false);
 	}
+
+	// Niagara Sign
+	if (NcParticlesSign != nullptr) {
+		NcParticlesSign->Deactivate();
+	}
 }
 
 void AOPAG_LootBox::Tick(float DeltaTime)
@@ -80,13 +92,20 @@ void AOPAG_LootBox::SetItemsToSpawn(TArray<TSubclassOf<AActor>>& ItemsList)
 
 void AOPAG_LootBox::Unlock()
 {
-	ActivationParticleEffect();
 	bIsInteractable = true;
 	
 	if(SMS)
 		SMS->PlayRewardSound(this);
 	// Make Lid Material Pulse
 	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 1.0f);
+
+	// Particle effects
+	if (NsActivationParticles != nullptr) {
+		NcActivationParticles->Activate();
+	}
+	if (NcParticlesSign != nullptr) {
+		NcParticlesSign->Activate();
+	}
 }
 
 void AOPAG_LootBox::SetModules(FOPAG_GunModules& ModulesStruct)
@@ -98,6 +117,9 @@ void AOPAG_LootBox::ActivationParticleEffect()
 {
 	if (NsActivationParticles != nullptr) {
 		NcActivationParticles->Activate();
+	}
+	if (NcParticlesSign != nullptr) {
+		NcParticlesSign->Deactivate();
 	}
 }
 

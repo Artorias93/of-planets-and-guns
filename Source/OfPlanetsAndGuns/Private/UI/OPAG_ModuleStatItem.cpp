@@ -10,15 +10,16 @@ UOPAG_ModuleStatItem::UOPAG_ModuleStatItem()
 	Value = "Value";
 	Delta = "42";
 	bIsInverted = false;
-	bIsNegative = false;
+	// bIsNegative = false;
 }
 
 void UOPAG_ModuleStatItem::Init
-(FString _Name, FString _Value, FString _Delta, bool _bIsNegative, bool _bIsInverted)
+(FString _Name, FString _Value, FString _Delta, EDeltaSign _eDeltaSign, bool _bIsInverted)
 {
 	Name = _Name;
 	Value = _Value;
 	Delta = _Delta;
 	bIsInverted = _bIsInverted;
-	bIsNegative = _bIsNegative;
+	// bIsNegative = _bIsNegative;
+	DeltaSign = _eDeltaSign;
 }
