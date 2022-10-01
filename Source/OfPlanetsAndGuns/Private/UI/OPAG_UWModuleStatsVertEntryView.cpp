@@ -2,16 +2,20 @@
 
 
 #include "UI/OPAG_UWModuleStatsVertEntryView.h"
+#include "UI/OPAG_ModuleStatVertItem.h"
 #include "Components/TextBlock.h"
 
-void UOPAG_UWModuleStatsVertEntryView::NativeConstruct()
+void UOPAG_UWModuleStatsVertEntryView::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
-	Super::NativeConstruct();
+	UOPAG_ModuleStatVertItem* Item = Cast<UOPAG_ModuleStatVertItem>(ListItemObject);
 
-	DamageText->SetText(FText::FromString("999"));
-	AccuracyText->SetText(FText::FromString("999"));
-	FireRateText->SetText(FText::FromString("999"));
-	ReloadingText->SetText(FText::FromString("999"));
-	ClipSizeText->SetText(FText::FromString("999"));
-	StabilityText->SetText(FText::FromString("999"));
+	if (Item)
+	{
+		DamageText->SetText(FText::FromString(Item->DamageValue));
+		FireRateText->SetText(FText::FromString(Item->FireRateValue));
+		AccuracyText->SetText(FText::FromString(Item->AccuracyValue));
+		StabilityText->SetText(FText::FromString(Item->StabilityValue));
+		ReloadingText->SetText(FText::FromString(Item->ReloadingValue));
+		ClipSizeText->SetText(FText::FromString(Item->ClipSizeValue));
+	}
 }

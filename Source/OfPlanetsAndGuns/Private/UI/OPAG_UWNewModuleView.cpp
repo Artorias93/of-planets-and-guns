@@ -165,7 +165,7 @@ void UOPAG_UWNewModuleView::AddStatEntry(FString StatName, float OldStat, float 
 
 	EDeltaSign DeltaSign;
 	if(Delta < 0) DeltaSign = Negative;
-	else if (Delta>0) DeltaSign = Positive;
+	else if (Delta > 0) DeltaSign = Positive;
 	else DeltaSign = Zero;
 	
 	UOPAG_ModuleStatItem* item = NewObject<UOPAG_ModuleStatItem>(UOPAG_ModuleStatItem::StaticClass());
