@@ -90,17 +90,7 @@ void UOPAG_UWOptionsView::BackButtonClicked()
 void UOPAG_UWOptionsView::MappingButtonClicked()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Adding to viewport"));
-	MappingViewWidget->AddToViewport(999);
-	
-	// if (AOPAG_GameplayHUD* const MyHUD = Cast<AOPAG_GameplayHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
-	// {
-	// 	MyHUD->HideOptionsView();
-	// 	return;
-	// }
-	// if(const AOPAG_MainMenuHUD* const MenuHUD = Cast<AOPAG_MainMenuHUD>(GetWorld()->GetFirstPlayerController()->GetHUD()))
-	// {
-	// 	MenuHUD->SequencePlaySelection(Options, MainMenu);
-	// }
+	MappingViewWidget->AddToViewport(9);
 }
 
 void UOPAG_UWOptionsView::GraphicsSliderChanged(float CurrentValue)
