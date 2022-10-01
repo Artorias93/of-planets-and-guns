@@ -21,6 +21,8 @@ class AOPAG_AbilityBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStartPlanet, int, PlanetIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadMainMenu);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLoadEndCutscene);
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FStageManagerInit, const UWorld* const, World);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStageManagerReady);
@@ -148,6 +150,8 @@ public:
 		FStartPlanet StartPlanet;
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = Game)
 		FLoadMainMenu LoadMainMenu;
+	UPROPERTY(BlueprintAssignable, Category = Game)
+		FLoadEndCutscene LoadEndCutscene;
 
 	UPROPERTY(BlueprintAssignable, Category = StageManager)
 		FStageManagerInit StageManagerInit;

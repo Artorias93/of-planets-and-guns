@@ -80,6 +80,7 @@ void AOPAG_MageEnemy::Attack()
 void AOPAG_MageEnemy::Death()
 {
 	Super::Death();
+	EMS->LoadEndCutscene.Broadcast();
 }
 
 void AOPAG_MageEnemy::OnEnemyDeath(const AOPAG_Enemy* const Enemy)

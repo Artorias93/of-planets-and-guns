@@ -72,6 +72,9 @@ struct FOPAG_PlanetData : public FTableRowBase
 		TSoftObjectPtr<UWorld> PlanetPersistentLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Planet)
+		TSoftObjectPtr<UWorld> EndCutsceneLevel;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Planet)
 		UDataTable* StageGenerationTable;
 
 };

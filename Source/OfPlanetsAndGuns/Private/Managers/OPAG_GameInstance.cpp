@@ -25,6 +25,7 @@ void UOPAG_GameInstance::BindEvents()
 	EMS->QualitySettingsChanged.AddDynamic(this, &UOPAG_GameInstance::OnQualitySettingsChanged);
 
 	EMS->LoadMainMenu.AddDynamic(this, &UOPAG_GameInstance::LoadMainMenu);
+	EMS->LoadEndCutscene.AddDynamic(this, &UOPAG_GameInstance::LoadEndCutscene);
 	EMS->StartPlanet.AddDynamic(this, &UOPAG_GameInstance::LoadPlanet);
 
 	EMS->PlayerDied.AddDynamic(this, &UOPAG_GameInstance::OnPlayerDeath);
@@ -145,6 +146,14 @@ void UOPAG_GameInstance::Init()
 void UOPAG_GameInstance::LoadMainMenu()
 {
 	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), MainMenuLevel);
+}
+
+void UOPAG_GameInstance::LoadEndCutscene()
+{
+	if (!CurrentPlanet->EndCutsceneLevel.IsNull())
+		UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), CurrentPlanet->EndCutsceneLevel);
+	else
+		LoadMainMenu();
 }
 
 void UOPAG_GameInstance::LoadPlanet(int PlanetIndex)

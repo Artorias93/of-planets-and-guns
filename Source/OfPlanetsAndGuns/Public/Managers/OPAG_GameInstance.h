@@ -87,6 +87,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void LoadMainMenu();
+	UFUNCTION(BlueprintCallable)
+		void LoadEndCutscene();
 
 	UFUNCTION(BlueprintCallable)
 		void LoadPlanet(int PlanetIndex);
