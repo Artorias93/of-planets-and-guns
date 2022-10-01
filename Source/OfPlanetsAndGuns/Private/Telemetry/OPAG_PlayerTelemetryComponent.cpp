@@ -29,7 +29,7 @@ static TAutoConsoleVariable<FString> ConsoleVarTelemetryList(
 
 static TAutoConsoleVariable<FString> ConsoleVarTelemetryStats(
 	TEXT("PlayerTelemetry.Stats"),
-	TEXT("None"),
+	TEXT("Weapon"),
 	TEXT("Get Weapon or specific Module stats"),
 	ECVF_Default);
 
