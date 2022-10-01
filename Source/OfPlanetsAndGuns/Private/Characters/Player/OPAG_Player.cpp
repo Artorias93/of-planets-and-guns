@@ -1568,14 +1568,21 @@ void AOPAG_Player::ApplySettings(const FOPAG_Settings& SettingsToApply)
 		NewSettings.HipSensitivity = HipSensitivity;
 		ShouldSaveWithDefaults = true;
 	}
+	else
+	{
+		HipSensitivity = SettingsToApply.HipSensitivity;
+	}
+
 	if (SettingsToApply.ADSSensitivity == 0.f)
 	{
 		NewSettings.ADSSensitivity = ADSSensitivity;
 		ShouldSaveWithDefaults = true;
 	}
+	else
+	{
+		ADSSensitivity = SettingsToApply.ADSSensitivity;
+	}
 
-	HipSensitivity = SettingsToApply.HipSensitivity;
-	ADSSensitivity = SettingsToApply.ADSSensitivity;
 
 	if (ShouldSaveWithDefaults) EMS->SaveSettings.Broadcast(NewSettings);
 }
