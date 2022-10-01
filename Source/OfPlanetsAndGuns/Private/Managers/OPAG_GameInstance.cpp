@@ -201,10 +201,7 @@ void UOPAG_GameInstance::SendSettings()
 	if (PlayerState.LoadType == PlayerStateLoadType::NOT_LOADED)
 		LoadSaveGameState();
 
-	if (PlayerState.LoadType != PlayerStateLoadType::NOT_LOADED)
-	{
-		GetEventManager()->ApplySettings.Broadcast(Settings);
-	}
+	GetEventManager()->ApplySettings.Broadcast(Settings);
 }
 
 void UOPAG_GameInstance::OnStageManagerInitialized(const UWorld* const World)
