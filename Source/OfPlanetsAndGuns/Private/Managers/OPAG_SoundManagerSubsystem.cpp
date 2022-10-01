@@ -44,11 +44,18 @@ void UOPAG_SoundManagerSubsystem::SetIntensity(float value) {
 }
 
 
-void UOPAG_SoundManagerSubsystem::StopSound() {
+void UOPAG_SoundManagerSubsystem::StopZiplineSound() {
 	if (ZiplineAudioComponent) {
 		ZiplineAudioComponent->Stop();
 		ZiplineAudioComponent->Release();
 	}	
+}
+
+void UOPAG_SoundManagerSubsystem::StopRewardSound() {
+	if (RewardAudioComponent) {
+		RewardAudioComponent->Stop();
+		RewardAudioComponent->Release();
+	}
 }
 
 float  UOPAG_SoundManagerSubsystem::dBToLinear(const float &dbValue) {
@@ -444,6 +451,21 @@ void UOPAG_SoundManagerSubsystem::PlayCharacterSounds(AActor* actor, ECharacterS
 		}
 	}
 }
+
+void UOPAG_SoundManagerSubsystem::PlayRewardSound(AActor* actor) {
+	FVector position = actor->GetActorLocation();
+	if (EnviromentAudioLibrary) {
+		//if (InstanceAmbient.Instance->isValid())
+			//StopAmbient();
+		FAudioEvent* libraryRow;
+		libraryRow = EnviromentAudioLibrary->FindRow<FAudioEvent>(*FString("Chest_Near"), "", false);
+		if (libraryRow) {
+			UFMODEvent* currentEvent = libraryRow->AudioContent;
+			RewardAudioComponent = UFMODBlueprintStatics::PlayEventAttached(currentEvent, actor->GetRootComponent(), NAME_None, position, EAttachLocation::KeepWorldPosition, false, true, true);
+		}
+	}
+}
+
 void UOPAG_SoundManagerSubsystem::PlayAmbient() {
 	if (EnviromentAudioLibrary) {
 		//if (InstanceAmbient.Instance->isValid())

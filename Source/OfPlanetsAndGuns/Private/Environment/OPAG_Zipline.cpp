@@ -150,7 +150,7 @@ void AOPAG_Zipline::OverlapReset(UPrimitiveComponent* OverlappedComponent, AActo
 void AOPAG_Zipline::OnZiplineEnded()
 {
 	if (SMS) {
-		SMS->StopSound();
+		SMS->StopZiplineSound();
 		//SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Zipline_Out);
 	}
 	bIsPlayerRidingZipline = false;

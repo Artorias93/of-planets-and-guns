@@ -93,6 +93,7 @@ private:
 	TArray<FOPAG_GunList*> GunsList;
 	FOPAG_GunModules Modules;
 	FTimerHandle SpawnItemsHandle;
+	class UOPAG_SoundManagerSubsystem* SMS = nullptr;
 	bool ShowingMerch;
 
 	void PopulateGunAndModuleArray();

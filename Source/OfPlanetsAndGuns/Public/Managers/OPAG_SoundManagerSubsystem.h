@@ -149,6 +149,8 @@ public:
 		class UFMODAudioComponent* AudioComponent;
 	UPROPERTY(EditAnywhere, Category = "FMOD | Zipline")
 		class UFMODAudioComponent* ZiplineAudioComponent;
+	UPROPERTY(EditAnywhere, Category = "FMOD | Reward")
+		class UFMODAudioComponent* RewardAudioComponent;
 	UPROPERTY(EditAnywhere, Category = "FMOD | Soundtrack")
 		float Intensity = 0.0f;
 
@@ -180,7 +182,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void PlayAmbient();
 	UFUNCTION(BlueprintCallable)
-		void StopSound();
+		void PlayRewardSound(AActor* actor);
+	UFUNCTION(BlueprintCallable)
+		void StopZiplineSound();
+	UFUNCTION(BlueprintCallable)
+		void StopRewardSound();
 	UFUNCTION(BlueprintCallable)
 		void StopSoundtrack();
 	UFUNCTION(BlueprintCallable)

@@ -82,7 +82,9 @@ void AOPAG_LootBox::Unlock()
 {
 	ActivationParticleEffect();
 	bIsInteractable = true;
-
+	
+	if(SMS)
+		SMS->PlayRewardSound(this);
 	// Make Lid Material Pulse
 	DynamicMaterial->SetScalarParameterValue(TEXT("ActivatePulse"), 1.0f);
 }
@@ -119,8 +121,10 @@ void AOPAG_LootBox::Interact_Implementation()
 	bHasBeenOpened = true;
 
 
-	if(SMS)
+	if (SMS) {
+		SMS->StopRewardSound(); 
 		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Chest_Open);
+	}
 
 	// Active Timer for spawn items
 	SpawnItem();

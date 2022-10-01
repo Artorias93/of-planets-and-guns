@@ -142,6 +142,7 @@ void AOPAG_Vendor::BeginPlay()
 
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	check(EMS);
+	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 	
 	EMS->DisableGunTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableGunTextInVendor);
 	EMS->DisableModuleTextInVendor.AddDynamic(this, &AOPAG_Vendor::DisableModuleTextInVendor);
@@ -167,7 +168,8 @@ void AOPAG_Vendor::BeginPlay()
 
 void AOPAG_Vendor::Unlock(const float Difficulty) {
 	ShowingMerch = true;
-	
+	if (SMS)
+		SMS->PlayRewardSound(this);
 	PopulateGunAndModuleArray();	
 	SpawnItem(Difficulty);
 
@@ -224,6 +226,8 @@ void AOPAG_Vendor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor);
 	if (Player != nullptr) {
 		EMS->HideGoldInGame.Broadcast();
+		if (SMS)
+			SMS->StopRewardSound();
 	}
 
 }
