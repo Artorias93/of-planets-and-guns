@@ -11,6 +11,7 @@
 #include "Components/HorizontalBox.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Components/VerticalBox.h"
+#include "Components/VerticalBoxSlot.h"
 #include "Components/ListView.h"
 
 void UOPAG_UWNewModuleView::NativeConstruct()
@@ -131,16 +132,17 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 			AbilityText->SetFont(AbilityTextFont);
 			AbilityText->SetText(FText::FromString("Ability: \n" + abilityDescription));
 			AbilityBox->AddChild(AbilityText);
+			AbilityText->SetAutoWrapText(true);
 		}
-		
-		UImage* const BarImage = WidgetTree->ConstructWidget<UImage>();
 
-		if (BarImage) 
-		{
-			BarImage->SetBrushSize(FVector2D(400, 10));
-			BarImage->SetOpacity(0.4f);
-			AbilityBox->AddChild(BarImage);
-		}
+		UVerticalBoxSlot* const MyBarImage = CastChecked<UVerticalBoxSlot>(FatherVerticalBox->GetSlots()[(FatherVerticalBox->GetChildrenCount() - 2)]);
+		ThirdBar->SetBrushSize(FVector2D(500, 10));
+		MyBarImage->SetPadding(5.0f);
+	}
+	else {
+		UVerticalBoxSlot* const MyBarImage = CastChecked<UVerticalBoxSlot>(FatherVerticalBox->GetSlots()[(FatherVerticalBox->GetChildrenCount() - 2)]);
+		ThirdBar->SetBrushSize(FVector2D(0, 0));
+		MyBarImage->SetPadding(0.0f);
 	}
 
 	if (CanBeEquipped) 
