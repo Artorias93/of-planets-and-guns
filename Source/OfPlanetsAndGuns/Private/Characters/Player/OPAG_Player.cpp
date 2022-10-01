@@ -37,7 +37,10 @@
 #include "Characters/OPAG_CharacterBase.h"
 #include "GenericPlatform/GenericPlatformCrashContext.h"
 #include "Weapons/Drones/OPAG_DroneBase.h"
+#include "Managers/RoomManager/OPAG_LootChance.h"
+#include <Engine/DataTable.h>
 #include "DisplayDebugHelpers.h"
+#include "Util/OPAG_UtilityFunctionLibrary.h"
 
 AOPAG_Player::AOPAG_Player()
 {
@@ -380,8 +383,36 @@ void AOPAG_Player::BindEvents()
 #pragma endregion BindsAndBroadcast
 
 #pragma region Init
+void AOPAG_Player::SetRandomGun() {
+	if (DataTableGuns)
+	{
+		FString Context;
+		DataTableGuns->GetAllRows(Context, GunsList);
+	}
+	
+	UOPAG_UtilityFunctionLibrary::ShuffleArray(GunsList);
+
+	const float RandomGunChance = FMath::RandRange(0.f, 100.f);
+	float Sum = 0.f;
+
+	for (FOPAG_GunList* Gun : GunsList)
+	{
+		Sum += Gun->GunChance;
+		if (RandomGunChance <= Sum)
+		{
+			PrimaryGunComponent->SetChildActorClass(nullptr);
+			PrimaryGunComponent->SetChildActorClass(Gun->GunClass);
+			return;
+		}
+	}
+
+}
+
 void AOPAG_Player::InitDefaultValues()
 {
+	// Random primary gun
+	SetRandomGun();
+
 	// Set secondary gun hidden because the primary guns is the starting gun
 	if (SecondaryGunComponent->GetChildActor())
 	{
@@ -392,6 +423,9 @@ void AOPAG_Player::InitDefaultValues()
 		CurrentGun = Cast<AOPAG_GunBase>(PrimaryGunComponent->GetChildActor());
 		PrimaryGun = Cast<AOPAG_ModularGun>(PrimaryGunComponent->GetChildActor());
 		
+		// Update current gun texture on Widget
+		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
+
 		// Update debug stats and modules struct
 		#if WITH_EDITOR
 		DebugCurretGunStats = CurrentGun->GetStatsTotal();

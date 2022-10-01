@@ -27,6 +27,8 @@ class AOPAG_GunBase;
 class AOPAG_ModularGun;
 class UAnimBlueprintGeneratedClass;
 class AOPAG_DroneBase;
+struct FOPAG_GunList;
+class UDataTable;
 
 
 UCLASS()
@@ -216,6 +218,11 @@ private:
 	//Footsteps "volume" for AI hearing perception [0,1]
 	UPROPERTY(Category="OPAG | Character | AI", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float FootstepsAILoudness = .5f;
+
+private:
+	// Data tables : Gun
+	UPROPERTY(Category = "OPAG | Character | DataTables", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UDataTable* DataTableGuns;
 	
 private:
 	UPROPERTY() TEnumAsByte<ETimelineDirection::Type> RecoilTimelineDirection;
@@ -276,6 +283,9 @@ private:
 private:
 	AOPAG_DroneBase* CurrentSpwanedDrone;
 
+private:
+	TArray<FOPAG_GunList*> GunsList; // GunList array
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Death() override;
@@ -296,6 +306,7 @@ private:
 	void BroadcastEvents();
 	void BindEvents();
 
+	void SetRandomGun();
 	// Init standard values
 	void InitDefaultValues();
 	void InitDashTimeline();
