@@ -12,6 +12,7 @@ class UTextBlock;
 class UListView;
 class UHorizontalBox;
 class UVerticalBox;
+class UVerticalBoxSlot;
 class UTexture2D;
 
 /**
@@ -36,6 +37,10 @@ class OFPLANETSANDGUNS_API UOPAG_UWNewModuleView : public UUserWidget
 
 	UPROPERTY(meta = (BindWidget))
 		UVerticalBox* AbilityBox;
+	UPROPERTY(meta = (BindWidget))
+		UVerticalBox* FatherVerticalBox;
+	UPROPERTY(meta = (BindWidget))
+		UImage* ThirdBar;
 
 	UPROPERTY(meta = (BindWidget))
 		UHorizontalBox* EquippableTypesBox;

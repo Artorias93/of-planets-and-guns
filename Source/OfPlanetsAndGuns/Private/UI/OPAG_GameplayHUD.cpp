@@ -147,11 +147,12 @@ void AOPAG_GameplayHUD::ShowPauseView()
 	{
 		PauseViewWidget->AddToViewport(2);
 	}
-
+	/*
 	if (PauseMenuGunViewWidget) 
 	{
 		PauseMenuGunViewWidget->AddToViewport(3);
 	}
+	*/
 }
 
 void AOPAG_GameplayHUD::HidePauseView() {
@@ -167,7 +168,7 @@ void AOPAG_GameplayHUD::HidePauseView() {
 	if (PauseViewWidget) 
 	{
 		PauseViewWidget->RemoveFromViewport();
-		PauseMenuGunViewWidget->RemoveFromViewport();
+		//PauseMenuGunViewWidget->RemoveFromViewport();
 	}
 
 	if (OptionsViewWidget) 
