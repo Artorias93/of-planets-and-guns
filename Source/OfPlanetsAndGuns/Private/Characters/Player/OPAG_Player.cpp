@@ -803,7 +803,8 @@ void AOPAG_Player::Shoot()
 	CurrentGun->DecrementAmmoCurrent(AmmoConsumate);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 
-	if (CurrentGun->GetAmmoCurrent() == 0)
+	if (CurrentGun->GetAmmoCurrent() == 0 ||
+		(CurrentGun->GetFireType() == EFireTypes::Burst3 && CurrentGun->GetAmmoCurrent() < 3))
 	{
 		// Update ui gun icon -> set linear color to red
 		EMS->ColorAmmoChanged.Broadcast(true, CurrentGun->GetAmmoMax() < 30);
