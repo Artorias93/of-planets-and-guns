@@ -10,7 +10,6 @@
 #include "UI/OPAG_UWDamageIndicatorView.h"
 #include "UI/OPAG_UWGameOverView.h"
 #include "UI/OPAG_UWOptionsView.h"
-#include "UI/OPAG_UWPauseMenuGunView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
@@ -126,11 +125,6 @@ void AOPAG_GameplayHUD::BeginPlay()
 			PlayerStatusViewWidget->AddToViewport(0);
 		}
 	}
-
-	if (PauseMenuGunViewWidgetClass != nullptr)
-	{
-		PauseMenuGunViewWidget = CreateWidget<UOPAG_UWPauseMenuGunView>(GetWorld(), PauseMenuGunViewWidgetClass);
-	}
 }
 
 void AOPAG_GameplayHUD::ShowPauseView(const FOPAG_GunStats GunStats,
@@ -165,7 +159,6 @@ void AOPAG_GameplayHUD::HidePauseView() {
 	if (PauseViewWidget) 
 	{
 		PauseViewWidget->RemoveFromViewport();
-		//PauseMenuGunViewWidget->RemoveFromViewport();
 	}
 
 	if (OptionsViewWidget) 

@@ -70,10 +70,6 @@ private:
 		class UOPAG_UWOptionsView* OptionsViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 		TSubclassOf<UOPAG_UWOptionsView> OptionsViewWidgetClass;
-	UPROPERTY()
-		class UOPAG_UWPauseMenuGunView* PauseMenuGunViewWidget;
-	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-		TSubclassOf<UOPAG_UWPauseMenuGunView> PauseMenuGunViewWidgetClass;
 	UPROPERTY() 
 		UOPAG_PlayerStatus* PlayerStatusViewWidget;
 	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
