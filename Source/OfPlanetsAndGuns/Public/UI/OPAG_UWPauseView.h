@@ -13,6 +13,10 @@
 class UTextBlock;
 class UImage;
 class UButton;
+class UListView;
+
+class AOPAG_ModuleBase;
+struct FOPAG_GunStats;
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWPauseView : public UUserWidget
@@ -25,6 +29,23 @@ class OFPLANETSANDGUNS_API UOPAG_UWPauseView : public UUserWidget
 		UImage* GoldIcon;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* GoldAmountText;
+
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* DamageAmount;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* FireRateAmount;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* AccuracyAmount;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* StabilityAmount;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* ReloadingAmount;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* ClipSizeAmount;
+
+	UPROPERTY(meta = (BindWidget))
+		UListView* StatsListView;
 
 	UPROPERTY(meta = (BindWidget))
 		UImage* PauseBackgroundImage;
@@ -47,4 +68,7 @@ public:
 	void UpdateGoldValue(const int Value);
 
 	void NativeConstruct();
+
+	void UpdateGunValues(const FOPAG_GunStats GunStats,
+		const FString GunName, const FString GunFireType, TArray<AOPAG_ModuleBase*> Modules);
 };

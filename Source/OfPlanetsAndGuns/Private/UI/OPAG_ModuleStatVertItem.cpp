@@ -7,9 +7,10 @@ UOPAG_ModuleStatVertItem::UOPAG_ModuleStatVertItem()
 
 }
 
-void UOPAG_ModuleStatVertItem::Init(FString _DamageText, FString _FireRateText, FString _AccuracyText, 
+void UOPAG_ModuleStatVertItem::Init(FString _StatsName, FString _DamageText, FString _FireRateText, FString _AccuracyText,
 	FString _StabilityText, FString _ReloadingText, FString _ClipSizeText)
 {
+	StatsName = _StatsName;
 	DamageValue = _DamageText;
 	FireRateValue = _FireRateText;
 	AccuracyValue = _AccuracyText;

@@ -940,9 +940,24 @@ void AOPAG_Player::OnPauseGame()
 	EMS->GoldChanged.Broadcast(GetInventorySystemComponent()->GoldAmount);
 
 	AOPAG_ModularGun* MyGun = GetPrimaryGun();
+
 	if (MyGun) 
 	{
-		EMS->PauseMenuGunChanged.Broadcast(MyGun->GetStatsTotal(), MyGun->GetGunName().ToString(), MyGun->GetFireTypeName(MyGun->GetFireType()));
+		const TArray<AOPAG_ModuleBase*> modules =
+		{
+			MyGun->GetModuleBySocketType(EModuleTypes::Accessory),
+			MyGun->GetModuleBySocketType(EModuleTypes::Barrel),
+			MyGun->GetModuleBySocketType(EModuleTypes::Grip),
+			MyGun->GetModuleBySocketType(EModuleTypes::Magazine),
+			MyGun->GetModuleBySocketType(EModuleTypes::Sight),
+			MyGun->GetModuleBySocketType(EModuleTypes::Stock)
+		};
+
+		EMS->PauseMenuGunChanged.Broadcast(
+			MyGun->GetStatsTotal(), 
+			MyGun->GetGunName().ToString(), 
+			MyGun->GetFireTypeName(MyGun->GetFireType()),
+			modules);
 	}
 
 }

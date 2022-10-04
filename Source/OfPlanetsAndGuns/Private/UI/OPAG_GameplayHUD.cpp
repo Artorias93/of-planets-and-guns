@@ -26,7 +26,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	if (EMS) 
 	{
-		EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
+		EMS->PauseMenuGunChanged.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
 		EMS->LoadingProgress.AddDynamic(this, &AOPAG_GameplayHUD::UpdateLoadingScreenBar);
 		EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
 		EMS->LookedAtModule.AddDynamic(this, &AOPAG_GameplayHUD::ShowModuleCompareView);
@@ -133,7 +133,8 @@ void AOPAG_GameplayHUD::BeginPlay()
 	}
 }
 
-void AOPAG_GameplayHUD::ShowPauseView() 
+void AOPAG_GameplayHUD::ShowPauseView(const FOPAG_GunStats GunStats,
+	const FString GunName, const FString GunFireType, const TArray<AOPAG_ModuleBase*> Modules)
 {
 
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
@@ -147,13 +148,8 @@ void AOPAG_GameplayHUD::ShowPauseView()
 	if (PauseViewWidget) 
 	{
 		PauseViewWidget->AddToViewport(2);
+		PauseViewWidget->UpdateGunValues(GunStats, GunName, GunFireType, Modules);
 	}
-	/*
-	if (PauseMenuGunViewWidget) 
-	{
-		PauseMenuGunViewWidget->AddToViewport(3);
-	}
-	*/
 }
 
 void AOPAG_GameplayHUD::HidePauseView() {
@@ -287,7 +283,7 @@ void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, const FString Intera
 	{
 		if (!InteractViewWidget->IsInViewport())
 		{
-			InteractViewWidget->AddToViewport(3);
+			InteractViewWidget->AddToViewport(2);
 		}
 
 		InteractViewWidget->UpdateInteractText(bCanInteract, InteractText);

@@ -58,8 +58,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FShieldChanged, float, CurrentVal
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FColorAmmoChanged, bool, bIsAmmoCurrentUnload, bool, bIsAmmoMaxUnload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FPauseMenuGunChanged, const FOPAG_GunStats, GunStats, 
-const FString, GunName, const FString, GunFireType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FPauseMenuGunChanged, const FOPAG_GunStats, GunStats, 
+const FString, GunName, const FString, GunFireType, const TArray<AOPAG_ModuleBase*>, Modules);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSoundSliderChanged, float, CurrentValue);

@@ -11,6 +11,7 @@ void UOPAG_UWModuleStatsVertEntryView::NativeOnListItemObjectSet(UObject* ListIt
 
 	if (Item)
 	{
+		StatsText->SetText(FText::FromString(Item->StatsName));
 		DamageText->SetText(FText::FromString(Item->DamageValue));
 		FireRateText->SetText(FText::FromString(Item->FireRateValue));
 		AccuracyText->SetText(FText::FromString(Item->AccuracyValue));

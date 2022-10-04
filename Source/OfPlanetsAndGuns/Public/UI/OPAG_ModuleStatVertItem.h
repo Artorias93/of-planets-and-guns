@@ -18,9 +18,10 @@ public:
 
 	UOPAG_ModuleStatVertItem();
 
-	void Init(FString _DamageText, FString _FireRateText, FString _AccuracyText,
+	void Init(FString _StatsName, FString _DamageText, FString _FireRateText, FString _AccuracyText,
 		FString _StabilityText, FString _ReloadingText, FString _ClipSizeText);
 
+	FString StatsName;
 	FString DamageValue;
 	FString FireRateValue;
 	FString AccuracyValue;

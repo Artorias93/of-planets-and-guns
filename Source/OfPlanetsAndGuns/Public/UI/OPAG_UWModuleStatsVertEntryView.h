@@ -22,6 +22,8 @@ protected:
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
 	UPROPERTY(meta = (BindWidget))
+		UTextBlock* StatsText;
+	UPROPERTY(meta = (BindWidget))
 		UTextBlock* DamageText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* FireRateText;

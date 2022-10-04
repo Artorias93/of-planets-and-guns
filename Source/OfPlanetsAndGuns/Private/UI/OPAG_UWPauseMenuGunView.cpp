@@ -24,7 +24,7 @@ void UOPAG_UWPauseMenuGunView::BindEvents()
 
 	if (EMS)
 	{
-		EMS->PauseMenuGunChanged.AddUniqueDynamic(this, &UOPAG_UWPauseMenuGunView::UpdateGunValues);
+		//EMS->PauseMenuGunChanged.AddUniqueDynamic(this, &UOPAG_UWPauseMenuGunView::UpdateGunValues);
 
 		//Remove all previous icons and stats
 		StatsHorizontalBox->ClearChildren();

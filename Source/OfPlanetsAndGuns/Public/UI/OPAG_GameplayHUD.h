@@ -83,7 +83,9 @@ public:
 	virtual void DrawHUD() override;
 
 	UFUNCTION()
-	void ShowPauseView();
+	void ShowPauseView(const FOPAG_GunStats GunStats, const FString GunName, const FString GunFireType, 
+			const TArray<AOPAG_ModuleBase*> Modules);
+
 	UFUNCTION()
 	void HidePauseView();
 
