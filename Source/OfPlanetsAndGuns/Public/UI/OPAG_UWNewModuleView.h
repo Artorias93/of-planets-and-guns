@@ -91,6 +91,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FSlateFontInfo AbilityTextFont;
 
+	//UI Rarity font color
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor CommonColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor UncommonColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor RareColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor EpicColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor LegendaryColor;
+	
 
 	UFUNCTION()
 	void UpdateModuleValues(const FOPAG_GunStats& CurrentModuleStats, const FOPAG_GunStats& OtherModuleStats,

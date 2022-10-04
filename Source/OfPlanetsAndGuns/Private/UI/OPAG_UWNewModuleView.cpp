@@ -4,7 +4,6 @@
 #include "UI/OPAG_UWNewModuleView.h"
 #include "UI/OPAG_ModuleStatItem.h"
 #include "Weapons/Guns/OPAG_GunBase.h"
-#include "Kismet/KismetTextLibrary.h"
 #include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
@@ -128,6 +127,26 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 
 	ModuleNameText->SetText(FText::FromString(OtherModuleName));
 	ModuleRarityText->SetText(FText::FromString(AOPAG_ModuleBase::GetRarityName(OtherModuleRarity)));
+	switch (OtherModuleRarity)
+	{
+	case EModuleRarity::Common:
+		ModuleRarityText->SetColorAndOpacity(CommonColor);
+		break;
+	case EModuleRarity::Uncommon:
+		ModuleRarityText->SetColorAndOpacity(UncommonColor);
+		break;
+	case EModuleRarity::Rare:
+		ModuleRarityText->SetColorAndOpacity(RareColor);
+		break;
+	case EModuleRarity::Epic:
+		ModuleRarityText->SetColorAndOpacity(EpicColor);
+		break;
+	case EModuleRarity::Legendary:
+		ModuleRarityText->SetColorAndOpacity(LegendaryColor);
+		break;
+	default:
+		ModuleRarityText->SetColorAndOpacity(CommonColor);
+	}
 	ModuleTypeText->SetText(FText::FromString(AOPAG_ModuleBase::GetTypeName(OtherModuleType)));
 
 	AddStatEntry("Damage: ", (int)CurrentModuleStats.Damage, (int)OtherModuleStats.Damage);
