@@ -10,6 +10,7 @@
 #include "Characters/Player/OPAG_PlayerState.h"
 #include "OPAG_Settings.h"
 #include "Abilities/OPAG_AbilityTypes.h"
+// #include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
 class AOPAG_RoomStreamingVolume;
@@ -90,9 +91,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtInteractable);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShowGoldInGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHideGoldInGame);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_EightParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, 
-const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const FString, OtherModuleAbilityName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
-const int, EquippableTypes, const bool, CanBeEquipped);
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_EightParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, 
+// const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const FString, OtherModuleAbilityName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
+// const int, EquippableTypes, const bool, CanBeEquipped);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FLookedAtModule,
+	const FOPAG_GunStats, CurrentModuleStats,
+	const AOPAG_ModuleBase * const, OtherModule,
+	const bool, CanBeEquipped);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FLookedAtGun, const FOPAG_GunStats, GunStats, 

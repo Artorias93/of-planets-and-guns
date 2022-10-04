@@ -14,7 +14,10 @@
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "UI/OPAG_PlayerStatus.h"
+#include "Weapons/Modules/OPAG_AccessoryBase.h"
 
+
+class AOPAG_AccessoryBase;
 
 void AOPAG_GameplayHUD::DrawHUD() 
 {
@@ -194,27 +197,32 @@ void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 	}
 }
 
-void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule, 
-	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const FString OtherModuleAbilityName, 
-	const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType, const int EquippableTypes, 
-	const bool CanBeEquipped)
+void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModuleStats,
+                                              const AOPAG_ModuleBase* const OtherModule,
+                                              const bool CanBeEquipped)
 {
 	if (GunCompareViewWidget->IsInViewport())
 		HideGunCompareView();
 
 	if (ModuleViewWidget) 
 	{
-		if (ModuleViewWidget->IsInViewport()) 
-		{
-			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleAbilityName, 
-				OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
-		}
-		else 
+		if (!ModuleViewWidget->IsInViewport()) 
 		{
 			ModuleViewWidget->AddToViewport(3);
-			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleAbilityName, 
-				OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
 		}
+		
+		const AOPAG_AccessoryBase* Accessory = Cast<AOPAG_AccessoryBase>(OtherModule);
+		FString AbilityDescription = Accessory ? Accessory->AbilityDescription : "";
+		
+		ModuleViewWidget->UpdateModuleValues(
+			CurrentModuleStats,
+			OtherModule->GetStats(),
+			OtherModule->GetModuleName(),
+			AbilityDescription,
+			OtherModule->GetRarity(),
+			OtherModule->GetType(),
+			OtherModule->GetBrand(),
+			OtherModule->GetEquippableFireTypes(), CanBeEquipped);
 	}
 }
 

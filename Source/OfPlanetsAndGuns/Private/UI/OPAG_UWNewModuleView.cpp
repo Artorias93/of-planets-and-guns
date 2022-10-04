@@ -21,13 +21,13 @@ void UOPAG_UWNewModuleView::NativeConstruct()
 
 void UOPAG_UWNewModuleView::UpdateModuleValues(
 	const FOPAG_GunStats& CurrentModuleStats,
-	const FOPAG_GunStats& OtherModuleStats, 
+	const FOPAG_GunStats& OtherModuleStats,
 	const FString OtherModuleName,
 	const FString OtherModuleAbilityName,
-	const EModuleRarity OtherModuleRarity, 
+	const EModuleRarity OtherModuleRarity,
 	const EModuleTypes OtherModuleType,
-	const int EquippableTypes,
-	const bool CanBeEquipped
+	const EModuleBrand OtherModuleBrand,
+	const int EquippableTypes, const bool CanBeEquipped
 )
 {
 	//Remove all previous icons and stats
@@ -35,6 +35,22 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 	StatsListView->ClearListItems();
 	AbilityBox->ClearChildren();
 
+	// Set brand icon
+	switch (OtherModuleBrand)
+	{
+	case EModuleBrand::Blobius:
+		ModuleBrandImage->SetBrushFromTexture(BlobiusBrandTexture);
+		break;
+	case EModuleBrand::Kaponian:
+		ModuleBrandImage->SetBrushFromTexture(KaponianBrandTexture);
+		break;
+	case EModuleBrand::Uronian:
+		ModuleBrandImage->SetBrushFromTexture(UronianBrandTexture);
+		break;
+	default:
+		ModuleBrandImage->SetBrushFromTexture(StandardBrandTexture);
+	}
+	
 	//Equippable-mask check
 	//Skippare parte int e shiftare di valore enum direttamente
 	//Refactoring in una funzione a parte

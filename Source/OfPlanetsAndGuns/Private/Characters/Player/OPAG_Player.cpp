@@ -1312,8 +1312,19 @@ void AOPAG_Player::UpdateComparison() {
 			if (Accessory)
 				AbilityDescription = Accessory->AbilityDescription;
 
-			EMS->LookedAtModule.Broadcast(CurrentModuleStats, Module->GetStats(),
-				Module->GetModuleName(), AbilityDescription, Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
+			EMS->LookedAtModule.Broadcast(
+				CurrentModuleStats,
+				Module,
+				CanBeEquipped);
+			// EMS->LookedAtModule.Broadcast(
+			// 	CurrentModuleStats,
+			// 	Module->GetStats(),
+			// 	Module->GetModuleName(),
+			// 	AbilityDescription,
+			// 	Module->GetRarity(),
+			// 	Module->GetType(),
+			// 	Module->GetEquippableFireTypes(),
+			// 	CanBeEquipped);
 
 			PreviousLookedAtModule = InteractableObject;
 		}
