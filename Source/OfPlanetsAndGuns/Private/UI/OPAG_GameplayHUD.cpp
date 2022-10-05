@@ -186,7 +186,7 @@ void AOPAG_GameplayHUD::UpdateLoadingScreenBar(float Percentage)
 
 void AOPAG_GameplayHUD::ShowLoadingScreenView()
 {
-	//TODO: Empty Function
+
 }
 
 void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)

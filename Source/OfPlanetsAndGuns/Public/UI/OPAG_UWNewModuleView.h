@@ -57,6 +57,11 @@ class OFPLANETSANDGUNS_API UOPAG_UWNewModuleView : public UUserWidget
 		UImage* ModuleBrandImage;
 
 public:
+
+	//Weapons textures padding
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float WeaponIconsPadding;
+
 	//Weapons textures
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UTexture2D* FullyAutomaticIconTexture;

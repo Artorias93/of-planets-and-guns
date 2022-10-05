@@ -29,7 +29,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 	const int EquippableTypes, const bool CanBeEquipped
 )
 {
-	//Remove all previous icons and stats
+	// Remove all previous icons and stats
 	EquippableTypesBox->ClearChildren();
 	StatsListView->ClearListItems();
 	AbilityBox->ClearChildren();
@@ -50,9 +50,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 		ModuleBrandImage->SetBrushFromTexture(StandardBrandTexture);
 	}
 	
-	//Equippable-mask check
-	//Skippare parte int e shiftare di valore enum direttamente
-	//Refactoring in una funzione a parte
+	// Equippable-mask check
 	int ResAR = EquippableTypes;
 	bool isAREquippable = ResAR & 1;
 	if (isAREquippable) 
@@ -67,7 +65,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 		UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(EquippableTypesBox->GetSlots()[(EquippableTypesBox->GetChildrenCount() - 1)]);
 
 		if (MyBoxSlot) {
-			MyBoxSlot->SetPadding(FMargin(10, 10, 10, 10));
+			MyBoxSlot->SetPadding(FMargin(WeaponIconsPadding, WeaponIconsPadding, WeaponIconsPadding, WeaponIconsPadding));
 		}
 	}
 
@@ -85,7 +83,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 		UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(EquippableTypesBox->GetSlots()[(EquippableTypesBox->GetChildrenCount() - 1)]);
 
 		if (MyBoxSlot) {
-			MyBoxSlot->SetPadding(FMargin(10, 10, 10, 10));
+			MyBoxSlot->SetPadding(FMargin(WeaponIconsPadding, WeaponIconsPadding, WeaponIconsPadding, WeaponIconsPadding));
 		}
 	}
 
@@ -103,7 +101,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 		UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(EquippableTypesBox->GetSlots()[(EquippableTypesBox->GetChildrenCount() - 1)]);
 
 		if (MyBoxSlot) {
-			MyBoxSlot->SetPadding(FMargin(10, 10, 10, 10));
+			MyBoxSlot->SetPadding(FMargin(WeaponIconsPadding, WeaponIconsPadding, WeaponIconsPadding, WeaponIconsPadding));
 		}
 	}
 
@@ -121,12 +119,13 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 		UHorizontalBoxSlot* const MyBoxSlot = CastChecked<UHorizontalBoxSlot>(EquippableTypesBox->GetSlots()[(EquippableTypesBox->GetChildrenCount() - 1)]);
 
 		if (MyBoxSlot) {
-			MyBoxSlot->SetPadding(FMargin(10, 10, 10, 10));
+			MyBoxSlot->SetPadding(FMargin(WeaponIconsPadding, WeaponIconsPadding, WeaponIconsPadding, WeaponIconsPadding));
 		}
 	}
 
 	ModuleNameText->SetText(FText::FromString(OtherModuleName));
 	ModuleRarityText->SetText(FText::FromString(AOPAG_ModuleBase::GetRarityName(OtherModuleRarity)));
+
 	switch (OtherModuleRarity)
 	{
 	case EModuleRarity::Common:
@@ -147,6 +146,7 @@ void UOPAG_UWNewModuleView::UpdateModuleValues(
 	default:
 		ModuleRarityText->SetColorAndOpacity(CommonColor);
 	}
+
 	ModuleTypeText->SetText(FText::FromString(AOPAG_ModuleBase::GetTypeName(OtherModuleType)));
 
 	AddStatEntry("Damage: ", (int)CurrentModuleStats.Damage, (int)OtherModuleStats.Damage);
@@ -204,10 +204,14 @@ void UOPAG_UWNewModuleView::AddStatEntry(FString StatName, float OldStat, float 
 	else DeltaSign = Zero;
 	
 	UOPAG_ModuleStatItem* item = NewObject<UOPAG_ModuleStatItem>(UOPAG_ModuleStatItem::StaticClass());
-	item->Init(StatName, FString::Printf(TEXT("%.2f"), NewStat),
+
+	item->Init(
+		StatName, 
+		FString::Printf(TEXT("%.2f"), NewStat),
 		Delta!=0 ? FString::Printf(TEXT("%.2f"), Delta) : FString(TEXT("-")),
 		DeltaSign,
 		bIsInverted);
+
 	StatsListView->AddItem(item);
 	item->MarkPendingKill();
 }
@@ -225,7 +229,7 @@ void UOPAG_UWNewModuleView::AddStatEntry(FString StatName, int OldStat, int NewS
 	item->Init(
 		StatName,
 		FString::Printf(TEXT("%d"), NewStat), 
-		Delta!=0 ? FString::Printf(TEXT("%d"), Delta) : FString(TEXT("-")),
+		Delta !=0 ? FString::Printf(TEXT("%d"), Delta) : FString(TEXT("-")),
 		DeltaSign,
 		bIsInverted);
 	StatsListView->AddItem(item);

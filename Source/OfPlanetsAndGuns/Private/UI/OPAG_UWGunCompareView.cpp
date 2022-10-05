@@ -14,25 +14,6 @@ void UOPAG_UWGunCompareView::UpdateGunValues(const FOPAG_GunStats& GunStats, con
 {
 	GunName->SetText(FText::FromString(OtherGunName));
 	GunType->SetText(FText::FromString(OtherGunFireType));
-
-	/*
-	switch (OtherGunType) {
-		case EFireTypes::FullyAutomatic:
-			GunType->SetText(FText::FromString("Fully Automatic"));
-			break;
-		case EFireTypes::Burst3:
-			GunType->SetText(FText::FromString("Burst3"));
-			break;
-		case EFireTypes::Shotgun:
-			GunType->SetText(FText::FromString("Shotgun"));
-			break;
-		case EFireTypes::SingleShot:
-			GunType->SetText(FText::FromString("Single Shot"));
-			break;
-		default:
-			break;
-	}
-	*/
 	UpdateSingleStat(DamageText, DamageAmount, DamageDelta, GunStats.Damage, OtherGunStats.Damage);
 	UpdateSingleStat(FireRateText, FireRateAmount, FireRateDelta, GunStats.FireRate, OtherGunStats.FireRate);
 	UpdateSingleStat(AccuracyText, AccuracyAmount, AccuracyDelta, GunStats.Accuracy, OtherGunStats.Accuracy);
@@ -68,7 +49,8 @@ void UOPAG_UWGunCompareView::UpdateSingleStat(UTextBlock* StatText, UTextBlock* 
 
 	StatAmount->SetText(UKismetTextLibrary::Conv_FloatToText(NewValue, ERoundingMode::FromZero, false, true, 1, 324, 2, 2));
 
-	DeltaString.Append(FString::SanitizeFloat(Delta, 2));
+	DeltaString.Append(FString::Printf(TEXT("%.2f"), Delta));
+
 	DeltaText->SetText(FText::FromString(DeltaString));
 }
 
