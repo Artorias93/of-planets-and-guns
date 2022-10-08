@@ -11,7 +11,8 @@
 AOPAG_MageEnemy::AOPAG_MageEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
+	
 	AbilityCaster = CreateDefaultSubobject<UOPAG_AbilityCasterComponent>("AbilityCaster");	
 }
 
@@ -69,6 +70,12 @@ void AOPAG_MageEnemy::Tick(float DeltaTime)
 
 void AOPAG_MageEnemy::CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern)
 {
+	UAnimInstance* const AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(CastAnimMontage, 1.f);
+	}	
+	
 	EMS->CastAbility.Broadcast(AbilityType, Caller, Target, AbilitySpawnPattern);
 }
 
