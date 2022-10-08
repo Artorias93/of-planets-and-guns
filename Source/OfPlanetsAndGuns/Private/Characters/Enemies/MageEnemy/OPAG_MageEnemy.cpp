@@ -73,6 +73,7 @@ void AOPAG_MageEnemy::CastAbilityRequest(EAbilityTypes AbilityType, AActor* Call
 	UAnimInstance* const AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("IN IF ANIMINSTANCE"));
 		AnimInstance->Montage_Play(CastAnimMontage, 1.f);
 	}	
 	
