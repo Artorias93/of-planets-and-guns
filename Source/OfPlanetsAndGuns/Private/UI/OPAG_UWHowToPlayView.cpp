@@ -7,6 +7,7 @@ void UOPAG_UWHowToPlayView::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	/*
 	CurrentPage = 0;
 
 	PagesList.Add(Pag0);
@@ -31,8 +32,9 @@ void UOPAG_UWHowToPlayView::NativeConstruct()
 	PreviousButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWHowToPlayView::PreviousButtonClicked);
 	NextButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWHowToPlayView::NextButtonClicked);
 	BackButton->OnClicked.AddUniqueDynamic(this, &UOPAG_UWHowToPlayView::BackButtonClicked);
+	*/
 }
-
+/*
 void UOPAG_UWHowToPlayView::PreviousButtonClicked()
 {
 	if(CurrentPage <= 0)
@@ -112,3 +114,4 @@ void UOPAG_UWHowToPlayView::BackButtonClicked()
 		MyHUD->SequencePlaySelection(HowToPlay, MainMenu);
 	}
 }
+*/
