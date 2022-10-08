@@ -49,6 +49,14 @@ void AOPAG_GameplayHUD::BeginPlay()
 
 	BindEvents();
 
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (PC)
+	{
+		PC->SetInputMode(FInputModeUIOnly());
+		PC->bShowMouseCursor = true;
+	}
+
 	if (PlayerStatsViewWidgetClass)
 	{
 		PlayerStatsViewWidget = CreateWidget<UOPAG_UWPlayerStatsView>(GetWorld(), PlayerStatsViewWidgetClass);
@@ -194,6 +202,14 @@ void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 	if (LoadingScreenViewWidget) 
 	{
 		LoadingScreenViewWidget->RemoveFromViewport();
+	}
+
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (PC)
+	{
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->bShowMouseCursor = false;
 	}
 }
 
