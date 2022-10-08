@@ -67,6 +67,11 @@ void UOPAG_UWPauseView::UpdateGoldValue(const int Value)
 void UOPAG_UWPauseView::UpdateGunValues(const FOPAG_GunStats GunStats,
 	const FString GunName, const FString GunFireType, const TArray<AOPAG_ModuleBase*> Modules)
 {
+	if (GunNameText)
+		GunNameText->SetText(FText::FromString(GunName));
+	if (GunType)
+		GunType->SetText(FText::FromString(GunFireType));
+
 	if (DamageAmount)
 		DamageAmount->SetText(UKismetTextLibrary::Conv_FloatToText(GunStats.Damage, ERoundingMode::FromZero, false, true, 1, 324, 2, 2));
 	if (FireRateAmount)

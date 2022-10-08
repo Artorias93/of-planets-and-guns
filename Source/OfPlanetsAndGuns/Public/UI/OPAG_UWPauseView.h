@@ -44,6 +44,12 @@ class OFPLANETSANDGUNS_API UOPAG_UWPauseView : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ClipSizeAmount;
 
+
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* GunNameText;
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* GunType;
+
 	UPROPERTY(meta = (BindWidget))
 		UListView* StatsListView;
 
