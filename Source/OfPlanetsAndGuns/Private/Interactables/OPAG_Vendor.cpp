@@ -202,6 +202,12 @@ void AOPAG_Vendor::Tick(float DeltaTime)
 		PriceTextRender_Module1->SetWorldRotation(LookToPlayerRotation3);
 		PriceTextRender_Module2->SetWorldRotation(LookToPlayerRotation4);
 	}
+
+	// show on gameplay HUD gold amount (spam calls it)
+	if (ShowingMerch && PlayerInVendorVolume) {
+		EMS->ShowGoldInGame.Broadcast();
+		//EMS->GoldChanged.Broadcast(Player->GetInventorySystemComponent()->GoldAmount);
+	}
 }
 
 // Overlap Begin
@@ -209,10 +215,8 @@ void AOPAG_Vendor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* O
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor);
 	if (Player != nullptr && Player->GetInventorySystemComponent() != nullptr) {
-		if (ShowingMerch) {
-			EMS->ShowGoldInGame.Broadcast();
-			EMS->GoldChanged.Broadcast(Player->GetInventorySystemComponent()->GoldAmount);
-		}
+		PlayerInVendorVolume = true;
+
 	}
 
 }
@@ -221,6 +225,7 @@ void AOPAG_Vendor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Oth
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	AOPAG_Player* Player = Cast<AOPAG_Player>(OtherActor);
 	if (Player != nullptr) {
+		PlayerInVendorVolume = false;
 		EMS->HideGoldInGame.Broadcast();
 		if (SMS)
 			SMS->StopRewardSound();

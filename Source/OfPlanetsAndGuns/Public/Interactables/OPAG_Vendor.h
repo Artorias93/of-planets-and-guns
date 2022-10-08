@@ -83,6 +83,8 @@ private:
 
 	UPROPERTY(Category = "OPAG | Vendor| Settings", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	float DifficultyMultiplierGun = 1.f;
+
+	bool PlayerInVendorVolume = false;
 	
 
 private:

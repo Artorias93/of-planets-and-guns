@@ -524,6 +524,7 @@ void AOPAG_Player::InitUICounters()
 
 	EMS->PotionsAmountChanged.Broadcast(InventorySystemComp->PotionsAmount);
 	EMS->BoltsAmountChanged.Broadcast(InventorySystemComp->BoltsAmount);
+	EMS->GoldChanged.Broadcast(InventorySystemComp->GoldAmount);
 }
 #pragma endregion Init
 
