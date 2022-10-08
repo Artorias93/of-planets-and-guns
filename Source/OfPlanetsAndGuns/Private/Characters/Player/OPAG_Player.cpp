@@ -679,7 +679,7 @@ void AOPAG_Player::SwapGuns()
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 
 		// Switch current ammo color
-		EMS->ColorAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent() == 0, CurrentGun->GetAmmoMax() < 30);
+		EMS->ColorAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent() == 0, true);
 
 		// Update current gun texture on Widget
 		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
