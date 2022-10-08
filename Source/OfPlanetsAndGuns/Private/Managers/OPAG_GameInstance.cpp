@@ -148,6 +148,11 @@ void UOPAG_GameInstance::LoadMainMenu()
 	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), MainMenuLevel);
 }
 
+void UOPAG_GameInstance::LoadTutorial()
+{
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), TutorialLevel);
+}
+
 void UOPAG_GameInstance::LoadEndCutscene()
 {
 	if (!CurrentPlanet->EndCutsceneLevel.IsNull())

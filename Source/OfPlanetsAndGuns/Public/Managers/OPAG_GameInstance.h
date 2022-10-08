@@ -46,6 +46,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main Menu")
 		TSoftObjectPtr<UWorld> MainMenuLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Main Menu")
+		TSoftObjectPtr<UWorld> TutorialLevel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FMOD | Audio Libraries")
 		UDataTable* WeaponsAudioLibrary;
@@ -87,6 +89,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void LoadMainMenu();
+	UFUNCTION(BlueprintCallable)
+		void LoadTutorial();
 	UFUNCTION(BlueprintCallable)
 		void LoadEndCutscene();
 

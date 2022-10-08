@@ -80,6 +80,8 @@ void UOPAG_UWPauseView::UpdateGunValues(const FOPAG_GunStats GunStats,
 	if (ClipSizeAmount)
 		ClipSizeAmount->SetText(UKismetTextLibrary::Conv_FloatToText(GunStats.ClipSize, ERoundingMode::FromZero, false, true, 1, 324, 2, 2));
 
+	StatsListView->ClearListItems();
+
 	for (AOPAG_ModuleBase* module : Modules) 
 	{
 		UOPAG_ModuleStatVertItem* item = NewObject<UOPAG_ModuleStatVertItem>(UOPAG_ModuleStatVertItem::StaticClass());

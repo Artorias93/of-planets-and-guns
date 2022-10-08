@@ -16,7 +16,7 @@ void UOPAG_UWOptionsView::NativeConstruct()
 	//BindEvents();
 	
 	EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
-	EMS->ApplySettings.AddDynamic(this, &UOPAG_UWOptionsView::LoadSettings);
+	EMS->ApplySettings.AddUniqueDynamic(this, &UOPAG_UWOptionsView::LoadSettings);
 	EMS->RequestSettings.Broadcast();
 
 	UGameUserSettings* GameUserSettings = Cast<UGameUserSettings>(GEngine->GetGameUserSettings());
