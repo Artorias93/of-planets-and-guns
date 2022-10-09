@@ -18,7 +18,7 @@ FProperty* UOPAG_TelemetryFunctionLibrary::RetrieveProperty(AActor* InActor, con
 
 	bool bSucceded = InPath.Split(".", &ObjectString, &PropertyString);
 
-	ensureAlways(bSucceded);
+	if (!bSucceded) ObjectString = "this";
 
 	UObject* TargetObject = nullptr;
 	if (ObjectString.Equals("this", ESearchCase::IgnoreCase))
