@@ -196,7 +196,7 @@ void UOPAG_SoundManagerSubsystem::PlayTurretSounds(AActor* weapon) {
 	FVector position = weapon->GetActorLocation();
 	FAudioEvent* libraryRow = nullptr;
 	if (WeaponsAudioLibrary) {
-		libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("Single_Fire"), "", false);
+		libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("Turret_Fire"), "", false);
 	}
 	if (libraryRow) {
 		UFMODEvent* currentEvent = libraryRow->AudioContent;

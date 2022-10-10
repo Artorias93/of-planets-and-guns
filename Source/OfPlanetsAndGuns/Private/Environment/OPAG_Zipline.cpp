@@ -68,7 +68,7 @@ void AOPAG_Zipline::Interact_Implementation()
 	UE_LOG(LogTemp, Warning, TEXT("INTERACT"));
 
 	if (SMS && !bIsPlayerRidingZipline)
-		SMS->PlayEnviromentSounds(this, EEnviromentSoundAction::Zipline_On);
+		SMS->PlayEnviromentSounds(PlayerRef, EEnviromentSoundAction::Zipline_On);
 
 	float deltaDistance = FVector::Distance(StartingPoint, EndingPoint);
 	float deltaTime = deltaDistance / 1000;
