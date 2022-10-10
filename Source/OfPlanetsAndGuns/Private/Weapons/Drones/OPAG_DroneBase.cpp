@@ -69,9 +69,11 @@ void AOPAG_DroneBase::BeginPlay()
 
 	SMS = GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
 	
+	// Spawn timeline
 	InitTimeline();
 	
-	GetWorld()->GetTimerManager().SetTimer(ShootingHandle, this, &AOPAG_DroneBase::FiendEnemisTimer, .5f, true);
+	// Init timer for find enemies
+	GetWorld()->GetTimerManager().SetTimer(ShootingHandle, this, &AOPAG_DroneBase::FindEnemisTimer, .5f, true);
 }
 
 // Called every frame
@@ -94,18 +96,6 @@ void AOPAG_DroneBase::InitTimeline()
 	SpawnTimeline->SetTimelineFinishedFunc(OnSpawnTimelineFinished);
 }
 
-void AOPAG_DroneBase::IdleMovement(float DeltaTime)
-{
-	FRotator NewRotation = !bIsReverse ? UKismetMathLibrary::RInterpTo_Constant(BoxCollision->GetRelativeRotation(), 
-		FRotator(.0f, .0f, -26.f), DeltaTime, InterpMovementSpeed) : UKismetMathLibrary::RInterpTo_Constant(BoxCollision->GetRelativeRotation(),
-		FRotator(.0f, .0f, 26.f), DeltaTime, InterpMovementSpeed);
-
-	BoxCollision->SetRelativeRotation(NewRotation);
-
-	if(BoxCollision->GetRelativeRotation().Roll < -25.f)	bIsReverse = true;
-	if(BoxCollision->GetRelativeRotation().Roll > 25.f) bIsReverse = false;
-}
-
 void AOPAG_DroneBase::DestroyDrone()
 {
 	if(ExplosionParticle == nullptr)	return;
@@ -115,7 +105,7 @@ void AOPAG_DroneBase::DestroyDrone()
 }
 
 #pragma region Shoot
-void AOPAG_DroneBase::FiendEnemisTimer()
+void AOPAG_DroneBase::FindEnemisTimer()
 {
 	TArray<FHitResult> OutHits;
 	TArray<AActor*> ActorsToIgnore;
@@ -171,7 +161,7 @@ void AOPAG_DroneBase::Shoot(AOPAG_Enemy* Enemy, const FVector TraceStartLocation
 	GetWorld()->SpawnActor(ProjectileTrace, &TracerTransform);
 
 	float EffectiveDamage = CalculateDamage();
-	Enemy->ReceiveDamage(EffectiveDamage, GetParentActor(), false); // temporarily crits set to false
+	Enemy->ReceiveDamage(EffectiveDamage, GetParentActor(), false); // temporarily crit set to false
 
 	// Implement sound ---
 }
@@ -277,3 +267,17 @@ void AOPAG_DroneBase::SpawnTimelineFinished()
 	BoxCollision->SetSimulatePhysics(false);
 }
 #pragma endregion Spawn methods
+
+#pragma region Temporaly
+void AOPAG_DroneBase::IdleMovement(float DeltaTime)
+{
+	FRotator NewRotation = !bIsReverse ? UKismetMathLibrary::RInterpTo_Constant(BoxCollision->GetRelativeRotation(),
+		FRotator(.0f, .0f, -26.f), DeltaTime, InterpMovementSpeed) : UKismetMathLibrary::RInterpTo_Constant(BoxCollision->GetRelativeRotation(),
+			FRotator(.0f, .0f, 26.f), DeltaTime, InterpMovementSpeed);
+
+	BoxCollision->SetRelativeRotation(NewRotation);
+
+	if (BoxCollision->GetRelativeRotation().Roll < -25.f)	bIsReverse = true;
+	if (BoxCollision->GetRelativeRotation().Roll > 25.f) bIsReverse = false;
+}
+#pragma endregion Temporaly
