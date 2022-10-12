@@ -42,6 +42,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UAnimMontage* CastAnimMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CastAnimMontagePlayRate = 1.f;
 	
 protected:
 
