@@ -4,6 +4,8 @@ AOPAG_AccessoryDrone::AOPAG_AccessoryDrone()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	AccessoryType = EAccessoryType::Drone;
+
 }
 
 void AOPAG_AccessoryDrone::BeginPlay()

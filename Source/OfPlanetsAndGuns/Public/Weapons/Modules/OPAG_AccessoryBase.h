@@ -29,6 +29,9 @@ protected:
 	UPROPERTY(Category = "Accessory Ability", EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FGameplayTagContainer PassiveAbilityTagContainer;
 
+	UPROPERTY(Category = "Accessory Type Description", EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true", ToolTip = "Fill in with the ability's name"))
+		EAccessoryType AccessoryType = EAccessoryType::None;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -42,4 +45,5 @@ public:
 	const TSubclassOf<UGameplayAbility> GetActiveAbility() const;
 	const TSubclassOf<UGameplayAbility> GetPassiveAbility() const;
 
+	FORCEINLINE EAccessoryType GetAccessoryType() const { return AccessoryType; }
 };

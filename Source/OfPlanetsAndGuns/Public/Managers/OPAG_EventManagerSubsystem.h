@@ -144,6 +144,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemovePassiveAbilityEffect, FGamepl
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateShieldDamage, const float, OpacityAmount);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateAccessoryInfo, const EAccessoryType, AccessoryType);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
@@ -265,6 +267,8 @@ public:
 		FLookedAtInteractable LookedAtInteractable;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
 		FUnlookedAtInteractable UnlookedAtInteractable;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FUpdateAccessoryInfo UpdateAccessoryInfo;
 
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)

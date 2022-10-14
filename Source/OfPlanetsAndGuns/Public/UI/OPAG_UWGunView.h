@@ -31,6 +31,7 @@ class OFPLANETSANDGUNS_API UOPAG_UWGunView : public UUserWidget
 		UTextBlock* TotalAmmoText;
 
 public:
+	//Guns textures
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Textures")
 		UTexture2D* RifleTexture2D;
 

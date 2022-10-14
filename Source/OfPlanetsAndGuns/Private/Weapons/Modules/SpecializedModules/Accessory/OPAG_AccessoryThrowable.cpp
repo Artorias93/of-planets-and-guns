@@ -3,7 +3,7 @@
 
 AOPAG_AccessoryThrowable::AOPAG_AccessoryThrowable()
 {
-
+	AccessoryType = EAccessoryType::Throwable;
 }
 
 void AOPAG_AccessoryThrowable::BeginPlay()
