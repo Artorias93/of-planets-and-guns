@@ -1074,9 +1074,15 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 		{
 			SMS->PlayAbiltySounds(PrimaryGun, EAbilitySoundAction::Module_PickUp);
 			AOPAG_MagazineBase* Magazine = Cast<AOPAG_MagazineBase>(Module);
-			if (Magazine) 
+			if (Magazine)
 			{
 				EMS->ColorAmmoChanged.Broadcast(false, CurrentGun->GetAmmoMax() < 30);
+			}
+
+			AOPAG_AccessoryBase* Accessory = Cast<AOPAG_AccessoryBase>(Module);
+			if (Accessory)
+			{
+				EMS->UpdateAccessoryInfo.Broadcast(Accessory->GetAccessoryType());
 			}
 
 			Module->Destroy();
@@ -1148,6 +1154,14 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 
 		// Update current gun texture on Widget
 		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
+
+		const AOPAG_AccessoryBase* const Accessory = 
+			Cast<AOPAG_AccessoryBase>(PrimaryGun->GetModuleBySocketType(EModuleTypes::Accessory));
+
+		const EAccessoryType AccessoryType = Accessory == nullptr ?
+			EAccessoryType::None : Accessory->GetAccessoryType();
+
+		EMS->UpdateAccessoryInfo.Broadcast(AccessoryType);
 	}
 
 	// Spawn the old primary gun in scene

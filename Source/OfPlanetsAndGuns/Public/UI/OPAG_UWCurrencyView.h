@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_UWCurrencyView.generated.h"
 
 /**
@@ -40,17 +41,6 @@ class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
 		UTextBlock* GoldText;
 
 public:
-	//Unused
-	UFUNCTION()
-		void IncrementPotionsAmount();
-	UFUNCTION()
-		void DecrementPotionsAmount();
-	//Unused
-	UFUNCTION()
-		void IncrementBoltsAmount();
-	UFUNCTION()
-		void DecrementBoltsAmount();
-	//
 
 	UFUNCTION()
 		void UpdateBoltsAmount(const int CurrentValue);
@@ -62,13 +52,12 @@ public:
 		void ShowGold(); 
 	UFUNCTION()
 		void HideGold();
+	UFUNCTION()
+		void UpdateAccessoryIcon(const EAccessoryType Value);
 
 	void NativeConstruct();
 
-	//Unused
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-		UTexture2D* PotionsIconTexture;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
-		UTexture2D* BoltsIconTexture;
-	//
+	//Accessories textures
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "OPAG | Widgets | Textures")
+		TArray<UTexture2D*> AccessoryTextures2D;
 };
