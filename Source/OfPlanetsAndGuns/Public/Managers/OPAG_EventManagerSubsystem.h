@@ -146,6 +146,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateShieldDamage, const float, Op
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateAccessoryInfo, const EAccessoryType, AccessoryType);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAccessoryProgressCooldown, float, Percentage);
+
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
 {
@@ -312,6 +314,9 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FUIButtonPressed UIButtonPressed;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+	FAccessoryProgressCooldown AccessoryProgressCooldown;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "OPAG | Events | UI")
 	FUpdateShieldDamage UpdateShieldDamage;

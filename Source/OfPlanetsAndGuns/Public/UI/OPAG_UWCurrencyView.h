@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -7,12 +5,10 @@
 #include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_UWCurrencyView.generated.h"
 
-/**
- * 
- */
 class UTextBlock;
 class UImage;
 class UHorizontalBox;
+class UProgressBar;
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
@@ -40,6 +36,9 @@ class OFPLANETSANDGUNS_API UOPAG_UWCurrencyView : public UUserWidget
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* GoldText;
 
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* AccessoryProgressBar;
+
 public:
 
 	UFUNCTION()
@@ -54,6 +53,8 @@ public:
 		void HideGold();
 	UFUNCTION()
 		void UpdateAccessoryIcon(const EAccessoryType Value);
+
+	UFUNCTION() void UpdateAccessoryProgressCooldown(float TimeProgress);
 
 	void NativeConstruct();
 

@@ -188,7 +188,7 @@ void AOPAG_Player::Tick(float DeltaTime)
 
 	//UE_LOG(LogTemp, Warning, TEXT("Health: %f"), AttributeSetPlayer->GetHealth());
 
-	// UpdateDashProgressBar();
+	UpdateAccessoryProgressBar();
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic)
@@ -964,17 +964,20 @@ void AOPAG_Player::OnPauseGame()
 
 }
 
-void AOPAG_Player::UpdateDashProgressBar()
+void AOPAG_Player::UpdateAccessoryProgressBar()
 {
 	FGameplayTagContainer TempTagsContainer;
-	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
+	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.shield.cooldown")));
+	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.drone.cooldown")));
 	float TimeRemaning;
 	float Duration;
 	bool bCheckResult = GetCooldownRemainingForTag(TempTagsContainer, TimeRemaning, Duration);
 	if(!bCheckResult)	return;
 
-	float TimeProgress = (Duration - TimeRemaning) / Duration;
-	EMS->UpdateDashProgressBar.Broadcast(TimeProgress);
+	float TimeProgress = TimeRemaning / Duration;
+	EMS->AccessoryProgressCooldown.Broadcast(TimeProgress);
+
+	UE_LOG(LogTemp, Warning, TEXT("TimeRemaning:%f, Duration:%f, TimeProgress:%f"), TimeRemaning, Duration, TimeProgress);
 }
 
 void AOPAG_Player::RelocateComponets()

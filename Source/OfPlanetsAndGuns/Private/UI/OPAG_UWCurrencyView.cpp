@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/OPAG_UWCurrencyView.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
@@ -9,6 +6,7 @@
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Blueprint/WidgetTree.h"
+#include "Components/ProgressBar.h"
 
 void UOPAG_UWCurrencyView::NativeConstruct() {
 	BindEvents();
@@ -25,6 +23,7 @@ void UOPAG_UWCurrencyView::BindEvents()
 		EMS->ShowGoldInGame.AddUniqueDynamic(this, &UOPAG_UWCurrencyView::ShowGold);
 		EMS->HideGoldInGame.AddUniqueDynamic(this, &UOPAG_UWCurrencyView::HideGold);
 		EMS->UpdateAccessoryInfo.AddUniqueDynamic(this, &UOPAG_UWCurrencyView::UpdateAccessoryIcon);
+		EMS->AccessoryProgressCooldown.AddUniqueDynamic(this, &UOPAG_UWCurrencyView::UpdateAccessoryProgressCooldown);
 	}
 
 	GoldIcon->SetVisibility(ESlateVisibility::Hidden);
@@ -77,4 +76,11 @@ void UOPAG_UWCurrencyView::UpdateAccessoryIcon(const EAccessoryType Value)
 	{
 		BoltsIcon->SetBrushFromTexture(AccessoryTextures2D[(int)Value]);
 	}
+}
+
+void UOPAG_UWCurrencyView::UpdateAccessoryProgressCooldown(float TimeProgress)
+{
+	AccessoryProgressBar->SetPercent(TimeProgress);
+
+	// if (DashProgressBar->Percent >= 1.f)	DashProgressBar->SetPercent(.0f);
 }

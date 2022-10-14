@@ -207,11 +207,12 @@ void AOPAG_DroneBase::FollowPlayer(float DeltaTime)
 	const FVector InterpMovement = FMath::VInterpConstantTo(GetActorLocation(), OffesetLocation, DeltaTime, MovementSpeed);
 	BoxCollision->SetWorldLocation(InterpMovement);
 
-	const FRotator TargetRotation = !bIsShooting ? (-Player->GetActorForwardVector()).Rotation() :
-		(-TargetEnemy->GetActorForwardVector()).Rotation();
+	FRotator TargetRotation = !bIsShooting ? UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PlayerLocation) :
+		UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetEnemy->GetActorLocation());
+	TargetRotation = FRotator(GetActorRotation().Pitch, TargetRotation.Yaw, GetActorRotation().Roll);
 	const FRotator IterpRotation = FMath::RInterpConstantTo(GetActorRotation(), TargetRotation, DeltaTime, RotationSpeed);
 	BoxCollision->SetWorldRotation(IterpRotation);
-
+	
 	// New Check Distance
 	float PlayerDistanceToSelf = FVector::Distance(OffesetLocation, GetActorLocation());
 	if (PlayerDistanceToSelf < 20.f)
