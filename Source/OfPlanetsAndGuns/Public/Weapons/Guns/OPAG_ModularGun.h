@@ -101,6 +101,7 @@ protected:
 	void UpdateStatsTotal();
 
 	// Create and Attach module behavior
+	UFUNCTION(BlueprintCallable)
 	void CreateModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> Module) const;
 	bool AttachModule(UChildActorComponent* ModuleSlot, const TSubclassOf<AOPAG_ModuleBase> NewModule, const
 	                  EModuleBrand NewModuleBrand, const FOPAG_GunStats NewModuleStats, const int NewModuleEquippableFireTypes) const;
@@ -176,6 +177,7 @@ public:
 	// Modules getter
 	AOPAG_ModuleBase* GetModule(const UChildActorComponent* const ChildComponent) const;
 	UChildActorComponent* GetSocketByModuleType(const EModuleTypes ModuleType) const;
+	UFUNCTION(BlueprintCallable)
 	AOPAG_ModuleBase* GetModuleBySocketType(const EModuleTypes ModuleType) const;
 	FName GetSocketNameByModuleType(const EModuleTypes ModuleType) const;
 

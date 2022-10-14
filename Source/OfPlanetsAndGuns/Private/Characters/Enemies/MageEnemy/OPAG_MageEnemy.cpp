@@ -11,7 +11,8 @@
 AOPAG_MageEnemy::AOPAG_MageEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
+	
 	AbilityCaster = CreateDefaultSubobject<UOPAG_AbilityCasterComponent>("AbilityCaster");	
 }
 
@@ -69,6 +70,13 @@ void AOPAG_MageEnemy::Tick(float DeltaTime)
 
 void AOPAG_MageEnemy::CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern)
 {
+	//Executes casting animation via montage
+	UAnimInstance* const AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(CastAnimMontage, CastAnimMontagePlayRate);
+	}	
+	
 	EMS->CastAbility.Broadcast(AbilityType, Caller, Target, AbilitySpawnPattern);
 }
 
@@ -85,7 +93,8 @@ void AOPAG_MageEnemy::Death()
 
 void AOPAG_MageEnemy::OnEnemyDeath(const AOPAG_Enemy* const Enemy)
 {
-	// when an enemy is killed, check if it's one of those casted by the mage, and if yes, untrack it by removing him from th array
+	// when an enemy is killed, check if it's one of those spawned by the mage, and if so untrack
+	// it by removing it from the array
 	if (CastedEnemiesList.Contains(Enemy))
 	{
 		CastedEnemiesList.Remove(Enemy);
@@ -114,17 +123,15 @@ void AOPAG_MageEnemy::OnBrokenForceField()
 {
 	FightStatus = EFightStatus::SecondPhase;
 
-	// since the force field has been broken, enable again the collisions
+	// since the force field has been broken, enable collisions again
 	GetMesh()->SetCollisionProfileName(TEXT("BlockAll"));
 	this->SetActorEnableCollision(true);
 
 	// change Blackboard value in order to change BT selection
-
 	if (AOPAG_AICBase* AIController = Cast<AOPAG_AICBase>(GetController()))
 	{
 		AIController->SetBlackboardEntryAsBool("bSecondStage", true);
 	}
-
 }
 
 FVector AOPAG_MageEnemy::GetRandomPointInRadius()
@@ -133,7 +140,6 @@ FVector AOPAG_MageEnemy::GetRandomPointInRadius()
 	{
 		if (const AOPAG_Enemy* const Enemy = Cast<AOPAG_Enemy>(AIController->GetPawn()))
 		{
-			const FVector ActorLocation = Enemy->GetActorLocation();
 			if (const UNavigationSystemV1* const NavSystem = UNavigationSystemV1::GetCurrent(GetWorld()))
 			{
 				//Gets the random point and writes it on the blackboard

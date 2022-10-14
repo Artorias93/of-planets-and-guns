@@ -46,6 +46,15 @@ enum class EModuleStatType : uint8
 	ClipSize
 };
 
+UENUM(BlueprintType)
+enum class EAccessoryType : uint8
+{
+	None,
+	Drone,
+	Throwable,
+	Shield
+};
+
 USTRUCT(BlueprintType)
 struct OFPLANETSANDGUNS_API FOPAG_SecondaryStatModifier : public FTableRowBase
 {

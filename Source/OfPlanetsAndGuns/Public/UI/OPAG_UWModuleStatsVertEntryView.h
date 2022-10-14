@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Blueprint/IUserObjectListEntry.h"
 #include "OPAG_UWModuleStatsVertEntryView.generated.h"
 
 /**
@@ -12,13 +13,16 @@
 class UTextBlock;
 
 UCLASS()
-class OFPLANETSANDGUNS_API UOPAG_UWModuleStatsVertEntryView : public UUserWidget
+class OFPLANETSANDGUNS_API UOPAG_UWModuleStatsVertEntryView : public UUserWidget, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
 protected:
-	void NativeConstruct();
+	// IUserObjectListEntry
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject) override;
 
+	UPROPERTY(meta = (BindWidget))
+		UTextBlock* StatsText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* DamageText;
 	UPROPERTY(meta = (BindWidget))
@@ -31,5 +35,4 @@ protected:
 		UTextBlock* ReloadingText;
 	UPROPERTY(meta = (BindWidget))
 		UTextBlock* ClipSizeText;
-
 };

@@ -5,8 +5,11 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
+#include "Weapons/Modules/OPAG_ModuleStats.h"
 #include "OPAG_UWNewModuleView.generated.h"
 
+enum class EModuleTypes : uint8;
+enum class EModuleRarity : uint8;
 class UImage;
 class UTextBlock;
 class UListView;
@@ -49,8 +52,16 @@ class OFPLANETSANDGUNS_API UOPAG_UWNewModuleView : public UUserWidget
 		UImage* ModuleBackground; 
 	UPROPERTY(meta = (BindWidget))
 		UImage* ModuleForeground;
+	
+	UPROPERTY(meta = (BindWidget))
+		UImage* ModuleBrandImage;
 
 public:
+
+	//Weapons textures padding
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float WeaponIconsPadding;
+
 	//Weapons textures
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UTexture2D* FullyAutomaticIconTexture;
@@ -60,6 +71,16 @@ public:
 		UTexture2D* ShotgunIconTexture;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UTexture2D* SingleShotIconTexture;
+
+	// Brand textures
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* BlobiusBrandTexture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* KaponianBrandTexture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* UronianBrandTexture;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UTexture2D* StandardBrandTexture;
 
 	//UI Colors
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -75,11 +96,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FSlateFontInfo AbilityTextFont;
 
+	//UI Rarity font color
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor CommonColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor UncommonColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor RareColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor EpicColor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FSlateColor LegendaryColor;
+	
 
 	UFUNCTION()
-	void UpdateModuleValues(const FOPAG_GunStats& CurrentModuleStats,const FOPAG_GunStats& OtherModuleStats, 
-		const FString OtherModuleName, const FString OtherModuleAbilityName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
-		const int EquippableTypes, const bool CanBeEquipped);
+	void UpdateModuleValues(const FOPAG_GunStats& CurrentModuleStats, const FOPAG_GunStats& OtherModuleStats,
+	                        const FString OtherModuleName, const FString OtherModuleAbilityName, const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType,
+	                        const EModuleBrand OtherModuleBrand, const int EquippableTypes, const bool CanBeEquipped);
 
 	void NativeConstruct();
 

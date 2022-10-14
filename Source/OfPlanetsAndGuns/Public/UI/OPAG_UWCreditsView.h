@@ -13,34 +13,17 @@ class OFPLANETSANDGUNS_API UOPAG_UWCreditsView : public UUserWidget
 	
 	//Variables
 
-	int CurrentPage;
-
 	UPROPERTY(meta = (BindWidget))
-	UCanvasPanel* Pag0;
-	UPROPERTY(meta = (BindWidget))
-	UCanvasPanel* Pag1;
-	UPROPERTY(meta = (BindWidget))
-	UCanvasPanel* Pag2;
-
-	UPROPERTY()
-	TArray<UCanvasPanel*> PagesList;
+	UCanvasPanel* CreditsPage;
 	
 private:
-	UPROPERTY(meta = (BindWidget))
-	UButton* PreviousButton;
-	UPROPERTY(meta = (BindWidget))
-	UButton* NextButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* BackButton;
 
 	//Functions
 	
 	void NativeConstruct();
-
-	UFUNCTION()
-	void PreviousButtonClicked();
-	UFUNCTION()
-	void NextButtonClicked();
+	
 	UFUNCTION()
 	void BackButtonClicked();	
 };

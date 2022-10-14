@@ -6,6 +6,17 @@
 #include "Components/ActorComponent.h"
 #include "OPAG_PlayerTelemetryComponent.generated.h"
 
+USTRUCT(BlueprintType)
+struct OFPLANETSANDGUNS_API FOPAG_TelemetryQuery
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FString Component;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FString Query;
+};
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class OFPLANETSANDGUNS_API UOPAG_PlayerTelemetryComponent : public UActorComponent
@@ -13,6 +24,7 @@ class OFPLANETSANDGUNS_API UOPAG_PlayerTelemetryComponent : public UActorCompone
 	GENERATED_BODY()
 
 	FString CurrentTelemetryList;
+	FString CurrentTelemetryPreset;
 
 	TArray<FString>	TelemetryArray;
 
@@ -24,9 +36,19 @@ class OFPLANETSANDGUNS_API UOPAG_PlayerTelemetryComponent : public UActorCompone
 
 	TArray<FTelemetryTarget> TelemetryTargets;
 
+
 public:	
 	// Sets default values for this component's properties
 	UOPAG_PlayerTelemetryComponent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Telemetry Presets")
+		TArray<FOPAG_TelemetryQuery> TelemetryQueriesPreset1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Telemetry Presets")
+		TArray<FOPAG_TelemetryQuery> TelemetryQueriesPreset2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player Telemetry Presets")
+		TArray<FOPAG_TelemetryQuery> TelemetryQueriesPreset3;
+
+
 
 private:
 	void UpdateTelemetryTargets();

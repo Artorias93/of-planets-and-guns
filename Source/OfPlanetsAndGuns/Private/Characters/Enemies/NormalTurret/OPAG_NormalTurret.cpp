@@ -33,7 +33,7 @@ AOPAG_NormalTurret::AOPAG_NormalTurret()
 		LaserBeam->SetVisibility(false);
 	}
 	
-	//SMS = GetWorld()->GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+	
 
 	
 }
@@ -79,8 +79,9 @@ void AOPAG_NormalTurret::StartShooting()
 
 	ShootLineTrace(StartLocation, TurretShootDirection);
 	
-	UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
-	//SMS->PlayTurretSounds(this);
+	//UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+	//UOPAG_SoundManagerSubsystem* SMS = GetWorld()->GetGameInstance<UOPAG_GameInstance>()->GetSoundManager();
+	SMS->PlayTurretSounds(this);
 
 	// activate shoot effect
 	UGameplayStatics::SpawnEmitterAttached(

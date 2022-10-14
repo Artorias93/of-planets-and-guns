@@ -188,7 +188,7 @@ void AOPAG_Player::Tick(float DeltaTime)
 
 	//UE_LOG(LogTemp, Warning, TEXT("Health: %f"), AttributeSetPlayer->GetHealth());
 
-	// UpdateDashProgressBar();
+	UpdateAccessoryProgressBar();
 }
 
 void AOPAG_Player::ReceiveDamage(const float Damage, AActor* const Causer, bool bCritic)
@@ -524,6 +524,7 @@ void AOPAG_Player::InitUICounters()
 
 	EMS->PotionsAmountChanged.Broadcast(InventorySystemComp->PotionsAmount);
 	EMS->BoltsAmountChanged.Broadcast(InventorySystemComp->BoltsAmount);
+	EMS->GoldChanged.Broadcast(InventorySystemComp->GoldAmount);
 }
 #pragma endregion Init
 
@@ -679,7 +680,7 @@ void AOPAG_Player::SwapGuns()
 		EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 
 		// Switch current ammo color
-		EMS->ColorAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent() == 0, CurrentGun->GetAmmoMax() < 30);
+		EMS->ColorAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent() == 0, true);
 
 		// Update current gun texture on Widget
 		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
@@ -803,7 +804,8 @@ void AOPAG_Player::Shoot()
 	CurrentGun->DecrementAmmoCurrent(AmmoConsumate);
 	EMS->CurrentAmmoChanged.Broadcast(CurrentGun->GetAmmoCurrent());
 
-	if (CurrentGun->GetAmmoCurrent() == 0)
+	if (CurrentGun->GetAmmoCurrent() == 0 ||
+		(CurrentGun->GetFireType() == EFireTypes::Burst3 && CurrentGun->GetAmmoCurrent() < 3))
 	{
 		// Update ui gun icon -> set linear color to red
 		EMS->ColorAmmoChanged.Broadcast(true, CurrentGun->GetAmmoMax() < 30);
@@ -940,24 +942,42 @@ void AOPAG_Player::OnPauseGame()
 	EMS->GoldChanged.Broadcast(GetInventorySystemComponent()->GoldAmount);
 
 	AOPAG_ModularGun* MyGun = GetPrimaryGun();
+
 	if (MyGun) 
 	{
-		EMS->PauseMenuGunChanged.Broadcast(MyGun->GetStatsTotal(), MyGun->GetGunName().ToString(), MyGun->GetFireTypeName(MyGun->GetFireType()));
+		const TArray<AOPAG_ModuleBase*> modules =
+		{
+			MyGun->GetModuleBySocketType(EModuleTypes::Accessory),
+			MyGun->GetModuleBySocketType(EModuleTypes::Barrel),
+			MyGun->GetModuleBySocketType(EModuleTypes::Grip),
+			MyGun->GetModuleBySocketType(EModuleTypes::Magazine),
+			MyGun->GetModuleBySocketType(EModuleTypes::Sight),
+			MyGun->GetModuleBySocketType(EModuleTypes::Stock)
+		};
+
+		EMS->PauseMenuGunChanged.Broadcast(
+			MyGun->GetStatsTotal(), 
+			MyGun->GetGunName().ToString(), 
+			MyGun->GetFireTypeName(MyGun->GetFireType()),
+			modules);
 	}
 
 }
 
-void AOPAG_Player::UpdateDashProgressBar()
+void AOPAG_Player::UpdateAccessoryProgressBar()
 {
 	FGameplayTagContainer TempTagsContainer;
-	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.movement.dash.cooldown")));
+	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.shield.cooldown")));
+	TempTagsContainer.AddTag(FGameplayTag::RequestGameplayTag(TEXT("char.ability.drone.cooldown")));
 	float TimeRemaning;
 	float Duration;
 	bool bCheckResult = GetCooldownRemainingForTag(TempTagsContainer, TimeRemaning, Duration);
 	if(!bCheckResult)	return;
 
-	float TimeProgress = (Duration - TimeRemaning) / Duration;
-	EMS->UpdateDashProgressBar.Broadcast(TimeProgress);
+	float TimeProgress = TimeRemaning / Duration;
+	EMS->AccessoryProgressCooldown.Broadcast(TimeProgress);
+
+	UE_LOG(LogTemp, Warning, TEXT("TimeRemaning:%f, Duration:%f, TimeProgress:%f"), TimeRemaning, Duration, TimeProgress);
 }
 
 void AOPAG_Player::RelocateComponets()
@@ -1057,9 +1077,15 @@ void AOPAG_Player::PickupModule(AOPAG_ModuleBase* Module)
 		{
 			SMS->PlayAbiltySounds(PrimaryGun, EAbilitySoundAction::Module_PickUp);
 			AOPAG_MagazineBase* Magazine = Cast<AOPAG_MagazineBase>(Module);
-			if (Magazine) 
+			if (Magazine)
 			{
 				EMS->ColorAmmoChanged.Broadcast(false, CurrentGun->GetAmmoMax() < 30);
+			}
+
+			AOPAG_AccessoryBase* Accessory = Cast<AOPAG_AccessoryBase>(Module);
+			if (Accessory)
+			{
+				EMS->UpdateAccessoryInfo.Broadcast(Accessory->GetAccessoryType());
 			}
 
 			Module->Destroy();
@@ -1131,6 +1157,14 @@ void AOPAG_Player::PickupGun(AOPAG_ModularGun* Gun)
 
 		// Update current gun texture on Widget
 		EMS->SwapGunTexture.Broadcast(CurrentGun->GetFireType());
+
+		const AOPAG_AccessoryBase* const Accessory = 
+			Cast<AOPAG_AccessoryBase>(PrimaryGun->GetModuleBySocketType(EModuleTypes::Accessory));
+
+		const EAccessoryType AccessoryType = Accessory == nullptr ?
+			EAccessoryType::None : Accessory->GetAccessoryType();
+
+		EMS->UpdateAccessoryInfo.Broadcast(AccessoryType);
 	}
 
 	// Spawn the old primary gun in scene
@@ -1297,8 +1331,19 @@ void AOPAG_Player::UpdateComparison() {
 			if (Accessory)
 				AbilityDescription = Accessory->AbilityDescription;
 
-			EMS->LookedAtModule.Broadcast(CurrentModuleStats, Module->GetStats(),
-				Module->GetModuleName(), AbilityDescription, Module->GetRarity(), Module->GetType(), Module->GetEquippableFireTypes(), CanBeEquipped);
+			EMS->LookedAtModule.Broadcast(
+				CurrentModuleStats,
+				Module,
+				CanBeEquipped);
+			// EMS->LookedAtModule.Broadcast(
+			// 	CurrentModuleStats,
+			// 	Module->GetStats(),
+			// 	Module->GetModuleName(),
+			// 	AbilityDescription,
+			// 	Module->GetRarity(),
+			// 	Module->GetType(),
+			// 	Module->GetEquippableFireTypes(),
+			// 	CanBeEquipped);
 
 			PreviousLookedAtModule = InteractableObject;
 		}

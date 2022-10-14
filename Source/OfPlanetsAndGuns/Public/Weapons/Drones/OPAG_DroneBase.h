@@ -106,7 +106,7 @@ protected:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void FiendEnemisTimer();
+	virtual void FindEnemisTimer();
 	virtual void Shoot(AOPAG_Enemy* Enemy, const FVector TraceStartLocation, const FRotator EffectiveRotation);
 
 	void InitTimeline();

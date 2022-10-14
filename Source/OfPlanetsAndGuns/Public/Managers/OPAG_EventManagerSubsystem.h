@@ -10,6 +10,7 @@
 #include "Characters/Player/OPAG_PlayerState.h"
 #include "OPAG_Settings.h"
 #include "Abilities/OPAG_AbilityTypes.h"
+// #include "Weapons/Modules/OPAG_ModuleBase.h"
 #include "OPAG_EventManagerSubsystem.generated.h"
 
 class AOPAG_RoomStreamingVolume;
@@ -58,8 +59,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FShieldChanged, float, CurrentVal
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAmmoChanged, int, CurrentValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FColorAmmoChanged, bool, bIsAmmoCurrentUnload, bool, bIsAmmoMaxUnload);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPauseGame);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FPauseMenuGunChanged, const FOPAG_GunStats, GunStats, 
-const FString, GunName, const FString, GunFireType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FPauseMenuGunChanged, const FOPAG_GunStats, GunStats, 
+const FString, GunName, const FString, GunFireType, const TArray<AOPAG_ModuleBase*>, Modules);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FResumeGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FQuitGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSoundSliderChanged, float, CurrentValue);
@@ -90,9 +91,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtInteractable);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FShowGoldInGame);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FHideGoldInGame);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_EightParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, 
-const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const FString, OtherModuleAbilityName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
-const int, EquippableTypes, const bool, CanBeEquipped);
+// DECLARE_DYNAMIC_MULTICAST_DELEGATE_EightParams(FLookedAtModule, const FOPAG_GunStats, CurrentModule, 
+// const FOPAG_GunStats, OtherModule, const FString, OtherModuleName, const FString, OtherModuleAbilityName, const EModuleRarity, OtherModuleRarity, const EModuleTypes, OtherModuleType,
+// const int, EquippableTypes, const bool, CanBeEquipped);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FLookedAtModule,
+	const FOPAG_GunStats, CurrentModuleStats,
+	const AOPAG_ModuleBase * const, OtherModule,
+	const bool, CanBeEquipped);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUnlookedAtModule);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FLookedAtGun, const FOPAG_GunStats, GunStats, 
@@ -138,6 +143,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActivePassiveAbilityEffect, TSubcla
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRemovePassiveAbilityEffect, FGameplayTagContainer, PassiveAbilityTagContainer);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateShieldDamage, const float, OpacityAmount);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FUpdateAccessoryInfo, const EAccessoryType, AccessoryType);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAccessoryProgressCooldown, float, Percentage);
 
 UCLASS()
 class OFPLANETSANDGUNS_API UOPAG_EventManagerSubsystem : public UGameInstanceSubsystem
@@ -260,6 +269,8 @@ public:
 		FLookedAtInteractable LookedAtInteractable;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
 		FUnlookedAtInteractable UnlookedAtInteractable;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Gun)
+		FUpdateAccessoryInfo UpdateAccessoryInfo;
 
     //Enemy stuff
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = EnemyManager)
@@ -303,6 +314,9 @@ public:
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
 		FUIButtonPressed UIButtonPressed;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = Game)
+	FAccessoryProgressCooldown AccessoryProgressCooldown;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable, Category = "OPAG | Events | UI")
 	FUpdateShieldDamage UpdateShieldDamage;

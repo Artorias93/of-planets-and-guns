@@ -9,17 +9,12 @@
 
 #include "RenderUtils.h"
 #include "Characters/Player/OPAG_Player.h"
+#include "Misc/DefaultValueHelper.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "Weapons/Guns/OPAG_ModularGun.h"
 #include "Weapons/Modules/OPAG_ModuleBase.h"
 
 #pragma optimize("", off)
-
-static TAutoConsoleVariable<bool> ConsoleVarTelemetry(
-	TEXT("showdebug PlayerTelemetry"),
-	false,
-	TEXT("Toggles display of Player telemetry."),
-	ECVF_Default);
 
 static TAutoConsoleVariable<FString> ConsoleVarTelemetryList(
 	TEXT("PlayerTelemetry.List"),
@@ -31,6 +26,12 @@ static TAutoConsoleVariable<FString> ConsoleVarTelemetryStats(
 	TEXT("PlayerTelemetry.Stats"),
 	TEXT("Weapon"),
 	TEXT("Get Weapon or specific Module stats"),
+	ECVF_Default);
+
+static TAutoConsoleVariable<FString> ConsoleVarTelemetryPreset(
+	TEXT("PlayerTelemetry.Preset"),
+	TEXT(""),
+	TEXT("Use Player Telemetry preset"),
 	ECVF_Default);
 
 
@@ -49,8 +50,9 @@ void UOPAG_PlayerTelemetryComponent::UpdateTelemetryTargets()
 {
 
 	FString TelemetryList = ConsoleVarTelemetryList.GetValueOnGameThread();
+	FString TelemetryPreset = ConsoleVarTelemetryPreset.GetValueOnGameThread();
 
-	if (CurrentTelemetryList.Compare(TelemetryList) != 0)
+	if (CurrentTelemetryList.Compare(TelemetryList) != 0 || CurrentTelemetryPreset.Compare(TelemetryPreset) != 0)
 	{
 		TelemetryTargets.Reset();
 
@@ -71,7 +73,44 @@ void UOPAG_PlayerTelemetryComponent::UpdateTelemetryTargets()
 			}
 		}
 
+		if (TelemetryPreset.Len() > 0)
+		{
+			int presetVal = 0;
+			if (FDefaultValueHelper::ParseInt(TelemetryPreset, presetVal))
+			{
+				TArray<FOPAG_TelemetryQuery>* Queries = nullptr;
+				switch (presetVal)
+				{
+				case 1:
+					Queries = &TelemetryQueriesPreset1; break;
+				case 2:
+					Queries = &TelemetryQueriesPreset2; break;
+				case 3:
+					Queries = &TelemetryQueriesPreset3; break;
+				default: break;
+				}
+
+				if (Queries)
+				{
+					for (FOPAG_TelemetryQuery& Query : *Queries)
+					{
+						void* Object = nullptr;
+						FString Telemetry = Query.Component.Len() > 0 ? (Query.Component + "." + Query.Query) : Query.Query;
+						TelemetryArray.Add(Telemetry);
+						FProperty* Property = UOPAG_TelemetryFunctionLibrary::RetrieveProperty(GetOwner(), Telemetry, Object);
+
+						FTelemetryTarget Target;
+						Target.TargetObject = Object;
+						Target.TargetProperty = Property;
+
+						TelemetryTargets.Add(Target);
+					}
+				}
+			}
+		}
+
 		CurrentTelemetryList = TelemetryList;
+		CurrentTelemetryPreset = TelemetryPreset;
 	}
 }
 

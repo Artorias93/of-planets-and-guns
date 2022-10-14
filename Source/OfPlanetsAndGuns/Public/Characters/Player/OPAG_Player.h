@@ -361,7 +361,7 @@ private:
 	void OnPauseGame();
 
 	// Dash
-	void UpdateDashProgressBar();
+	void UpdateAccessoryProgressBar();
 
 private:
 	UFUNCTION() void TeleportPlayerToStart(FTransform StartLocation);

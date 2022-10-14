@@ -158,7 +158,7 @@ float UOPAG_SoundManagerSubsystem::GetBusVolume(EBusNames busName){
 	if (bus) {
 		bus->getVolume(currentVol);
 	}
-	float returnValue;
+	float returnValue = 0.f;
 	if (currentVol) {
 		//returnValue = *currentVol;
 		//returnValue = (*currentVol - dBToLinear(minVolumeDB)) / dBToLinear(maxVolumeDB) - dBToLinear(minVolumeDB);
@@ -196,7 +196,7 @@ void UOPAG_SoundManagerSubsystem::PlayTurretSounds(AActor* weapon) {
 	FVector position = weapon->GetActorLocation();
 	FAudioEvent* libraryRow = nullptr;
 	if (WeaponsAudioLibrary) {
-		libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("Single_Fire"), "", false);
+		libraryRow = WeaponsAudioLibrary->FindRow<FAudioEvent>(*FString("Turret_Fire"), "", false);
 	}
 	if (libraryRow) {
 		UFMODEvent* currentEvent = libraryRow->AudioContent;
@@ -302,7 +302,7 @@ void UOPAG_SoundManagerSubsystem::PlayEnviromentSounds(AActor* actor, EEnviromen
 	}
 }
 
-// Sbatti quando è empty
+// Sbatti quando ï¿½ empty
 void UOPAG_SoundManagerSubsystem::PlayWeaponsFireSound(AOPAG_GunBase* weapon) {
 	FVector position = weapon->GetActorLocation();
 	EFireTypes weaponType = weapon->GetFireType();

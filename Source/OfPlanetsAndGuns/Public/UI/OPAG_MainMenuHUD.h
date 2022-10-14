@@ -53,7 +53,7 @@ public:
 	
 	virtual void DrawHUD() override;
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SequencePlaySelection(const EMenuScreen From, const EMenuScreen To) const;
 
 protected:

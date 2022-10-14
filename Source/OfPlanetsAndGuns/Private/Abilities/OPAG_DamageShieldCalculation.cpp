@@ -20,8 +20,9 @@ void UOPAG_DamageShieldCalculation::Execute_Implementation(const FGameplayEffect
 	const UAbilitySystemComponent* const Target = ExecutionParams.GetTargetAbilitySystemComponent();
 	const UAbilitySystemComponent* const Source = ExecutionParams.GetSourceAbilitySystemComponent();
 
-	AActor* TargetActor = Target ? Target->AvatarActor : nullptr;
-	AActor* SourceActor = Source ? Source->AvatarActor : nullptr;
+	//TODO: Unused local variables?
+	AActor* TargetActor = Target ? Target->GetAvatarActor() : nullptr;
+	AActor* SourceActor = Source ? Source->GetAvatarActor() : nullptr;
 
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();

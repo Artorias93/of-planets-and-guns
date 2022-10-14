@@ -82,5 +82,5 @@ protected:
 	UPROPERTY()
 		FVector TurretShootDirection = FVector::ZeroVector;
 
-	class UOPAG_SoundManagerSubsystem* SMS;
+	//class UOPAG_SoundManagerSubsystem* SMS;
 };

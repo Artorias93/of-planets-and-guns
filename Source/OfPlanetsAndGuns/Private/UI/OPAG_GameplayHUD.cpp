@@ -10,12 +10,14 @@
 #include "UI/OPAG_UWDamageIndicatorView.h"
 #include "UI/OPAG_UWGameOverView.h"
 #include "UI/OPAG_UWOptionsView.h"
-#include "UI/OPAG_UWPauseMenuGunView.h"
 #include "Managers/OPAG_GameInstance.h"
 #include "Managers/OPAG_EventManagerSubsystem.h"
 #include "Weapons/Guns/OPAG_GunStats.h"
 #include "UI/OPAG_PlayerStatus.h"
+#include "Weapons/Modules/OPAG_AccessoryBase.h"
 
+
+class AOPAG_AccessoryBase;
 
 void AOPAG_GameplayHUD::DrawHUD() 
 {
@@ -26,7 +28,7 @@ void AOPAG_GameplayHUD::BindEvents() {
 	UOPAG_EventManagerSubsystem* EMS = GetGameInstance<UOPAG_GameInstance>()->GetEventManager();
 	if (EMS) 
 	{
-		EMS->PauseGame.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
+		EMS->PauseMenuGunChanged.AddDynamic(this, &AOPAG_GameplayHUD::ShowPauseView);
 		EMS->LoadingProgress.AddDynamic(this, &AOPAG_GameplayHUD::UpdateLoadingScreenBar);
 		EMS->StageLoaded.AddDynamic(this, &AOPAG_GameplayHUD::HideLoadingScreenView);
 		EMS->LookedAtModule.AddDynamic(this, &AOPAG_GameplayHUD::ShowModuleCompareView);
@@ -46,6 +48,14 @@ void AOPAG_GameplayHUD::BeginPlay()
 	Super::BeginPlay();
 
 	BindEvents();
+
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (PC)
+	{
+		PC->SetInputMode(FInputModeUIOnly());
+		PC->bShowMouseCursor = true;
+	}
 
 	if (PlayerStatsViewWidgetClass)
 	{
@@ -126,14 +136,10 @@ void AOPAG_GameplayHUD::BeginPlay()
 			PlayerStatusViewWidget->AddToViewport(0);
 		}
 	}
-
-	if (PauseMenuGunViewWidgetClass != nullptr)
-	{
-		PauseMenuGunViewWidget = CreateWidget<UOPAG_UWPauseMenuGunView>(GetWorld(), PauseMenuGunViewWidgetClass);
-	}
 }
 
-void AOPAG_GameplayHUD::ShowPauseView() 
+void AOPAG_GameplayHUD::ShowPauseView(const FOPAG_GunStats GunStats,
+	const FString GunName, const FString GunFireType, const TArray<AOPAG_ModuleBase*> Modules)
 {
 
 	APlayerController* PC = GetWorld()->GetFirstPlayerController();
@@ -147,13 +153,8 @@ void AOPAG_GameplayHUD::ShowPauseView()
 	if (PauseViewWidget) 
 	{
 		PauseViewWidget->AddToViewport(2);
+		PauseViewWidget->UpdateGunValues(GunStats, GunName, GunFireType, Modules);
 	}
-	/*
-	if (PauseMenuGunViewWidget) 
-	{
-		PauseMenuGunViewWidget->AddToViewport(3);
-	}
-	*/
 }
 
 void AOPAG_GameplayHUD::HidePauseView() {
@@ -169,7 +170,6 @@ void AOPAG_GameplayHUD::HidePauseView() {
 	if (PauseViewWidget) 
 	{
 		PauseViewWidget->RemoveFromViewport();
-		//PauseMenuGunViewWidget->RemoveFromViewport();
 	}
 
 	if (OptionsViewWidget) 
@@ -194,7 +194,7 @@ void AOPAG_GameplayHUD::UpdateLoadingScreenBar(float Percentage)
 
 void AOPAG_GameplayHUD::ShowLoadingScreenView()
 {
-	//TODO: Empty Function
+
 }
 
 void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
@@ -203,29 +203,42 @@ void AOPAG_GameplayHUD::HideLoadingScreenView(int32 RoomCount)
 	{
 		LoadingScreenViewWidget->RemoveFromViewport();
 	}
+
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	if (PC)
+	{
+		PC->SetInputMode(FInputModeGameOnly());
+		PC->bShowMouseCursor = false;
+	}
 }
 
-void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModule, 
-	const FOPAG_GunStats OtherModule, const FString OtherModuleName, const FString OtherModuleAbilityName, 
-	const EModuleRarity OtherModuleRarity, const EModuleTypes OtherModuleType, const int EquippableTypes, 
-	const bool CanBeEquipped)
+void AOPAG_GameplayHUD::ShowModuleCompareView(const FOPAG_GunStats CurrentModuleStats,
+                                              const AOPAG_ModuleBase* const OtherModule,
+                                              const bool CanBeEquipped)
 {
 	if (GunCompareViewWidget->IsInViewport())
 		HideGunCompareView();
 
 	if (ModuleViewWidget) 
 	{
-		if (ModuleViewWidget->IsInViewport()) 
-		{
-			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleAbilityName, 
-				OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
-		}
-		else 
+		if (!ModuleViewWidget->IsInViewport()) 
 		{
 			ModuleViewWidget->AddToViewport(3);
-			ModuleViewWidget->UpdateModuleValues(CurrentModule, OtherModule, OtherModuleName, OtherModuleAbilityName, 
-				OtherModuleRarity, OtherModuleType, EquippableTypes, CanBeEquipped);
 		}
+		
+		const AOPAG_AccessoryBase* Accessory = Cast<AOPAG_AccessoryBase>(OtherModule);
+		FString AbilityDescription = Accessory ? Accessory->AbilityDescription : "";
+		
+		ModuleViewWidget->UpdateModuleValues(
+			CurrentModuleStats,
+			OtherModule->GetStats(),
+			OtherModule->GetModuleName(),
+			AbilityDescription,
+			OtherModule->GetRarity(),
+			OtherModule->GetType(),
+			OtherModule->GetBrand(),
+			OtherModule->GetEquippableFireTypes(), CanBeEquipped);
 	}
 }
 
@@ -287,7 +300,7 @@ void AOPAG_GameplayHUD::ShowInteractView(bool bCanInteract, const FString Intera
 	{
 		if (!InteractViewWidget->IsInViewport())
 		{
-			InteractViewWidget->AddToViewport(3);
+			InteractViewWidget->AddToViewport(2);
 		}
 
 		InteractViewWidget->UpdateInteractText(bCanInteract, InteractText);

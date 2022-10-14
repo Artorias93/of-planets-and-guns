@@ -39,6 +39,12 @@ public:
 
 
 	void CastAbilityRequest(EAbilityTypes AbilityType, AActor* Caller, AActor* Target, EAbilitySpawnPattern AbilitySpawnPattern);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* CastAnimMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float CastAnimMontagePlayRate = 1.f;
 	
 protected:
 
@@ -60,12 +66,13 @@ protected:
 		TArray<TSoftObjectPtr<AOPAG_Enemy>> CastedEnemiesList;
 
 private:
-		void Init();
-		float GetGroundHeight();
-		
-		EFightStatus FightStatus = EFightStatus::FirstPhase;
+	
+	void Init();
+	float GetGroundHeight();
+	
+	EFightStatus FightStatus = EFightStatus::FirstPhase;
 
-		// vars to track if the enemy life is at or lower a specific value
-		bool bHealth25 = false;
-		bool bHealth50 = false;
+	// vars to track if the enemy life is at or lower a specific value
+	bool bHealth25 = false;
+	bool bHealth50 = false;
 };
